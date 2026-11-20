@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Culture — KalshiDash1</title>
+<meta name="description" content="Live Kalshi demo markets and resolutions for culture.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="category" data-category="culture">
+<header class="top"><div class="wrap top-inner">
+  <div class="brand">Kalshi<span>Dash1</span> <span class="badge">DEMO — mock funds</span></div>
+  <nav class="main"><a href="index.html">Dashboard</a><a href="executive-summary.html">Executive Summary</a><a href="events.html">Events &amp; Resolutions</a><a href="portfolio.html">Portfolio</a><a href="trade.html">Trade</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for Review</a></nav>
+</div></header>
+<main class="wrap">
+  <h1 id="cat-title">Culture</h1>
+  <ul class="subnav"><a href="gas-prices.html">Gas prices</a><a href="elections.html">Elections</a><a class="active" href="culture.html">Culture</a><a href="crypto.html">Crypto</a><a href="golf.html">Golf</a><a href="../index.html">← Site landing</a></ul>
+  <p class="muted">Markets on awards, box office and entertainment outcomes. Rows are fetched live from the Kalshi <strong>demo</strong> API in your browser — never hard-coded. Ranking is by <strong>estimated traded notional</strong> (<code>volume_fp × last price</code>); see <a href="methodology.html">Methodology</a>.</p>
+  <div class="row">
+    <div><span id="live-status" class="badge warn">CONNECTING…</span> <span id="cat-note" class="muted small"></span></div>
+    <div class="auto"><label class="switch"><input type="checkbox" id="cat-auto"> auto-refresh 30s</label> <button id="cat-refresh" class="secondary">↻ Refresh</button> <a class="btn" href="index.html">Open live chart</a></div>
+  </div>
+  <div id="dash-error" class="notice err" style="display:none"></div>
+
+  <h2>Open markets (highest estimated dollar amount first)</h2>
+  <div class="card tablewrap"><table>
+    <thead><tr><th>#</th><th>Market</th><th class="num">Est. notional (total)</th><th class="num">Est. notional (24h)</th><th class="num">Volume</th><th class="num">Last price</th><th class="num">Open interest</th><th>Close time</th><th></th></tr></thead>
+    <tbody id="cat-markets"><tr><td colspan="9" class="muted">Loading…</td></tr></tbody>
+  </table></div>
+  <p class="muted small"><code>volume_fp</code>, <code>volume_24h_fp</code>, <code>open_interest_fp</code> and <code>close_time</code> are documented fields of <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">GET /markets</a>; “est. notional” is our calculation, not a Kalshi field. Blank cells mean the API did not return a value — we never infer one.</p>
+
+  <h2>Resolutions (settled markets)</h2>
+  <div class="card tablewrap"><table>
+    <thead><tr><th>Market</th><th>Status</th><th>Resolution (YES/NO)</th><th>Settled at</th><th class="num">Settlement value</th><th class="num">Est. notional</th></tr></thead>
+    <tbody id="cat-events"><tr><td colspan="6" class="muted">Loading…</td></tr></tbody>
+  </table></div>
+  <p class="muted small">Resolution comes only from the API <code>result</code> field (<code>yes</code>/<code>no</code>/<code>scalar</code>/empty) with <code>settlement_ts</code> and <code>settlement_value_dollars</code> — <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>. A settled market whose <code>result</code> is empty is shown as such instead of being guessed.</p>
+
+  <h2>Series included in this category (audit)</h2>
+  <p class="muted small">Discovery rule: a live <code>GET /series</code> row is included when its <code>title</code>, <code>category</code>, <code>categories[]</code> or ticker matches this category's keyword list (see <a href="methodology.html">Methodology</a>). If a market you expected is missing, it is because no series matched — flag it on <a href="flagged.html">Flagged for Review</a> rather than editing data.</p>
+  <div class="card tablewrap"><table>
+    <thead><tr><th>Series ticker</th><th>Title</th><th>Primary category</th><th>Categories</th><th class="num">Series volume (fp)</th></tr></thead>
+    <tbody id="cat-series"><tr><td colspan="5" class="muted">Loading…</td></tr></tbody>
+  </table></div>
+
+  <div class="notice"><strong>Not financial advice.</strong> Demo prices “may not be reflective of those in real markets” — <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">official demo docs</a>. Paper trades in the <a href="trade.html">simulator</a> are recorded in your browser only.</div>
+</main>
+<footer><div class="wrap">KalshiDash1 · Demo data only · Not financial advice · <a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for Review</a></div></footer>
+<script src="assets/kalshi.js"></script><script src="assets/chart.js"></script><script src="assets/app.js"></script>
+</body>
+</html>

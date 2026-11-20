@@ -1,0 +1,36 @@
+name: Site build check
+
+# GitHub Pages serves the repository root from main (legacy source). This workflow
+# rebuilds the generated site and fails if it is stale or has broken internal links.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Regenerate site, check links, check JS syntax
+        run: |
+          node scripts/build-site.mjs
+          node scripts/check-links.mjs
+          node --check assets/app.js
+      - name: Fail if the committed site is stale
+        run: git diff --exit-code -- '*.html' assets categories

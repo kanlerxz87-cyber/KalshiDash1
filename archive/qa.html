@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q&amp;A — Pre-Decision Questions — KalshiDash1</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">Kalshi<span class="em">Dash1</span></div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="categories/gas.html">Gas Prices</a>
+      <a href="categories/elections.html">Elections</a>
+      <a href="categories/culture.html">Culture</a>
+      <a href="categories/crypto.html">Crypto</a>
+      <a href="categories/golf.html">Golf</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="qa.html" class="active">Q&amp;A</a>
+      <a href="flagged.html">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <h1 class="page-title">Questions &amp; Answers — Pre-Decision Review</h1>
+  <p class="page-sub">Clear list of questions, information, and answers that must be addressed before any decision can reasonably be made. Items we do not have are flagged as missing, with suggestions to discover them.</p>
+
+  <div class="card">
+    <h3>How to use</h3>
+    <p style="font-size:0.9rem;color:#334155;">Every decision based on this dashboard should wait until the questions below are answered. "Missing" means the information is not available from an official source or was not provided to this session.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Question register</h2>
+    <table class="wide">
+      <thead>
+        <tr>
+          <th style="width:6%;">#</th>
+          <th style="width:30%;">Question / information needed</th>
+          <th style="width:30%;">Answer / current state</th>
+          <th style="width:16%;">Status</th>
+          <th style="width:18%;">How to discover missing info</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Kalshi demo API credentials (API key + secret) for the account to track.</td>
+          <td><strong>Missing</strong> — not provided to this session; never hardcode credentials.</td>
+          <td><span class="badge badge-warn">Missing</span></td>
+          <td>User creates a demo account at <a href="https://demo.kalshi.co/" target="_blank" rel="noopener">demo.kalshi.co</a> and generates an API key (<a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener">API Keys docs</a>).</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Which demo account balance / portfolio to track.</td>
+          <td><strong>Missing</strong> — no account specified.</td>
+          <td><span class="badge badge-warn">Missing</span></td>
+          <td>Provide the demo account identifier; query <code>GET /balance</code>.</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Live market prices for gas, elections, culture, crypto, golf events.</td>
+          <td><strong>Missing</strong> — sandbox cannot call kalshi.co.</td>
+          <td><span class="badge badge-warn">Missing</span></td>
+          <td>Connect browser to demo WebSocket/REST with a demo API key; verify via <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener">order book</a>.</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Resolution outcome (Yes / No) for each tracked event.</td>
+          <td><strong>Missing</strong> — no live data.</td>
+          <td><span class="badge badge-warn">Missing</span></td>
+          <td>Check <code>GET /event/{ticker}</code> status/settlement after market settles (<a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener">market settlement docs</a>).</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Liquidity: contracts available at each price (yes/no bid stacks).</td>
+          <td><strong>Missing</strong> — no live order book.</td>
+          <td><span class="badge badge-warn">Missing</span></td>
+          <td>Query <code>GET /market-orderbook?market_ticker=...</code>.</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>CORS policy for calling kalshi.co from GitHub Pages.</td>
+          <td><strong>Unverified</strong> — not tested.</td>
+          <td><span class="badge badge-warn">Unverified</span></td>
+          <td>Test a CORS request from the published Pages URL to the demo REST API.</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Trade classification rules (directional / scalping / swing / hedge).</td>
+          <td><strong>Proposed</strong> — see Suggestions page.</td>
+          <td><span class="badge badge-neutral">Proposed</span></td>
+          <td>Define rules, review in Suggestions register, then implement.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Missing-information discovery plan</h3>
+    <ul style="margin-left:20px; color:#334155; font-size:0.95rem;">
+      <li><strong>Demo account:</strong> follow the <a href="https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account" target="_blank" rel="noopener">Kalshi demo account tutorial</a>.</li>
+      <li><strong>API key:</strong> generate one in the demo environment (<a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener">docs</a>); set <code>window.KALSHI_API_KEY</code> in DevTools and refresh.</li>
+      <li><strong>Live data:</strong> open the browser console and inspect <code>window.KalshiDash.STATE</code> after connecting.</li>
+      <li><strong>All unverified values:</strong> see <a href="flagged.html">Flagged for Review</a>.</li>
+    </ul>
+  </div>
+
+  <footer>
+    KalshiDash1 &middot; Q&amp;A &middot; Not financial advice.
+  </footer>
+</div>
+
+</body>
+</html>

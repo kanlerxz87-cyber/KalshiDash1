@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trade analysis · Kalshi Demo Dashboard</title>
+<meta name="description" content="How trades would be categorised and analysed once demo fills exist. Currently no trade data.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body >
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="active">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="docs/index.html" class="">Docs dashboard</a><a href="docs/events.html" class="">Events & resolutions</a><a href="docs/methodology.html" class="">Methodology</a><a href="docs/flagged.html" class="">Docs flagged page</a></div></nav>
+<main class="content">
+
+<h1>Trade analysis &amp; strategy categories</h1>
+<div class="notice"><strong>No trade data yet.</strong> There are zero fills, so no results, win rates or strategy returns are shown. Nothing here is computed from real trades.</div>
+
+<h2>Proposed categorisation schema (our proposal, not an official Kalshi classification)</h2>
+<div class="table-wrap"><table  class="compact"><thead><tr><th>Dimension</th><th>Possible values</th><th>Data needed</th><th>Available now?</th><th>Source</th></tr></thead><tbody>
+<tr><td>Topic</td><td>Gas, Elections, Culture, Crypto, Golf</td><td>Market → series → category (from API)</td><td>Yes (live)</td><td><a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a></td></tr>
+<tr><td>Side</td><td>YES / NO</td><td>Fill side</td><td><span class="badge warn">No fills</span></td><td><a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener" title="Kalshi docs: Market Settlement">Market Settlement ↗</a></td></tr>
+<tr><td>Entry price band</td><td>Price in $0.00–$1.00 buckets</td><td>Fill price</td><td><span class="badge warn">No fills</span></td><td><a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a></td></tr>
+<tr><td>Time to close</td><td>< 1 day, 1–7 days, > 7 days</td><td>Fill time and close_time (API)</td><td><span class="badge warn">No fills</span></td><td><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a></td></tr>
+<tr><td>Liquidity at entry</td><td>Resting contracts at best price</td><td>Orderbook snapshot at fill time</td><td><span class="badge warn">Not recorded</span></td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Orderbook">Get Market Orderbook ↗</a></td></tr>
+<tr><td>Strategy label</td><td>Analyst-defined (proposal only)</td><td>Analyst label per trade</td><td><span class="badge warn">Not defined</span></td><td>Internal proposal — no external source</td></tr>
+</tbody></table></div>
+<p class="muted small">Strategy labels are a human decision and have no external source.</p>
+
+<h2>What is needed</h2>
+<ul>
+  <li>Demo fills history (see <a class="flag" href="flagged.html#F-07">F-07</a>).</li>
+  <li>Agreement on the schema above (see Questions and Suggestions).</li>
+</ul>
+
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
+</main>
+</div>
+<script src="assets/app.js" type="module"></script>
+</body>
+</html>

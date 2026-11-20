@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trade — KalshiDash1</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="trade">
+<header class="top"><div class="wrap top-inner">
+  <div class="brand">Kalshi<span>Dash1</span> <span class="badge">DEMO — mock funds</span></div>
+  <nav class="main"><a href="index.html">Dashboard</a><a href="executive-summary.html">Executive Summary</a><a href="events.html">Events &amp; Resolutions</a><a href="portfolio.html">Portfolio</a><a href="trade.html">Trade</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="methodology.html">Methodology</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for Review</a></nav>
+</div></header>
+<main class="wrap">
+  <h1>Execute trades</h1>
+  <p class="muted">Two modes: <strong>Simulator</strong> (local paper fills at the live demo price — works now) and <strong>Demo account</strong> (real orders on the demo exchange via the official V2 order endpoint — requires connecting a demo key on the <a href="portfolio.html">Portfolio</a> page). Demo orders are limit orders (<code>good_till_canceled</code>) with a unique <code>client_order_id</code> for deduplication — <a href="https://docs.kalshi.com/getting_started/quick_start_create_order" target="_blank" rel="noopener">official create-order guide</a>.</p>
+  <form id="trade-form" class="card">
+    <label>Market ticker</label>
+    <input name="ticker" placeholder="e.g. KX… — pick a row on the Dashboard, then come here" autocomplete="off">
+    <div class="row">
+      <div><label>Mode</label><select name="mode"><option value="simulator">Simulator (local paper)</option><option value="demo">Demo account (real demo order)</option></select></div>
+      <div><label>Side (YES leg)</label><select name="side"><option value="buy">Buy YES → book side <code>bid</code></option><option value="sell">Sell YES → book side <code>ask</code></option></select></div>
+      <div><label>Quantity (contracts)</label><input name="qty" type="number" min="1" value="1"></div>
+      <div><label>Limit price $ (demo mode only, 0.01–0.99)</label><input name="price" type="number" step="0.01" min="0.01" max="0.99" value="0.50"></div>
+    </div>
+    <div class="row" style="margin-top:12px"><div class="auto"><button type="submit">Place trade</button></div>
+    <div><a class="btn secondary" href="index.html">← Back to dashboard to pick a market</a></div></div>
+    <p id="trade-result" class="muted small" role="status"></p>
+  </form>
+  <div class="notice"><strong>Safety:</strong> simulator trades never touch Kalshi. Demo trades use mock funds only and cannot affect production. On V2 order placement, <code>side</code> refers to the YES leg only: “<em>bid means buy YES, ask means sell YES</em> (selling YES is economically equivalent to buying NO at 1 − price, but this endpoint quotes everything from the YES side)” — <a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a>. A <code>201</code> means accepted, not resting — the page reports <code>fill_count</code> and <code>remaining_count</code>. Always double-check the ticker — the dashboard fills this field from the market you clicked. Order errors (401/400/404/409/429) are explained in the <a href="https://docs.kalshi.com/getting_started/order_errors" target="_blank" rel="noopener">official Order Errors docs</a>.</div>
+  <h2>After you trade</h2>
+  <p>Simulator fills appear on the <a href="portfolio.html">Portfolio</a> page under categorized trades. Demo fills appear there too once connected (<code>GET /portfolio/fills</code>). Performance by category and strategy ideas are on the <a href="strategies.html">Strategies</a> page.</p>
+</main>
+<footer><div class="wrap">KalshiDash1 · Demo data only · Not financial advice · <a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for Review</a></div></footer>
+<script src="assets/kalshi.js"></script><script src="assets/chart.js"></script><script src="assets/app.js"></script>
+</body>
+</html>

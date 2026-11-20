@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Methodology — KalshiDash1</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="methodology">
+<header class="top"><div class="wrap top-inner">
+  <div class="brand">Kalshi<span>Dash1</span> <span class="badge">DEMO — mock funds</span></div>
+  <nav class="main"><a href="index.html">Dashboard</a><a href="executive-summary.html">Executive Summary</a><a href="events.html">Events &amp; Resolutions</a><a href="portfolio.html">Portfolio</a><a href="trade.html">Trade</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="methodology.html">Methodology</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for Review</a></nav>
+</div></header>
+<main class="wrap">
+  <h1>Methodology</h1>
+  <p class="muted">How every number on this site is produced, so a reviewer can reproduce or reject it. Source links for each factual claim: <a href="sources.html">Sources &amp; verification</a>.</p>
+
+  <h2>1 · Data source</h2>
+  <p>Everything comes from Kalshi's <strong>demo</strong> Trade API, root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> (recommended demo REST root per the <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>). Public market-data endpoints need no authentication (<a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">market data quick start</a>). Requests are made by your browser when you open a page; the site stores no market data in the repository, so there is no stale snapshot to be mistaken for live data.</p>
+  <p>Freshness caveat, verbatim from the docs: market-data responses “are cached for a short time, so prices, sizes and status can lag the exchange by several seconds, and filtered listings can lag longer than a read of a single market” (<a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">source</a>). That is why the selected market is re-read every 5 s and rankings refresh on demand.</p>
+
+  <h2>2 · Category discovery (gas prices, elections, culture, crypto, golf)</h2>
+  <ol>
+    <li>Read <code>GET /series?include_volume=true</code> (documented params: <code>category</code>, <code>tags</code>, <code>include_product_metadata</code>, <code>include_volume</code>, <code>min_updated_ts</code> — <a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a>).</li>
+    <li>For each series row, lowercase the concatenation of <code>title</code> + <code>category</code> + <code>categories[]</code> + <code>ticker</code>.</li>
+    <li>Assign the series to the first category whose keyword list appears in that text:
+      <div class="card" style="overflow:auto"><table>
+        <thead><tr><th>Category</th><th>Keyword rules (substring match)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Gas prices</strong></td><td><code>gasoline</code>, <code>gas price</code>, <code>gas prices</code>, <code>fuel price</code>, <code>fuel prices</code></td></tr>
+          <tr><td><strong>Elections</strong></td><td><code>election</code>, <code>president</code>, <code>senate</code>, <code>house race</code>, <code>governor</code>, <code>mayor</code>, <code>ballot</code>, <code>congress</code></td></tr>
+          <tr><td><strong>Culture</strong></td><td><code>oscar</code>, <code>grammy</code>, <code>emmy</code>, <code>box office</code>, <code>movie</code>, <code>film</code>, <code>celebrity</code>, <code>entertainment</code>, <code>culture</code></td></tr>
+          <tr><td><strong>Crypto</strong></td><td><code>crypto</code>, <code>bitcoin</code>, <code>ethereum</code>, <code>btc</code>, <code>eth price</code>, <code>digital asset</code></td></tr>
+          <tr><td><strong>Golf</strong></td><td><code>golf</code>, <code>pga</code>, <code>masters</code>, <code>ryder cup</code>, <code>open championship</code></td></tr>
+        </tbody></table></div>
+    </li>
+    <li>Series are then ordered by the official <code>volume_fp</code> field (contract volume across the series) so the busiest series are queried first.</li>
+  </ol>
+  <p class="muted small">Why not hard-code tickers? A hard-coded list would silently rot and would be unverifiable against “the five topics”. Keyword discovery is reproducible and every included series is printed on each category page for audit. Limitation: Kalshi's exact discovery-category names are not enumerated in the docs, so a series whose titles never mention the keywords can be missed — this is <a href="flagged.html">Flagged F-04</a>.</p>
+
+  <h2>3 · “Highest dollar amount” ranking</h2>
+  <ul>
+    <li>For each discovered series: <code>GET /markets?series_ticker=…&amp;status=open&amp;limit=1000</code> (status filter values <code>unopened|open|paused|closed|settled</code>, max limit 1000, cursor pagination — <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>).</li>
+    <li><strong>Estimated traded notional</strong> = <code>volume_fp × last price</code>, where <code>last price</code> is <code>last_price_dollars</code> (falling back to <code>last_price</code> cents ÷ 100, then to the YES bid/ask mid).</li>
+    <li>A second column uses <code>volume_24h_fp × last price</code> to show recent dollar flow instead of lifetime flow.</li>
+    <li>Raw <code>volume_fp</code> and <code>open_interest_fp</code> are always displayed, so the estimate can be re-derived or replaced.</li>
+    <li>Why an estimate at all: Kalshi documents <code>notional_value_dollars</code> as “the total value of a single contract at settlement in dollars” — a per-contract payout, not traded dollars — and no event-level dollar-volume field exists in the API reference. See <a href="flagged.html">Flagged F-05</a> and <a href="suggestions.html">SUG-03</a>.</li>
+  </ul>
+
+  <h2>4 · Prices, sizes and fixed-point strings</h2>
+  <p>API quantities arrive as strings: <code>FixedPointDollars</code> (“responses emit up to 6” decimals) and <code>FixedPointCount</code> (2 decimals; minimum granularity 0.01 contracts) — <a href="https://docs.kalshi.com/getting_started/fixed_point_migration" target="_blank" rel="noopener">Fixed-Point Representation</a>. The client parses them with <code>parseFloat</code>, and prefers the <code>*_dollars</code> / <code>*_fp</code> fields, falling back to legacy cent fields only if the new ones are absent. Values that are absent stay <strong>blank (—)</strong>.</p>
+
+  <h2>5 · Chart (X = time, Y = price)</h2>
+  <ul>
+    <li>Windows of 1 h / 6 h / 24 h / 7 d use official candlesticks: <code>GET /series/{series}/markets/{ticker}/candlesticks?start_ts&amp;end_ts&amp;period_interval</code> where <code>period_interval</code> is one of <code>1</code>, <code>60</code>, <code>1440</code> minutes, timestamps in <strong>seconds</strong>, max 5,000 periods per request — <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Get Market Candlesticks</a>. Plotted value = candle close (or <code>price.close</code> where the response is nested).</li>
+    <li>Windows of 60 s / 5 m / 15 m cannot be served by candlesticks (1 minute is the finest official interval), so the page samples <code>GET /markets/{ticker}</code> every 5 s while the tab is open, and marks those points as local samples. There is no sub-minute historical source in the public REST API; the WebSocket alternative requires an authenticated handshake (see <a href="flagged.html">Flagged F-07</a>).</li>
+    <li>Y axis is the contract price in dollars ($0.00–$1.00 for binary markets).</li>
+  </ul>
+
+  <h2>6 · Liquidity / order book</h2>
+  <p><code>GET /markets/{ticker}/orderbook</code> returns <code>orderbook_fp.yes_dollars</code> and <code>orderbook_fp.no_dollars</code> as <code>[price_dollars, count_fp]</code> pairs sorted ascending by price, best bid last; only <strong>bids</strong> for both sides are returned because “a bid for yes at price X is equivalent to an ask for no at price (100−X)”, and <strong>order counts are not returned</strong> — <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">Get Market Orderbook</a>.</p>
+  <ul>
+    <li>“How many contracts are available at a given price” = the <code>count_fp</code> of that level, aggregated at the price level (the docs state order counts are not returned, so this is contracts, not number of orders).</li>
+    <li>Cumulative column = running sum from the best price, i.e. how deep you can trade at that side.</li>
+    <li>Implied YES ask = 1 − best NO bid, and implied NO ask = 1 − best YES bid, using the equivalence above.</li>
+    <li>Level notional = level price × level contracts.</li>
+    <li><code>depth</code> parameter: 1–100 levels per side, 0/omit for all; invalid values return 400 (same source). This page requests all levels and shows the 12 best per side.</li>
+  </ul>
+
+  <h2>7 · Resolution tracking</h2>
+  <p>A market is considered resolved when its documented <code>result</code> field is <code>yes</code> or <code>no</code> (the enum is <code>yes | no | scalar | ""</code>), or when <code>status</code> is <code>settled</code>/<code>finalized</code>. <code>settlement_ts</code> and <code>settlement_value_dollars</code> (“only filled after determination”) are shown when present. If a market is settled but <code>result</code> is empty, the site prints “SETTLED — result field empty in API” instead of guessing a winner. Sources: <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>; note the docs list different status vocabularies for the filter and the response field, which is <a href="flagged.html">Flagged F-03</a>.</p>
+  <p>Recent resolutions are read with <code>GET /markets?status=settled&amp;min_settled_ts=…</code>. The docs warn “only one <code>status</code> filter may be supplied at a time” and that timestamp filters are “mutually exclusive from other timestamp filters and certain status filters”, so the client retries without the timestamp filter if the API answers 400 — <a href="flagged.html">Flagged F-06</a>. Older settled data lives behind <code>GET /historical/cutoff</code> and <code>GET /historical/markets</code> (<a href="https://docs.kalshi.com/getting_started/historical_data" target="_blank" rel="noopener">Historical Data</a>), which the in-browser build does not query.</p>
+
+  <h2>8 · Portfolio &amp; trade accounting</h2>
+  <ul>
+    <li><strong>Simulator:</strong> local ledger in <code>localStorage</code>. Buy fills book at the live demo price of the moment; cash and average cost are updated accordingly; nothing is sent to Kalshi. Starting cash $1,000 is a stated assumption of this tool, not a Kalshi figure (reset on the Portfolio page).</li>
+    <li><strong>Demo account (optional):</strong> balance / positions / fills from <code>GET /portfolio/balance</code>, <code>GET /portfolio/positions</code>, <code>GET /portfolio/fills</code>; orders via <code>POST /portfolio/events/orders</code> (Create Order V2) with required fields <code>ticker, side, count, price, time_in_force, self_trade_prevention_type</code> and an optional <code>client_order_id</code> for deduplication — <a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a>. <code>side</code> is the YES-leg book side: “bid means buy YES, ask means sell YES” (same source), and a <code>201</code> means accepted, not resting — the page reports <code>fill_count</code> and <code>remaining_count</code>.</li>
+    <li>Legacy <code>/portfolio/orders</code> write endpoints return <code>410 Gone</code> with code <code>deprecated_v1_order_endpoint</code>, which is why this site only uses the V2 path (same source). The legacy <code>action</code>/<code>side</code> fields are deprecated in favour of <code>outcome_side</code>/<code>book_side</code> (<a href="https://docs.kalshi.com/getting_started/order_direction" target="_blank" rel="noopener">Order direction</a>).</li>
+    <li><strong>Signing:</strong> <code>timestamp + METHOD + path</code>, path signed from the API root without the query string, RSA-PSS/SHA-256 for RSA keys or Ed25519 for Ed25519 keys, base64 encoded, with the three <code>KALSHI-ACCESS-*</code> headers — <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">Authenticated requests quick start</a>. The key is never stored in the repository or sent anywhere except the demo API origin.</li>
+  </ul>
+
+  <h2>9 · Verification rule applied to this site</h2>
+  <p>Every table row on <a href="sources.html">Sources</a> links to the official page it was read from, on 2026-11-20. Anything not confirmable from an official Kalshi source is left blank and listed on <a href="flagged.html">Flagged for Review</a> — it is never inferred, estimated into a “verified” column, or silently defaulted. Values we computed ourselves (estimated notional, cumulative depth, implied asks) are labeled as our calculation next to the API fields they came from.</p>
+
+  <h2>10 · Rate-limit discipline</h2>
+  <p>Requests are deliberately few: one series scan + one markets call per matched series on refresh, one market read per 5 s for the selected ticker, and no balance polling loop (<code>GET /portfolio/balance</code> is limited to once per second on Basic/Advanced tiers, per <a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate Limits and Tiers</a>). On <code>429</code> the client surfaces the error and stops rather than retrying in a tight loop, matching the docs' “apply exponential backoff on 429”.</p>
+</main>
+<footer><div class="wrap">KalshiDash1 · Demo data only · Not financial advice · <a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for Review</a></div></footer>
+<script src="assets/kalshi.js"></script><script src="assets/chart.js"></script><script src="assets/app.js"></script>
+</body>
+</html>

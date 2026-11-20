@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trades — KalshiDash1</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div class="site-wrap">
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand"><div class="mark">KD</div><div>KalshiDash1</div></div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Live Dashboard</a>
+        <a href="categories/gas.html">Gas Prices</a>
+        <a href="categories/elections.html">Elections</a>
+        <a href="categories/culture.html">Culture</a>
+        <a href="categories/crypto.html">Crypto</a>
+        <a href="categories/golf.html">Golf</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="trades.html" class="active">Trades</a>
+        <a href="suggestions.html">Suggestions</a>
+        <a href="questions.html">Questions &amp; Answers</a>
+        <a href="flagged.html">Flagged for Review</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero" style="padding:24px 0 10px;">
+    <h1 style="font-size:22px;margin-bottom:6px;">Trade Execution &amp; Tracking</h1>
+    <p style="font-size:14px;color:var(--muted);">Execute trades on events, track performance, categorize trades, and build strategies by trade type. Demo environment uses mock funds.</p>
+    <div class="status err"><span class="dot"></span><strong>Credentials required.</strong> Order placement is an authenticated endpoint (<code>POST /portfolio/events/orders</code>) needing a demo API key + Ed25519 private-key signature. No credentials were provided or requested, so execution is shown as a documented structure only.</div>
+  </div>
+
+  <div class="section">
+    <h2><span class="tag">Authenticated — not connected</span> Order lifecycle (documented)</h2>
+    <table class="wide">
+      <thead>
+        <tr><th>Step</th><th>Action</th><th>Endpoint (authenticated)</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Find an open market</td><td><code>GET /markets?status=open</code> (public)</td><td>No auth needed; returns ticker, title, yes/no bid dollars.</td></tr>
+        <tr><td>2</td><td>Place an order</td><td><code>POST /portfolio/events/orders</code></td><td>Fields: ticker, side (bid/ask), count, price, time_in_force, self_trade_prevention_type, client_order_id.</td></tr>
+        <tr><td>3</td><td>Check order status</td><td>Orders endpoint (portfolio tag)</td><td>Check <code>remaining_count</code>; 201 = accepted, not necessarily filled.</td></tr>
+        <tr><td>4</td><td>Amend an order</td><td><code>POST /portfolio/events/orders/{order_id}/amend</code></td><td>Amend price or quantity.</td></tr>
+        <tr><td>5</td><td>Cancel an order</td><td><code>DELETE /portfolio/events/orders/{order_id}</code></td><td>Cancel resting order.</td></tr>
+        <tr><td>6</td><td>Track to settlement</td><td><code>GET /events/{event_ticker}</code></td><td>Read <code>result</code> (&ldquo;yes&rdquo;/&ldquo;no&rdquo;) once <code>status=settled</code>.</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><strong>Source:</strong> <a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener">Quick Start: Create your first order</a> (includes the full sign-and-post pattern and error codes: 401, 400, 404, 409, 429) &middot; <a href="https://docs.kalshi.com/getting_started/order_errors.md" target="_blank" rel="noopener">Order Errors</a> &middot; <a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener">Market Settlement</a>.</div>
+  </div>
+
+  <div class="section">
+    <h2>Example order payload (documented, not executed)</h2>
+    <pre style="background:#f8fafc;border:1px solid var(--line);border-radius:var(--radius);padding:12px;font-size:13px;overflow:auto;">{
+  "ticker": "KX...",
+  "side": "bid",
+  "count": "1",
+  "price": "0.0100",
+  "time_in_force": "good_till_canceled",
+  "self_trade_prevention_type": "taker_at_cross",
+  "client_order_id": "&lt;uuid4&gt;"
+}</pre>
+    <p class="small"><code>client_order_id</code> (up to 64 chars: letters, digits, <code>_ - : + = /</code>) enables idempotent retries; resubmitting with the same ID while the order is open returns <code>409 order_already_exists</code>.</p>
+  </div>
+
+  <div class="section">
+    <h2>Categorize trades &amp; strategies by trade type</h2>
+    <table class="wide">
+      <thead>
+        <tr><th>Category</th><th>Trade type</th><th>Performance metric to track</th><th>Strategy idea</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Gas prices</td><td>Directional YES / NO</td><td>Win rate, avg $ per trade, $ at resolution</td><td>Compare yes vs no accuracy per event.</td></tr>
+        <tr><td>Elections</td><td>Directional YES / NO</td><td>Win rate, avg $ per trade</td><td>Track by election cycle / market.</td></tr>
+        <tr><td>Culture</td><td>Directional YES / NO</td><td>Win rate, avg $ per trade</td><td>Track by event type.</td></tr>
+        <tr><td>Crypto</td><td>Directional YES / NO</td><td>Win rate, avg $ per trade</td><td>Track by asset / timeframe.</td></tr>
+        <tr><td>Golf</td><td>Directional YES / NO</td><td>Win rate, avg $ per trade</td><td>Track by tournament / player.</td></tr>
+        <tr><td>Any</td><td>Spread / hedge</td><td>Net exposure per category</td><td>Offset correlated events.</td></tr>
+        <tr><td>Any</td><td>Scalp / swing</td><td>Hold time, per-trade $</td><td>Capture short-term price moves.</td></tr>
+      </tbody>
+    </table>
+    <div class="note">All values above are a framework, not executed trades. Fill in only after connecting demo credentials and confirming each fill from the API.</div>
+  </div>
+
+  <div class="footer-inner" style="margin-top:30px;">
+    <p class="small">KalshiDash1 &middot; Trades &middot; Endpoints verified against <a href="https://docs.kalshi.com" target="_blank" rel="noopener">docs.kalshi.com</a> &middot; Demo environment uses mock funds &middot; Not financial advice.</p>
+  </div>
+</div>
+</body>
+</html>
