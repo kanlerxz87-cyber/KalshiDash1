@@ -1202,3 +1202,13 @@ Updated: 2026-11-20 (UTC)
 ## Flagged for review
 
 - None published yet. Add each unverified requirement, data limitation, or implementation irregularity here and on the site's clearly labeled Flagged for Review page; unresolved items do not block deployment.
+
+## Completion record — session-cb49437b merged (PR #24, 14:18 UTC)
+
+- **PR #24 merged to `main` as `36aceb4`; Pages deploy `success`.** Branch `arena/cb49437b-kalshidash1`.
+- **Delivered:** `≥ $0.10` swing detection from three independent sources (sampled polling, candlestick moves, and per-trade prices from the unauthenticated `GET /markets/trades`), two scrolling chat feeds (chronological + highest-ROI-first), a published scoring heuristic, and a scheduled capture in `live-alerts.yml` publishing `data/live/feed.json`.
+- **Not duplicated:** automated simulated trading is already the `dash/autotrade.html` engine (five strategies). This session linked it in the shared navigation rather than writing a parallel engine.
+- **Irregularity F-27 (upstream, the main finding):** the demo API returns self-contradicting quote rows. `KXPRESPERSON-28-GABB` came back `last_price_dollars 0.8030` **and** `yes_ask_dollars 0.8030` against `no_bid_dollars 0.9970`, which violates yes ask + no bid = $1.00; the direct single-market read was a healthy 0.0020/0.0030 with previous price 0.0030. Earlier engine versions published this as a fake $0.80 crash. Fixed in four layers: reciprocity test, stale-last-price test on tight books only, corroboration against a second published field before publishing a sampled alert, and a documented state reset. Wide-but-reciprocal books keep their real last trade (`KXPRESNOMD-28-JP`, 0.01/0.94) — a midpoint rule was tried first and was wrong.
+- **Merge reconciliation:** `main` had rewritten the generator around `data/snapshot.json` + `templates/`. Resolved by taking main's generator, deleting this session's now-dead `S` source table, and re-applying only the alerts nav entry and the `alerts/` link-checker exemption. Flagged rows were renumbered into the published series (F-27..F-31), including **F-30, which corrects F-04** ("Kalshi has no Culture category") — the live API returns `category: Culture` series.
+- **Verification:** selftest, feed validator, page test, link checks (mjs + py + js), logic/alert QA, and site build all pass; alerts/qa/build jobs green on the PR. Post-merge engine run: 671 markets sampled, **0 alerts**, 1 contradictory row flagged rather than alerted.
+- **Honest limit unchanged:** no demo API key is committed, so no real order is placed and the portfolio cannot be synced (F-24, F-29). No streaming, because the WebSocket handshake is authenticated.
