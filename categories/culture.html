@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Culture — KalshiDash1</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<div class="site-wrap">
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand"><div class="mark">KD</div><div>KalshiDash1</div></div>
+      <nav>
+        <a href="../index.html">Home</a>
+        <a href="../dashboard.html">Live Dashboard</a>
+        <a href="gas.html">Gas Prices</a>
+        <a href="elections.html">Elections</a>
+        <a href="culture.html" class="active">Culture</a>
+        <a href="crypto.html">Crypto</a>
+        <a href="golf.html">Golf</a>
+        <a href="../portfolio.html">Portfolio</a>
+        <a href="../trades.html">Trades</a>
+        <a href="../suggestions.html">Suggestions</a>
+        <a href="../questions.html">Questions &amp; Answers</a>
+        <a href="../flagged.html">Flagged for Review</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero" style="padding:24px 0 10px;">
+    <h1 style="font-size:22px;margin-bottom:6px;">Culture</h1>
+    <p style="font-size:14px;color:var(--muted);">Findings table for Kalshi events related to <strong>culture</strong>. Tracks live events until resolved, with the resolution (yes / no) and source links. Values are left blank and flagged unverified unless confirmed from an official source.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="tag">Category focus</span> Culture</h2>
+    <p>Track live Kalshi events on culture. For each event: market/event name, ticker, dollar amount (highest dollar live event), status (open / settled), resolution (yes / no / pending), and the official source link.</p>
+    <div class="status warn"><span class="dot"></span><strong>Unverified:</strong> No culture events were confirmed in the Kalshi demo environment at review time (the demo currently lists sports markets). Values below are intentionally blank. Use the discovery method to confirm.</div>
+  </div>
+
+  <div class="section">
+    <h2>Findings — culture events</h2>
+    <table class="wide">
+      <thead>
+        <tr>
+          <th>Event / market</th>
+          <th>Ticker</th>
+          <th>Category</th>
+          <th>Highest $ live event</th>
+          <th>Status</th>
+          <th>Resolved (yes / no)</th>
+          <th>Source link</th>
+          <th>Verified?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-blank" colspan="7">No culture events confirmed in the demo environment. Values left blank per verification policy (never infer or fill in).</td>
+          <td><span class="badge badge-off">unverified</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <strong>Discovery method (official):</strong> call <code>GET /markets?status=open</code> to list open demo markets, then <code>GET /events/{event_ticker}</code> for each event and check its <code>category</code>. Inspect <code>yes_bid_dollars</code>/<code>no_bid_dollars</code> and <code>result</code> (empty = pending, &ldquo;yes&rdquo;/&ldquo;no&rdquo; = resolved) to track until resolution.<br>
+      <strong>Sources:</strong>
+      <ul>
+        <li><a href="https://docs.kalshi.com/api-reference/market/get-markets.md" target="_blank" rel="noopener">Get Markets</a> (public, no auth)</li>
+        <li><a href="https://docs.kalshi.com/api-reference/market/get-event.md" target="_blank" rel="noopener">Get Event</a> (title, category, result)</li>
+        <li><a href="https://docs.kalshi.com/getting_started/quick_start_market_data.md" target="_blank" rel="noopener">Quick Start: Market Data</a></li>
+        <li><a href="https://docs.kalshi.com/getting_started/market_lifecycle.md" target="_blank" rel="noopener">Market Lifecycle</a></li>
+        <li><a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener">Market Settlement</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>How to track until resolved</h2>
+    <ol>
+      <li>Find culture events via <code>GET /markets?status=open</code> + <code>GET /events/{event_ticker}</code> (check <code>category</code>).</li>
+      <li>Record ticker, status, and current <code>yes_bid_dollars</code> / <code>no_bid_dollars</code> (dollar amount).</li>
+      <li>Poll until <code>status</code> becomes <code>settled</code>, then read <code>result</code> (&ldquo;yes&rdquo; or &ldquo;no&rdquo;) for the resolution.</li>
+      <li>Add each confirmed row to this table with its official source link.</li>
+    </ol>
+  </div>
+
+  <div class="footer-inner" style="margin-top:30px;">
+    <p class="small">KalshiDash1 &middot; Culture &middot; Endpoints verified against <a href="https://docs.kalshi.com" target="_blank" rel="noopener">docs.kalshi.com</a> &middot; Demo environment uses mock funds &middot; Not financial advice.</p>
+  </div>
+</div>
+</body>
+</html>
