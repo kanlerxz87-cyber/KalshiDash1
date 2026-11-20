@@ -1289,4 +1289,8 @@ None new. All pre-existing flags remain published on the site's `flagged.html` (
 
 ### PR & merge record (I4)
 
-TBD — recorded below once the PR exists.
+- Pull request: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/30 (`arena/d1de3583-kalshidash1` → `main`).
+- Merge: `gh pr merge 30 --merge`, merge commit `68049a499e965e0035b658d4eea38e1a90ba0fd5`, 2026-11-20. No approval awaited (per brief); first-try merge.
+- Rebase note: `origin/main` advanced (PRs #25–#29) while this session worked; the branch was rebased onto `origin/main` (union conflict resolution in `COORDINATION.md`, no other session's record discarded) and force-leased pushed before the PR was merged.
+- GitHub Pages: latest build for commit `e67e70c` (main, contains merge `68049a4`) status `built`, error `null` (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest`). Live site: https://kanlerxz87-cyber.github.io/KalshiDash1/ — homepage, category pages (gas/elections/culture/crypto/golf), flagged page and dash suite all serve; local QA: build staleness PASS, 90 pages / 2089 internal links / 0 broken, JS syntax PASS, no conflict markers.
+- Flagged irregularities F-01…F-23 remain published on the site's Flagged for Review page with source links; per board policy none block the merge.
