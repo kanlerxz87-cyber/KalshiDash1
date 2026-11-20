@@ -53,6 +53,12 @@
           (A.state.feed.resolutions || []).length + ' resolutions.'
         : 'No engine sample found yet.';
     }
+    var rm = document.getElementById('reset-note');
+    if (rm) {
+      var reason = A.state.feed && A.state.feed.meta && A.state.feed.meta.data_reset_reason;
+      if (reason) { rm.style.display = ''; rm.textContent = 'Engine note: ' + reason; }
+      else rm.style.display = 'none';
+    }
     var lm = document.getElementById('live-meta');
     if (lm) {
       lm.textContent = A.state.live.ok && A.state.live.lastPoll
@@ -146,6 +152,7 @@
     var allHtml = all.length
       ? all.slice(0, 120).map(msgHtml).join('')
       : '<div class="empty">No swing of $0.10 or more has been recorded yet for this selection.<br>' +
+        (A.state.feed && A.state.feed.meta && A.state.feed.meta.data_reset_reason ? 'The engine restarted its feed; see the note under “Highest-dollar live events”.<br>' : '') +
         (A.state.mode === 'offline' ? 'No data source is reachable from this page.' : 'The engine records one only when a real API price moves that far — nothing is seeded or simulated here.') + '</div>';
 
     var roiHtml = roi.length

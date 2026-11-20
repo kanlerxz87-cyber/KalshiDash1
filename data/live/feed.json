@@ -1360,7 +1360,7 @@
   "trade_markets_checked": 8,
   "trade_lookback_seconds": 1800,
   "duplicates_collapsed": 0,
-  "data_reset_reason": "Alerts and history recorded before the F-A9 price-coherence fix were removed because they were computed from contradictory demo quotes. The feed restarts clean and re-accumulates under the corrected rule."
+  "data_reset_reason": "Feed restarted at 2026-11-20T13:51Z. Earlier alerts and history were computed while a demo-API quote inconsistency (F-A9) could still reach the price rule; they were removed rather than published. All rows from this point use the cross-validated price rule."
  },
  "run": {
   "run_id": "2026-11-20T13:51:54.000Z",
@@ -1371,53 +1371,7 @@
   "candle_alerts_added": 0,
   "untracked_settled_seen": 500
  },
- "alerts": [
-  {
-   "id": "KXBTCY-27JAN0100-B47500@1795182548",
-   "ts": "2026-11-20T13:49:08.000Z",
-   "ticker": "KXBTCY-27JAN0100-B47500",
-   "event_ticker": "KXBTCY-27JAN0100",
-   "series_ticker": "KXBTCY",
-   "topic": "crypto",
-   "title": "BTC price  on Jan 1, 2027?",
-   "direction": "down",
-   "from": 0.98,
-   "to": 0.055,
-   "delta": -0.925,
-   "abs_delta": 0.925,
-   "threshold": 0.1,
-   "baseline_kind": "previous sample",
-   "yes_bid_dollars": "0.0500",
-   "yes_ask_dollars": "0.0600",
-   "yes_bid_size_fp": "9999.99",
-   "yes_ask_size_fp": "2777.77",
-   "volume_24h_fp": "359.47",
-   "volume_fp": "80178705.51",
-   "open_interest_fp": "26587876.94",
-   "est_traded_dollars": 4409828.8,
-   "close_time": "2027-01-01T05:00:00Z",
-   "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 45000.00-49999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
-   "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf",
-   "contract_url": "https://assets.kalshi.com/regulatory/product-certifications/CRYPTO.pdf",
-   "settlement_sources": [
-    {
-     "name": "CF Benchmarks",
-     "url": "https://www.cfbenchmarks.com/"
-    }
-   ],
-   "model": {
-    "score": 0.5588,
-    "highROI": false,
-    "reasons": [
-     "headroom 0.04 (price was $0.98)",
-     "move 100% of a $0.50 move",
-     "24h volume 359.47 contracts -> liquidity 0.36",
-     "spread $0.01 -> 0.90"
-    ]
-   },
-   "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200"
-  }
- ],
+ "alerts": [],
  "resolutions": [
   {
    "ticker": "KXBTCD-26NOV2001-T72799.99",
