@@ -65,8 +65,14 @@ jobs:
         # Runs whenever a sample was produced and validated, even if a later step fails, so a
         # partial problem never loses real, verified market data.
         if: steps.sample.outcome == 'success' && success() || steps.sample.outcome == 'success'
+        # F-49: this step failed twice with no readable log (the job log download is not always
+        # available). Every command is now traced, and a trap emits a ::error:: annotation with the
+        # failing command so the cause is readable through the API even when the log is not.
+        shell: bash
         run: |
-          set -e
+          set -eo pipefail
+          trap 'echo "::error::commit step failed at line $LINENO: $BASH_COMMAND" >&2' ERR
+          set -x
           git config user.name  "kalshidash1-engine"
           git config user.email "engine@users.noreply.github.com"
           git add data/live/
