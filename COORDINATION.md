@@ -3,7 +3,116 @@
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
 ## Active session — arena-f89b55f7 (2026-11-20; acting integration session for the alerts engines)
+## Claims & record — session-7f90cf50 (branch `arena/7f90cf50-kalshidash1`, base `8f80f34`)
 
+Branch note: Arena pins this session to `arena/7f90cf50-kalshidash1` (the `session-<id>/<task>` naming in the brief is not usable here). All work happened on this branch only.
+
+### Overlap check at claim time (read from `origin`, 2026-11-20 ~13:30 UTC) — respected, not duplicated
+
+| Claimed work | Claimant(s) | Outcome |
+|---|---|---|
+| Alert engine: two scrolling chat feeds + ≥ $0.10 swing detection | `session-cb49437b` (`alerts/**`, `tools/live_engine.mjs`) | respected; not built here |
+| Alert feeds + auto-trade engine (brief §automate simulated trades) | `session-815b546d` | respected; **delivered** by that session (PR #15, merged 13:36:53 UTC — `dash/alerts.html`, `dash/autotrade.html`, `dash/js/autotrade.js`). K3 contingency below did not trigger |
+| Final integration I1–I10 (repo review, consolidation, market/resolution/portfolio pages, data refresh, sources/flagged, verification, PR/merge) | `session-7d6d2fcb` | respected; their PR #16 is open at the time of writing |
+| Repo hygiene + verified-facts audit page | `session-bf16f2dd` | respected (PR #12 → merged, recorded as PR #14) |
+| Real demo-account toolchain | `session-d5b935f4` | respected (PRs #17–#18 merged) |
+| Live re-verification L1–L3 | `session-e6c3b3b6` | done earlier (PR #11) |
+
+### Task board
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| K1 | **Swing-catalyst link layer** (brief: "Live charts should include events and website links that may have caused a sharp jump in contract price ≥ $0.10 in either direction"): ≥ $0.10 swing detection on live prices + 1-min candle closes + `previous_price_dollars`; every swing annotated with official market/event API links, the event's official `settlement_sources` (from the API), and clearly-labelled *possible-catalyst discovery links* (news/web search — never asserted as causes) | **done** | session-7f90cf50 | `catalyst.html`, `assets/catalyst.js`, `assets/catalyst.css` (new) |
+| K2 | **Trade categorisation + strategy synthesis lab** (brief: "analyze the results of the trades and categorize trades and create strategies based on the type of trade"): multi-store ingestion (dash v1 incl. session-815b546d's auto-trade records + open schema `kalshidash:trades:v2`), categorisation (topic/strategy/entry-price band/holding band/size band), performance tables with recorded-vs-computed P&L cross-check, strategy-rule hypotheses synthesised from winning trade types (labelled hypothesis-only) | **done** | session-7f90cf50 | `strategylab.html`, `assets/strategylab.js`, `assets/strategylab.css` (new) |
+| K3 | **Auto-trade engine contingency** (take over `815b546d`'s claim only if stale > 60 min) | **closed — not needed** | session-7f90cf50 | none (never started) |
+| K4 | **Session record + PR to main + Pages check** | done (PR record below) | session-7f90cf50 | `COORDINATION.md` (this section only) |
+
+### Verification performed (session-7f90cf50, 2026-11-20)
+
+Official docs read line by line with the fetch tool (URLs are the source links published on the two pages):
+Fixed-Point Representation (`*_dollars` prices, `*_fp` quantities) · Get Markets (full response schema) · Get Market (path `GET /markets/{ticker}` confirmed) · Get Events (`settlement_sources[{name,url}]`, nested markets) · Get Market Candlesticks (`period_interval` 1/60/1440, `price.close_dollars`) · Market Settlement ($1 per winning contract, `result` = yes/no) · Demo Environment (endpoint table + "prices may not reflect real markets" warning) · Rate Limits ("back off on 429"; unauthenticated budgets not published) · Create Order (V2) (`side` = bid/ask, `count`, `price`, auth headers, `POST /portfolio/events/orders`).
+
+Live demo-API probes (fetch tool, exact URLs re-runnable):
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets?limit=5&status=open` — response matches the documented fixed-point schema (captured shape used in tests).
+- `https://external-api.demo.kalshi.co/trade-api/v2/events?category=Crypto&status=open&limit=3&with_nested_markets=true` — **quirk re-confirmed**: returned events with `category` "World" and "Elections"; server-side category filtering is unreliable → all topic mapping is client-side (K-F1).
+- Gas series map reused and re-checked against `verification/2026-11-20-e6c3b3b6.md` (V5–V9).
+
+QA run locally: `node --check` on both new JS files · `node scripts/check-links.mjs` (65 pages, 0 broken internal links) · `python3 tools/linkcheck.py` (65 pages, 0 broken) · `node scripts/check_lab.mjs` (headless jsdom, 21 assertions against verified payload shapes: page render, candle + prev-close swing detection, link attachment, diesel exclusion, v1/v2 ingestion, band categorisation, P&L cross-check, synthesis rule + hypothesis labelling) — all green. `scripts/check_lab.mjs` skips cleanly when jsdom is absent (CI-safe).
+
+### Irregularities / flags published with this session (source links on the pages)
+
+- **K-F1** — `/events?category=` filter is unreliable (verified live; aligns with existing F-01). Pages filter client-side and say so.
+- **K-F2** — `previous_price_dollars` field semantics (which previous close) are not spelled out in the Get Markets schema text; used only as a labelled `prev-close` detection basis, values shown as returned. Reviewer decision.
+- **K-F3** — unauthenticated rate-limit budgets are not published; the client polls conservatively (30 s) and backs off 60 s on 429/403 ("back off on 429" verified).
+- **K-F4** — the API has no news feed; "possible catalyst" links are external discovery searches and are labelled as such. Causation of any move is NOT claimed anywhere (nothing to verify — left blank).
+- **K-F5** — browser CORS to the demo API remains untested in a real browser (existing F-01); both pages show a clear notice and fall back to the bundled `dash/data/snapshot.json` capture when live reads fail.
+- **K-F6/K-F7** — diesel excluded from the gas scope (consistent with F-18); 24 h dollar-volume ranking is a derived estimate, labelled `est.` (consistent with F-03).
+
+### Handoff / conflict log
+
+- **Merge conflict (this branch, 2026-11-20):** `git merge origin/main` (PRs #12–#18) conflicted in `COORDINATION.md` only. Resolved as a union: no session's record was discarded — this section was re-inserted above the merged records.
+- **Integration request to the final integration session (`session-7d6d2fcb`, owner of `scripts/build-site.mjs`):** please add nav entries under "Tools" for `catalyst.html` ("Swing catalyst links") and `strategylab.html` ("Strategy lab") in the generated sidebar. Until then the two pages are reachable by URL and cross-link each other; their sidebars carry the full current nav plus their own entries (self-contained, shared generator untouched).
+- **K2 schema adoption note for engine owners:** session-815b546d's auto-trade engine writes the dash v1 store (`kalshidash:v1:trades`, fields `ts`/`entry_ts`, `price`, `qty`, `side`, `pnl`, `auto`); the lab ingests it via the documented compatibility mapping and marks those rows' provenance. The open schema `kalshidash:trades:v2` (field table on `strategylab.html`) remains available for future engines.
+
+## Session on this branch — session-d5b935f4 (current)
+
+- Session ID: `session-d5b935f4`
+- Branch: `arena/d5b935f4-kalshidash1` (base `8f80f34`, `main`) — Arena manages this one branch; no other branches/worktrees are created by this session.
+
+### Overlap check (read from `origin` 2026-11-20 ~13:35 UTC, AFTER my first claim push) — read first
+
+My first claim on this branch (A1–A7, commit `6b1474d`) was written from the board state at base `8f80f34` and **overlapped active claims discovered on `origin` afterwards**. The A1–A7 claim is **withdrawn** and replaced by the narrow D-scope below. Nothing from A1–A7 was implemented before the withdrawal (no code files were touched). The overlapping work stays with its owners:
+
+| Overlapping work I had claimed | Actual claimant(s) observed | State at 13:35 UTC |
+|---|---|---|
+| ≥$0.10 swing alert engine + two scrolling chat feeds (incl. high-ROI filter) + scheduled capture | `session-cb49437b` (`tools/live_engine.mjs`, `alerts/**`, `data/live/**`, `live-alerts.yml`) | active — engine sample committed 13:33 UTC |
+| Automated simulated trade engine + alert feeds in the `dash/` suite | `session-815b546d` (`dash/js/autotrade.js`, `dash/js/alerts.js`, …) | claim commit 13:18 UTC, **no implementation commits yet** (7f90cf50 K3 holds a takeover watch for ~14:20 UTC; I will not race it) |
+| Swing-catalyst links on charts, strategy synthesis lab | `session-7f90cf50` (`catalyst.html`, `strategylab.html`, `assets/catalyst.*`, `assets/strategylab.*`) | active — claim 13:30 UTC |
+| Canonical site pages (market/resolution/portfolio), consolidation of site trees, `data/snapshot.json` + `refresh-data.yml`, sources/flagged, **final integration PR/merge (I10)** | `session-7d6d2fcb` (final integration session) | active — data refresh committed 13:22 UTC |
+| Live re-verification L1–L3, repo hygiene + audit page R1–R3 | `session-e6c3b3b6`, `session-bf16f2dd` | done, merged (PR #11, PR #12) |
+
+**Irregularity logged (not mine to resolve):** both `session-cb49437b` ("integration edits … this is the final integration session") and `session-7d6d2fcb` ("FINAL INTEGRATION — read this first", I10) describe themselves as the final integration session. One of them should stand down; flagged here and on my session record for the user.
+
+### Task board — session-d5b935f4 (non-overlapping gaps only)
+
+| ID | Task | Status | Owner | Files touched (only these) | Sources | Irregularities |
+|---|---|---|---|---|---|---|
+| D1 | Verified API-contract record for the demo Trade API, published for all engine builders: exact schemas verified live this session (Get Trades path `/markets/trades` + fields, candlestick periods 1/60/1440 min per official OpenAPI, create-order contract + millisecond signing, fixed-point `*_fp` string fields, `settlement_sources[].url` as swing-catalyst links, orderbook pair shape) | done | session-d5b935f4 | `verification/2026-11-20-d5b935f4.md` (new, session-stamped file in the existing `verification/` folder pattern) | docs.kalshi.com `llms.txt`, `get-trades.md`, `quick_start_create_order.md`, `get-market-candlesticks.md` (via llms.txt), live demo API GETs listed in the file | `verification/**` was created by `e6c3b3b6`; only a new session-stamped file is added, no existing file edited (noted in their folder convention) |
+| D2 | **Real demo-account portfolio tracking + trade execution toolchain** — the brief's "Track the portfolio performance using the kalshi demo account" / "Execute trades": signed `GET /portfolio/{balance,positions,fills,settlements}` + `POST /portfolio/events/orders` exactly per the official quick start; dry-run by default; activates when the owner adds `KALSHI_KEY_ID` / `KALSHI_PRIVATE_KEY` GitHub Secrets (no manual input required now; never stores keys) | done | session-d5b935f4 | `tools/demo_trader.mjs` (new), `docs/DEMO_ACCOUNT.md` (new), `.github/workflows/demo-account.yml` (new), `demo-account.html` (new, standalone page not in shared nav), `assets/demo-account.js` (new), `data/account.json` (placeholder `connected:false`) | `quick_start_create_order.md`, `api_keys.md`, `quick_start_authenticated_requests.md`, `get-trades.md` (all read this session) | Distinct from `815b546d`'s *simulated* auto-trade engine (`dash/**`) and from `7d6d2fcb`'s portfolio *pages*; no file owned by another session is edited |
+| D3 | QA of D1/D2 deliverables (link check, node syntax, workflow lint), this session's PR `arena/d5b935f4-kalshidash1` → `main`, merge without waiting, Pages deploy check, record here | done (PR/merge record below) | session-d5b935f4 | `COORDINATION.md` (this section only) | `gh`, Pages API | Leaves the **final** integration PR (whole-site) to I10 (`7d6d2fcb`) per the board |
+| D4 | Handoff notes for the final integration session: nav-integration request for `demo-account.html`, plus observations (fixed-point `*_fp` strings in live payloads, correct trades endpoint path, integration-role ambiguity) | done (handoff below) | session-d5b935f4 | `COORDINATION.md` (this section only) | — | — |
+
+Shared-file policy: no file owned by another session is edited. New pages follow the root page template so `scripts/check-links.mjs` passes unchanged (pattern used by `bf16f2dd` and `7f90cf50`).
+
+### Record — session-d5b935f4 (2026-11-20)
+
+- **Sources (official, read this session):** docs index [llms.txt](https://docs.kalshi.com/llms.txt) · [Get Trades](https://docs.kalshi.com/api-reference/market/get-trades.md) (OpenAPI: path `get /markets/trades`, Trade schema) · [Quick Start: Create your first order](https://docs.kalshi.com/getting_started/quick_start_create_order.md) (demo host in the example; signed POST body; ms timestamps; amend/cancel paths) · [Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md) (period 1/60/1440 minutes) · [Orderbook Responses](https://docs.kalshi.com/getting_started/orderbook_responses.md) · [Fixed-Point Representation](https://docs.kalshi.com/getting_started/fixed_point_migration.md) · [API Keys](https://docs.kalshi.com/getting_started/api_keys.md) · [Order Errors](https://docs.kalshi.com/getting_started/order_errors.md) · [Demo environment](https://docs.kalshi.com/getting_started/demo_env). Live demo API (read 2026-11-20 via the fetch tool): `GET /exchange/status`, `GET /search/tags_by_categories`, `GET /series?category=Economics&include_volume=true&limit=20`, `GET /events?series_ticker=KXDEMOFUTHOURLY&status=open&with_nested_markets=true&limit=1`. Exact captured values in `verification/2026-11-20-d5b935f4.md` (C-1…C-8).
+- **Verification performed:** every D2 code path is written against the verified contracts only (no invented fields). Offline smoke tests: `node tools/demo_trader.mjs buy …` dry-run prints the exact quick-start body (`side`/`count`/`price` 4-decimal / `time_in_force` / `self_trade_prevention_type` / `client_order_id`); `account --ci` without secrets is a no-op exit 0; usage exit 2. QA battery on the merged tree: `node scripts/build-site.mjs` + `git diff --exit-code -- '*.html' assets categories` (staleness OK), `node scripts/check-links.mjs` (65 pages, 0 broken internal), `python3 tools/linkcheck.py` (1017 internal links OK), `node tools/qa_logic_test.mjs` (all pass), `node --check` on `assets/app.js`, `assets/demo-account.js`, `tools/demo_trader.mjs`, JSON validity of `data/account.json` + `dash/data/snapshot.json`.
+- **Irregularities found (D-01…D-05):** D-01: `GET /markets/{ticker}/trades` and the doc URL `get-market-trades` do not exist (fetch errors); the trades endpoint is `GET /markets/trades?ticker=…` — engine builders should use C-1. D-02: live payloads use fixed-point **strings** (`volume_fp: "4175.00"`, prices `"0.3500"`) — swing math must parse consistently (C-4). D-03: two sessions currently describe themselves as the "final integration session" (`cb49437b` integration-claim note vs `7d6d2fcb` I10) — one should stand down; flagged for the user. D-04: `815b546d`'s "auto-trade engine" claim (13:18 UTC) still has no implementation commits; `7f90cf50` K3 holds a takeover watch (~14:20 UTC) — this session does not race it. D-05: the demo REST API's browser CORS is still untested here (repo flag F-01; `cb49437b` committed `cors-test.mjs`, outcome not read).
+- **Not blocked, but flagged:** real demo-account data requires the owner to add `KALSHI_KEY_ID`/`KALSHI_PRIVATE_KEY` repository secrets (2-minute setup, `docs/DEMO_ACCOUNT.md`). Until then `demo-account.html` honestly shows "not connected" with the verified endpoint table. Simulated-trading pages belong to other sessions (see overlap table).
+
+### D4 handoff — notes for the final integration session (`7d6d2fcb`, I10)
+
+1. **Nav-integration request (my file → your shared nav):** please link `demo-account.html` ("Demo account") in the Tools group of the generated nav in `scripts/build-site.mjs`, and consider a row on `portfolio.html` pointing at it (the live demo-account connection page). The page is standalone and template-compliant; adding it to the generator's nav keeps chrome in sync.
+2. **Engine data notes:** see C-1…C-8 in `verification/2026-11-20-d5b935f4.md` before wiring any collector to the demo API — especially `/markets/trades` (not per-market), candlestick periods 1/60/1440 minutes only, and `*_fp` string fields.
+3. **`data/account.json`** is owned by this session's D2 (`demo-account.yml` refreshes it when secrets exist). It is placeholder-only (`connected:false`) today; treat "connected:false" as "not connected" if you surface it elsewhere.
+4. **Workflow note:** `.github/workflows/demo-account.yml` commits `data/account.json` with `[skip ci]` via `GITHUB_TOKEN` (no recursive workflow runs). Scheduled runs execute on `main` only after I10 merges; until then run it manually via *workflow_dispatch* on this branch.
+5. **Integration-role ambiguity (D-03)** needs a human or board decision; the final PR to `main` is I10's per this board.
+
+### PR and merge record (D3) — session-d5b935f4
+
+- PR: [#17](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/17) `arena/d5b935f4-kalshidash1` → `main`.
+- CI on the PR head: `build` pass, `qa` pass (site-qa), `qa` pass (suite-qa) — 2026-11-20.
+- Merge: `gh pr merge 17 --merge`, merge commit `3391d88bfd4fc92d228d113d2700a99cfe1f47c0` (2026-11-20).
+- GitHub Pages: build for `3391d88` status `built`, no error (`gh api …/pages/builds/latest`).
+- Live check: https://kanlerxz87-cyber.github.io/KalshiDash1/demo-account.html serves the new page (h1, verified-endpoints table, honest "not connected" state, setup steps) — fetched live after deploy.
+- This record lands on `main` via a follow-up commit/PR from the same branch (a record cannot contain its own merge commit — precedent `e6c3b3b6`).
+
+Status key: `unclaimed` · `in progress` · `done` · `needs review` (published on the Flagged page; does not block).
+
+## Prior session records (preserved verbatim — sessions bf16f2dd, e6c3b3b6, ef745c36 and earlier)
+
+## Claims — session bf16f2dd (branch `arena/bf16f2dd-kalshidash1`, base `8f80f34`)
 - Session ID: `arena-f89b55f7` · Branch: `arena/f89b55f7-kalshidash1` (branched from `main` @ `8f80f34`, the merge of PR #10). This session may only commit to its own branch, so it works there (same constraint documented for earlier sessions).
 - Claim made before any code was written. Prior sessions' pages and modules were read only; every change to a file owned by an earlier session is **additive** and logged below.
 
