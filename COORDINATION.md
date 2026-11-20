@@ -74,6 +74,37 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review` (published 
 - Pages: the token got HTTP 403 when changing Pages to the workflow build type or to `/docs` (repo admin needed). The existing legacy source (`main`, `/`) is used, so the site is at the repo root.
 
 
+## Session arena/815b546d-kalshidash1 — live alert feeds + automated simulated trades (current session)
+
+# Coordination board (this session)
+
+Updated: 2026-11-20 (UTC)
+
+## Branch/session constraints
+
+- Current Arena branch: `arena/815b546d-kalshidash1` (active; branched from `main` at `8f80f3481d15e733e3e7aad3a106e3a141cdd469` = PR #10 merge).
+- The Arena session is restricted to this branch. No alternate branches or worktrees are created.
+- `main` already contains three overlapping site implementations (root generated site, `docs/` suite, `dash/` suite) plus `archive/`. This session builds on the `dash/` suite, the most complete interactive implementation, and does not touch `docs/`, `archive/`, root generated site files, or shared workflows owned by the integration session.
+
+## Task board
+
+| Task | Status | Owner/session | File scope |
+| --- | --- | --- | --- |
+| Review repo & verify brief gaps against official sources | done | `arena/815b546d-kalshidash1` | read-only |
+| Claim scope: live alert feeds (two scrolling chats, ≥$0.10 swing, high-ROI filter), catalyst links, automated simulated trade engine, executive summary | in progress | `arena/815b546d-kalshidash1` | `dash/js/alerts.js`, `dash/js/autotrade.js`, `dash/alerts.html`, `dash/autotrade.html`, `dash/js/data.js`, `dash/js/config.js`, `dash/js/store.js`, `dash/js/app-common.js`, `dash/css/style.css`, `dash/index.html`, `dash/flagged.html`, `dash/sources.html`, `dash/suggestions.html`, `dash/questions.html`, `dash/executive-summary.html` (create), `dash/data/snapshot.json` (refresh only), `.github/workflows/suite-qa.yml` (CI wiring) |
+
+## Verification / completion log
+
+- Claim recorded before implementation. `git status --short` clean; branch `arena/815b546d-kalshidash1` at base `8f80f34` (PR #10 merge).
+- Gap-check vs brief completed line by line against the `dash/` suite: **missing** two scrolling alert chats with ≥$0.10 swing detection and high-ROI model filter; **missing** automated simulated trades (only manual form + seeded rows); **missing** catalyst/jump-event links on charts; executive summary exists on home page but not as a dedicated page. Charts (seconds/minutes/hours windows), orderbook liquidity ladder, resolution tracking, portfolio/strategy analysis, sources/flagged pages all present.
+- Official sources verified this session: `GET /markets/trades` schema (Get Trades docs — trades filtered by ticker/min_ts/max_ts, fields trade_id/count_fp/yes_price_dollars/created_time; trade prices are the mechanism to detect ≥$0.10 swings), WebSocket quick start (ticker/trade/market_lifecycle_v2 public channels still require an authenticated WS session — browser WS without keys impossible, polling is the verified fallback). Sources: https://docs.kalshi.com/api-reference/market/get-trades , https://docs.kalshi.com/getting_started/quick_start_websockets
+- Sandbox egress: direct `curl` to the demo API returns empty (prior session F-04); API verification via the platform fetch tool. Snapshot refresh will use the platform fetch tool and re-bundle `dash/data/snapshot.json` with fresh capture.
+
+## Flagged for review
+
+- F-07 (new, this session): Alert detection depends on REST polling of `last_price_dollars`/trade prices at 5–10s cadence; the demo API has cache lag and no server-side swing alerting. Fast swings shorter than the poll interval may be missed. Documented on the Flagged page with sources.
+- F-08 (new, this session): Demo hourly BTC markets (`KXDEMOFUTHOURLY-*`) settle hourly and are the most active focus-topic markets; auto-traded strategies therefore run mostly on simulated positions in these markets. No inference about real-market behavior.
+
 ---
 
 # Prior coordination record (preserved verbatim from `main`, sessions arena-15d2acea, arena-652d8f6d, arena-f661348d)
