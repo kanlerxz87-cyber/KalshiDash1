@@ -13,6 +13,18 @@
 (function () {
   'use strict';
 
+  /* Page-depth-aware site root. app.js always lives in <root>/assets/, so its own script
+   * URL tells us where the site root is. Pages under subdirectories (categories/*.html)
+   * must load data/snapshot.json and link market.html relative to the root, not to their
+   * own folder — a bare 'data/snapshot.json' resolves to categories/data/snapshot.json
+   * there and 404s, which used to wipe the baked fallback rows. */
+  var APP_ROOT = '';
+  try {
+    var s = document.currentScript;
+    if (s && s.src) APP_ROOT = new URL('../', s.src).href;
+  } catch (e) { APP_ROOT = ''; }
+  function rootHref(p) { return APP_ROOT + p; }
+
   /* ==================================================================== config */
   var CFG = {
     endpoints: {
@@ -237,7 +249,7 @@
 
   function loadSnapshot() {
     if (state.snapshot) return Promise.resolve(state.snapshot);
-    return fetchJSON('data/snapshot.json', 12000)
+    return fetchJSON(rootHref('data/snapshot.json'), 12000)
       .then(function (snap) {
         state.snapshot = snap;
         ingestSnapshot(snap);
@@ -688,7 +700,7 @@
     var res = m.result ? '<span class="badge ' + (m.result === 'yes' ? 'good' : 'bad') + '">' + esc(m.result) + '</span>' : '<span class="muted">—</span>';
     var status = m.status || '—';
     return '<tr' + (opts.tickerAttr ? ' data-ticker="' + esc(opts.tickerAttr) + '"' : '') + '>' +
-      '<td><a href="market.html?ticker=' + encodeURIComponent(m.ticker) + '">' + esc(m.title || m.ticker) + '</a>' +
+      '<td><a href="' + rootHref('market.html?ticker=') + encodeURIComponent(m.ticker) + '">' + esc(m.title || m.ticker) + '</a>' +
         '<br><span class="ticker">' + esc(m.ticker) + '</span></td>' +
       '<td><span class="tag ' + esc(t.id) + '">' + esc(t.label) + '</span></td>' +
       '<td class="num">' + cents(m.last_price_dollars) + '</td>' +
@@ -708,6 +720,25 @@
     return '<tr><th>Market</th><th>Topic</th><th class="num">Last</th><th class="num">Bid / Ask</th>' +
       '<th class="num">Spread</th><th class="num">24h vol ($)</th><th class="num">Total vol ($)</th>' +
       '<th class="num">Open int ($)</th><th class="num">ROI</th><th>Status</th><th>Result</th><th>Source</th></tr>';
+  }
+
+  function ensureRoiHeader(tbodyEl) {
+    /* marketRowHtml emits an ROI score cell (see marketTableHead). Some baked page headers
+     * predate it (11 columns); without this repair every rendered row shifts one column.
+     * Adds the missing ROI column once at paint time; no-op where the header already has it. */
+    if (!tbodyEl || !tbodyEl.parentNode) return;
+    var ths = tbodyEl.parentNode.querySelectorAll('thead th');
+    if (!ths.length) return;
+    for (var i = 0; i < ths.length; i++) if (ths[i].textContent.trim() === 'ROI') return;
+    var th = document.createElement('th');
+    th.className = 'num';
+    th.textContent = 'ROI';
+    var before = null;
+    for (var j = 0; j < ths.length; j++) {
+      if (ths[j].textContent.trim() === 'Status') { before = ths[j]; break; }
+    }
+    if (!before) before = ths[ths.length - 1];
+    ths[0].parentNode.insertBefore(th, before);
   }
 
   function sortedMarkets(filterFn) {
@@ -730,7 +761,7 @@
       $$('a', nav).forEach(function (a) {
         var href = a.getAttribute('href');
         var cur = location.pathname.split('/').pop() || 'index.html';
-        var here = href === cur || (cur === '' && href === 'index.html');
+        var here = (href || '').split(/[?#]/)[0].split('/').pop() === cur;
         if (here) a.classList.add('active');
       });
     }
@@ -788,6 +819,9 @@
     var topicBody = tbodyOf('topic-table');   /* topic overview is generated statically; no live body on this page */
 
     function paint() {
+      var hasData = !!state.snapshot || Object.keys(state.markets).length > 0;
+      if (!hasData) return; /* no snapshot and no live universe: keep the rows the build baked in */
+      ensureRoiHeader(topBody);
       var rows = sortedMarkets(function (m) { return m.status !== 'finalized' && m.status !== 'settled'; }).slice(0, 12);
       if (topBody) {
         topBody.innerHTML = rows.length
@@ -806,7 +840,7 @@
             '<td class="num">' + (state.seriesByTopic[t.id] || []).length + '</td>' +
             '<td class="num">' + open.length + '</td>' +
             '<td class="num">' + num(vol) + '</td>' +
-            '<td>' + (best ? '<a href="market.html?ticker=' + encodeURIComponent(best.ticker) + '">' + esc(best.title) + '</a>' : '<span class="muted">no open market right now</span>') + '</td>' +
+            '<td>' + (best ? '<a href="' + rootHref('market.html?ticker=') + encodeURIComponent(best.ticker) + '">' + esc(best.title) + '</a>' : '<span class="muted">no open market right now</span>') + '</td>' +
             '<td class="src">' + (state.seriesByTopic[t.id] && state.seriesByTopic[t.id][0] && state.seriesByTopic[t.id][0].source_url
               ? '<a href="' + esc(state.seriesByTopic[t.id][0].source_url) + '" target="_blank" rel="noopener">series query</a>'
               : '<span class="muted">—</span>') + '</td></tr>';
@@ -848,12 +882,12 @@
         (a.roi !== undefined && a.roi !== null ? '<span class="badge neutral">ROI ' + a.roi + '</span>' : '') + '</div>';
       var body;
       if (a.type === 'resolve') {
-        body = '<div class="m-title"><a href="market.html?ticker=' + encodeURIComponent(a.ticker) + '">' + esc(a.title) + '</a> resolved <b class="' + (a.result === 'yes' ? 'up' : 'down') + '">' + esc(a.result).toUpperCase() + '</b></div>' +
+        body = '<div class="m-title"><a href="' + rootHref('market.html?ticker=') + encodeURIComponent(a.ticker) + '">' + esc(a.title) + '</a> resolved <b class="' + (a.result === 'yes' ? 'up' : 'down') + '">' + esc(a.result).toUpperCase() + '</b></div>' +
           '<div class="m-body">Settlement published by the exchange. YES holders receive $1.00 per contract, NO holders $1.00 per contract.</div>';
       } else if (a.type === 'system') {
         body = '<div class="m-body">' + esc(a.title) + '</div>';
       } else {
-        body = '<div class="m-title"><a href="market.html?ticker=' + encodeURIComponent(a.ticker) + '">' + esc(a.title) + '</a></div>' +
+        body = '<div class="m-title"><a href="' + rootHref('market.html?ticker=') + encodeURIComponent(a.ticker) + '">' + esc(a.title) + '</a></div>' +
           '<div class="m-body"><b class="' + (a.delta > 0 ? 'up' : 'down') + '">' + (a.delta > 0 ? '▲ +' : '▼ ') + a.delta.toFixed(2) + '</b> ' +
           cents(a.from) + ' → <b>' + cents(a.to) + '</b> · threshold ' + usd(feedState.minSwing, 2) + '</div>';
       }
@@ -882,13 +916,15 @@
       if (cntB) cntB.textContent = roi.length + ' message' + (all.length === 1 ? '' : 's');
       if (logA) logA.scrollTop = logA.scrollHeight;
       if (logB) logB.scrollTop = logB.scrollHeight;
-      if (moversBody) {
+      var hasData = !!state.snapshot || Object.keys(state.markets).length > 0;
+      if (moversBody && hasData) {
+        ensureRoiHeader(moversBody);
         var rows = sortedMarkets(function (m) { return m.status !== 'finalized' && m.status !== 'settled'; }).slice(0, 15);
         moversBody.innerHTML = rows.length ? rows.map(function (m) { return marketRowHtml(m); }).join('')
           : '<tr><td colspan="12" class="muted">No open focus-topic markets available right now.</td></tr>';
       }
       var rt = tbodyOf('roi-table');
-      if (rt) {
+      if (rt && hasData) {
         var rr = Object.keys(state.markets).map(function (k) { return state.markets[k]; })
           .filter(function (m) { return m.status !== 'finalized' && m.status !== 'settled'; })
           .map(function (m) { return { m: m, r: roiOf(m) }; })
@@ -896,7 +932,7 @@
           .slice(0, 15);
         rt.innerHTML = rr.length ? rr.map(function (x) {
           var p = x.r.parts;
-          return '<tr><td><a href="market.html?ticker=' + encodeURIComponent(x.m.ticker) + '">' + esc(x.m.title) + '</a>' +
+          return '<tr><td><a href="' + rootHref('market.html?ticker=') + encodeURIComponent(x.m.ticker) + '">' + esc(x.m.title) + '</a>' +
             '<br><span class="ticker">' + esc(x.m.ticker) + '</span></td>' +
             '<td><span class="tag ' + esc(topicOf(x.m.topic).id) + '">' + esc(topicOf(x.m.topic).label) + '</span></td>' +
             '<td class="num">' + x.r.score + '</td>' +
@@ -986,12 +1022,14 @@
         if (f.status === 'resolved') d = String(b.settlement_ts || '').localeCompare(String(a.settlement_ts || ''));
         return d;
       });
-      if (body) {
+      var hasData = !!state.snapshot || Object.keys(state.markets).length > 0;
+      if (body && hasData) {
+        ensureRoiHeader(body);
         body.innerHTML = rows.length ? rows.map(function (m) { return marketRowHtml(m); }).join('')
           : '<tr><td colspan="12" class="muted">No markets match this filter.</td></tr>';
       }
       var c = $('#markets-count');
-      if (c) c.textContent = rows.length + ' market' + (rows.length === 1 ? '' : 's');
+      if (c && hasData) c.textContent = rows.length + ' market' + (rows.length === 1 ? '' : 's');
     }
 
     var chips = $('#markets-topic-chips');
@@ -1025,6 +1063,8 @@
     var seriesBody = $('#series-body'), marketBody = $('#market-body'), resolvedBody = $('#resolved-body');
 
     function paint() {
+      var hasData = !!state.snapshot || Object.keys(state.markets).length > 0;
+      if (!hasData) return; /* no snapshot and no live universe: keep the rows the build baked in */
       if (seriesBody) {
         var list = (state.seriesByTopic[topicId] || []).slice();
         seriesBody.innerHTML = list.length ? list.map(function (s) {
@@ -1041,6 +1081,7 @@
         }).join('') : '<tr><td colspan="7" class="muted">No series captured for this topic.</td></tr>';
       }
       if (marketBody) {
+        ensureRoiHeader(marketBody);
         var rows = Object.keys(state.markets).map(function (k) { return state.markets[k]; })
           .filter(function (m) { return m.topic === topicId; })
           .sort(function (a, b) { return (b.volume_24h_fp || 0) - (a.volume_24h_fp || 0); });
@@ -1278,7 +1319,7 @@
           var live = m ? (m.last_price_dollars !== null && m.last_price_dollars !== undefined ? cents(m.last_price_dollars) : '—') : '—';
           var strat = STRATEGIES.filter(function (s) { return s.id === t.strategy; })[0];
           return '<tr><td>' + dt(t.ts) + '</td>' +
-            '<td><a href="market.html?ticker=' + encodeURIComponent(t.ticker) + '">' + esc(t.title || t.ticker) + '</a><br><span class="ticker">' + esc(t.ticker) + '</span></td>' +
+            '<td><a href="' + rootHref('market.html?ticker=') + encodeURIComponent(t.ticker) + '">' + esc(t.title || t.ticker) + '</a><br><span class="ticker">' + esc(t.ticker) + '</span></td>' +
             '<td><span class="tag ' + esc(topicOf(t.topic).id) + '">' + esc(topicOf(t.topic).label) + '</span></td>' +
             '<td>' + esc(t.side) + '</td>' +
             '<td class="num">' + num(t.qty) + '</td>' +

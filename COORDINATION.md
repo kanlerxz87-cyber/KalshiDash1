@@ -116,6 +116,46 @@ See `verification/2026-11-20-dd012e26.md` for the exact scope, methods and evide
 
 ---
 
+---
+
+## Current Arena session — `arena/5bb909f6-kalshidash1` — independent verification & live-site audit (V-scope, session-5bb909f6)
+
+- Branch: `arena/5bb909f6-kalshidash1` (base `d24616a` of `main`; rebased onto `origin/main` `e67e70c` at claim time). Arena pins this session to this branch; no other branches/worktrees are created. The brief's `session-<id>/<task>` branch naming is not usable here (same note as session-7f90cf50).
+- Role: **independent verification session** — NOT the final integration session.
+
+### Overlap check at claim time (read from `origin` 2026-11-20 ~19:17 UTC) — respected, not duplicated
+
+| Claimed work | Claimant(s) | State | Outcome |
+|---|---|---|---|
+| R1–R6 final integration: refresh-workflow repair, duplicate flag IDs, nav consolidation, README rewrite, line-by-line integration evidence (touches `flagged.html`, `templates/*`, `index.html`, `categories/*`, `sources.html`, workflows, `README.md`, `VERIFICATION.md`) | `arena-dd012e26` (PR #32, open; commits 19:13–19:17 UTC) | active | respected; none of those files are edited here |
+| "Final integration: verify sources, run QA, publish" claim | `arena-d1de3583` (claim-only PR #30, merged 19:15:31 UTC) | claim recorded | respected; not taken over |
+| Settlement-source provenance audit + golf spot-check (F-27..F-31 dup anchors noted) | `arena-b71d6814` (PR #27, merged 19:16:38 UTC) | done | respected |
+| L4 live re-verification (F-L4-01…F-L4-08) | `arena-605bbb3f` (PRs #26/#28, merged) | done | re-verified independently in V3 below (additive, no files of theirs edited) |
+| Integration smoke-audit + README conflict cleanup | `arena-c431fca8` (PRs #25/#29, merged) | done | respected |
+| Record of PR #16 merge + Pages result | `arena-7d6d2fcb` (PR #23, open since 14:10 UTC, no commits for >60 min) | **stale** | left in place (record-only PR; content already reflected on this board). Noted for the user. Not taken over |
+
+### Task board — session-5bb909f6
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| V1 | **Live-site deployment audit**: fetch the deployed GitHub Pages site over HTTPS, content-check every canonical page, verify deployed internal-link integrity and Pages build status via the API | **done** | session-5bb909f6 | `verification/2026-11-20-5bb909f6.md` (new) |
+| V2 | **External-link liveness audit** (the 267–275 external links the local checkers explicitly do not fetch): all official source links + every settlement-source URL + a systematic sample checked against their hosts; dead/unverifiable links listed for review | **done** (official sources + suspect domains + sample probed; full sweep script shipped for open-egress runs) | session-5bb909f6 | `verification/2026-11-20-5bb909f6.md`, `tools/external_link_audit.mjs` (new, re-runnable where egress is open) |
+| V3 | **F-L4-01…F-L4-08 independent re-verification** against the live demo API + publication-status check on the shared Flagged page | **done** — all 8 re-probed live and **published on flagged.html** (the outstanding handoff task; page owner session-dd012e26 had finished, so the scope was extended with that handoff and recorded here) | session-5bb909f6 | `verification/2026-11-20-5bb909f6.md`, `templates/flagged.tpl`, `flagged.html` |
+| V4 | **Requirements-coverage matrix**: every requirement sentence from the project brief mapped to its implementing page(s) + official source links + verified status | **done** (18/18 rows mapped in the verification file; 1 credential-gated item flagged F-07) | session-5bb909f6 | `verification/2026-11-20-5bb909f6.md` |
+| V5 | **Session record + PR to `main` + Pages confirmation + post-merge record** (per brief: merge without waiting for approval; record PR link and merge result) | in progress | session-5bb909f6 | `COORDINATION.md` (this section only) |
+| D1–D6 | **Defect fixes found by the line-by-line review** (scope extension after the owners finished; all verified on the live site first): D-1 snapshot path 404 on subdirectory pages wiped baked fallback rows; D-2 JS market links 404'd from category pages; D-3 ROI cell vs 11-column headers shifted every rendered row; D-4 topic pages showed other topics' order books (gas showed golf rows; golf showed an elections row); D-5 F-L4 publication (see V3); D-6 nav active-highlight on category pages | **done** | session-5bb909f6 | `assets/app.js`, `scripts/build-site.mjs`, `templates/flagged.tpl`, regenerated `categories/*.html` + `flagged.html` |
+
+File scope (as claimed): `verification/2026-11-20-5bb909f6.md` (new), `tools/external_link_audit.mjs` (new), `COORDINATION.md` (this section only). **Scope extension (logged per protocol):** after `session-dd012e26` recorded their task board as done (PRs #32/#37 merged 19:27–19:29 UTC) and the `605bbb3f` handoff ("please add F-L4-01…F-L4-08 to the Flagged page") was still open, this session additionally took the released scopes `assets/app.js`, `scripts/build-site.mjs`, `templates/flagged.tpl` and the generated pages they feed — no other active claim covered them, and every change is evidence-backed in `verification/2026-11-20-5bb909f6.md` (defect log D-1…D-6). No other session's files were edited while their owner was active.
+
+### Session record (V5) — sources, verification, irregularities
+
+- **Official sources read in full this session** (fetched live 2026-11-20; links in the verification file): `docs.kalshi.com/getting_started/fee_rounding` (fee components + rounding mechanics; the trade-fee **model** formula is still unpublished — F-10 stays partially open), `getting_started/market_settlement.md` ($1 per winning contract, yes/no), `getting_started/demo_env.md` (mock funds, separate credentials, demo-price warning, endpoint table = the brief's table), `docs.kalshi.com/llms.txt` (doc index; candlestick periods 1/60/1440 min; bids-only orderbooks).
+- **Live demo-API re-verification (V3):** F-L4-02/03/04/05/06/07/08 confirmed unchanged (exact probe URLs in the verification file); F-L4-01 remains unreconciled (its list-level figure could not be re-located because of the new F-54 filter bug). New irregularity **F-54** raised: `GET /series` ignores `series_ticker` and `limit`.
+- **External liveness (V2):** AAA gas prices, CF Benchmarks, congress.gov, europeantour.com, apnews.com all live; `constitutionalcourt.com` is a **parked for-sale domain** and `leader.ir` is the Iranian Supreme Leader's office site — F-L4-03's "domains not checked" gap is now closed and the row updated. Remaining external hosts listed as not-fetched (no claim); `tools/external_link_audit.mjs` covers them where egress is open.
+- **QA reproduced:** `npm test` (engine/feed/page/links — 90 pages, 0 broken internal links, 2,115 internal links checked), `node scripts/build-site.mjs` + `--check`, `node scripts/check_lab.mjs`, `node tools/qa_logic_test.mjs`, `node tools/qa_alert_test.mjs`, `python3 -m py_compile tools/*.py scripts/refresh_snapshot.py`, `node --check` on changed JS. All green after the fixes.
+- **Conflict log:** one `COORDINATION.md` rebase conflict against `origin/main` (session-dd012e26's board section) resolved as a union — no record discarded (this session's claim preserved below theirs). Three pushes raced the `live-alerts` keepalive pulses to `main`; resolved with `git pull --rebase` + `--force-with-lease` to this session's own branch only.
+- **Stale item noted (not taken over):** PR #23 (`arena-7d6d2fcb`, record-only) has had no commits since 14:10 UTC. Its content is already reflected on this board.
+
 ## Current Arena session — `arena/c431fca8-kalshidash1` (2026-11-20 UTC)
 
 - Status: active; branched from `d24616a80151e8e51c6334f585d3e0e6d4cde919`.
