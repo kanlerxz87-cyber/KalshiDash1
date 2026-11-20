@@ -58,11 +58,12 @@ jobs:
         run: node scripts/check_alerts.mjs
 
       - name: Commit the new sample
+        # Feature branches exercise the engine/validation but do not write data; only main is durable.
+        if: github.ref == 'refs/heads/main' && steps.sample.outcome == 'success'
         # Runs whenever a sample was produced and validated, even if a later step fails, so a
         # partial problem never loses real, verified market data.
         # The rebase is no longer allowed to fail silently: the old `|| true` turned a
         # conflicting remote into an opaque push failure (session-dd012e26, F-39).
-        if: steps.sample.outcome == 'success'
         run: |
           set -euo pipefail
           git config user.name  "kalshidash1-engine"
