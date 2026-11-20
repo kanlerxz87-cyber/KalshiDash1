@@ -1217,6 +1217,26 @@ Updated: 2026-11-20 (UTC)
 
 ---
 
+## Claim — session-b71d6814 (branch `arena/b71d6814-kalshidash1`, base `d24616a`)
+
+Arena pins this session to `arena/b71d6814-kalshidash1` (single-branch rule); no `session-<id>/<task>` branches are created.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+| --- | --- | --- | --- | --- |
+| B1 | **Settlement-source provenance audit** (brief: "every table row must have a source link to an official site"): scan every `settlement_sources` URL in the committed snapshot, classify each as official publisher / search-engine / social profile / placeholder, check a sample live against the official demo API, and publish any non-official link as a new flag | **done** (F-34–F-37) | session-b71d6814 | `verification/2026-11-20-b71d6814.md` (new), `templates/flagged.tpl` (additive F-rows only), `COORDINATION.md` (this section only) |
+| B2 | Live spot-check of the highest-dollar rows on the home page against `GET /markets/{ticker}` (last, bid, ask, spread, status, result) | **done** (F-38) | session-b71d6814 | `verification/2026-11-20-b71d6814.md` (same file), `flagged.html` (regenerated) |
+
+Overlap check: no other open claim touches `verification/` for this date or the Flagged template rows beyond F-33. PRs #16 and #23 are the only open integration items at the time of claim; this session does not touch their files.
+
+### Results — session-b71d6814
+
+- **B1 (done).** Scanned all 1,208 `settlement_sources` entries in `data/snapshot.json` (912 unique). 31 entries are non-official or unclear and are published as **F-34** (10 Google search pages, one unfilled `<account>` placeholder), **F-35** (`x.com/elonmusk`), **F-36** (17 entries pointing at `kalshi.com/`), **F-37** (3 NASS voter-info links under rule-text names). Official schema: https://docs.kalshi.com/api-reference/market/get-series-list. Live confirmation of the Culture series via `GET /series?category=Culture`.
+- **B2 (done).** Four golf rows (TMOO, SSTR, KROY, MMEI) checked against `GET /markets/{ticker}`: last price and status match on 4/4; bid, ask and open interest drift on some rows, expected for a 14:09:32 UTC snapshot. Recorded in **F-38**. Reference: https://docs.kalshi.com/getting_started/demo_env and https://docs.kalshi.com/api-reference/market/get-market.
+- **Verification performed:** `node scripts/build-site.mjs` (22 pages), `node scripts/check-links.mjs` (no broken internal links), `python3 tools/linkcheck.py` (OK), `node --check assets/app.js`, `node tools/qa_logic_test.mjs`, `node tools/alerts-qa.mjs`, `node tools/qa_alert_test.mjs` — all pass.
+- **Irregularities / limits:** the sandbox cannot reach `*.kalshi.co` directly; live reads used the fetch tool. The audit classifies sources but does not open each publisher to confirm it is the contract's authority; that needs manual review against each contract's `contract_terms_url`.
+- **Handoff request (for whoever runs the next integration):** F-34–F-37 are open manual-review items. No values were substituted.
+- **Single-branch note:** the brief's `session-<id>/<task>` branch naming cannot be used under this session's pinned branch; all work is on `arena/b71d6814-kalshidash1`.
+
 ## Claim — session-605bbb3f (branch `arena/605bbb3f-kalshidash1`, base `d24616a`, 2026-11-20)
 
 Branch note: Arena pins this session to `arena/605bbb3f-kalshidash1`. No other branch or worktree is created.
@@ -1240,6 +1260,7 @@ Shared outputs (site pages, `data/`, `scripts/`, `flagged.html`) are NOT edited.
 1. Shared `flagged.html` and `data/sources.json` are **not** edited here. Please add F-L4-01 … F-L4-08 from `verification/2026-11-20-605bbb3f.md` to the Flagged page, linking the verification file.
 2. The fetch-tool series and market URLs in the verification file are the only sources for L4. Re-run them before quoting any golf, elections or crypto value.
 3. F-L4-03 must not be treated as having official settlement sources. The `leader.ir` and `constitutionalcourt.com` domains were not checked.
+- **Irregularity found during integration (session-b71d6814), not fixed here:** `templates/flagged.tpl` contains duplicate anchor IDs `F-27`, `F-28`, `F-29`, `F-30`, `F-31` (each appears twice, with different content), inherited from earlier sessions. Renumbering would break existing links, so it is recorded for the integration owner to decide. New flags F-34–F-38 do not collide with these IDs.
 
 ### PR and merge record (L4) — session-605bbb3f
 
