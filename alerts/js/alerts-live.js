@@ -65,17 +65,25 @@
     return id || '—';
   }
 
-  /* Same price rule as the engine (tools/live_engine.mjs, trackedPrice): never invent a
-   * price. last traded price first; else the bid/ask midpoint, but only when both sides are
-   * a real book (bid > 0, ask < 1). */
+  /* Same price rule as the engine (tools/live_engine.mjs, trackedPrice): never invent a price,
+   * and do not trust a last trade that is incoherent with the live book. The demo returned
+   * last_price_dollars 0.8030 against a 0.002/0.003 book on 2026-11-20, which would otherwise
+   * show as a fake $0.80 crash. */
+  var MAX_LAST_PRICE_BOOK_GAP = 0.25;
   function trackedPrice(m) {
     var last = num(m.last_price_dollars);
     var bid = num(m.yes_bid_dollars);
     var ask = num(m.yes_ask_dollars);
-    if (last !== null && last > 0 && last < 1) return { price: last, field: 'last_price_dollars' };
-    if (bid !== null && ask !== null && bid > 0 && ask > 0 && ask < 1 && ask >= bid) {
-      return { price: round((bid + ask) / 2), field: 'mid' };
+    var settled = !!(m.result && m.result !== '');
+    var bookOk = bid !== null && ask !== null && bid > 0 && ask > 0 && ask < 1 && ask >= bid;
+    var mid = bookOk ? round((bid + ask) / 2) : null;
+    if (last !== null && last > 0 && last < 1) {
+      if (!settled && bookOk && Math.abs(last - mid) > MAX_LAST_PRICE_BOOK_GAP) {
+        return { price: mid, field: 'mid (last price incoherent with the book)' };
+      }
+      return { price: last, field: 'last_price_dollars' };
     }
+    if (bookOk) return { price: mid, field: 'mid' };
     return { price: null, field: null };
   }
 

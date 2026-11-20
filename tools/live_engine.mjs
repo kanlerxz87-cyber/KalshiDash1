@@ -165,25 +165,42 @@ export function round(x, dp = 4) {
 
 /**
  * The price this engine tracks, with the field it came from.
- * Order of preference (all from S5/S6):
- *   1. last_price_dollars   — the last traded price, when it is a real binary price
- *   2. midpoint of yes_bid_dollars and yes_ask_dollars, when both are in (0,1)
- *   3. null                 — no usable price; the market is skipped and reported
- * A last price of exactly 0 is treated as "no trade yet" for a binary contract (0 is the
- * floor, so a 0 quote carries no directional information) unless a mid is available.
+ *
+ * Order of preference:
+ *   1. last_price_dollars, when it is a real binary price AND coherent with the current book;
+ *   2. the midpoint of yes_bid_dollars and yes_ask_dollars when both sides are a real book;
+ *   3. null — skipped and counted, never invented.
+ *
+ * WHY THE COHERENCE CHECK EXISTS (measured, not theoretical)
+ * ---------------------------------------------------------
+ * The live demo returned `last_price_dollars: "0.8030"` for KXPRESPERSON-28-GABB while that
+ * same market's order book was yes 0.002 / yes 0.003 (no bid 0.997 / no ask 0.998) and
+ * `previous_price_dollars` was 0.0030. Read live on 2026-11-20. Trusting the last price there
+ * produced a fake "$0.80 crash" alert — exactly the hallucination this project forbids.
+ *
+ * So when the market is NOT settled and a tradable book exists, a last price further than
+ * `MAX_LAST_PRICE_BOOK_GAP` from the book is treated as stale and the book midpoint is used
+ * instead, with `price_field` saying so. No value is ever manufactured: the midpoint is two
+ * published quotes, and if the book is unusable the price is null.
  */
+export const MAX_LAST_PRICE_BOOK_GAP = 0.25;
+
 export function trackedPrice(m) {
   const last = num(m.last_price_dollars);
   const bid = num(m.yes_bid_dollars);
   const ask = num(m.yes_ask_dollars);
+  const settled = !!(m.result && m.result !== '');
+  // Both sides must be a real, tradable book: a bid above zero and an ask below one.
+  const bookOk = bid !== null && ask !== null && bid > 0 && ask > 0 && ask < 1 && ask >= bid;
+  const mid = bookOk ? round((bid + ask) / 2) : null;
+
   if (last !== null && last > 0 && last < 1) {
+    if (!settled && bookOk && Math.abs(last - mid) > MAX_LAST_PRICE_BOOK_GAP) {
+      return { price: mid, field: 'mid(yes_bid_dollars,yes_ask_dollars) — last_price_dollars rejected as incoherent with the book' };
+    }
     return { price: last, field: 'last_price_dollars' };
   }
-  // Both sides must be a real, tradable book: a bid above zero and an ask below one.
-  // A book of bid $0.00 / ask $1.00 has no price — averaging it would invent $0.50.
-  if (bid !== null && ask !== null && bid > 0 && ask > 0 && ask < 1 && ask >= bid) {
-    return { price: round((bid + ask) / 2), field: 'mid(yes_bid_dollars,yes_ask_dollars)' };
-  }
+  if (bookOk) return { price: mid, field: 'mid(yes_bid_dollars,yes_ask_dollars)' };
   return { price: null, field: null };
 }
 
@@ -1265,6 +1282,14 @@ export function selftest() {
   ok(trackedPrice({ last_price_dollars: '0.3400' }).price === 0.34, 'trackedPrice prefers last traded price');
   ok(trackedPrice({ last_price_dollars: '0.0000', yes_bid_dollars: '0.2000', yes_ask_dollars: '0.3000' }).price === 0.25, 'trackedPrice falls back to bid/ask mid when last price is 0');
   ok(trackedPrice({ last_price_dollars: '0.0000', yes_bid_dollars: '0.0000', yes_ask_dollars: '1.0000' }).price === null, 'trackedPrice returns null rather than inventing a price');
+  // The measured demo defect: last price 0.8030 against a 0.002/0.003 book.
+  const inconsistent = trackedPrice({ last_price_dollars: '0.8030', yes_bid_dollars: '0.0020', yes_ask_dollars: '0.0030', result: '' });
+  ok(inconsistent.price === 0.0025, 'a last price far from a live book is rejected in favour of the book midpoint');
+  ok(/rejected/.test(inconsistent.field), 'the row records why the last price was not used');
+  const settledFar = trackedPrice({ last_price_dollars: '0.9500', yes_bid_dollars: '0.0100', yes_ask_dollars: '0.0200', result: 'yes' });
+  ok(settledFar.price === 0.95, 'a settled market keeps its own last price (no book coherence rule)');
+  const coherent = trackedPrice({ last_price_dollars: '0.4400', yes_bid_dollars: '0.4300', yes_ask_dollars: '0.4500' });
+  ok(coherent.price === 0.44 && coherent.field === 'last_price_dollars', 'a coherent last price is still preferred over the midpoint');
 
   // threshold: exactly $0.10 must alert; $0.09 must not
   const up = detectSwing({ ticker: 'T', topic: 'crypto', title: 'x', price: 0.44, baseline: 0.34, nowSeconds: 1000 });
