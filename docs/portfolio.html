@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio — KalshiDash1</title>
+<meta name="description" content="Simulated portfolio performance, trade log and settlement tracking for Kalshi demo markets.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+  <h1>Portfolio &amp; Trade Log</h1>
+  <div class="notice warn">
+    <strong>SIMULATED portfolio.</strong> Real demo-account balances, positions, fills and settlements are only readable with
+    your demo API keys (<a href="https://docs.kalshi.com/api-reference/portfolio/get-balance" target="_blank" rel="noopener">Get Balance</a>,
+    <a href="https://docs.kalshi.com/api-reference/portfolio/get-positions" target="_blank" rel="noopener">Get Positions</a>,
+    <a href="https://docs.kalshi.com/api-reference/portfolio/get-fills" target="_blank" rel="noopener">Get Fills</a>,
+    <a href="https://docs.kalshi.com/api-reference/portfolio/get-settlements" target="_blank" rel="noopener">Get Settlements</a>).
+    This static site cannot and must not handle credentials, so live account sync is <a href="flagged.html">flagged as unverified (F-02)</a>
+    and is proposal <a href="suggestions.html">S-01</a>. Everything below runs in your browser and is clearly labeled.
+  </div>
+
+  <div class="grid cols-4" id="p-stats"></div>
+
+  <h2>Equity curve (realized P&amp;L, simulated)</h2>
+  <div class="chart-wrap">
+    <canvas class="chart" id="equity-chart" style="height:220px"></canvas>
+    <div class="chart-note">Cumulative realized P&amp;L of settled simulated trades over the last 7 days, in dollars.</div>
+  </div>
+
+  <h2>Trade log</h2>
+  <div class="btnrow">
+    <select id="f-topic"><option value="">all topics</option></select>
+    <select id="f-strategy"><option value="">all strategies</option></select>
+    <select id="f-status">
+      <option value="">all statuses</option>
+      <option value="open">open</option>
+      <option value="settled">settled</option>
+    </select>
+    <button class="btn" id="settle-btn" title="Settle open trades whose market result is known from live/snapshot data">Settle against known results</button>
+    <button class="btn bad" id="reset-btn">Reset to seeded demo data</button>
+    <span class="small muted" id="p-msg"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="trades-table">
+      <thead>
+        <tr>
+          <th>Opened</th><th>Market</th><th>Topic</th><th>Side</th>
+          <th class="num">Entry</th><th class="num">Qty</th><th class="num">Cost</th>
+          <th>Strategy</th><th>Status</th><th>Result</th>
+          <th class="num">Exit</th><th class="num">P&amp;L ($)</th><th>Source</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <h2>Performance by category</h2>
+  <div class="table-wrap">
+    <table id="cat-table">
+      <thead>
+        <tr><th>Category</th><th class="num">Trades</th><th class="num">Settled</th><th class="num">Wins</th><th class="num">Win rate</th><th class="num">Realized P&amp;L ($)</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="small muted">Deeper strategy comparisons live on <a href="analysis.html">Trade Analysis</a>.</p>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/kalshi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/app-common.js"></script>
+<script src="js/portfolio.js"></script>
+</body>
+</html>

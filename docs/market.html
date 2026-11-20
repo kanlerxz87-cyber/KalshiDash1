@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Market Detail — KalshiDash1</title>
+<meta name="description" content="Price chart (seconds/minutes/hours), orderbook liquidity ladder and simulated trading for a Kalshi demo market.">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  #chart-tip {
+    display: none; position: absolute; pointer-events: none; background: #17222e; color: #fff;
+    padding: 6px 9px; border-radius: 7px; font-size: 12px; z-index: 5; min-width: 120px; line-height: 1.35;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="m-title">Market detail</h1>
+  <p class="sub" id="m-sub">Pick a market from <a href="events.html">Live Events</a>, or enter a ticker below.</p>
+
+  <div class="btnrow">
+    <input type="text" id="ticker-input" placeholder="market ticker e.g. KXDEMOFUTHOURLY-26NOV20H12-UP" size="46">
+    <button class="btn primary" id="ticker-go">Load market</button>
+    <select id="ticker-pick"></select>
+  </div>
+
+  <div class="grid cols-4" id="m-stats"></div>
+
+  <h2>Price chart — <span id="chart-title" class="muted"></span></h2>
+  <div class="chart-wrap">
+    <div class="btnrow" id="window-btns"></div>
+    <canvas class="chart" id="price-chart"></canvas>
+    <div id="chart-tip"></div>
+    <div class="chart-note" id="chart-note">
+      Y axis: current contract price (USD per YES contract). X axis: time — choose window:
+      <strong>5 min</strong> plots browser-accumulated samples at seconds granularity (the REST API's finest public candles are 1-minute);
+      <strong>1 h / 6 h / 24 h</strong> plot 1-minute candle closes; <strong>7 d</strong> uses 60-minute candles when available
+      (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">candlestick docs</a>).
+    </div>
+  </div>
+
+  <h2>Liquidity — orderbook ladder</h2>
+  <p class="sub">Contracts available at each price. The API returns YES bids and NO bids only (a YES bid at $X is a NO ask at $(1−X) —
+  <a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">orderbook docs</a>).
+  Implied asks are computed from the complement; sizes come straight from <code>orderbook_fp</code>.</p>
+  <div class="grid cols-2">
+    <div class="table-wrap">
+      <table class="ladder" id="ladder">
+        <thead>
+          <tr><th class="num">Price (YES)</th><th class="num">Bid size (contracts)</th><th class="num">Ask size (contracts)</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <h3>Book summary</h3>
+      <div id="book-summary" class="small"></div>
+      <h3>Rules &amp; settlement</h3>
+      <div id="m-rules" class="small"></div>
+    </div>
+  </div>
+
+  <h2>Simulated trade</h2>
+  <div class="notice warn">
+    <strong>Simulation only.</strong> Real order execution requires your demo-account API keys and signed requests
+    (<code>POST /portfolio/events/orders</code> — <a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a>).
+    This static site never asks for or stores credentials. Trades placed here are recorded in your browser (localStorage)
+    and tracked on <a href="portfolio.html">Portfolio</a>.
+  </div>
+  <div class="panel">
+    <div class="grid cols-3">
+      <div>
+        <label class="field">Side</label>
+        <select id="tr-side"><option value="yes">Buy YES</option><option value="no">Buy NO</option></select>
+        <label class="field">Limit price (per contract, $0–$1)</label>
+        <input type="number" id="tr-price" min="0" max="1" step="0.001" value="0.50">
+      </div>
+      <div>
+        <label class="field">Quantity (contracts)</label>
+        <input type="number" id="tr-qty" min="1" step="1" value="10">
+        <label class="field">Strategy tag</label>
+        <select id="tr-strategy"></select>
+      </div>
+      <div>
+        <label class="field">Cost estimate</label>
+        <div id="tr-cost" class="stat"><div class="value">—</div><div class="note">price × quantity (fees not applied — see S-05)</div></div>
+        <div class="btnrow"><button class="btn good" id="tr-submit">Record simulated trade</button></div>
+      </div>
+    </div>
+    <div id="tr-msg" class="small"></div>
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/kalshi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/app-common.js"></script>
+<script src="js/market.js"></script>
+</body>
+</html>

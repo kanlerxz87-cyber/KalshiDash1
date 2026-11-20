@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Events — KalshiDash1</title>
+<meta name="description" content="Highest-dollar live events on the Kalshi demo exchange by topic, tracked until resolution (yes/no).">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+  <h1>Live Events Tracker</h1>
+  <p class="sub">Highest-dollar live markets by focus topic, ranked by 24h dollar volume (contracts × $1 notional), then total volume.
+  Each row links to the exact API query that produced it. Markets stay on this board until they resolve — the resolution
+  column flips to <span class="badge yes">YES</span> or <span class="badge no">NO</span> when the market determines and finalizes
+  (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">settlement docs</a>:
+  winning side receives $1 per contract).</p>
+
+  <div class="tabs" id="topic-tabs"></div>
+
+  <div class="btnrow">
+    <button class="btn small" id="refresh-btn">Refresh now</button>
+    <span class="small muted" id="refresh-note"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="events-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-sort="title">Event / market</th>
+          <th class="sortable" data-sort="topic">Topic</th>
+          <th class="sortable num" data-sort="last">Last</th>
+          <th class="num">Bid / Ask (size)</th>
+          <th class="sortable num" data-sort="vol24">24h vol ($)</th>
+          <th class="sortable num" data-sort="voltot">Total vol ($)</th>
+          <th class="sortable num" data-sort="oi">Open int ($)</th>
+          <th class="sortable" data-sort="close">Closes</th>
+          <th>Status / resolution</th>
+          <th>Source</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <h2>Resolution log</h2>
+  <p class="sub">Verified settled markets from the snapshot capture (and live data when reachable). Result is exactly
+  <code>yes</code> or <code>no</code> per the official market schema; payout shown is <code>settlement_value_dollars</code>
+  (the amount credited per YES contract).</p>
+  <div class="table-wrap">
+    <table id="resolved-table">
+      <thead>
+        <tr>
+          <th>Market</th><th>Topic</th><th>Strike</th>
+          <th class="num">Volume ($)</th>
+          <th>Resolved</th><th class="num">Payout / YES contract</th><th>Settled at</th><th>Settlement source</th><th>Source</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="notice" id="topic-note"></div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/kalshi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app-common.js"></script>
+<script src="js/events.js"></script>
+</body>
+</html>

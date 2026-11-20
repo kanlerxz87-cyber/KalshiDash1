@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flagged for Review — KalshiDash1</title>
+<meta name="description" content="Irregularities, unverified items and blanks — published for human review with source links.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+  <h1>Flagged for Review</h1>
+  <p class="sub">Nothing here blocks the site or the merge — each item is published with its evidence so a human can review and
+  request changes. Values that could not be confirmed from an official source are left <strong>blank</strong> everywhere they appear;
+  they are never inferred or filled in. See also <a href="questions.html">Questions &amp; Gaps</a> for the discovery plan of each unknown.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Item</th><th>What we found</th><th>Evidence</th><th>What is left blank / affected</th><th>Requested review</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>F-01</strong></td>
+          <td><code>GET /events</code> silently ignores <code>category</code> query parameter</td>
+          <td>Requesting open events with <code>category=Crypto</code> returned events from unrelated categories (World, Elections). The official parameter list for Get Events has no category filter, and the event <code>category</code> field is marked deprecated.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/events/get-events" target="_blank" rel="noopener">Get Events docs</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/events?status=open&category=Crypto&with_nested_markets=true&limit=10" target="_blank" rel="noopener">live probe (mixed results)</a></td>
+          <td>Topic filtering relies on <code>/series?category=…</code> + series tickers instead. Two rows captured from this probe (KXNEXTNATOSECGEN-99-*) have partial fields and are marked where the response was truncated.</td>
+          <td>Confirm the events endpoint should reject unknown params; consider reporting to Kalshi API feedback.</td>
+        </tr>
+        <tr>
+          <td><strong>F-02</strong></td>
+          <td>Real demo-account portfolio/trade sync is <strong>unverified and blank</strong></td>
+          <td>The brief asks for portfolio performance "using the kalshi demo account". Reading that account requires the holder's demo API key + private key and signed requests. This session must never request or store credentials, so no real account data was read.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo_env.md</a> · <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">auth quick start</a></td>
+          <td>All real-account figures (balance, positions, fills, real P&amp;L) are blank. The Portfolio page is explicitly SIMULATED with seeded demo rows tagged <code>seed</code>.</td>
+          <td>Provide demo keys locally via <code>scripts/fetch_snapshot.mjs</code> (see README) to populate real data — then re-verify (proposal S-01).</td>
+        </tr>
+        <tr>
+          <td><strong>F-03</strong></td>
+          <td>No volume-sorted market listing in the Trade API</td>
+          <td>Get Markets ordering rules are creation/close/settlement time. "Highest dollar amount" ranking therefore cannot be fetched as a single server-sorted list.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets docs</a></td>
+          <td>The exact "top N by dollar volume across all markets" list is approximated by topic (series volume → open markets → sort). A scanner job (S-03) would make it exact.</td>
+          <td>Confirm the ranking definition (24h vs total vs open interest) and whether a scheduled scanner is acceptable.</td>
+        </tr>
+        <tr>
+          <td><strong>F-04</strong></td>
+          <td>Browser CORS reachability of the demo API untested from the sandbox</td>
+          <td>Server-side fetches of the demo API succeed; browsers may still block cross-origin reads depending on the API's CORS headers, which this environment cannot inspect.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">docs show browser fetch examples</a></td>
+          <td>—</td>
+          <td>Open the live site and check the data badge. If it shows SNAPSHOT mode, use <code>scripts/local-proxy.mjs</code> locally or the S-03 scanner.</td>
+        </tr>
+        <tr>
+          <td><strong>F-05</strong></td>
+          <td>Series volumes blank for some snapshot rows</td>
+          <td>Culture and Crypto series were captured without <code>include_volume=true</code> (the parameter was verified later on other queries). Volume cells for those rows are left blank rather than estimated.</td>
+          <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&limit=50" target="_blank" rel="noopener">Culture query (no volume)</a> · <a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">param docs</a></td>
+          <td><code>volume_fp</code> for KXXBANNED* and KXBTCHIT85K/ETHMAXY/KXRIPPLE/KXBNBD/KXXRPATH series rows = blank.</td>
+          <td>Re-capture with <code>include_volume=true</code> on the next snapshot refresh.</td>
+        </tr>
+        <tr>
+          <td><strong>F-06</strong></td>
+          <td>Ben Wallace NATO row partially truncated in capture</td>
+          <td>The nested-markets probe response was cut mid-object; fields not visible in the capture (bid/ask prices and sizes, volume) are recorded as <code>null</code>.</td>
+          <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?status=open&category=Crypto&with_nested_markets=true&limit=10" target="_blank" rel="noopener">source query</a></td>
+          <td>KXNEXTNATOSECGEN-99-BWAL: yes bid/ask, sizes, volume cells blank.</td>
+          <td>Re-fetch <code>GET /markets/KXNEXTNATOSECGEN-99-BWAL</code> on next refresh.</td>
+        </tr>
+        <tr>
+          <td><strong>F-07</strong></td>
+          <td>Sandbox network policy blocks direct shell access to the demo API</td>
+          <td><code>curl</code> from the build sandbox fails TLS to external-api.demo.kalshi.co (host allowlist). Data capture used the platform fetch tool instead; identical requests, logged in <a href="sources.html">Sources</a>.</td>
+          <td>Build log 2026-11-20 (curl → SSL_ERROR_SYSCALL)</td>
+          <td>—</td>
+          <td>No action needed for the site; noted for transparency about how verification was performed.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Blank-value policy</h2>
+  <div class="notice">
+    When a value could not be confirmed from an official source it is displayed as empty/“—” and listed above.
+    No number on this site was copied from memory, guessed, or interpolated. Prices shown to 4 decimals and counts to 2 decimals
+    follow the fixed-point conventions in
+    <a href="https://docs.kalshi.com/getting_started/fixed_point_migration" target="_blank" rel="noopener">Fixed-Point Representation</a>.
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/kalshi.js"></script>
+<script src="js/app-common.js"></script>
+<script>
+  App.renderHeader('flagged.html');
+  App.renderFooter();
+</script>
+</body>
+</html>
