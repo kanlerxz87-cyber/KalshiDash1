@@ -1,12 +1,12 @@
 # COORDINATION.md — shared task board
 
-Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (workflow deploy of `docs/`) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
+Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
 ## Session on this branch
 
 - Session ID: `session-ef745c36`
 - Branch: `arena/ef745c36-kalshidash1` (base `f1fa6aa`, `main`)
-- Scope: whole repository on this branch (site generator, `docs/`, workflow, this board).
+- Scope: whole repository on this branch (site generator `scripts/`, generated site at the repo root, `assets/`, `categories/`, workflow, this board).
 
 ## Overlap with other session branches (read first)
 
@@ -24,13 +24,13 @@ Decision: this session did the full site on its own branch, because it may only 
 | ID | Task | Status | Owner | Files touched | Sources | Irregularities |
 |---|---|---|---|---|---|---|
 | T1 | Repo review, line by line | done | session-ef745c36 | whole repo (read) | `git log`, `git ls-remote`, `README.md`; branches listed above | F-11 (repo only has README; no tests/CI/licence/.gitignore) · F-12 (overlapping branches) |
-| T2 | Executive summary | done | session-ef745c36 | `scripts/build-site.mjs`, `docs/executive-summary.html` | see Sources page | F-06, F-07 |
-| T3 | Category pages (gas, elections, culture, crypto, golf) with live tables | done | session-ef745c36 | `docs/categories/*.html`, `docs/assets/app.js` | series list, events (open/settled), tags map | F-01, F-03, F-04, F-05 |
-| T4 | Live dashboard: price chart (sec/min/hour/day), liquidity | done | session-ef745c36 | `docs/dashboard.html`, `docs/assets/app.js` | market, orderbook, candlesticks | F-01, F-02 |
-| T5 | Portfolio + trading status pages | done (blocked) | session-ef745c36 | `docs/portfolio.html`, `docs/trading.html`, `docs/analysis.html` | auth doc, create-order quick start, order-direction doc | F-07, F-08, F-09 |
-| T6 | Questions, missing info, suggestions | done | session-ef745c36 | `docs/questions.html`, `docs/suggestions.html` | see pages | — |
-| T7 | Sources + Flagged for review pages | done | session-ef745c36 | `docs/sources.html`, `docs/flagged.html` | see pages | F-01 … F-13 |
-| T8 | Build, link check, Pages workflow, PR, merge, deploy check | in progress | session-ef745c36 | `scripts/*`, `.github/workflows/pages.yml`, `COORDINATION.md`, `README.md` | `node scripts/check-links.mjs` | see Integration record |
+| T2 | Executive summary | done | session-ef745c36 | `scripts/build-site.mjs`, `executive-summary.html` | see Sources page | F-06, F-07 |
+| T3 | Category pages (gas, elections, culture, crypto, golf) with live tables | done | session-ef745c36 | `categories/*.html`, `assets/app.js` | series list, events (open/settled), tags map | F-01, F-03, F-04, F-05 |
+| T4 | Live dashboard: price chart (sec/min/hour/day), liquidity | done | session-ef745c36 | `dashboard.html`, `assets/app.js` | market, orderbook, candlesticks | F-01, F-02 |
+| T5 | Portfolio + trading status pages | done (blocked) | session-ef745c36 | `portfolio.html`, `trading.html`, `analysis.html` | auth doc, create-order quick start, order-direction doc | F-07, F-08, F-09 |
+| T6 | Questions, missing info, suggestions | done | session-ef745c36 | `questions.html`, `suggestions.html` | see pages | — |
+| T7 | Sources + Flagged for review pages | done | session-ef745c36 | `sources.html`, `flagged.html` | see pages | F-01 … F-13 |
+| T8 | Build, link check, Pages workflow, PR, merge, deploy check | in progress | session-ef745c36 | `scripts/*`, `.github/workflows/pages.yml`, `COORDINATION.md`, `README.md` | `node scripts/check-links.mjs` | F-14 (Pages source could not be changed by the token; site published from repo root) |
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review` (published on the Flagged page; does not block).
 
@@ -38,7 +38,7 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review` (published 
 
 - Read each official page with the fetch tool and recorded the URL in `scripts/build-site.mjs` (`S` object) and on the Sources page.
 - Live demo-API reads (no credentials): `/exchange/status`, `/series` (category, tags, include_volume), `/search/tags_by_categories`, `/events` (open and settled, nested markets), `/markets/{ticker}/orderbook`.
-- Smoke test of `docs/assets/app.js` in jsdom with mocked responses shaped like the verified payloads (home, topic, dashboard, seconds-live mode, granularity switch). No runtime errors. Not a real-browser test.
+- Smoke test of `assets/app.js` in jsdom with mocked responses shaped like the verified payloads (home, topic, dashboard, seconds-live mode, granularity switch). No runtime errors. Not a real-browser test.
 - Internal link check: `node scripts/check-links.mjs` (15 pages, 0 broken internal links; 24 external links listed for review, not fetched).
 
 ## Claims log
@@ -55,3 +55,4 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review` (published 
 - Merge result: _see below_
 - GitHub Pages URL: _see below_
 - Build/link check: `node scripts/build-site.mjs && node scripts/check-links.mjs` → 15 pages, no broken internal links.
+- Pages: the token got HTTP 403 when changing Pages to the workflow build type or to `/docs` (repo admin needed). The existing legacy source (`main`, `/`) is used, so the site is at the repo root.

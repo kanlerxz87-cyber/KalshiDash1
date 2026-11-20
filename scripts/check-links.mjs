@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Offline check of the generated site in docs/:
+// Offline check of the generated site (repository root, see build-site.mjs):
 //  - every internal href/src resolves to an existing file (and #anchor exists if given)
 //  - every page has a <title>, a <h1>, and the shared navigation
 //  - every page loads the shared stylesheet and script
@@ -9,10 +9,12 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const DOCS = resolve(here, "..", "docs");
+const DOCS = resolve(here, "..");
 
+const SKIP = new Set(["node_modules", "scripts"]);
 function walk(dir) {
   return readdirSync(dir).flatMap((f) => {
+    if (f.startsWith(".") || SKIP.has(f)) return [];
     const p = join(dir, f);
     return statSync(p).isDirectory() ? walk(p) : p.endsWith(".html") ? [p] : [];
   });
