@@ -70,6 +70,8 @@ jobs:
           git add data/live/
           if git diff --cached --quiet -- data/live/; then
             echo "No market change in this run — nothing to commit."
+          elif [ "$TARGET_BRANCH" != "main" ]; then
+            echo "Sample validated on $TARGET_BRANCH; write-back is intentionally restricted to main."
           else
             STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
             git commit -m "data(live): engine sample ${STAMP}"

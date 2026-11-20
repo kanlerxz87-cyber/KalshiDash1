@@ -72,6 +72,8 @@ jobs:
           if [ -f scripts/build-site.mjs ]; then git add -- '*.html' assets categories; fi
           if git diff --cached --quiet; then
             echo 'No data change — nothing to commit.'
+          elif [ "$TARGET_BRANCH" != "main" ]; then
+            echo "Snapshot checked on $TARGET_BRANCH; write-back is intentionally restricted to main."
           else
             git commit -m 'chore(data): refresh demo snapshot from the official Kalshi demo API'
             # A fetch/rebase/push loop closes the race where live-alerts commits
