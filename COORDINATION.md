@@ -212,12 +212,18 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review` (published 
 | I7 | Live data refresh: GitHub Actions job that re-captures the snapshot from the official demo API | done | session-7d6d2fcb | `scripts/fetch-snapshot.mjs`, `.github/workflows/refresh-data.yml` | demo API | — |
 | I8 | Sources page with a source link on every table row; Flagged for Review page | done | session-7d6d2fcb | `templates/sources.tpl`, `templates/flagged.tpl`, `data/sources.json` | docs.kalshi.com | — |
 | I9 | Line-by-line re-verification of combined data; link check; build check | done | session-7d6d2fcb | `scripts/check-links.mjs`, `scripts/build-site.mjs`, `templates/*.tpl` | — | F-22 (the whole-tree checker scanned `templates/*.html`; templates renamed to `.tpl`) |
-| I10 | PR to `main`, merge, confirm Pages deploy, record PR + merge result | in progress | session-7d6d2fcb | `COORDINATION.md` | `gh pr`, `gh api .../pages/builds/latest` | — |
+| I10 | PR to `main`, merge, confirm Pages deploy, record PR + merge result | in progress | session-7d6d2fcb | `COORDINATION.md` | `gh pr`, `gh api .../pages/builds/latest` | PR https://github.com/kanlerxz87-cyber/KalshiDash1/pull/16 (`arena/7d6d2fcb-kalshidash1` → `main`); checks on the head commit: Site build check, site-qa, suite-qa all pass. Merge and Pages result: see the PR-result note in the next section. |
 
 Rules honoured by this session: only files in the scope above are edited; no other session's file is
 modified; every claim is committed and pushed immediately; `git pull --rebase` is run before every push;
 no value is inferred — anything not confirmable from an official source is left blank and published on
 the Flagged for Review page.
+
+## PR result — session-7d6d2fcb (final integration)
+
+- PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/16 (`arena/7d6d2fcb-kalshidash1` → `main`).
+- Checks on the head commit: `Site build check` (pages.yml), `site-qa`, `suite-qa` — all pass.
+- Merge: `gh pr merge 16 --merge` (no approval waited for, per the brief). The merge commit and the Pages build status are recorded on PR #16 itself and in the session log.
 
 ## Verification & completion log (session-7d6d2fcb, final integration, 2026-11-20)
 
