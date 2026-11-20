@@ -38,6 +38,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -57,22 +58,48 @@ jobs:
         run: node scripts/check_alerts.mjs
 
       - name: Commit the new sample
+        # Feature branches exercise the engine/validation but do not write data; only main is durable.
+        if: github.ref == 'refs/heads/main' && steps.sample.outcome == 'success'
         # Runs whenever a sample was produced and validated, even if a later step fails, so a
         # partial problem never loses real, verified market data.
-        if: steps.sample.outcome == 'success' && success() || steps.sample.outcome == 'success'
+        # The rebase is no longer allowed to fail silently: the old `|| true` turned a
+        # conflicting remote into an opaque push failure (session-dd012e26, F-39).
         run: |
-          set -e
+          set -euo pipefail
           git config user.name  "kalshidash1-engine"
           git config user.email "engine@users.noreply.github.com"
           git add data/live/
           if git diff --cached --quiet -- data/live/; then
             echo "No market change in this run — nothing to commit."
+          elif [ "$TARGET_BRANCH" != "main" ]; then
+            echo "Sample validated on $TARGET_BRANCH; write-back is intentionally restricted to main."
           else
             STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
             git commit -m "data(live): engine sample ${STAMP}"
-            git pull --rebase --autostash origin ${{ github.ref_name }} || true
-            git push origin HEAD:${{ github.ref_name }}
-          fi
+            PUSHED=false
+            for attempt in 1 2 3 4 5; do
+              if ! git fetch origin "$TARGET_BRANCH"; then
+                echo "::error::could not fetch origin/$TARGET_BRANCH"
+                exit 1
+              fi
+              if ! git rebase FETCH_HEAD; then
+                git rebase --abort || true
+                echo "::error::could not rebase the engine sample onto origin/$TARGET_BRANCH"
+                exit 1
+              fi
+              if git push origin "HEAD:$TARGET_BRANCH"; then
+                echo "Pushed the engine sample to origin/$TARGET_BRANCH on attempt $attempt."
+                PUSHED=true
+                break
+              fi
+              echo "Push attempt $attempt lost a concurrent-update race; retrying after fetch/rebase."
+            done
+            if [ "$PUSHED" != true ]; then
+              echo "::error::could not push the engine sample to origin/$TARGET_BRANCH after 5 attempts"
+              exit 1
+            fi
+        env:
+          TARGET_BRANCH: ${{ github.ref_name }}
 
       - name: Fail the run if the engine could not reach the API
         if: steps.sample.outcome != 'success'

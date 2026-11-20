@@ -50,27 +50,37 @@ const TOPICS = [
 const topicLabel = (id) => (TOPICS.find((t) => t.id === id) || { label: id || '—' }).label;
 
 /* --------------------------------------------------------------- navigation */
+/* One canonical navigation for the whole published tree (session-dd012e26).
+ * Groups, in order: the working pages a trader uses, the five focus topics, the
+ * reference/verification pages, and the two earlier builds that are still published
+ * but are NOT the canonical site. Every published page is reachable from the landing
+ * page through this list. */
 const NAV = [
   ['index.html', 'Home'],
-  ['dashboard.html', 'Dashboard'],
+  ['executive-summary.html', 'Executive summary'],
+  ['dashboard.html', 'Live dashboard'],
+  ['alerts/index.html', 'Live alerts'],
   ['markets.html', 'Markets'],
   ['portfolio.html', 'Portfolio'],
   ['analysis.html', 'Analysis'],
-  ['strategies.html', 'Strategies'],
-  ['sources.html', 'Sources'],
-  ['flagged.html', 'Flagged for review']
+  ['strategies.html', 'Strategies']
 ];
 const NAV_TOPICS = TOPICS.map((t) => [`categories/${t.id}.html`, t.label]);
-const NAV_MORE = [
+const NAV_REF = [
+  ['sources.html', 'Sources'],
+  ['flagged.html', 'Flagged for review'],
   ['questions.html', 'Questions'],
   ['suggestions.html', 'Suggestions'],
   ['api.html', 'API reference'],
   ['demo-account.html', 'Demo account'],
   ['catalyst.html', 'Swing catalysts'],
-  ['strategylab.html', 'Strategy lab'],
-  ['alerts/index.html', 'Live alerts (engine, 2 chats)'],
-  ['dash/alerts.html', 'Alert feeds (dash suite)'],
-  ['dash/autotrade.html', 'Auto-trade engine (dash suite)']
+  ['strategylab.html', 'Strategy lab']
+];
+/* Earlier builds, kept published and clearly labelled. They are superseded by the
+ * pages above; nothing links to them from the dashboard's own flow. */
+const NAV_EARLIER = [
+  ['dash/index.html', 'Earlier build: dash/'],
+  ['docs/index.html', 'Earlier build: docs/']
 ];
 
 function navHtml(base = '') {
@@ -79,8 +89,10 @@ function navHtml(base = '') {
     NAV.map(link).join(''),
     '<span class="nav-sep">Topics</span>',
     NAV_TOPICS.map(link).join(''),
-    '<span class="nav-sep">More</span>',
-    NAV_MORE.map(link).join('')
+    '<span class="nav-sep">Reference</span>',
+    NAV_REF.map(link).join(''),
+    '<span class="nav-sep">Earlier builds</span>',
+    NAV_EARLIER.map(link).join('')
   ].join('');
 }
 function footerHtml(base = '') {
@@ -98,6 +110,9 @@ function footerHtml(base = '') {
        <a href="${base}COORDINATION.md">Coordination board</a></p>
     <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
     Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+    <p class="muted small">Canonical site: the pages in the navigation above. Two earlier builds are still published for
+    reference only and are not kept up to date:
+    <a href="${base}dash/index.html">dash/</a> · <a href="${base}docs/index.html">docs/</a>.</p>
   </div>`;
 }
 

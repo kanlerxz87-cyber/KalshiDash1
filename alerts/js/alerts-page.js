@@ -99,7 +99,7 @@
         '<span class="badge ' + (up ? 'up' : 'down') + '">' + dir + ' ' + A.usd(a.abs_delta, 2) + '</span>' +
         (isTrade ? '<span class="badge neutral" title="Detected between two consecutive trades — the sharpest public price view">trade</span>' : '') +
         (isCandle ? '<span class="badge neutral" title="Detected from 1-minute candlesticks, not from two samples">candle</span>' : '') +
-        (a.book_inconsistent ? '<span class="badge warn" title="The API row for this contract contradicted itself (yes_ask + no_bid != $1); the price came from the other side of the book. See F-27.">quotes inconsistent</span>' : '') +
+        (a.book_inconsistent ? '<span class="badge warn" title="The API row for this contract contradicted itself (yes_ask + no_bid != $1); the price came from the other side of the book. See F-49.">quotes inconsistent</span>' : '') +
         (model.highROI ? '<span class="badge accent">model ' + Number(model.score).toFixed(2) + '</span>' : '') +
         '<span class="when" title="' + A.esc(a.ts || '') + '">' + timeAgo(a.ts) + '</span>' +
       '</div>' +
@@ -272,7 +272,7 @@
         '<td class="num">' + (m.est_traded_dollars === null || m.est_traded_dollars === undefined ? '—' : '$' + m.est_traded_dollars.toLocaleString()) + '</td>' +
         '<td class="small nowrap">' + A.esc((m.close_time || '').replace('T', ' ').replace(/\.\d+Z$/, 'Z') || '—') + '</td>' +
         '<td>' + (m.result ? '<span class="badge ' + (m.result === 'yes' ? 'yes' : 'no') + '">' + A.esc(m.result) + '</span>' : '<span class="badge live">' + A.esc(m.status || '—') + '</span>') +
-          (m.book_inconsistent ? ' <span class="badge warn" title="The API row contradicted itself; price taken from the NO side (F-27)">quotes inconsistent</span>' : '') + '</td>' +
+          (m.book_inconsistent ? ' <span class="badge warn" title="The API row contradicted itself; price taken from the NO side (F-49)">quotes inconsistent</span>' : '') + '</td>' +
         '<td class="src">' + (m.source_url ? '<a href="' + A.esc(m.source_url) + '" target="_blank" rel="noopener">API</a>' : '—') + '</td>' +
       '</tr>';
     }).join('');

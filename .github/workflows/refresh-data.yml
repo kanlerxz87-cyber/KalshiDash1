@@ -34,6 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -51,15 +54,44 @@ jobs:
           if [ -f scripts/check-links.mjs ]; then node scripts/check-links.mjs; fi
 
       - name: Commit refreshed data (only when something changed)
+        # Feature branches exercise capture/build/link validation without write-back;
+        # only main is the durable publisher of snapshot and generated HTML.
+        if: github.ref == 'refs/heads/main'
+        # Fixed 2026-11-20 (session-dd012e26). This step used to fail on `main`:
+        #   1. `git rev-parse --abbrev-ref HEAD` returns the literal string "HEAD" on
+        #      the detached checkout that actions/checkout leaves behind, so the push
+        #      target was the invalid refspec "HEAD:HEAD";
+        #   2. the push had no rebase, so it lost the race against the concurrent
+        #      `live-alerts` job, which pushes data/live/ to the same branch.
+        # Both are fixed below: the target branch comes from the event, and the
+        # commit is rebased onto the remote branch first.
         run: |
-          set -e
+          set -euo pipefail
+          echo "Preparing snapshot push: event=$GITHUB_EVENT_NAME ref=$GITHUB_REF target=$TARGET_BRANCH"
+          git status --short
           git config user.name  'kalshidash-bot'
           git config user.email 'kalshidash-bot@users.noreply.github.com'
           git add data/snapshot.json
           if [ -f scripts/build-site.mjs ]; then git add -- '*.html' assets categories; fi
           if git diff --cached --quiet; then
             echo 'No data change — nothing to commit.'
+          elif [ "$TARGET_BRANCH" != "main" ]; then
+            echo "Snapshot checked on $TARGET_BRANCH; write-back is intentionally restricted to main."
           else
             git commit -m 'chore(data): refresh demo snapshot from the official Kalshi demo API'
-            git push origin "HEAD:$(git rev-parse --abbrev-ref HEAD)"
-          fi
+            # A fetch/rebase/push loop closes the race where live-alerts commits
+            # between our rebase and push. Failed pushes are retried only after a
+            # fresh rebase; other errors fail after the bounded retry count.
+            for attempt in 1 2 3 4 5; do
+              git fetch origin "$TARGET_BRANCH"
+              git rebase FETCH_HEAD
+              if git push origin "HEAD:$TARGET_BRANCH"; then
+                echo "Pushed the refreshed snapshot to origin/$TARGET_BRANCH on attempt $attempt."
+                exit 0
+              fi
+              echo "Push attempt $attempt lost a concurrent-update race; retrying after fetch/rebase."
+            done
+            echo "::error::could not push refreshed snapshot to origin/$TARGET_BRANCH after 5 attempts"
+            exit 1
+        env:
+          TARGET_BRANCH: ${{ github.ref_name }}
