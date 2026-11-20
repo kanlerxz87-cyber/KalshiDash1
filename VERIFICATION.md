@@ -1,5 +1,9 @@
 # VERIFICATION.md — Line-by-Line Verification Record
 
+## Final integration — session dd012e26 (2026-11-20)
+
+See [`verification/2026-11-20-dd012e26.md`](verification/2026-11-20-dd012e26.md) for full scope, evidence and limitations. Official demo endpoint roots and bids-only orderbook semantics were checked against Kalshi docs; one open gas market was compared field-by-field with the committed snapshot. All flag anchors are unique. The landing-page link graph reaches 52 of 53 published HTML pages; `404.html` is the intentional exception. Build freshness, whole-tree link checks, and automated suites pass. The zero schedule-triggered-run history and the stale lockfile metadata are flagged. A new schedule run, PR merge and Pages deployment remain unverified at this point.
+
 **Verified:** 2026-11-20 · **Session:** session-cdfe52bd · **Method:** every table row, figure, and API claim re-checked against the official source listed in `SOURCES.md`; values that could not be confirmed are blank + flagged (see `dash/flagged.html`).
 
 ## 1. Verification rules applied

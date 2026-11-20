@@ -1,5 +1,59 @@
 # COORDINATION.md — shared task board
 
+## Current Arena session — `arena/dd012e26-kalshidash1` (2026-11-20 UTC) — FINAL INTEGRATION
+
+- Session ID: `dd012e26`. Branch: `arena/dd012e26-kalshidash1` (base `d24616a`, `main`; branch fast-forwarded to `c57e52e` = `main` after PRs #25/#26 landed).
+- Role: **final integration session.** Re-verifies the combined tree, repairs the defects found in the
+  line-by-line review, consolidates the published navigation, fixes the failing scheduled refresh job,
+  then opens and merges the PR to `main` and confirms the GitHub Pages deploy.
+
+### Overlap check at claim time (read from `origin`, 2026-11-20 ~19:25 UTC) — respected, not duplicated
+
+| Claimed work | Claimant | Outcome |
+|---|---|---|
+| README merge-conflict repair + repo smoke audit | `session-c431fca8` (PR #25, merged) | respected; **their** resolution of `README.md` is kept as-is and is not re-done here |
+| L4 live re-verification of golf/elections/crypto | `session-605bbb3f` (PR #26, merged) | respected; their `verification/2026-11-20-605bbb3f.md` is untouched and their F-L4-* items are adopted as-is |
+| Alert engine + two scrolling chats | `session-cb49437b` (PR #24, merged) | respected; only the **flag-ID references** inside their files are renumbered (they asked for it implicitly by leaving duplicate IDs) |
+| Root-site generator, templates, `data/`, workflows | `session-7d6d2fcb` (PR #16, merged) | finished; this session takes the shared outputs over as the integration session |
+
+### Task board — session-dd012e26
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| R1 | **Repair the failing `Refresh demo data snapshot` job** (the old push used detached `HEAD`; feature-branch workflow write-back attempts also failed despite explicit branch targeting and retries). | **in progress — write-back restricted to `main`; validate by running the refreshed workflows on `main` after merge** | session-dd012e26 | `.github/workflows/refresh-data.yml`, `.github/workflows/live-alerts.yml` |
+| R2 | **Fix duplicate flag IDs on the Flagged for Review page.** `F-27`…`F-31` each appear twice (the alert-engine set from session-cb49437b was appended after the integration set, out of numeric order). The alert-engine set is renumbered `F-49`…`F-53` (the later-arriving upstream settlement audit already owns F-34…F-38), and every in-repo reference to the alert-engine IDs is updated. | **done** | session-dd012e26 | `templates/flagged.tpl`, `flagged.html` (generated), `docs/ALERTS.md`, `alerts/index.html`, `alerts/js/alerts-page.js` |
+| R3 | **Complete the navigation consolidation** left half-finished by session-7d6d2fcb: `dash/index.html`, `dash/api.html`, `dash/executive-summary.html`, `dash/market.html` were unreachable from the landing page. One canonical nav now reaches every published page, the live alert console is a first-class nav entry, and the two earlier suites are labelled as supplementary rather than left as orphans. | **done** | session-dd012e26 | `scripts/build-site.mjs`, `templates/*.tpl` (nav/footer text only), regenerated root pages |
+| R4 | **Record the new irregularities found in the line-by-line review** (duplicate flag IDs; the failing refresh job; the scheduled-workflow gap; the `package.json`/`package-lock.json` dependency mismatch) on the site's Flagged for Review page with sources, per the brief. | **done** | session-dd012e26 | `templates/flagged.tpl`, `flagged.html` (generated) |
+| R5 | **Re-verify the combined tree line by line** against official sources and record it. | **done** — integration changes, tested outputs, and the previously fetched official docs/API comparison are recorded; older archived rows are not claimed as newly re-fetched | session-dd012e26 | `verification/2026-11-20-dd012e26.md` (new), `VERIFICATION.md`, `COORDINATION.md` |
+| R6 | **PR to `main`, merge, confirm the Pages deploy**, record the result. | **in progress** | session-dd012e26 | `COORDINATION.md` (this section only) |
+
+### Verification performed (session-dd012e26, 2026-11-20 UTC)
+
+See `verification/2026-11-20-dd012e26.md` for the exact scope, methods and evidence. In summary:
+
+- The official demo environment and order-book docs were fetched: endpoint roots, mock-funds warning, bids-only orderbook and implied-ask semantics checked.
+- The live demo market query was compared against snapshot market `KXAAAGASW-26NOV23-3.9400`; captured fields matched and the unresolved `result` remained blank.
+- `npm ci`, `npm test`, `node scripts/build-site.mjs --check`, both whole-tree link checkers, alert/render/lab/logic tests, dash link/asset test, and Python syntax checks all passed. Latest link scan: 90 pages, zero broken internal links; 2,160 internal links checked.
+- The navigation graph reaches 52/53 published pages from the landing page; `404.html` is the intentional exception.
+- No schedule-triggered run was observed. This is flagged, not presented as a successful scheduled execution.
+- The post-fix branch CI/deployment has not yet been observed; no passing checks or deployment is claimed here.
+
+### Irregularities found in this session's review (published on `flagged.html`)
+
+- **F-49–F-53** — alert-engine entries had reused F-27–F-31 IDs; rows are now unique and references were updated. The intervening F-34–F-38 IDs were added on `main` by the concurrently merged settlement-source audit and were preserved. The alert-engine meanings are: F-49 data coherence, F-50 Culture tag taxonomy inconsistency, F-51 browser CORS limitation, F-52 Culture topic category correction, F-53 heuristic ROI model.
+- **F-44–F-48** — this integration's new findings: refresh push failure (retry-loop repair pending Actions confirmation), no recorded scheduled runs, stale lockfile metadata, duplicate IDs fixed, and formerly unreachable supplementary pages now linked.
+- **F-39** — refresh-data push step failed in run `44752211268`: it constructed a push target from detached `HEAD` and did not rebase against concurrent updates. Workflow repaired; future run is needed to confirm the live fix.
+- **F-40** — repository Actions API reported zero schedule-triggered runs despite declared cron schedules.
+- **F-41** — stale `package-lock.json` package records/root name do not match `package.json`; `npm ci` still passes. Left unchanged, flagged.
+- **F-42** — duplicate flag anchors repaired.
+- **F-43** — four earlier `dash/` pages had been unreachable from root navigation; consolidated navigation now reaches the earlier build, labelled supplementary.
+
+### PR & merge record (R6)
+
+- *To be completed when the PR is opened and merged. No PR, merge or deploy result is claimed yet.*
+
+---
+
 ## Current Arena session — `arena/c431fca8-kalshidash1` (2026-11-20 UTC)
 
 - Status: active; branched from `d24616a80151e8e51c6334f585d3e0e6d4cde919`.
@@ -83,14 +137,17 @@ Every claim below was checked against the GitHub API or a local run **in this se
 
 ### Irregularities / flags published with this session
 
-- **F-J1 (open, environmental)** — GitHub has never fired a `schedule` trigger on this repository. It is public,
+Flag IDs were renumbered to F-54…F-56 after `main` published F-44…F-53 (session dd012e26); the
+rows were merged as a union, nothing was dropped.
+
+- **F-54 (open, environmental)** — GitHub has never fired a `schedule` trigger on this repository. It is public,
   fresh (created 2026-11-20T10:57Z), not a fork, not archived/disabled, has an active default branch and a
   valid cron, so none of the documented disqualifiers apply. Cause not determinable from the repository side;
   documented as a flag rather than "fixed" by assertion. Mitigation: `keepalive.yml` samples inline on its own
   cron **and** the site prints the measured age so a stall is visible either way.
-- **F-J2 (open, needs merge)** — `keepalive.yml` cannot be exercised before merge (J1-d). Its first real run
+- **F-55 (open, needs merge)** — `keepalive.yml` cannot be exercised before merge (J1-d). Its first real run
   will be on `main` after this PR merges; the merge step below checks that run and reports its result.
-- **F-J3 (open, informational)** — the snapshot/feed volumes reported on the demo exchange are very large
+- **F-56 (open, informational)** — the snapshot/feed volumes reported on the demo exchange are very large
   (e.g. 465,856,531 contracts on one 2028 nomination market). Values are reproduced exactly as the API returns
   them and are labelled as demo mock data; they are **not** claimed to be realistic. See the demo-environment
   caveat: https://docs.kalshi.com/getting_started/demo_env ("The price and behavior of markets in the demo

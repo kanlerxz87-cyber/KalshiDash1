@@ -108,7 +108,8 @@
     <div class="panel">
       <h3>Watch and decide</h3>
       <ol>
-        <li><a href="dashboard.html">Dashboard</a> — two scrolling chats: every move ≥ $0.10, and only the moves the ROI model likes.</li>
+        <li><a href="dashboard.html">Live dashboard</a> — two scrolling chats: every move ≥ $0.10, and only the moves the ROI model likes.</li>
+        <li><a href="alerts/index.html">Live alerts console</a> — the same two chats fed by the background engine, so the record keeps running when no browser is open.</li>
         <li><a href="markets.html">Markets</a> — the full tracked list, filterable by topic and by open/resolved, with each market's result.</li>
         <li><a href="categories/gas.html">Topic pages</a> — series, open markets, liquidity and resolved events for one topic at a time.</li>
         <li><a href="market.html">Market detail</a> — price chart (30 s → 24 h), order-book ladder, settlement rules, paper trade.</li>
@@ -120,6 +121,7 @@
         <li><a href="portfolio.html">Portfolio</a> — the simulated portfolio, the auto-trader and the equity curve.</li>
         <li><a href="analysis.html">Analysis</a> — trades categorised by strategy and topic so you can build a strategy from the results.</li>
         <li><a href="strategies.html">Strategies</a> — the exact rule behind every strategy and behind the ROI score.</li>
+        <li><a href="catalyst.html">Swing catalysts</a> — every ≥ $0.10 move with its official event link and the settlement sources the API names, plus clearly-labelled discovery links for a possible cause.</li>
         <li><a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for review</a> · <a href="questions.html">Questions</a> — provenance and open items.</li>
       </ol>
     </div>

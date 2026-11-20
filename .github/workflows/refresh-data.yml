@@ -8,17 +8,6 @@ name: Refresh demo data snapshot
 # committed fallback used when the browser cannot reach the demo API.
 #
 # Docs: https://docs.kalshi.com/getting_started/demo_env
-#
-# FAILURE THIS FIXES (measured, PR run 44752211268 on main, 2026-11-20T14:18:40Z)
-# ---------------------------------------------------------------------------
-# The job failed at "Commit refreshed data". The refresh step itself succeeded; the push lost a
-# race against the engine bot, which committed to `main` at the same second from the `live-alerts`
-# workflow that the merge had just started. `git push` returns non-fast-forward in that case and
-# `set -e` failed the job. Nothing had changed in data/snapshot.json, so no data was lost — but a
-# permanently red job trains everyone to ignore a red job, which is how a silent stall survives.
-#
-# The fix is the standard rebase-and-retry loop (three attempts), which is what makes two bots
-# writing to one branch safe. It does not force-push and never discards the other bot's commit.
 
 on:
   workflow_dispatch:
@@ -36,10 +25,8 @@ on:
 permissions:
   contents: write
 
-# `live-alerts` and this workflow both push commits to the same branch. Sharing one concurrency
-# group means the second one queues instead of colliding; the retry loop above covers the rest.
 concurrency:
-  group: writer-${{ github.ref }}
+  group: refresh-data-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -47,6 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -64,56 +54,44 @@ jobs:
           if [ -f scripts/check-links.mjs ]; then node scripts/check-links.mjs; fi
 
       - name: Commit refreshed data (only when something changed)
+        # Feature branches exercise capture/build/link validation without write-back;
+        # only main is the durable publisher of snapshot and generated HTML.
+        if: github.ref == 'refs/heads/main'
+        # Fixed 2026-11-20 (session-dd012e26). This step used to fail on `main`:
+        #   1. `git rev-parse --abbrev-ref HEAD` returns the literal string "HEAD" on
+        #      the detached checkout that actions/checkout leaves behind, so the push
+        #      target was the invalid refspec "HEAD:HEAD";
+        #   2. the push had no rebase, so it lost the race against the concurrent
+        #      `live-alerts` job, which pushes data/live/ to the same branch.
+        # Both are fixed below: the target branch comes from the event, and the
+        # commit is rebased onto the remote branch first.
         run: |
           set -euo pipefail
+          echo "Preparing snapshot push: event=$GITHUB_EVENT_NAME ref=$GITHUB_REF target=$TARGET_BRANCH"
+          git status --short
           git config user.name  'kalshidash-bot'
           git config user.email 'kalshidash-bot@users.noreply.github.com'
           git add data/snapshot.json
           if [ -f scripts/build-site.mjs ]; then git add -- '*.html' assets categories; fi
           if git diff --cached --quiet; then
             echo 'No data change — nothing to commit.'
-            exit 0
-          fi
-          git commit -m 'chore(data): refresh demo snapshot from the official Kalshi demo API'
-          BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-          # Another bot (the alert engine) also commits to this branch. Rebase onto whatever
-          # landed in the meantime and retry instead of failing on a non-fast-forward.
-          for attempt in 1 2 3; do
-            echo "push attempt ${attempt}/3 to ${BRANCH}"
-            if git pull --rebase --autostash origin "$BRANCH" && git push origin "HEAD:${BRANCH}"; then
-              echo "pushed on attempt ${attempt}"
-              exit 0
-            fi
-            git rebase --abort 2>/dev/null || true
-            sleep $((attempt * 10))
-          done
-          echo "::error::could not push after 3 attempts; another writer is committing to ${BRANCH} continuously"
-          exit 1
-
-      # OPTIONAL chain hint. Measured 2026-11-20: a dispatch made with the repository's own
-      # `GITHUB_TOKEN` returns 204 but does not create a run in another workflow, and a workflow
-      # file added on a branch other than the default is not registered at all. The reliable
-      # driver is `keepalive.yml`, which samples both feeds inline on a schedule. This step only
-      # helps if a fine-grained PAT with Actions:write is stored as SELF_DISPATCH_TOKEN; without
-      # it the step reports that fact instead of pretending the chain continued.
-      # https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow
-      - name: Queue the next run (only with SELF_DISPATCH_TOKEN)
-        if: always()
+          elif [ "$TARGET_BRANCH" != "main" ]; then
+            echo "Snapshot checked on $TARGET_BRANCH; write-back is intentionally restricted to main."
+          else
+            git commit -m 'chore(data): refresh demo snapshot from the official Kalshi demo API'
+            # A fetch/rebase/push loop closes the race where live-alerts commits
+            # between our rebase and push. Failed pushes are retried only after a
+            # fresh rebase; other errors fail after the bounded retry count.
+            for attempt in 1 2 3 4 5; do
+              git fetch origin "$TARGET_BRANCH"
+              git rebase FETCH_HEAD
+              if git push origin "HEAD:$TARGET_BRANCH"; then
+                echo "Pushed the refreshed snapshot to origin/$TARGET_BRANCH on attempt $attempt."
+                exit 0
+              fi
+              echo "Push attempt $attempt lost a concurrent-update race; retrying after fetch/rebase."
+            done
+            echo "::error::could not push refreshed snapshot to origin/$TARGET_BRANCH after 5 attempts"
+            exit 1
         env:
-          SELF_DISPATCH_TOKEN: ${{ secrets.SELF_DISPATCH_TOKEN }}
-        run: |
-          if [ -z "${SELF_DISPATCH_TOKEN}" ]; then
-            echo "::notice::No SELF_DISPATCH_TOKEN secret; the scheduled driver is keepalive.yml, which samples inline."
-            exit 0
-          fi
-          CODE=$(curl -sS -o /dev/null -w '%{http_code}' -X POST \
-            -H 'Accept: application/vnd.github+json' \
-            -H "Authorization: Bearer ${SELF_DISPATCH_TOKEN}" \
-            -H 'X-GitHub-Api-Version: 2022-11-28' \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/refresh-data.yml/dispatches" \
-            -d "{\"ref\":\"${GITHUB_REF_NAME}\"}" || true)
-          echo "dispatch HTTP ${CODE}"
-          case "${CODE}" in
-            204|200) echo "Queued the next run." ;;
-            *) echo "::warning::dispatch refused (HTTP ${CODE}); keepalive.yml remains the driver." ;;
-          esac
+          TARGET_BRANCH: ${{ github.ref_name }}

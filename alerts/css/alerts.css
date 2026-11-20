@@ -44,6 +44,11 @@ nav.site { max-width: 1320px; margin: 0 auto; padding: 8px 20px; display: flex; 
 nav.site a { padding: 5px 10px; border-radius: 6px; color: var(--ink-soft); font-size: 13.5px; }
 nav.site a:hover { background: var(--accent-soft); text-decoration: none; }
 nav.site a.active { background: var(--accent); color: var(--accent-ink); }
+nav.site .nav-sep {
+  display: flex; align-items: center; padding: 0 8px;
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft);
+  border-left: 1px solid var(--line); margin-left: 8px;
+}
 
 main { max-width: 1320px; margin: 0 auto; padding: 20px; }
 footer.site { border-top: 1px solid var(--line); background: var(--panel); margin-top: 32px; }

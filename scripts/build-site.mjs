@@ -115,6 +115,9 @@ function footerHtml(base = '') {
        <a href="${base}COORDINATION.md">Coordination board</a></p>
     <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
     Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+    <p class="muted small">Canonical site: the pages in the navigation above. Two earlier builds are still published for
+    reference only and are not kept up to date:
+    <a href="${base}dash/index.html">dash/</a> · <a href="${base}docs/index.html">docs/</a>.</p>
   </div>`;
 }
 
