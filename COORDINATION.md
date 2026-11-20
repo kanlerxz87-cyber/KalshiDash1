@@ -24,52 +24,32 @@
 | R2 | **Fix duplicate flag IDs on the Flagged for Review page.** `F-27`…`F-31` each appear twice (the alert-engine set from session-cb49437b was appended after the integration set, out of numeric order). The alert-engine set is renumbered `F-34`…`F-38`, moved into numeric order, and every in-repo reference to the old IDs is updated. | **done** | session-dd012e26 | `templates/flagged.tpl`, `flagged.html` (generated), `docs/ALERTS.md`, `alerts/index.html`, `alerts/js/alerts-page.js` |
 | R3 | **Complete the navigation consolidation** left half-finished by session-7d6d2fcb: `dash/index.html`, `dash/api.html`, `dash/executive-summary.html`, `dash/market.html` were unreachable from the landing page. One canonical nav now reaches every published page, the live alert console is a first-class nav entry, and the two earlier suites are labelled as supplementary rather than left as orphans. | **done** | session-dd012e26 | `scripts/build-site.mjs`, `templates/*.tpl` (nav/footer text only), regenerated root pages |
 | R4 | **Record the new irregularities found in the line-by-line review** (duplicate flag IDs; the failing refresh job; the scheduled-workflow gap; the `package.json`/`package-lock.json` dependency mismatch) on the site's Flagged for Review page with sources, per the brief. | **done** | session-dd012e26 | `templates/flagged.tpl`, `flagged.html` (generated) |
-| R5 | **Re-verify the combined tree line by line** against official sources and record it. | **done** | session-dd012e26 | `verification/2026-11-20-dd012e26.md` (new), `VERIFICATION.md`, `COORDINATION.md` |
+| R5 | **Re-verify the combined tree line by line** against official sources and record it. | **done** — integration changes, tested outputs, and the previously fetched official docs/API comparison are recorded; older archived rows are not claimed as newly re-fetched | session-dd012e26 | `verification/2026-11-20-dd012e26.md` (new), `VERIFICATION.md`, `COORDINATION.md` |
 | R6 | **PR to `main`, merge, confirm the Pages deploy**, record the result. | **in progress** | session-dd012e26 | `COORDINATION.md` (this section only) |
 
 ### Verification performed (session-dd012e26, 2026-11-20 UTC)
 
-- Official docs re-read with the fetch tool: `demo_env` (endpoint table, mock-funds warning),
-  `orderbook_responses` ($1.00 reciprocity, bids-only orderbook, implied-ask formula).
-- Live demo API re-read with the fetch tool: `GET /exchange/status`, `GET /markets?series_ticker=KXAAAGASW&status=open&limit=3`.
-  The live payload was compared field by field against the committed `data/snapshot.json` row for
-  `KXAAAGASW-26NOV23-3.9400` — every field matches (`last_price_dollars` 0.0200, `yes_bid_dollars` 0,
-  `yes_ask_dollars` 1, `no_bid_dollars` 0, `no_ask_dollars` 1, `volume_fp` 3421.27, `open_interest_fp` 3421.27,
-  `notional_value_dollars` 1, `status` active, `result` "" → blank on the site).
-- Whole-tree QA, all green on the merged tree: `npm test` (engine selftest, feed schema, jsdom page
-  render, both link checkers), `node scripts/build-site.mjs --check` (site not stale),
-  `node scripts/check-links.mjs` (90 pages, 0 broken internal links), `python3 tools/linkcheck.py`
-  (2,089 internal links, 0 broken), `node tools/qa_alert_test.mjs` (5), `node tools/alerts-qa.mjs` (37),
-  `node tools/alerts-render-test.mjs`, `node scripts/check_lab.mjs` (21), `node tools/qa_logic_test.mjs`,
-  `node scripts/check_links.js` (dash/, 69 links), `python3 -m py_compile tools/*.py`,
-  `node --check` on every published script, repository-wide merge-marker scan (0 found).
-- CI on this branch: `Site build check`, `site-qa`, `alerts-qa`, `suite-qa` all succeeded for the PR.
+See `verification/2026-11-20-dd012e26.md` for the exact scope, methods and evidence. In summary:
 
-### Irregularities found in this session's review (all published on `flagged.html`)
+- The official demo environment and order-book docs were fetched: endpoint roots, mock-funds warning, bids-only orderbook and implied-ask semantics checked.
+- The live demo market query was compared against snapshot market `KXAAAGASW-26NOV23-3.9400`; captured fields matched and the unresolved `result` remained blank.
+- `npm ci`, `npm test`, `node scripts/build-site.mjs --check`, both whole-tree link checkers, alert/render/lab/logic tests, dash link/asset test, and Python syntax checks all passed. Latest link scan: 90 pages, zero broken internal links; 2,160 internal links checked.
+- The navigation graph reaches 52/53 published pages from the landing page; `404.html` is the intentional exception.
+- No schedule-triggered run was observed. This is flagged, not presented as a successful scheduled execution.
+- The post-fix branch CI/deployment has not yet been observed; no passing checks or deployment is claimed here.
 
-- **F-34** — the alert-engine flag set was appended with duplicate IDs `F-27`…`F-31`; renumbered to
-  `F-34`…`F-38` and every reference updated. Source: this repository's `flagged.html` before the fix.
-- **F-35** — `/search/tags_by_categories` omits `Culture` while `GET /series?category=Culture` serves it
-  (upstream inconsistency, previously `F-28`).
-- **F-36** — browser → demo-API access (CORS) is unconfirmed from the build sandbox; the console detects a
-  blocked request and falls back to the engine feed (previously `F-29`).
-- **F-37** — the `Culture` topic is canonical in the API but has no tag list (previously `F-30`).
-- **F-38** — the high-ROI score is a published heuristic, not a back-tested model (previously `F-31`).
-- **F-39** — the `Refresh demo data snapshot` job failed on `main`: the push step used a detached-HEAD refspec
-  and no rebase, so it lost a race with the concurrent `live-alerts` push. Fixed in this session.
-  Source: the failed run `44752211268` (steps 1–6 success, step 7 failure).
-- **F-40** — no `schedule`-triggered workflow run has ever been recorded for this repository
-  (`GET /repos/kanlerxz87-cyber/KalshiDash1/actions/runs?event=schedule` → `total_count: 0`), although
-  `live-alerts.yml` declares `*/10 * * * *` and `refresh-data.yml` declares `23 */2 * * *`. GitHub only
-  schedules workflows on the default branch and the queue can be delayed; the schedules are left in place and
-  the in-browser live poll remains the primary live path.
-- **F-41** — `package.json` declares one dev dependency (`jsdom`) while `package-lock.json` still carries
-  `playwright`, `puppeteer-core` and `@sparticuz/chromium` entries and a different root `name`. `npm ci`
-  succeeds and installs only the `jsdom` tree; the stale entries are harmless but misleading.
+### Irregularities found in this session's review (published on `flagged.html`)
+
+- **F-34–F-38** — alert-engine entries had reused F-27–F-31 IDs; rows are now unique, ordered and references were updated. These IDs also preserve the original distinct meanings: F-34 data coherence, F-35 Culture tag taxonomy inconsistency, F-36 browser CORS limitation, F-37 Culture topic category correction, F-38 heuristic ROI model.
+- **F-39** — refresh-data push step failed in run `44752211268`: it constructed a push target from detached `HEAD` and did not rebase against concurrent updates. Workflow repaired; future run is needed to confirm the live fix.
+- **F-40** — repository Actions API reported zero schedule-triggered runs despite declared cron schedules.
+- **F-41** — stale `package-lock.json` package records/root name do not match `package.json`; `npm ci` still passes. Left unchanged, flagged.
+- **F-42** — duplicate flag anchors repaired.
+- **F-43** — four earlier `dash/` pages had been unreachable from root navigation; consolidated navigation now reaches the earlier build, labelled supplementary.
 
 ### PR & merge record (R6)
 
-- *To be completed when the PR is opened and merged. Nothing in this section is written in advance.*
+- *To be completed when the PR is opened and merged. No PR, merge or deploy result is claimed yet.*
 
 ---
 
