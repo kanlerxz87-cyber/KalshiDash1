@@ -260,6 +260,40 @@ export function trackedPrice(m) {
 }
 
 /**
+ * Corroboration: an alert found by *sampling* must be confirmed by a second published field.
+ *
+ * WHY: the demo can return a single stale price field (measured: last_price_dollars 0.8030 on
+ * a market whose book and previous price were both ~0.003). A per-field guard cannot catch
+ * every shape of that, but a claim can always be checked against the other published numbers:
+ *
+ *   * the book (bid/ask, or 1 − no price) — a real move moves the book with it;
+ *   * `previous_price_dollars` — the price of the trade before the last one (S5).
+ *
+ * An alert is published only if the new price is within `CORROBORATION_GAP` of at least one of
+ * those. Trade- and candle-detected alerts are exempt: their price *is* a published trade, so
+ * they are already corroborated by the trade record itself.
+ */
+export const CORROBORATION_GAP = 0.10;
+
+export function corroborate({ to, m }) {
+  if (to === null || to === undefined) return { ok: false, how: 'no price to corroborate' };
+  const yb = num(m.yes_bid_dollars), ya = num(m.yes_ask_dollars);
+  const nb = num(m.no_bid_dollars), na = num(m.no_ask_dollars);
+  const prev = num(m.previous_price_dollars);
+  const readings = [];
+  if (yb !== null && ya !== null && ya >= yb) readings.push({ v: round((yb + ya) / 2), how: 'book midpoint (yes quotes)' });
+  if (nb !== null && na !== null && na >= nb) readings.push({ v: round(((1 - na) + (1 - nb)) / 2), how: 'book midpoint (1 − no quotes)' });
+  if (prev !== null) readings.push({ v: prev, how: 'previous_price_dollars' });
+  if (!readings.length) return { ok: false, how: 'no second published field was returned' };
+  let best = null;
+  for (const r of readings) {
+    const gap = Math.abs(to - r.v);
+    if (!best || gap < best.gap) best = { gap: round(gap, 4), how: r.how, value: r.v };
+  }
+  return { ok: best.gap <= CORROBORATION_GAP, how: best.how, gap: best.gap, value: best.value };
+}
+
+/**
  * Dollar amount ranking. Kalshi's market object does not publish traded dollars, so this
  * is an ESTIMATE from two published fields (S5): contracts traded x last traded price.
  * It is labelled `est_traded_dollars` everywhere and is never presented as exchange data.
@@ -713,6 +747,13 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
       nowSeconds,
     });
     if (swing) {
+      // A sampled price must be corroborated by another published field before it is published
+      // as an alert. Uncorroborated rows are suppressed and counted, never shown.
+      const corr = corroborate({ to: swing.to, m });
+      if (!corr.ok) {
+        next.run.uncorroborated_suppressed = (next.run.uncorroborated_suppressed || 0) + 1;
+        continue; // skip this market only — never abort the whole sample
+      }
       const model = modelScore({
         from: swing.from,
         delta: swing.delta,
@@ -750,6 +791,7 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
         contract_url: row.contract_url,
         settlement_sources: row.settlement_sources,
         model: model,
+        corroboration: { by: corr.how, gap: corr.gap, value: corr.value },
         book_inconsistent: !!book_inconsistent,
         source_url: row.source_url,
       });
@@ -1451,6 +1493,18 @@ export function selftest() {
   ok(withCandles.alerts.length === 2, 'candle alert merges alongside a sample alert');
   ok(withCandles.alerts.every((a) => a.model && typeof a.model.score === 'number'), 'merged candle alerts also carry a model score');
   ok(mergeCandleAlerts(withCandles, cs).alerts.length === 2, 'candle alerts are de-duplicated by id');
+
+  // corroboration: the measured fake crash must be rejected, a genuine move kept
+  const fakeMove = corroborate({ to: 0.803, m: { yes_bid_dollars: '0.0020', yes_ask_dollars: '0.0030', no_bid_dollars: '0.9970', no_ask_dollars: '0.9980', previous_price_dollars: '0.0030' } });
+  ok(fakeMove.ok === false, 'a price contradicted by the book AND the previous price is not corroborated');
+  const realMove = corroborate({ to: 0.943, m: { yes_bid_dollars: '0.0100', yes_ask_dollars: '0.9430', no_bid_dollars: '0.0570', no_ask_dollars: '0.9900', previous_price_dollars: '0.9350' } });
+  ok(realMove.ok === true, 'a real move is corroborated by previous_price_dollars');
+  ok(corroborate({ to: 0.5, m: {} }).ok === false, 'no second field -> no corroboration -> not published');
+  // and end to end: a fake sample swing never reaches the feed
+  const stFake = applySample(structuredClone(EMPTY_STATE), { nowSeconds: 5000, markets: [mk('F1', 0.003, 100)], runId: 'r1' });
+  const stFake2 = applySample(stFake, { nowSeconds: 5100, markets: [{ raw: { ...mk('F1', 0.003, 100).raw, last_price_dollars: '0.8030', previous_price_dollars: '0.0030' }, topic: 'crypto', series_ticker: 'SER', series: {}, source_url: BASE + '/x' }], runId: 'r1' });
+  ok(stFake2.alerts.length === 0, 'the fake 0.803 sample swing is suppressed end to end');
+  ok((stFake2.run.uncorroborated_suppressed || 0) >= 1, 'the suppression is counted, not silent');
 
   // trade swings
   const nowT = 1_760_000_000;
