@@ -163,6 +163,45 @@
       </tbody>
     </table>
   </div>
+
+  <h2>E. Alerting &amp; automated trading</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:22%">Question</th><th style="width:30%">Known (verified)</th><th style="width:22%">Missing</th><th style="width:26%">How to discover it</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>How are ≥ $0.10 price swings detected?</td>
+          <td><span class="badge good">Answered</span> Trade-by-trade prices from the public <code>GET /markets/trades</code> endpoint are polled at 10-second cadence; a swing ≥ $0.10 between observed prices fires an alert in both chats. Fallback: <code>last_price_dollars</code> polling. Offline: verified snapshot trades are replayed through the same detector. <a href="https://docs.kalshi.com/api-reference/market/get-trades" target="_blank" rel="noopener">source</a></td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Can the alert latency be tighter?</td>
+          <td><span class="badge warn">Partial</span> REST responses are cached and lag the exchange; WebSocket needs an authenticated session (impossible from a browser without keys). <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">source</a></td>
+          <td>Sub-second freshness without keys.</td>
+          <td>Server-side scanner (S-09) or authenticated WS bridge (S-02) — both need a runner with keys or a hosted cron.</td>
+        </tr>
+        <tr>
+          <td>What does the high-ROI model actually do?</td>
+          <td><span class="badge good">Answered</span> A transparent heuristic: 40% liquidity (24h volume, normalized), 30% open interest (normalized), 30% opportunity (|0.5 − price| × 2). ROI proxy = (1−price) for YES, price for NO, scaled by liquidity. Markets scoring ≥ 0.50 pass the filter. Not a Kalshi feature — flagged F-09. <a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">source</a></td>
+          <td>— (weighting is a design choice, reviewable).</td>
+          <td>Adjust weights on the Alerts page after reviewing the formula.</td>
+        </tr>
+        <tr>
+          <td>Do the automated trades execute on Kalshi?</td>
+          <td><span class="badge bad">Open</span> No — they are simulated in-browser against live public prices. Real execution needs the account holder's demo API keys and signed <code>POST /portfolio/events/orders</code> requests, which this static site must never handle. <a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">source</a></td>
+          <td>Demo account credentials (holder-provided, never requested by this session).</td>
+          <td>Run a local signed runner (S-01) to execute and sync real fills.</td>
+        </tr>
+        <tr>
+          <td>How are positions settled?</td>
+          <td><span class="badge good">Answered</span> Open simulated positions are settled when their market's <code>result</code> becomes <code>yes</code> or <code>no</code>; winning contracts pay $1 (<code>settlement_value_dollars</code> for YES holders). <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">source</a></td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </main>
 
 <script src="js/config.js"></script>

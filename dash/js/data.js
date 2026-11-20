@@ -65,7 +65,7 @@
   }
 
   function snapshotRows(topicId) {
-    return cache.snapshot.then(function (snap) {
+    return snapshot().then(function (snap) {
       var t = snap.topics[topicId];
       if (!t) return { series: [], markets: [], settled: [], note: '' };
       var markets = (t.live_markets || []).map(function (m) { return Object.assign({}, m, { live: false, fromSnapshot: true }); });

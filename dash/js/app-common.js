@@ -5,9 +5,12 @@
   var NAV = [
     ['index.html', 'Home'],
     ['events.html', 'Live Events'],
+    ['alerts.html', 'Live Alerts'],
     ['market.html', 'Market Detail'],
+    ['autotrade.html', 'Automated Trading'],
     ['portfolio.html', 'Portfolio'],
     ['analysis.html', 'Trade Analysis'],
+    ['executive-summary.html', 'Executive Summary'],
     ['suggestions.html', 'Suggestions'],
     ['questions.html', 'Questions & Gaps'],
     ['api.html', 'API Reference'],

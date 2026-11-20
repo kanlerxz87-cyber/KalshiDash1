@@ -26,3 +26,5 @@ jobs:
           for f in scripts/*.js scripts/*.mjs; do echo "node --check $f"; node --check "$f"; done
       - name: Snapshot JSON validity
         run: node -e "JSON.parse(require('fs').readFileSync('dash/data/snapshot.json')); console.log('snapshot ok')"
+      - name: Alert + autotrade engine logic tests
+        run: node tools/qa_alert_test.mjs

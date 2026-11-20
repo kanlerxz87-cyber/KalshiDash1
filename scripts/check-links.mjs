@@ -48,7 +48,10 @@ for (const file of pages) {
     if (!/src="[^"]*assets\/app\.js"/.test(html)) errors.push(`${rel}: missing app.js`);
   }
 
-  for (const m of html.matchAll(/\b(href|src)="([^"]*)"/g)) {
+  // JavaScript fragments inside inline <script> blocks contain href/src string
+  // concatenations that are not real links — strip script/style blocks first.
+  const scanText = html.replace(/<script\b[\s\S]*?<\/script>|<style\b[\s\S]*?<\/style>/gi, " ");
+  for (const m of scanText.matchAll(/\b(href|src)="([^"]*)"/g)) {
     const raw = m[2];
     if (raw === "" || raw.startsWith("mailto:") || raw.startsWith("data:")) continue;
     // JavaScript template placeholders inside archived inline scripts are not links.
