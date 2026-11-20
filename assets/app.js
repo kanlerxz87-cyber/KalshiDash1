@@ -722,6 +722,25 @@
       '<th class="num">Open int ($)</th><th class="num">ROI</th><th>Status</th><th>Result</th><th>Source</th></tr>';
   }
 
+  function ensureRoiHeader(tbodyEl) {
+    /* marketRowHtml emits an ROI score cell (see marketTableHead). Some baked page headers
+     * predate it (11 columns); without this repair every rendered row shifts one column.
+     * Adds the missing ROI column once at paint time; no-op where the header already has it. */
+    if (!tbodyEl || !tbodyEl.parentNode) return;
+    var ths = tbodyEl.parentNode.querySelectorAll('thead th');
+    if (!ths.length) return;
+    for (var i = 0; i < ths.length; i++) if (ths[i].textContent.trim() === 'ROI') return;
+    var th = document.createElement('th');
+    th.className = 'num';
+    th.textContent = 'ROI';
+    var before = null;
+    for (var j = 0; j < ths.length; j++) {
+      if (ths[j].textContent.trim() === 'Status') { before = ths[j]; break; }
+    }
+    if (!before) before = ths[ths.length - 1];
+    ths[0].parentNode.insertBefore(th, before);
+  }
+
   function sortedMarkets(filterFn) {
     var list = Object.keys(state.markets).map(function (t) { return state.markets[t]; });
     if (filterFn) list = list.filter(filterFn);
@@ -799,28 +818,10 @@
     var topBody = tbodyOf('top-table-body');
     var topicBody = tbodyOf('topic-table');   /* topic overview is generated statically; no live body on this page */
 
-    function ensureRoiHeader() {
-      /* marketRowHtml emits an ROI score cell (see marketTableHead). Headers that predate
-       * it would mis-align every rendered row, so add the missing column once at paint time. */
-      if (!topBody || !topBody.parentNode) return;
-      var ths = topBody.parentNode.querySelectorAll('thead th');
-      if (!ths.length) return;
-      for (var i = 0; i < ths.length; i++) if (ths[i].textContent.trim() === 'ROI') return;
-      var th = document.createElement('th');
-      th.className = 'num';
-      th.textContent = 'ROI';
-      var before = null;
-      for (var j = 0; j < ths.length; j++) {
-        if (ths[j].textContent.trim() === 'Status') { before = ths[j]; break; }
-      }
-      if (!before) before = ths[ths.length - 1];
-      ths[0].parentNode.insertBefore(th, before);
-    }
-
     function paint() {
       var hasData = !!state.snapshot || Object.keys(state.markets).length > 0;
       if (!hasData) return; /* no snapshot and no live universe: keep the rows the build baked in */
-      ensureRoiHeader();
+      ensureRoiHeader(topBody);
       var rows = sortedMarkets(function (m) { return m.status !== 'finalized' && m.status !== 'settled'; }).slice(0, 12);
       if (topBody) {
         topBody.innerHTML = rows.length
@@ -917,6 +918,7 @@
       if (logB) logB.scrollTop = logB.scrollHeight;
       var hasData = !!state.snapshot || Object.keys(state.markets).length > 0;
       if (moversBody && hasData) {
+        ensureRoiHeader(moversBody);
         var rows = sortedMarkets(function (m) { return m.status !== 'finalized' && m.status !== 'settled'; }).slice(0, 15);
         moversBody.innerHTML = rows.length ? rows.map(function (m) { return marketRowHtml(m); }).join('')
           : '<tr><td colspan="12" class="muted">No open focus-topic markets available right now.</td></tr>';
@@ -1022,6 +1024,7 @@
       });
       var hasData = !!state.snapshot || Object.keys(state.markets).length > 0;
       if (body && hasData) {
+        ensureRoiHeader(body);
         body.innerHTML = rows.length ? rows.map(function (m) { return marketRowHtml(m); }).join('')
           : '<tr><td colspan="12" class="muted">No markets match this filter.</td></tr>';
       }
@@ -1078,6 +1081,7 @@
         }).join('') : '<tr><td colspan="7" class="muted">No series captured for this topic.</td></tr>';
       }
       if (marketBody) {
+        ensureRoiHeader(marketBody);
         var rows = Object.keys(state.markets).map(function (k) { return state.markets[k]; })
           .filter(function (m) { return m.topic === topicId; })
           .sort(function (a, b) { return (b.volume_24h_fp || 0) - (a.volume_24h_fp || 0); });

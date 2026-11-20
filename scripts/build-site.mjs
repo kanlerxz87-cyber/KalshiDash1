@@ -223,7 +223,7 @@ function resolvedTable(topicId) {
   </tr>`).join('\n');
 }
 
-function liquidityTable(base = '') {
+function liquidityTable(base = '', topicId = null) {
   const rows = [];
   Object.keys(snap.orderbooks || {}).forEach((t) => {
     const ob = snap.orderbooks[t];
@@ -235,8 +235,13 @@ function liquidityTable(base = '') {
     const bestNo = no.length ? Number(no[no.length - 1][0]) : null;
     rows.push({ ticker: t, title: m.title, topic: m.topic, yes, no, total, bestYes, bestNo, source: ob.source_url });
   });
-  if (!rows.length) return '<tr><td colspan="7" class="muted">No order book captured.</td></tr>';
-  return rows.map((r) => `<tr>
+  const shown = topicId ? rows.filter((r) => r.topic === topicId) : rows;
+  if (!shown.length) {
+    return topicId
+      ? '<tr><td colspan="7" class="muted">No order book for this topic&rsquo;s markets was captured at snapshot time (the capture stores the busiest books overall).</td></tr>'
+      : '<tr><td colspan="7" class="muted">No order book captured.</td></tr>';
+  }
+  return shown.map((r) => `<tr>
     <td><a href="${base}market.html?ticker=${encodeURIComponent(r.ticker)}">${esc(r.title || r.ticker)}</a><br><span class="ticker">${esc(r.ticker)}</span></td>
     <td><span class="tag ${esc(r.topic || '')}">${esc(topicLabel(r.topic))}</span></td>
     <td class="num">${r.bestYes === null ? '<span class="muted">—</span>' : cents(r.bestYes)}</td>
@@ -315,7 +320,7 @@ const CATEGORY_PAGES = TOPICS.map((t) => ({
   <div class="table-wrap"><table class="compact"><thead><tr>
     <th>Market</th><th>Topic</th><th class="num">Best yes bid</th><th class="num">Best no bid</th>
     <th class="num">Price levels</th><th class="num">Contracts in book</th><th>Source</th></tr></thead>
-    <tbody id="liquidity-body">{{LIQUIDITY}}</tbody></table></div>
+    <tbody id="liquidity-body">{{LIQUIDITY:${t.id}}}</tbody></table></div>
 
   <h2>Resolved events (yes / no)</h2>
   <p class="sub">Events that have already been determined, with the market-level result the exchange published.</p>
@@ -395,6 +400,7 @@ function replacements(text, base = '') {
     map[`{{CATEGORY_SERIES:${t.id}}}`] = seriesTable(t.id);
     map[`{{CATEGORY_MARKETS:${t.id}}}`] = marketTable(topic.live_markets || [], { empty: 'No open market for this topic at capture time.', base });
     map[`{{CATEGORY_RESOLVED:${t.id}}}`] = resolvedTable(t.id);
+    map[`{{LIQUIDITY:${t.id}}}`] = liquidityTable(base, t.id);
     map[`{{TOPIC_OPEN:${t.id}}}`] = String(topic.live_markets_total === undefined ? (topic.live_markets || []).length : topic.live_markets_total);
   });
   Object.keys(map).forEach((k) => { text = text.split(k).join(map[k]); });
