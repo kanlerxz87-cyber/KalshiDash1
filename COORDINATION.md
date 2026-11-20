@@ -1248,3 +1248,45 @@ Shared outputs (site pages, `data/`, `scripts/`, `flagged.html`) are NOT edited.
 - GitHub Pages: build for `c57e52e` status `built`, no error (`gh api …/pages/builds/latest`). Live: https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html loads.
 - Flagged irregularities F-L4-01 … F-L4-08 are not yet on the shared Flagged page (that file is owned by the integration session); they are in `verification/2026-11-20-605bbb3f.md` and listed in the handoff above.
 - This record lands on `main` via a follow-up PR from the same branch (a record cannot contain its own merge commit).
+
+## Session on this branch — session-d1de3583 (current)
+
+- Session ID: `session-d1de3583`
+- Branch: `arena/d1de3583-kalshidash1` (base `d24616a80151e8e51c6334f585d3e0e6d4cde919` = `main`) — Arena manages this branch; this session works only here, commits only here, and pushes only here.
+- Role: final integration for this branch — resolve the committed conflict markers, verify every published official source against docs.kalshi.com, run the full QA battery, then open and merge the PR `arena/d1de3583-kalshidash1` → `main` and confirm GitHub Pages deploys.
+- Scope (files this session touches): `README.md`, `COORDINATION.md` (this board only). No `dash/`, `docs/`, `archive/`, `assets/` or generated site file is changed. No file claimed by another session is touched.
+
+### Task board — session-d1de3583
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| I1 | Resolve the `<<<<<<< HEAD` / `>>>>>>> origin/main` conflict markers in `README.md` — keep the merged alerts-engine row (sessions arena-f89b55f7 + arena/815b546d) per the existing reconciliation record | done | session-d1de3583 | `README.md` |
+| I2 | Verify each official source the site publishes against docs.kalshi.com (demo env, get-markets, rate limits; market settlement, candlesticks and create-order quick start referenced by the site) | done | session-d1de3583 | docs.kalshi.com fetches recorded below |
+| I3 | Full QA battery: build staleness gate, whole-tree internal link check, JS syntax checks | done | session-d1de3583 | repo-wide, read-only checks |
+| I4 | Open PR `arena/d1de3583-kalshidash1` → `main`, merge without waiting (`gh pr merge N --merge`), confirm GitHub Pages builds/deploys, record PR link + merge SHA | in progress | session-d1de3583 | PR via `gh` |
+
+### Sources verified this session (official, fetched line by line)
+
+| Claim on the site | Official source | Result |
+|---|---|---|
+| Demo REST root `https://external-api.demo.kalshi.co/trade-api/v2` (also supported `demo-api.kalshi.co`); WS roots `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (+ `demo-api...`); demo uses mock funds; demo prices may not reflect real markets | https://docs.kalshi.com/getting_started/demo_env | PASS — endpoint table matches the brief exactly; mock-funds and caveat language confirmed |
+| `GET /markets` batch by `tickers` returns every match in one response; responses cached short term; demo server `https://external-api.demo.kalshi.co/trade-api/v2` listed in the OpenAPI servers | https://docs.kalshi.com/api-reference/market/get-markets.md | PASS |
+| Unauthenticated public requests have separate limits; back off on `429`; apply exponential backoff on `429` | https://docs.kalshi.com/getting_started/rate_limits.md | PASS — matches the engine's conservative poll + backoff design |
+
+### QA results this session (all local, against the committed tree)
+
+| Check | Command | Result |
+|---|---|---|
+| Site staleness gate | `node scripts/build-site.mjs --check` | PASS — committed site matches templates and data |
+| Whole-tree internal links (root + docs + archive) | `python3 tools/linkcheck.py` | PASS — 90 pages, 2089 internal links, 0 broken |
+| Root-site link + template check | `node scripts/check-links.mjs` | PASS — 90 pages, no broken internal links, 267 external links listed for review (not fetched) |
+| JS syntax | `node --check` on assets/app.js, chart.js, catalyst.js, strategylab.js, demo-account.js + scripts/*.mjs | PASS |
+| Conflict markers | `grep` for `<<<<<<<`/`>>>>>>>` in published files | PASS — none remain (README.md resolved) |
+
+### Irregularities
+
+None new. All pre-existing flags remain published on the site's `flagged.html` (F-01…F-23) and in this board's flag log; per board policy none of them block the merge, and they stay on the labeled "Flagged for review" page after the site is live.
+
+### PR & merge record (I4)
+
+TBD — recorded below once the PR exists.
