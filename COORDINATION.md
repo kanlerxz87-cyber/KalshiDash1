@@ -2,7 +2,31 @@
 
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
-## Session on this branch
+## Session on this branch (FINAL INTEGRATION — read this first)
+
+- Session ID: `session-7d6d2fcb`
+- Branch: `arena/7d6d2fcb-kalshidash1` (base `8f80f34`, `main`)
+- Role: **final integration session** — all other sessions' tasks are already merged into `main`
+  (PRs #1–#4 and #10). This session re-verifies the combined data line by line, consolidates the
+  duplicated site trees into one canonical site, publishes to GitHub Pages, and opens/merges the PR to `main`.
+- Scope (files this session edits):
+  - `COORDINATION.md` (this board), `README.md`
+  - site generator `scripts/build-site.mjs`, `scripts/check-links.mjs`, `scripts/fetch-snapshot.mjs`
+  - canonical site at the repo root: `index.html`, `dashboard.html`, `markets.html`, `market.html`,
+    `portfolio.html`, `analysis.html`, `strategies.html`, `categories/*.html`, `sources.html`,
+    `flagged.html`, `questions.html`, `suggestions.html`, `api.html`, `executive-summary.html`, `404.html`
+  - `assets/style.css`, `assets/app.js`, `assets/chart.js`
+  - `data/snapshot.json`, `data/sources.json`
+  - `.github/workflows/pages.yml`, `.github/workflows/refresh-data.yml`, `.github/workflows/site-qa.yml`
+- Consolidation rule: the three overlapping site trees that exist on `main` today
+  (root site, `dash/`, `docs/`, plus `archive/`) are preserved **verbatim** under `archive/`
+  (nothing is deleted from git history) and are removed from the published navigation so the
+  live site has exactly one canonical experience.
+- Claimed tasks: see "Task board — session-7d6d2fcb" below. All prior records are preserved verbatim below.
+
+---
+
+## Session on this branch (prior — session-ef745c36)
 
 - Session ID: `session-ef745c36`
 - Branch: `arena/ef745c36-kalshidash1` (base `f1fa6aa`, `main`)
@@ -43,6 +67,26 @@ Decision: this session did the full site on its own branch, because it may only 
 | T8 | Build, link check, Pages workflow, PR, merge, deploy check | done (merged PR #4; Pages built) | session-ef745c36 | `scripts/*`, `.github/workflows/pages.yml`, `COORDINATION.md`, `README.md` | `node scripts/check-links.mjs` | F-14 (Pages source could not be changed by the token; site published from repo root) |
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review` (published on the Flagged page; does not block).
+
+### Task board — session-7d6d2fcb (final integration)
+
+| ID | Task | Status | Owner | Files touched | Sources | Irregularities |
+|---|---|---|---|---|---|---|
+| I1 | Repo review, line by line (all files, all branches, all prior records) | in progress | session-7d6d2fcb | whole repo (read) | `git log`, `gh api`, repo tree | see REVIEW.md |
+| I2 | Consolidate the three overlapping site trees into one canonical site at the repo root; preserve the others under `archive/` | in progress | session-7d6d2fcb | site generator, root pages, `archive/` | — | F-20 (prior sessions shipped 3 parallel site trees) |
+| I3 | Live alert engine: two scrolling chats (all events + high-ROI model filter), swing threshold ≥ $0.10 | unclaimed | session-7d6d2fcb | `assets/app.js`, `dashboard.html` | get-market, orderbook | F-21 (no news feed in the Kalshi API) |
+| I4 | Market page: price chart (seconds → days), orderbook ladder (contracts available at each price) | unclaimed | session-7d6d2fcb | `market.html`, `assets/chart.js` | candlesticks, orderbook | — |
+| I5 | Resolution tracking (live → determined → finalized; result yes/no) | unclaimed | session-7d6d2fcb | `markets.html`, `categories/*.html` | get-events, market settlement | — |
+| I6 | Simulated trades + strategy engine + portfolio P&L + trade categorisation | unclaimed | session-7d6d2fcb | `portfolio.html`, `analysis.html`, `strategies.html` | market settlement, create-order (V2) | F-07 (no demo key → simulated only) |
+| I7 | Live data refresh: GitHub Actions job that re-captures the snapshot from the official demo API | unclaimed | session-7d6d2fcb | `scripts/fetch-snapshot.mjs`, `.github/workflows/refresh-data.yml` | demo API | — |
+| I8 | Sources page with a source link on every table row; Flagged for Review page | unclaimed | session-7d6d2fcb | `sources.html`, `flagged.html`, `data/sources.json` | docs.kalshi.com | — |
+| I9 | Line-by-line re-verification of combined data; link check; build check | unclaimed | session-7d6d2fcb | `scripts/check-links.mjs`, `VERIFICATION.md` | — | — |
+| I10 | PR to `main`, merge, confirm Pages deploy, record PR + merge result | unclaimed | session-7d6d2fcb | `COORDINATION.md`, `README.md` | `gh pr`, `gh api .../pages/builds/latest` | — |
+
+Rules honoured by this session: only files in the scope above are edited; no other session's file is
+modified; every claim is committed and pushed immediately; `git pull --rebase` is run before every push;
+no value is inferred — anything not confirmable from an official source is left blank and published on
+the Flagged for Review page.
 
 ## Verification performed (session-ef745c36, 2026-11-20)
 
