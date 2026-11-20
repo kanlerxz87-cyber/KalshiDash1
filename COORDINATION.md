@@ -2,6 +2,20 @@
 
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
+## Claims — session bf16f2dd (branch `arena/bf16f2dd-kalshidash1`, base `8f80f34`)
+
+Branch note: Arena fixes this session's branch name as `arena/bf16f2dd-kalshidash1`; the `session-<id>/<task>` naming in the brief is not used here. Work stays on this branch only.
+
+Overlap check (read from `origin` on 2026-11-20 before claiming): already claimed by others and therefore NOT claimed here — repo review I1 and consolidation I2 (`7d6d2fcb`), alert engine (`cb49437b`, `815b546d`), market/resolution/portfolio pages I4–I6 (`7d6d2fcb`), live re-verification and flagged refresh L1–L3 (`e6c3b3b6`), final PR/merge (`7d6d2fcb` I10).
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| R1 | Repo hygiene: `tools/__pycache__/*.pyc` are tracked in git; untrack them and add `__pycache__/` and `*.pyc` to `.gitignore` | in progress | session-bf16f2dd | `.gitignore`, `tools/__pycache__/*.pyc` (untrack only) |
+| R2 | Verified-facts page `audit/index.html` (not linked from the shared nav): each official fact checked against docs.kalshi.com or the live demo API, with the captured value, plus irregularities found in the repo | in progress | session-bf16f2dd | `audit/index.html` (new) |
+| R3 | Record this session's sources, verification, irregularities and PR/merge result in this section | in progress | session-bf16f2dd | `COORDINATION.md` (this section only) |
+
+Not in scope for this session: data tables, shared index/navigation, the dashboard, alerts, portfolio and trading. Those belong to the claimed sessions above or require demo API credentials this session does not have.
+
 ## Session on this branch
 
 - Session ID: `session-ef745c36`
