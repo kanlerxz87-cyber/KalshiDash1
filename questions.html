@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Questions &amp; Answers — KalshiDash1</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand"><span class="mark"></span> KalshiDash1</div>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Live Dashboard</a>
+      <a href="categories.html">Categories</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="questions.html" class="active">Questions &amp; Answers</a>
+      <a href="flagged-review.html">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section">
+    <div class="section-head">
+      <h1>Questions to Address Before Any Decision</h1>
+      <p>Clear list of questions, the information needed to answer them, and the current answer. Where information is not available, it is left blank and flagged — with a suggestion for how to discover it. Nothing is inferred.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th>#</th><th>Question</th><th>Information needed</th><th>Answer / status</th><th>How to discover missing info</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Which live events have the highest dollar amount?</td>
+            <td>Market notional = price × size × contracts; open interest and 24h volume per market.</td>
+            <td>Partial — shown per topic sorted by open interest/volume from <code>/markets</code>.</td>
+            <td>Page through all <code>/markets</code> and compute notional per market.</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Are there gas-price markets on the Kalshi demo API?</td>
+            <td>Events feed categories and market titles mentioning gas/oil/energy.</td>
+            <td>Blank — not found in the demo <code>/events</code> feed (flagged).</td>
+            <td>Search <code>/events</code> and <code>/markets</code> for "gas"/"oil"; confirm on kalshi.com.</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>How is each event resolved (sources)?</td>
+            <td>Each event's <code>settlement_sources</code> array from <code>/events</code>.</td>
+            <td>Available per event in the API; linked on category pages.</td>
+            <td>Read <code>/events/{event_ticker}</code> settlement_sources.</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Did each tracked event resolve Yes or No?</td>
+            <td>Market <code>result</code> field from <code>/markets/{ticker}</code>.</td>
+            <td>Shown per market: Resolved: Yes / No / unresolved.</td>
+            <td>Poll <code>/markets/{ticker}</code> until result is non-empty.</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>What is current liquidity (contracts available at a given price)?</td>
+            <td><code>yes_bid_size_fp</code>, <code>yes_ask_size_fp</code>, <code>no_bid_size_fp</code>, <code>no_ask_size_fp</code>.</td>
+            <td>Shown per market in tables and liquidity readout.</td>
+            <td>Read <code>/markets/{ticker}</code> size fields.</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Can the site execute live trades on the demo account?</td>
+            <td>Kalshi demo API key pair + <code>POST /portfolio/orders</code>.</td>
+            <td>No — not configured; paper simulator only.</td>
+            <td>Obtain demo API keys from Kalshi; add authenticated client.</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>What is real demo-account portfolio performance?</td>
+            <td><code>GET /portfolio</code> and <code>GET /trades</code> (authenticated).</td>
+            <td>Blank — requires auth; not available without keys.</td>
+            <td>Connect demo API keys; fetch /portfolio.</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>Is the demo API reachable from the live GitHub Pages site (CORS)?</td>
+            <td>Browser CORS preflight to <code>external-api.demo.kalshi.co</code>.</td>
+            <td>Unknown — not yet tested on the published Pages origin.</td>
+            <td>Deploy to GitHub Pages and test fetch from the live origin.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel" style="margin-top:24px">
+      <h3>Suggestions to discover missing information</h3>
+      <ul>
+        <li>For gas prices: search the full <code>/events</code> feed (beyond the first 200) and <code>/markets</code> for "gas", "oil", "energy"; check kalshi.com for real gas markets.</li>
+        <li>For CORS: publish to GitHub Pages and open the browser console on the live origin to confirm <code>fetch</code> to the demo API succeeds.</li>
+        <li>For live portfolio/trades: create a Kalshi demo account, generate API keys, and add them as encrypted GitHub repository secrets (never committed to the repo).</li>
+        <li>For historical graph data: confirm whether <code>/markets/{ticker}/candles</code> exists on the demo API; otherwise use the WebSocket for live ticks.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  KalshiDash1 &middot; Questions &amp; Answers &middot; Demo environment only &middot; Not financial advice.
+</footer>
+</body>
+</html>

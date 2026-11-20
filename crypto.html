@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crypto — KalshiDash1</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand"><span class="mark"></span> KalshiDash1</div>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Live Dashboard</a>
+      <a href="categories.html">Categories</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="questions.html">Questions &amp; Answers</a>
+      <a href="flagged-review.html">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section">
+    <div class="section-head">
+      <h1>Crypto</h1>
+      <p>Live crypto events from the Kalshi demo API <code>/events</code> (category: <b>Crypto</b>), e.g. Bitcoin price markets. Settlement source: CF Benchmarks (BRTI). Tracked until resolved: <b>Resolved: Yes</b> or <b>Resolved: No</b>.</p>
+      <div class="note">Source: Kalshi demo API — <code>GET /trade-api/v2/events?category=Crypto</code> and <code>GET /trade-api/v2/markets/{ticker}</code>. Each row links to the market on <a href="https://demo.kalshi.com" target="_blank" rel="noopener">demo.kalshi.com</a> and to the official API endpoint.</div>
+    </div>
+    <div id="markets-table"></div>
+  </section>
+</main>
+
+<footer>
+  KalshiDash1 &middot; Crypto &middot; Data is live from <code>external-api.demo.kalshi.co</code> &middot; Demo environment only &middot; Not financial advice.
+</footer>
+<script src="assets/js/app.js"></script>
+<script>
+window.KalshiDash.renderTable('markets-table', 'crypto', {
+  title: 'Crypto',
+  note: 'Bitcoin price markets settled against CF Benchmarks BRTI (observed settlement source on /events).'
+});
+</script>
+</body>
+</html>
