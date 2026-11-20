@@ -246,8 +246,12 @@
       .catch(function (e) { state.snapshotError = e.message; return null; });
   }
 
+  /* normMarket() is the single factory for rows that came from an API response, so the
+   * provenance tag is set here once. Snapshot rows are stored raw in ingestSnapshot with
+   * provenance='snapshot'. Anything without a tag is therefore a bug, not a live row. */
   function normMarket(m, topic, sourceUrl, seriesTicker, settlementSources) {
     return {
+      provenance: 'live',
       ticker: m.ticker || null,
       event_ticker: m.event_ticker || null,
       title: m.title || m.yes_sub_title || m.ticker || '',
@@ -282,6 +286,10 @@
   function ingestSnapshot(snap) {
     if (!snap) return;
     (snap.markets || []).forEach(function (m) {
+      /* Provenance: a row read from the committed capture is NOT a live row. Without this tag
+       * the home page counted snapshot rows as "live from the demo API" whenever the browser
+       * could not reach the API (F-41). Every stat that says "live" filters on this. */
+      m.provenance = 'snapshot';
       state.markets[m.ticker] = m;
       if (m.last_price_dollars !== null && m.last_price_dollars !== undefined) {
         state.lastRef[m.ticker] = m.last_price_dollars;
@@ -343,7 +351,11 @@
 
   /* Refresh the tracked universe from the live API (series + open markets). */
   function refreshUniverse() {
-    if (state.mode === 'snapshot') return Promise.resolve([]);
+    /* Do NOT gate on state.mode here. probe() sets the mode from /exchange/status only, and a
+     * browser can reach /exchange/status while every topic query is blocked, or the mode can
+     * still be 'snapshot' when the first universe refresh is scheduled. Each request below
+     * already fails softly; a row is tagged 'live' only when it actually came from the API
+     * (see the provenance tag), so a failed request adds nothing rather than a wrong label. */
     var all = [];
     var chain = Promise.resolve();
     CFG.topics.forEach(function (topic) {
@@ -377,8 +389,18 @@
       });
     });
     return chain.then(function () {
+      /* F-42: the snapshot is ingested first, so a row read from the API and a row read from
+       * the committed capture collide on ticker. Writing the snapshot row over the live one
+       * (or the live row over the snapshot one) silently mixes two captures. Keep them apart:
+       * snap-* keys for committed rows, live tickers for API rows, so a number labelled "live"
+       * always came from this session's request. */
       all.forEach(function (m) {
         var old = state.markets[m.ticker];
+        /* Keep one row per ticker and let the live row win. The snapshot is ingested first
+         * (loadSnapshot) and a live row can only be tagged 'live' by this function, so an
+         * incoming snapshot row must never overwrite a live one — that is what made a
+         * stale capture look like a live quote (F-42). */
+        if (old && old.provenance === 'live' && m.provenance !== 'live') return;
         state.markets[m.ticker] = m;
         if (old && old.last_price_dollars !== null && m.last_price_dollars === null) {
           m.last_price_dollars = old.last_price_dollars;
@@ -814,11 +836,24 @@
       }
       if (cards) {
         var snapMeta = (state.snapshot && state.snapshot.meta) || {};
-        var liveCount = Object.keys(state.markets).length;
+        /* Count by provenance, not by the page's global mode. A snapshot row must never be
+         * presented as a live one, and a live row must never be hidden because another request
+         * fell back. Source rows: every snapshot market is tagged 'snapshot' in ingestSnapshot,
+         * every API market is tagged 'live' in refreshUniverse. */
+        var allRows = Object.keys(state.markets).map(function (k) { return state.markets[k]; });
+        var liveRows = allRows.filter(function (m) { return m.provenance === 'live'; });
+        var snapRows = allRows.filter(function (m) { return m.provenance === 'snapshot'; });
+        var trackedCount = allRows.length;
+        var apiProbed = state.mode === 'live' || state.mode === 'legacy';
+        var trackedNote = liveRows.length && snapRows.length
+          ? liveRows.length + ' live · ' + snapRows.length + ' from the snapshot'
+          : (liveRows.length ? 'live from the demo API'
+            : (apiProbed ? 'no API row readable this round · ' + snapRows.length + ' from the snapshot'
+              : 'committed snapshot · API not reachable'));
         cards.innerHTML =
           '<div class="stat"><div class="label">Environment</div><div class="value">Demo</div><div class="note">mock funds · separate credentials</div></div>' +
           '<div class="stat"><div class="label">Focus topics</div><div class="value">5</div><div class="note">gas · elections · culture · crypto · golf</div></div>' +
-          '<div class="stat"><div class="label">Markets tracked</div><div class="value">' + liveCount + '</div><div class="note">' + (state.mode === 'snapshot' ? 'from the committed snapshot' : 'live from the demo API') + '</div></div>' +
+          '<div class="stat"><div class="label">Markets tracked</div><div class="value">' + trackedCount + '</div><div class="note">' + trackedNote + '</div></div>' +
           '<div class="stat"><div class="label">Snapshot captured</div><div class="value" style="font-size:15px">' +
             esc(String(snapMeta.captured_at || '—').replace('T', ' ').slice(0, 19)) + '</div><div class="note">' +
             (snapMeta.api_root ? '<a href="' + esc(snapMeta.api_root) + '/exchange/status" target="_blank" rel="noopener">source endpoint</a>' : '—') + '</div></div>';

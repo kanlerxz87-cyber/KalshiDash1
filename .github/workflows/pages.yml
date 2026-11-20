@@ -32,6 +32,12 @@ jobs:
           node scripts/build-site.mjs
           node scripts/check-links.mjs
           node --check assets/app.js
+      # F-41/F-42 (session-444e829d): the home page must never label committed-snapshot rows
+      # as live. jsdom is installed on demand so the check stays skipped where it is absent.
+      - name: Provenance check (snapshot rows are never counted as live)
+        run: |
+          npm install --no-save --silent jsdom@25
+          node scripts/check_provenance.mjs
       - name: Fail if the committed site is stale
         run: |
           if [ -n "$(git status --porcelain -- '*.html' assets categories data)" ]; then
