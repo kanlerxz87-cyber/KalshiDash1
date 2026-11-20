@@ -7,11 +7,11 @@
 <meta name="description" content="Two real-time scrolling chats for Kalshi demo markets: every move of at least $0.10, and only the moves the published ROI model likes. With live movers, ROI ranking and liquidity.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
-<body data-page="dashboard">
+<body data-base="{{BASE}}">
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta">
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span>
       <span id="mode-badge" class="badge warn">data: probing…</span>
       <span id="clock" class="mono small muted"></span>
     </div>
@@ -143,5 +143,6 @@
 <footer class="site">{{FOOTER}}</footer>
 <script src="assets/app.js"></script>
 <script src="assets/chart.js"></script>
+<script src="{{BASE}}assets/freshness.js"></script>
 </body>
 </html>

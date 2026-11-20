@@ -50,38 +50,55 @@ const TOPICS = [
 const topicLabel = (id) => (TOPICS.find((t) => t.id === id) || { label: id || '—' }).label;
 
 /* --------------------------------------------------------------- navigation */
-const NAV = [
-  ['index.html', 'Home'],
-  ['dashboard.html', 'Dashboard'],
-  ['markets.html', 'Markets'],
-  ['portfolio.html', 'Portfolio'],
-  ['analysis.html', 'Analysis'],
-  ['strategies.html', 'Strategies'],
-  ['sources.html', 'Sources'],
-  ['flagged.html', 'Flagged for review']
-];
-const NAV_TOPICS = TOPICS.map((t) => [`categories/${t.id}.html`, t.label]);
-const NAV_MORE = [
-  ['questions.html', 'Questions'],
-  ['suggestions.html', 'Suggestions'],
-  ['api.html', 'API reference'],
-  ['demo-account.html', 'Demo account'],
-  ['catalyst.html', 'Swing catalysts'],
-  ['strategylab.html', 'Strategy lab'],
-  ['alerts/index.html', 'Live alerts (engine, 2 chats)'],
-  ['dash/alerts.html', 'Alert feeds (dash suite)'],
-  ['dash/autotrade.html', 'Auto-trade engine (dash suite)']
+/* Five groups, in the order a trader actually uses the dashboard:
+ *   Start   -> what is on fire right now (alerts, dashboard, executive summary)
+ *   Topics  -> one page per focus topic, so events in the same topic stay together
+ *   Trading -> act on it and measure what happened
+ *   Model   -> how the score and the strategies are computed
+ *   Review  -> sources, questions, flagged items, API reference
+ * Every URL that existed before this change still exists; only the labels are grouped.
+ * The legacy suites (`dash/`, `docs/`) are reachable from Review -> "Legacy suites" so no
+ * working page is orphaned, but they no longer clutter the primary navigation. */
+const NAV_GROUPS = [
+  ['Start', [
+    ['alerts/index.html', 'Live alerts · 2 chats'],
+    ['dashboard.html', 'Dashboard'],
+    ['executive-summary.html', 'Executive summary']
+  ]],
+  ['Topics', TOPICS.map((t) => [`categories/${t.id}.html?topic=${t.id}`, t.label])],
+  ['Trading', [
+    ['markets.html', 'Markets'],
+    ['market.html', 'Market detail'],
+    ['portfolio.html', 'Portfolio'],
+    ['analysis.html', 'Trade analysis'],
+    ['strategylab.html', 'Strategy lab']
+  ]],
+  ['Model', [
+    ['strategies.html', 'Strategies & ROI model'],
+    ['catalyst.html', 'Swing catalysts'],
+    ['suggestions.html', 'Suggestions']
+  ]],
+  ['Review', [
+    ['sources.html', 'Sources'],
+    ['flagged.html', 'Flagged for review'],
+    ['questions.html', 'Questions'],
+    ['api.html', 'API reference'],
+    ['demo-account.html', 'Demo account'],
+    ['dash/index.html', 'Legacy suite (dash/)'],
+    ['docs/index.html', 'Legacy suite (docs/)']
+  ]]
 ];
 
 function navHtml(base = '') {
-  const link = ([href, label]) => `<a href="${base}${href}">${esc(label)}</a>`;
-  return [
-    NAV.map(link).join(''),
-    '<span class="nav-sep">Topics</span>',
-    NAV_TOPICS.map(link).join(''),
-    '<span class="nav-sep">More</span>',
-    NAV_MORE.map(link).join('')
-  ].join('');
+  return NAV_GROUPS.map(([group, links]) => {
+    const items = links.map(([href, label]) => {
+      /* Category links carry ?topic= so the dashboard/alert pages can pre-filter. */
+      const [path, query] = href.split('?');
+      const url = base + path + (query ? '?' + query : '');
+      return `<a href="${url}">${esc(label)}</a>`;
+    }).join('');
+    return `<span class="nav-sep nav-group">${esc(group)}</span><span class="nav-links">${items}</span>`;
+  }).join('');
 }
 function footerHtml(base = '') {
   const captured = snap.meta && snap.meta.captured_at ? dt(snap.meta.captured_at) : '—';
@@ -250,11 +267,11 @@ const CATEGORY_PAGES = TOPICS.map((t) => ({
 <meta name="description" content="Kalshi demo ${esc(t.label)} markets: series, highest-dollar open markets, order-book liquidity and resolved events, each row linked to its official source.">
 <link rel="stylesheet" href="{{BASE}}assets/style.css">
 </head>
-<body data-page="category" data-topic="${t.id}">
+<body data-page="category" data-topic="${t.id}" data-base="../">
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta"><span id="mode-badge" class="badge warn">data: probing…</span><span id="clock" class="mono small muted"></span></div>
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span><span id="mode-badge" class="badge warn">data: probing…</span><span id="clock" class="mono small muted"></span></div>
   </div>
   <nav class="site"><div class="nav-inner">{{NAV}}</div></nav>
 </header>
@@ -311,6 +328,7 @@ const CATEGORY_PAGES = TOPICS.map((t) => ({
 </div></main>
 <footer class="site">{{FOOTER}}</footer>
 <script src="{{BASE}}assets/app.js"></script>
+<script src="{{BASE}}assets/freshness.js"></script>
 </body>
 </html>
 `
@@ -345,6 +363,7 @@ function replacements(text, base = '') {
   const live = markets.filter((m) => m.status !== 'finalized' && m.status !== 'settled');
   const map = {
     '{{BASE}}': base,
+    '{{DATA_BASE}}': base || '',
     '{{NAV}}': navHtml(base),
     '{{FOOTER}}': footerHtml(base),
     '{{SNAPSHOT_CAPTURED}}': dt(snap.meta && snap.meta.captured_at),

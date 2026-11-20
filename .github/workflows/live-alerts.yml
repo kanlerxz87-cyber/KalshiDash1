@@ -25,8 +25,9 @@ on:
 permissions:
   contents: write
 
+# Shared with refresh-data.yml: both bots commit to the same branch, so they must not overlap.
 concurrency:
-  group: live-alerts
+  group: writer-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -70,8 +71,19 @@ jobs:
           else
             STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
             git commit -m "data(live): engine sample ${STAMP}"
-            git pull --rebase --autostash origin ${{ github.ref_name }} || true
-            git push origin HEAD:${{ github.ref_name }}
+            BRANCH="${GITHUB_REF_NAME}"
+            pushed=0
+            for attempt in 1 2 3; do
+              if git pull --rebase --autostash origin "$BRANCH" && git push origin "HEAD:$BRANCH"; then
+                pushed=1; break
+              fi
+              git rebase --abort 2>/dev/null || true
+              sleep $((attempt * 10))
+            done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::could not push the engine sample after 3 attempts"
+              exit 1
+            fi
           fi
 
       - name: Fail the run if the engine could not reach the API
@@ -85,3 +97,21 @@ jobs:
             echo "::error::engine: $line"
           done
           exit 1
+
+      # Ask for the next sample explicitly. A 10-minute `schedule` alone is not dependable here:
+      # measured 2026-11-20, no `schedule` run had ever fired in this repository. `workflow_dispatch`
+      # is the one event that is never suppressed for the built-in token:
+      # https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow
+      - name: Queue the next sample (self-trigger chain)
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.SELF_DISPATCH_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -o /dev/null -w '%{http_code}\n' -X POST \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/live-alerts.yml/dispatches" \
+            -d "{\"ref\":\"${GITHUB_REF_NAME}\"}" \
+            || echo '::warning::could not queue the next sample; keepalive.yml will retry it'

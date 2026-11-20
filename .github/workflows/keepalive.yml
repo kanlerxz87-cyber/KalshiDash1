@@ -1,0 +1,83 @@
+name: keepalive
+
+# WHY THIS WORKFLOW EXISTS
+# ------------------------
+# Measured on 2026-11-20: **no `schedule`-triggered run had ever occurred in this repository**
+# (`GET /repos/{owner}/{repo}/actions/runs?event=schedule` → empty), even though
+# `live-alerts.yml` and `refresh-data.yml` both declare a cron. The consequence on the site was
+# a "live" alert feed whose last sample was hours old.
+#
+# GitHub documents both plausible causes, so neither can be ruled out from the repository side:
+#   * "The `schedule` event can be delayed during periods of high loads of GitHub Actions
+#     workflow runs. ... If the load is sufficiently high enough, some queued jobs may be
+#     dropped."
+#   * "In a public repository, scheduled workflows are automatically disabled when no repository
+#     activity has occurred in 60 days."
+#   https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule
+#
+# This workflow therefore (a) asks GitHub every 15 minutes to run the two samplers itself, and
+# (b) after doing so, verifies the age of the newest sample in the committed feed and fails the
+# run if it is beyond the limit — so a stall becomes a red check instead of a silent stale page.
+#
+# "`workflow_dispatch` and `repository_dispatch` events always create workflow runs", which is
+# why a dispatch is used rather than relying on a `push`:
+#   https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow#triggering-a-workflow-from-a-workflow
+#
+# PERMISSIONS: `actions: write` is required to create a workflow-dispatch event
+# (https://docs.github.com/en/rest/actions/workflows#create-a-workflow-dispatch-event);
+# `contents: read` is enough to read run history and the committed feed. No secret is created,
+# requested or stored by this workflow. If the built-in token is refused by the repository's
+# policy, the optional repository secret `SELF_DISPATCH_TOKEN` (fine-grained PAT, Actions: write)
+# makes the dispatch unconditional — see scripts/keepalive.mjs for the exact behaviour.
+
+on:
+  schedule:
+    # Every 15 minutes, offset from the hour so it is less likely to land in the documented
+    # high-load window at the start of an hour.
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/keepalive.mjs'
+      - 'tools/freshness_check.mjs'
+      - '.github/workflows/keepalive.yml'
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: keepalive
+  cancel-in-progress: false
+
+jobs:
+  pulse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Refuse silently-stale inputs (syntax check)
+        run: |
+          node --check scripts/keepalive.mjs
+          node --check tools/freshness_check.mjs
+
+      - name: Dispatch the samplers if they are overdue
+        env:
+          GH_TOKEN: ${{ secrets.SELF_DISPATCH_TOKEN || secrets.GITHUB_TOKEN }}
+          SELF_DISPATCH_TOKEN: ${{ secrets.SELF_DISPATCH_TOKEN }}
+        run: node scripts/keepalive.mjs --ref "${{ github.ref_name }}" --stale-minutes 15
+
+      # Give the just-dispatched runs time to publish. If nothing was dispatched (everything was
+      # fresh) this still re-checks the committed feed, which is the honest thing to gate on.
+      - name: Wait for a fresh sample to land
+        run: sleep 90
+
+      - name: Fail the run when the published feed is beyond the freshness limit
+        env:
+          GH_TOKEN: ${{ secrets.SELF_DISPATCH_TOKEN || secrets.GITHUB_TOKEN }}
+        run: node tools/freshness_check.mjs --branch "${{ github.ref_name }}" --warn-minutes 20 --stale-minutes 45

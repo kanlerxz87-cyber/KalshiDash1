@@ -7,11 +7,11 @@
 <meta name="description" content="Every unverified value, limitation and irregularity found while building the Kalshi demo dashboard, with the official source to check it against.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
-<body data-page="flagged">
+<body data-base="{{BASE}}">
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta">
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span>
       <span id="mode-badge" class="badge warn">data: probing…</span>
       <span id="clock" class="mono small muted"></span>
     </div>
@@ -88,5 +88,6 @@
 
 <footer class="site">{{FOOTER}}</footer>
 <script src="assets/app.js"></script>
+<script src="{{BASE}}assets/freshness.js"></script>
 </body>
 </html>

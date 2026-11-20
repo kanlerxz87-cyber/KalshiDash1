@@ -7,11 +7,12 @@
 <meta name="description" content="Live alerting for Kalshi demo contracts: every price swing of $0.10 or more in either direction, in a scrolling feed, plus a second feed filtered to the alerts our model scores as high expected ROI.">
 <link rel="stylesheet" href="css/alerts.css">
 </head>
-<body>
+<body data-base="../">
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
     <div class="head-meta">
+      <span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span>
       <span id="mode-badge" class="badge warn">data: loading…</span>
       <span id="clock" class="mono small muted"></span>
     </div>
@@ -293,6 +294,7 @@
   </div>
 </footer>
 
+<script src="../assets/freshness.js"></script>
 <script src="js/alerts-live.js"></script>
 <script src="js/alerts-page.js"></script>
 </body>

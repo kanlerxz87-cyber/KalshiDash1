@@ -7,16 +7,16 @@
 <meta name="description" content="Every unverified value, limitation and irregularity found while building the Kalshi demo dashboard, with the official source to check it against.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
-<body data-page="flagged">
+<body data-base="">
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta">
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span>
       <span id="mode-badge" class="badge warn">data: probing…</span>
       <span id="clock" class="mono small muted"></span>
     </div>
   </div>
-  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">More</span><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="catalyst.html">Swing catalysts</a><a href="strategylab.html">Strategy lab</a><a href="alerts/index.html">Live alerts (engine, 2 chats)</a><a href="dash/alerts.html">Alert feeds (dash suite)</a><a href="dash/autotrade.html">Auto-trade engine (dash suite)</a></div></nav>
+  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
 </header>
 
 <main><div class="wrap">
@@ -101,5 +101,6 @@
     Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
   </div></footer>
 <script src="assets/app.js"></script>
+<script src="assets/freshness.js"></script>
 </body>
 </html>

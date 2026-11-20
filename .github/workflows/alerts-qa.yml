@@ -37,10 +37,22 @@ jobs:
       - name: JavaScript syntax
         run: |
           set -e
-          for f in alerts/js/*.js tools/live_engine.mjs scripts/check_alerts.mjs scripts/check_alerts_page.mjs; do
+          for f in alerts/js/*.js assets/freshness.js tools/live_engine.mjs \
+                   tools/freshness_check.mjs scripts/keepalive.mjs \
+                   scripts/check_alerts.mjs scripts/check_alerts_page.mjs; do
             echo "node --check $f"
             node --check "$f"
           done
+
+      # The staleness gate is exercised in --report-only mode here: on a pull request the feed is
+      # whatever the branch has, and failing CI for an old sample would make every PR red for a
+      # reason the PR cannot fix. The hard failure lives in keepalive.yml, which runs on a schedule
+      # and is the thing that actually keeps the feed fresh.
+      - name: Freshness tooling works (structure + thresholds, report-only on PRs)
+        run: |
+          node tools/freshness_check.mjs --warn-minutes 20 --stale-minutes 45 || \
+            echo "::warning::the published feed is older than the stale limit on this branch — see keepalive.yml"
+          node scripts/keepalive.mjs --dry-run --stale-minutes 15 || true
 
       - name: Link check (whole tree + root template)
         run: |
