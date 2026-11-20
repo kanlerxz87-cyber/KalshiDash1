@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated_at": "2026-11-20T19:15:55.000Z",
+  "generated_at": "2026-11-20T19:22:09.000Z",
   "engine": "tools/live_engine.mjs",
   "model_version": "heuristic-v1",
   "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
@@ -8,7 +8,7 @@
   "high_roi_threshold": 0.62,
   "data_reset_reason": "Clean restart at the F-A9 price-rule fix. All earlier state was discarded because alerts and baselines accumulated while a contradictory demo quote could reach the price rule.",
   "trade_markets_checked": 8,
-  "trade_lookback_seconds": 18421,
+  "trade_lookback_seconds": 1800,
   "candle_markets_checked": 6,
   "duplicates_collapsed": 0,
   "legacy_base_url": "https://demo-api.kalshi.co/trade-api/v2",
@@ -17,12 +17,12 @@
   "series_checked": [
    "KXAAAGASW",
    "KXPRESNOMD",
-   "KXXBANNEDMURRAYHILLGUY1",
+   "KXXBANNEDGROK",
    "KXBTCD",
    "KXPGATOUR",
    "KXAAAGASM",
    "KXPRESPERSON",
-   "KXXBANNEDGROK",
+   "KXXBANNEDMURRAYHILLGUY1",
    "KXBTCY",
    "KXDPWORLDTOUR",
    "KXAAAGASD",
@@ -105,7 +105,7 @@
     "source": "orderbook_fp",
     "ticker": "KXPRESNOMD-28-GPLA",
     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-GPLA/orderbook",
-    "sampled_at": "2026-11-20T19:16:02.784Z"
+    "sampled_at": "2026-11-20T19:22:16.363Z"
    },
    "KXPRESNOMD-28-JP": {
     "yes_bids": [
@@ -333,25 +333,21 @@
      },
      {
       "price": 0.055,
-      "count": 1099
-     },
-     {
-      "price": 0.056,
-      "count": 17.27
+      "count": 1082.44
      }
     ],
     "best_yes_bid": 0.01,
-    "best_no_bid": 0.056,
-    "implied_yes_ask": 0.944,
+    "best_no_bid": 0.055,
+    "implied_yes_ask": 0.945,
     "implied_no_ask": 0.99,
     "cumulative_contracts": {
      "yes": 1,
-     "no": 57623.98
+     "no": 57590.15
     },
     "source": "orderbook_fp",
     "ticker": "KXPRESNOMD-28-JP",
     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-JP/orderbook",
-    "sampled_at": "2026-11-20T19:16:03.114Z"
+    "sampled_at": "2026-11-20T19:22:16.677Z"
    },
    "KXPRESNOMD-28-HCLI": {
     "yes_bids": [
@@ -372,7 +368,7 @@
     "source": "orderbook_fp",
     "ticker": "KXPRESNOMD-28-HCLI",
     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-HCLI/orderbook",
-    "sampled_at": "2026-11-20T19:16:03.442Z"
+    "sampled_at": "2026-11-20T19:22:16.991Z"
    },
    "KXBTCY-27JAN0100-B147500": {
     "yes_bids": [
@@ -393,7 +389,7 @@
     "source": "orderbook_fp",
     "ticker": "KXBTCY-27JAN0100-B147500",
     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B147500/orderbook",
-    "sampled_at": "2026-11-20T19:16:03.772Z"
+    "sampled_at": "2026-11-20T19:22:17.305Z"
    },
    "KXPRESNOMR-28-NMIN": {
     "yes_bids": [],
@@ -409,13 +405,13 @@
     "source": "orderbook_fp",
     "ticker": "KXPRESNOMR-28-NMIN",
     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMR-28-NMIN/orderbook",
-    "sampled_at": "2026-11-20T19:16:04.101Z"
+    "sampled_at": "2026-11-20T19:22:17.619Z"
    },
    "KXPRESNOMD-28-RW": {
     "yes_bids": [
      {
       "price": 0.001,
-      "count": 120
+      "count": 100
      },
      {
       "price": 0.01,
@@ -1249,7 +1245,7 @@
      },
      {
       "price": 0.962,
-      "count": 4383.33
+      "count": 4344.45
      }
     ],
     "best_yes_bid": 0.035,
@@ -1257,13 +1253,13 @@
     "implied_yes_ask": 0.038,
     "implied_no_ask": 0.965,
     "cumulative_contracts": {
-     "yes": 26796.2,
-     "no": 427585.46
+     "yes": 26776.2,
+     "no": 427546.58
     },
     "source": "orderbook_fp",
     "ticker": "KXPRESNOMD-28-RW",
     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-RW/orderbook",
-    "sampled_at": "2026-11-20T19:16:04.430Z"
+    "sampled_at": "2026-11-20T19:22:17.934Z"
    },
    "KXPRESNOMD-28-JOSS": {
     "yes_bids": [
@@ -1323,7 +1319,7 @@
      },
      {
       "price": 0.728,
-      "count": 143.52
+      "count": 93.19
      }
     ],
     "best_yes_bid": 0.26,
@@ -1332,12 +1328,12 @@
     "implied_no_ask": 0.74,
     "cumulative_contracts": {
      "yes": 17272.71,
-     "no": 1225.15
+     "no": 1174.82
     },
     "source": "orderbook_fp",
     "ticker": "KXPRESNOMD-28-JOSS",
     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-JOSS/orderbook",
-    "sampled_at": "2026-11-20T19:16:04.759Z"
+    "sampled_at": "2026-11-20T19:22:18.247Z"
    },
    "KXPRESNOMR-28-MG": {
     "yes_bids": [
@@ -1358,13 +1354,13 @@
     "source": "orderbook_fp",
     "ticker": "KXPRESNOMR-28-MG",
     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMR-28-MG/orderbook",
-    "sampled_at": "2026-11-20T19:16:05.088Z"
+    "sampled_at": "2026-11-20T19:22:18.561Z"
    }
   }
  },
  "run": {
-  "run_id": "2026-11-20T19:15:55.000Z",
-  "sampled_at": "2026-11-20T19:15:55.000Z",
+  "run_id": "2026-11-20T19:22:09.000Z",
+  "sampled_at": "2026-11-20T19:22:09.000Z",
   "markets_sampled": 671,
   "markets_without_price": 295,
   "alerts_created": 0,
@@ -1416,7 +1412,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-JP",
@@ -1426,22 +1422,22 @@
    "title": "Will Jared Polis be the Democratic Presidential nominee in 2028?",
    "status": "active",
    "result": "",
-   "price": 0.944,
+   "price": 0.945,
    "price_field": "last_price_dollars",
    "book_inconsistent": false,
    "reciprocity_error": null,
    "yes_bid_dollars": "0.0100",
-   "yes_ask_dollars": "0.9440",
+   "yes_ask_dollars": "0.9450",
    "yes_bid_size_fp": "1.00",
-   "yes_ask_size_fp": "18.37",
-   "no_bid_dollars": "0.0560",
+   "yes_ask_size_fp": "1082.44",
+   "no_bid_dollars": "0.0550",
    "no_ask_dollars": "0.9900",
-   "last_price_dollars": "0.9440",
+   "last_price_dollars": "0.9450",
    "previous_price_dollars": "0.9370",
-   "volume_fp": "186515511.32",
-   "volume_24h_fp": "8190.28",
+   "volume_fp": "186515546.25",
+   "volume_24h_fp": "8196.30",
    "open_interest_fp": "89344735.06",
-   "est_traded_dollars": 176070642.69,
+   "est_traded_dollars": 176257191.21,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Jared Polis wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -1460,7 +1456,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-HCLI",
@@ -1504,7 +1500,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B147500",
@@ -1544,7 +1540,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMR-28-NMIN",
@@ -1588,7 +1584,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-RW",
@@ -1605,15 +1601,15 @@
    "yes_bid_dollars": "0.0350",
    "yes_ask_dollars": "0.0380",
    "yes_bid_size_fp": "4.47",
-   "yes_ask_size_fp": "4385.54",
+   "yes_ask_size_fp": "4344.45",
    "no_bid_dollars": "0.9620",
    "no_ask_dollars": "0.9650",
    "last_price_dollars": "0.0380",
    "previous_price_dollars": "0.0330",
-   "volume_fp": "414924936.54",
-   "volume_24h_fp": "17573.87",
+   "volume_fp": "414924977.63",
+   "volume_24h_fp": "22353.60",
    "open_interest_fp": "189529515.91",
-   "est_traded_dollars": 15767147.59,
+   "est_traded_dollars": 15767149.15,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Raphael Warnock wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -1632,7 +1628,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-JOSS",
@@ -1649,15 +1645,15 @@
    "yes_bid_dollars": "0.2600",
    "yes_ask_dollars": "0.2720",
    "yes_bid_size_fp": "641.02",
-   "yes_ask_size_fp": "144.63",
+   "yes_ask_size_fp": "96.04",
    "no_bid_dollars": "0.7280",
    "no_ask_dollars": "0.7400",
    "last_price_dollars": "0.2720",
    "previous_price_dollars": "0.2700",
-   "volume_fp": "54532539.75",
-   "volume_24h_fp": "8086.08",
+   "volume_fp": "54532588.34",
+   "volume_24h_fp": "8108.60",
    "open_interest_fp": "10488392.76",
-   "est_traded_dollars": 14832850.81,
+   "est_traded_dollars": 14832864.03,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Jon Ossoff wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -1676,7 +1672,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMR-28-MG",
@@ -1720,7 +1716,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B62500",
@@ -1760,7 +1756,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B57500",
@@ -1800,7 +1796,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-AOC",
@@ -1817,15 +1813,15 @@
    "yes_bid_dollars": "0.1400",
    "yes_ask_dollars": "0.1510",
    "yes_bid_size_fp": "1190.47",
-   "yes_ask_size_fp": "394.19",
+   "yes_ask_size_fp": "351.86",
    "no_bid_dollars": "0.8490",
    "no_ask_dollars": "0.8600",
    "last_price_dollars": "0.1510",
    "previous_price_dollars": "0.1500",
-   "volume_fp": "59044526.42",
-   "volume_24h_fp": "8149.83",
+   "volume_fp": "59044568.75",
+   "volume_24h_fp": "8163.63",
    "open_interest_fp": "14795886.21",
-   "est_traded_dollars": 8915723.49,
+   "est_traded_dollars": 8915729.88,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Alexandria Ocasio-Cortez wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -1844,7 +1840,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B67500",
@@ -1884,7 +1880,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-KH",
@@ -1901,15 +1897,15 @@
    "yes_bid_dollars": "0.0480",
    "yes_ask_dollars": "0.0500",
    "yes_bid_size_fp": "10416.66",
-   "yes_ask_size_fp": "8948.68",
+   "yes_ask_size_fp": "8918.61",
    "no_bid_dollars": "0.9500",
    "no_ask_dollars": "0.9520",
    "last_price_dollars": "0.0500",
    "previous_price_dollars": "0.0500",
-   "volume_fp": "134222640.99",
-   "volume_24h_fp": "7958.35",
+   "volume_fp": "134222671.06",
+   "volume_24h_fp": "7952.48",
    "open_interest_fp": "17647637.07",
-   "est_traded_dollars": 6711132.05,
+   "est_traded_dollars": 6711133.55,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Kamala Harris wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -1928,7 +1924,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-MK",
@@ -1945,15 +1941,15 @@
    "yes_bid_dollars": "0.0320",
    "yes_ask_dollars": "0.0330",
    "yes_bid_size_fp": "5208.33",
-   "yes_ask_size_fp": "2075.98",
+   "yes_ask_size_fp": "2043.19",
    "no_bid_dollars": "0.9670",
    "no_ask_dollars": "0.9680",
    "last_price_dollars": "0.0330",
    "previous_price_dollars": "0.0330",
-   "volume_fp": "201921158.31",
-   "volume_24h_fp": "8013.64",
+   "volume_fp": "201921191.10",
+   "volume_24h_fp": "8019.38",
    "open_interest_fp": "38595763.54",
-   "est_traded_dollars": 6663398.22,
+   "est_traded_dollars": 6663399.31,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Mark Kelly wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -1972,7 +1968,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-PB",
@@ -1989,15 +1985,15 @@
    "yes_bid_dollars": "0.0520",
    "yes_ask_dollars": "0.0540",
    "yes_bid_size_fp": "6410.24",
-   "yes_ask_size_fp": "4889.93",
+   "yes_ask_size_fp": "4856.18",
    "no_bid_dollars": "0.9460",
    "no_ask_dollars": "0.9480",
    "last_price_dollars": "0.0540",
    "previous_price_dollars": "0.0540",
-   "volume_fp": "118660652.56",
-   "volume_24h_fp": "8433.50",
+   "volume_fp": "118660686.31",
+   "volume_24h_fp": "8437.18",
    "open_interest_fp": "34090026.08",
-   "est_traded_dollars": 6407675.24,
+   "est_traded_dollars": 6407677.06,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Pete Buttigieg wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -2016,7 +2012,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESPERSON-28-JOSS",
@@ -2033,15 +2029,15 @@
    "yes_bid_dollars": "0.1700",
    "yes_ask_dollars": "0.1800",
    "yes_bid_size_fp": "980.39",
-   "yes_ask_size_fp": "52.66",
+   "yes_ask_size_fp": "22.81",
    "no_bid_dollars": "0.8200",
    "no_ask_dollars": "0.8300",
    "last_price_dollars": "0.1800",
    "previous_price_dollars": "0.1810",
-   "volume_fp": "33461639.18",
-   "volume_24h_fp": "6134.93",
-   "open_interest_fp": "5250401.50",
-   "est_traded_dollars": 6023095.05,
+   "volume_fp": "33461669.03",
+   "volume_24h_fp": "6125.51",
+   "open_interest_fp": "5250431.35",
+   "est_traded_dollars": 6023100.43,
    "close_time": "2029-11-07T15:00:00Z",
    "expected_expiration_time": "2029-01-21T15:00:00Z",
    "rules_primary": "If Jon Ossoff is the next person inaugurated as President for the term beginning in 2029, then the market resolves to Yes.",
@@ -2056,7 +2052,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-JTAL",
@@ -2073,15 +2069,15 @@
    "yes_bid_dollars": "0.0170",
    "yes_ask_dollars": "0.0180",
    "yes_bid_size_fp": "49019.60",
-   "yes_ask_size_fp": "15775.25",
+   "yes_ask_size_fp": "15737.92",
    "no_bid_dollars": "0.9820",
    "no_ask_dollars": "0.9830",
    "last_price_dollars": "0.0180",
    "previous_price_dollars": "0.0200",
-   "volume_fp": "311522766.05",
-   "volume_24h_fp": "8253.15",
+   "volume_fp": "311522803.38",
+   "volume_24h_fp": "8256.32",
    "open_interest_fp": "82392481.21",
-   "est_traded_dollars": 5607409.79,
+   "est_traded_dollars": 5607410.46,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If James Talarico wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -2100,7 +2096,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B52500",
@@ -2123,7 +2119,7 @@
    "last_price_dollars": "0.0900",
    "previous_price_dollars": "0.0800",
    "volume_fp": "61716672.39",
-   "volume_24h_fp": "2175.09",
+   "volume_24h_fp": "5585.83",
    "open_interest_fp": "7787531.90",
    "est_traded_dollars": 5554500.52,
    "close_time": "2027-01-01T05:00:00Z",
@@ -2140,7 +2136,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-AB",
@@ -2157,15 +2153,15 @@
    "yes_bid_dollars": "0.0350",
    "yes_ask_dollars": "0.0380",
    "yes_bid_size_fp": "9523.80",
-   "yes_ask_size_fp": "6063.53",
+   "yes_ask_size_fp": "6032.23",
    "no_bid_dollars": "0.9620",
    "no_ask_dollars": "0.9650",
    "last_price_dollars": "0.0380",
    "previous_price_dollars": "0.0380",
-   "volume_fp": "145034429.33",
-   "volume_24h_fp": "8151.41",
+   "volume_fp": "145034460.63",
+   "volume_24h_fp": "8149.74",
    "open_interest_fp": "27740224.39",
-   "est_traded_dollars": 5511308.31,
+   "est_traded_dollars": 5511309.5,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Andy Beshear wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -2184,7 +2180,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B122500",
@@ -2207,7 +2203,7 @@
    "last_price_dollars": "0.0300",
    "previous_price_dollars": "0.0100",
    "volume_fp": "162214680.45",
-   "volume_24h_fp": "16666.66",
+   "volume_24h_fp": "30555.54",
    "open_interest_fp": "23505706.64",
    "est_traded_dollars": 4866440.41,
    "close_time": "2027-01-01T05:00:00Z",
@@ -2224,7 +2220,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B47500",
@@ -2264,7 +2260,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-ESLO",
@@ -2281,15 +2277,15 @@
    "yes_bid_dollars": "0.0080",
    "yes_ask_dollars": "0.0090",
    "yes_bid_size_fp": "26047.03",
-   "yes_ask_size_fp": "34242.00",
+   "yes_ask_size_fp": "34206.89",
    "no_bid_dollars": "0.9910",
    "no_ask_dollars": "0.9920",
    "last_price_dollars": "0.0090",
    "previous_price_dollars": "0.8020",
-   "volume_fp": "468264423.05",
-   "volume_24h_fp": "44595.25",
-   "open_interest_fp": "150320965.24",
-   "est_traded_dollars": 4214379.81,
+   "volume_fp": "468264458.16",
+   "volume_24h_fp": "44603.67",
+   "open_interest_fp": "150321000.35",
+   "est_traded_dollars": 4214380.12,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Elissa Slotkin wins and accepts the nomination for the Presidency for the Democratic party, then the market resolves to Yes.",
@@ -2308,7 +2304,51 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
+  },
+  {
+   "ticker": "KXPRESNOMD-28-WM",
+   "event_ticker": "KXPRESNOMD-28",
+   "series_ticker": "KXPRESNOMD",
+   "topic": "elections",
+   "title": "Will Wes Moore be the Democratic Presidential nominee in 2028?",
+   "status": "active",
+   "result": "",
+   "price": 0.028,
+   "price_field": "last_price_dollars",
+   "book_inconsistent": false,
+   "reciprocity_error": null,
+   "yes_bid_dollars": "0.0250",
+   "yes_ask_dollars": "0.0280",
+   "yes_bid_size_fp": "6666.66",
+   "yes_ask_size_fp": "5917.01",
+   "no_bid_dollars": "0.9720",
+   "no_ask_dollars": "0.9750",
+   "last_price_dollars": "0.0280",
+   "previous_price_dollars": "0.0180",
+   "volume_fp": "143968103.16",
+   "volume_24h_fp": "79708.75",
+   "open_interest_fp": "43035547.01",
+   "est_traded_dollars": 4031106.89,
+   "close_time": "2028-11-07T15:00:00Z",
+   "expected_expiration_time": "2028-11-07T15:00:00Z",
+   "rules_primary": "If Wes Moore wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESNOM.pdf",
+   "contract_url": "https://kalshi-public-docs-staging.s3.us-east-1.amazonaws.com/regulatory/product-certifications/PRESNOM.pdf",
+   "settlement_sources": [
+    {
+     "name": "Republican Party",
+     "url": "https://gop.com/"
+    },
+    {
+     "name": "Democratic Party",
+     "url": "https://democrats.org/"
+    }
+   ],
+   "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B42500",
@@ -2348,7 +2388,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-GN",
@@ -2365,15 +2405,15 @@
    "yes_bid_dollars": "0.1000",
    "yes_ask_dollars": "0.1100",
    "yes_bid_size_fp": "4999.98",
-   "yes_ask_size_fp": "1514.39",
+   "yes_ask_size_fp": "1474.92",
    "no_bid_dollars": "0.8900",
    "no_ask_dollars": "0.9000",
    "last_price_dollars": "0.1100",
    "previous_price_dollars": "0.1100",
-   "volume_fp": "32268049.07",
-   "volume_24h_fp": "8129.16",
+   "volume_fp": "32268088.54",
+   "volume_24h_fp": "8137.77",
    "open_interest_fp": "9513861.88",
-   "est_traded_dollars": 3549485.4,
+   "est_traded_dollars": 3549489.74,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Gavin Newsom wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -2392,7 +2432,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-JS",
@@ -2409,15 +2449,15 @@
    "yes_bid_dollars": "0.0470",
    "yes_ask_dollars": "0.0490",
    "yes_bid_size_fp": "14184.36",
-   "yes_ask_size_fp": "9778.76",
+   "yes_ask_size_fp": "9739.56",
    "no_bid_dollars": "0.9510",
    "no_ask_dollars": "0.9530",
    "last_price_dollars": "0.0490",
    "previous_price_dollars": "0.0490",
-   "volume_fp": "60152991.45",
-   "volume_24h_fp": "8128.94",
-   "open_interest_fp": "18109605.17",
-   "est_traded_dollars": 2947496.58,
+   "volume_fp": "60153030.65",
+   "volume_24h_fp": "8136.78",
+   "open_interest_fp": "18109644.37",
+   "est_traded_dollars": 2947498.5,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Josh Shapiro wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -2436,7 +2476,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-REMA",
@@ -2453,15 +2493,15 @@
    "yes_bid_dollars": "0.0220",
    "yes_ask_dollars": "0.0230",
    "yes_bid_size_fp": "15151.50",
-   "yes_ask_size_fp": "11628.90",
+   "yes_ask_size_fp": "11594.23",
    "no_bid_dollars": "0.9770",
    "no_ask_dollars": "0.9780",
    "last_price_dollars": "0.0230",
    "previous_price_dollars": "0.0250",
-   "volume_fp": "125514124.71",
-   "volume_24h_fp": "30032.41",
-   "open_interest_fp": "36007716.59",
-   "est_traded_dollars": 2886824.87,
+   "volume_fp": "125514159.38",
+   "volume_24h_fp": "30038.66",
+   "open_interest_fp": "36007751.26",
+   "est_traded_dollars": 2886825.67,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Rahm Emanuel wins and accepts the nomination for the Presidency for the Democratic party, then the market resolves to Yes.",
@@ -2480,51 +2520,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
-  },
-  {
-   "ticker": "KXPRESNOMD-28-WM",
-   "event_ticker": "KXPRESNOMD-28",
-   "series_ticker": "KXPRESNOMD",
-   "topic": "elections",
-   "title": "Will Wes Moore be the Democratic Presidential nominee in 2028?",
-   "status": "active",
-   "result": "",
-   "price": 0.02,
-   "price_field": "last_price_dollars",
-   "book_inconsistent": false,
-   "reciprocity_error": null,
-   "yes_bid_dollars": "0.0170",
-   "yes_ask_dollars": "0.0200",
-   "yes_bid_size_fp": "29411.76",
-   "yes_ask_size_fp": "8900.45",
-   "no_bid_dollars": "0.9800",
-   "no_ask_dollars": "0.9830",
-   "last_price_dollars": "0.0200",
-   "previous_price_dollars": "0.0180",
-   "volume_fp": "143959164.72",
-   "volume_24h_fp": "29094.59",
-   "open_interest_fp": "43027213.68",
-   "est_traded_dollars": 2879183.29,
-   "close_time": "2028-11-07T15:00:00Z",
-   "expected_expiration_time": "2028-11-07T15:00:00Z",
-   "rules_primary": "If Wes Moore wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESNOM.pdf",
-   "contract_url": "https://kalshi-public-docs-staging.s3.us-east-1.amazonaws.com/regulatory/product-certifications/PRESNOM.pdf",
-   "settlement_sources": [
-    {
-     "name": "Republican Party",
-     "url": "https://gop.com/"
-    },
-    {
-     "name": "Democratic Party",
-     "url": "https://democrats.org/"
-    }
-   ],
-   "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-JBP",
@@ -2541,15 +2537,15 @@
    "yes_bid_dollars": "0.0250",
    "yes_ask_dollars": "0.0280",
    "yes_bid_size_fp": "33333.30",
-   "yes_ask_size_fp": "29265.30",
+   "yes_ask_size_fp": "29246.48",
    "no_bid_dollars": "0.9720",
    "no_ask_dollars": "0.9750",
    "last_price_dollars": "0.0280",
    "previous_price_dollars": "0.0270",
-   "volume_fp": "101971256.94",
-   "volume_24h_fp": "8375.84",
-   "open_interest_fp": "21061326.53",
-   "est_traded_dollars": 2855195.19,
+   "volume_fp": "101971275.76",
+   "volume_24h_fp": "8366.28",
+   "open_interest_fp": "21061345.35",
+   "est_traded_dollars": 2855195.72,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If J.B. Pritzker wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -2568,7 +2564,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B72500",
@@ -2591,7 +2587,7 @@
    "last_price_dollars": "0.0800",
    "previous_price_dollars": "0.0900",
    "volume_fp": "35277885.41",
-   "volume_24h_fp": "0.00",
+   "volume_24h_fp": "2083.33",
    "open_interest_fp": "4723628.03",
    "est_traded_dollars": 2822230.83,
    "close_time": "2027-01-01T05:00:00Z",
@@ -2608,7 +2604,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMR-28-RDS",
@@ -2625,15 +2621,15 @@
    "yes_bid_dollars": "0.1500",
    "yes_ask_dollars": "0.1600",
    "yes_bid_size_fp": "3333.33",
-   "yes_ask_size_fp": "1097.70",
+   "yes_ask_size_fp": "1064.03",
    "no_bid_dollars": "0.8400",
    "no_ask_dollars": "0.8500",
    "last_price_dollars": "0.1600",
    "previous_price_dollars": "0.1600",
-   "volume_fp": "17625186.61",
-   "volume_24h_fp": "7918.45",
+   "volume_fp": "17625220.28",
+   "volume_24h_fp": "7919.63",
    "open_interest_fp": "5301004.41",
-   "est_traded_dollars": 2820029.86,
+   "est_traded_dollars": 2820035.24,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Ron DeSantis wins and accepts the nomination for the Presidency for the Republican party in 2028, then the market resolves to Yes.",
@@ -2652,7 +2648,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESPERSON-28-AOCA",
@@ -2669,15 +2665,15 @@
    "yes_bid_dollars": "0.0900",
    "yes_ask_dollars": "0.0910",
    "yes_bid_size_fp": "3703.70",
-   "yes_ask_size_fp": "2776.51",
+   "yes_ask_size_fp": "2747.88",
    "no_bid_dollars": "0.9090",
    "no_ask_dollars": "0.9100",
    "last_price_dollars": "0.0910",
    "previous_price_dollars": "0.0910",
-   "volume_fp": "30323891.79",
-   "volume_24h_fp": "7151.28",
+   "volume_fp": "30323920.42",
+   "volume_24h_fp": "7161.51",
    "open_interest_fp": "6541990.54",
-   "est_traded_dollars": 2759474.15,
+   "est_traded_dollars": 2759476.76,
    "close_time": "2029-11-07T15:00:00Z",
    "expected_expiration_time": "2029-01-21T15:00:00Z",
    "rules_primary": "If Alexandria Ocasio-Cortez is the next person inaugurated as President for the term beginning in 2029, then the market resolves to Yes.",
@@ -2692,7 +2688,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-EWAR",
@@ -2707,17 +2703,17 @@
    "book_inconsistent": false,
    "reciprocity_error": null,
    "yes_bid_dollars": "0.0000",
-   "yes_ask_dollars": "1.0000",
+   "yes_ask_dollars": "0.0100",
    "yes_bid_size_fp": "0.00",
-   "yes_ask_size_fp": "0.00",
-   "no_bid_dollars": "0.0000",
+   "yes_ask_size_fp": "16651.54",
+   "no_bid_dollars": "0.9900",
    "no_ask_dollars": "1.0000",
    "last_price_dollars": "0.0100",
    "previous_price_dollars": "0.0100",
-   "volume_fp": "271940339.89",
-   "volume_24h_fp": "60544.08",
-   "open_interest_fp": "19112960.09",
-   "est_traded_dollars": 2719403.4,
+   "volume_fp": "271940372.31",
+   "volume_24h_fp": "66102.98",
+   "open_interest_fp": "19112960.39",
+   "est_traded_dollars": 2719403.72,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Elizabeth Warren wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -2736,7 +2732,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-GW",
@@ -2753,15 +2749,15 @@
    "yes_bid_dollars": "0.0050",
    "yes_ask_dollars": "0.0060",
    "yes_bid_size_fp": "100001.99",
-   "yes_ask_size_fp": "80067.69",
+   "yes_ask_size_fp": "80042.08",
    "no_bid_dollars": "0.9940",
    "no_ask_dollars": "0.9950",
    "last_price_dollars": "0.0060",
    "previous_price_dollars": "0.0060",
-   "volume_fp": "432107266.33",
-   "volume_24h_fp": "8248.48",
+   "volume_fp": "432107291.94",
+   "volume_24h_fp": "8242.39",
    "open_interest_fp": "169497438.62",
-   "est_traded_dollars": 2592643.6,
+   "est_traded_dollars": 2592643.75,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Gretchen Whitmer wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -2780,7 +2776,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMR-28-MR",
@@ -2797,15 +2793,15 @@
    "yes_bid_dollars": "0.2100",
    "yes_ask_dollars": "0.2200",
    "yes_bid_size_fp": "1587.30",
-   "yes_ask_size_fp": "80.22",
+   "yes_ask_size_fp": "37.04",
    "no_bid_dollars": "0.7800",
    "no_ask_dollars": "0.7900",
    "last_price_dollars": "0.2200",
    "previous_price_dollars": "0.1900",
-   "volume_fp": "11565221.58",
-   "volume_24h_fp": "11715.89",
+   "volume_fp": "11565264.76",
+   "volume_24h_fp": "11724.41",
    "open_interest_fp": "2690339.08",
-   "est_traded_dollars": 2544348.75,
+   "est_traded_dollars": 2544358.25,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Marco Rubio wins and accepts the nomination for the Presidency for the Republican party in 2028, then the market resolves to Yes.",
@@ -2824,7 +2820,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-RKHA",
@@ -2841,15 +2837,15 @@
    "yes_bid_dollars": "0.0150",
    "yes_ask_dollars": "0.0160",
    "yes_bid_size_fp": "11111.11",
-   "yes_ask_size_fp": "10408.35",
+   "yes_ask_size_fp": "10375.59",
    "no_bid_dollars": "0.9840",
    "no_ask_dollars": "0.9850",
    "last_price_dollars": "0.0160",
    "previous_price_dollars": "0.0160",
-   "volume_fp": "156643572.79",
-   "volume_24h_fp": "7539.32",
-   "open_interest_fp": "31527627.72",
-   "est_traded_dollars": 2506297.16,
+   "volume_fp": "156643605.55",
+   "volume_24h_fp": "7543.85",
+   "open_interest_fp": "31527660.48",
+   "est_traded_dollars": 2506297.69,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Ro Khanna wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -2868,7 +2864,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B127500",
@@ -2908,7 +2904,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMR-28-JDV",
@@ -2925,15 +2921,15 @@
    "yes_bid_dollars": "0.3200",
    "yes_ask_dollars": "0.3300",
    "yes_bid_size_fp": "760.89",
-   "yes_ask_size_fp": "255.41",
+   "yes_ask_size_fp": "216.32",
    "no_bid_dollars": "0.6700",
    "no_ask_dollars": "0.6800",
    "last_price_dollars": "0.3300",
    "previous_price_dollars": "0.3300",
-   "volume_fp": "6781388.27",
-   "volume_24h_fp": "10958.46",
-   "open_interest_fp": "3087618.26",
-   "est_traded_dollars": 2237858.13,
+   "volume_fp": "6781427.36",
+   "volume_24h_fp": "10975.82",
+   "open_interest_fp": "3087657.35",
+   "est_traded_dollars": 2237871.03,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If J.D. Vance wins and accepts the nomination for the Presidency for the Republican party in 2028, then the market resolves to Yes.",
@@ -2952,7 +2948,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B102500",
@@ -2975,7 +2971,7 @@
    "last_price_dollars": "0.0300",
    "previous_price_dollars": "0.0100",
    "volume_fp": "73856637.25",
-   "volume_24h_fp": "16666.66",
+   "volume_24h_fp": "30555.54",
    "open_interest_fp": "6911267.06",
    "est_traded_dollars": 2215699.12,
    "close_time": "2027-01-01T05:00:00Z",
@@ -2992,7 +2988,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -3015,7 +3011,7 @@
    "last_price_dollars": "0.0300",
    "previous_price_dollars": "0.9700",
    "volume_fp": "72284863.12",
-   "volume_24h_fp": "47222.20",
+   "volume_24h_fp": "61111.08",
    "open_interest_fp": "7322453.32",
    "est_traded_dollars": 2168545.89,
    "close_time": "2027-01-01T05:00:00Z",
@@ -3032,7 +3028,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-BS",
@@ -3049,15 +3045,15 @@
    "yes_bid_dollars": "0.0040",
    "yes_ask_dollars": "0.0050",
    "yes_bid_size_fp": "166667.67",
-   "yes_ask_size_fp": "132851.35",
+   "yes_ask_size_fp": "132811.48",
    "no_bid_dollars": "0.9950",
    "no_ask_dollars": "0.9960",
    "last_price_dollars": "0.0050",
    "previous_price_dollars": "0.0050",
-   "volume_fp": "430915901.43",
-   "volume_24h_fp": "8289.91",
+   "volume_fp": "430915941.30",
+   "volume_24h_fp": "8295.50",
    "open_interest_fp": "126693212.93",
-   "est_traded_dollars": 2154579.51,
+   "est_traded_dollars": 2154579.71,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Bernie Sanders wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -3076,7 +3072,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-BOBA",
@@ -3093,15 +3089,15 @@
    "yes_bid_dollars": "0.0020",
    "yes_ask_dollars": "0.0050",
    "yes_bid_size_fp": "83333.33",
-   "yes_ask_size_fp": "32049.37",
+   "yes_ask_size_fp": "32017.88",
    "no_bid_dollars": "0.9950",
    "no_ask_dollars": "0.9980",
    "last_price_dollars": "0.0050",
    "previous_price_dollars": "0.0050",
-   "volume_fp": "418777427.21",
-   "volume_24h_fp": "63560.18",
+   "volume_fp": "418777458.70",
+   "volume_24h_fp": "63567.28",
    "open_interest_fp": "137412877.49",
-   "est_traded_dollars": 2093887.14,
+   "est_traded_dollars": 2093887.29,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Barack Obama wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -3120,7 +3116,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B27500",
@@ -3160,7 +3156,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B92500",
@@ -3200,7 +3196,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-CBOO",
@@ -3217,15 +3213,15 @@
    "yes_bid_dollars": "0.0060",
    "yes_ask_dollars": "0.0080",
    "yes_bid_size_fp": "55555.54",
-   "yes_ask_size_fp": "62030.44",
+   "yes_ask_size_fp": "62001.84",
    "no_bid_dollars": "0.9920",
    "no_ask_dollars": "0.9940",
    "last_price_dollars": "0.0080",
    "previous_price_dollars": "0.0080",
-   "volume_fp": "248522983.32",
-   "volume_24h_fp": "8119.07",
+   "volume_fp": "248523011.92",
+   "volume_24h_fp": "8127.77",
    "open_interest_fp": "102293176.44",
-   "est_traded_dollars": 1988183.87,
+   "est_traded_dollars": 1988184.1,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Cory Booker wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -3244,7 +3240,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B112500",
@@ -3284,7 +3280,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESPERSON-28-MRUB",
@@ -3301,15 +3297,15 @@
    "yes_bid_dollars": "0.0870",
    "yes_ask_dollars": "0.0890",
    "yes_bid_size_fp": "3831.40",
-   "yes_ask_size_fp": "2864.83",
+   "yes_ask_size_fp": "2820.76",
    "no_bid_dollars": "0.9110",
    "no_ask_dollars": "0.9130",
    "last_price_dollars": "0.0890",
    "previous_price_dollars": "0.0890",
-   "volume_fp": "21755890.94",
-   "volume_24h_fp": "7215.22",
-   "open_interest_fp": "3493974.86",
-   "est_traded_dollars": 1936274.29,
+   "volume_fp": "21755935.01",
+   "volume_24h_fp": "7220.77",
+   "open_interest_fp": "3494018.93",
+   "est_traded_dollars": 1936278.22,
    "close_time": "2029-11-07T15:00:00Z",
    "expected_expiration_time": "2029-01-21T15:00:00Z",
    "rules_primary": "If Marco Rubio is the next person inaugurated as President for the term beginning in 2029, then the market resolves to Yes.",
@@ -3324,7 +3320,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESPERSON-28-RDES",
@@ -3341,15 +3337,15 @@
    "yes_bid_dollars": "0.0560",
    "yes_ask_dollars": "0.0570",
    "yes_bid_size_fp": "5952.38",
-   "yes_ask_size_fp": "2915.63",
+   "yes_ask_size_fp": "2882.06",
    "no_bid_dollars": "0.9430",
    "no_ask_dollars": "0.9440",
    "last_price_dollars": "0.0570",
    "previous_price_dollars": "0.0580",
-   "volume_fp": "33945037.24",
-   "volume_24h_fp": "7093.36",
+   "volume_fp": "33945070.81",
+   "volume_24h_fp": "7098.41",
    "open_interest_fp": "10858277.46",
-   "est_traded_dollars": 1934867.12,
+   "est_traded_dollars": 1934869.04,
    "close_time": "2029-11-07T15:00:00Z",
    "expected_expiration_time": "2029-01-21T15:00:00Z",
    "rules_primary": "If Ron DeSantis is the next person inaugurated as President for the term beginning in 2029, then the market resolves to Yes.",
@@ -3364,7 +3360,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMR-28-TCAR",
@@ -3381,15 +3377,15 @@
    "yes_bid_dollars": "0.0270",
    "yes_ask_dollars": "0.0280",
    "yes_bid_size_fp": "12345.66",
-   "yes_ask_size_fp": "9163.81",
+   "yes_ask_size_fp": "9134.96",
    "no_bid_dollars": "0.9720",
    "no_ask_dollars": "0.9730",
    "last_price_dollars": "0.0280",
    "previous_price_dollars": "0.0300",
-   "volume_fp": "68976046.36",
-   "volume_24h_fp": "8304.26",
+   "volume_fp": "68976075.21",
+   "volume_24h_fp": "8306.36",
    "open_interest_fp": "19484042.84",
-   "est_traded_dollars": 1931329.3,
+   "est_traded_dollars": 1931330.11,
    "close_time": "2028-11-07T15:00:00Z",
    "expected_expiration_time": "2028-11-07T15:00:00Z",
    "rules_primary": "If Tucker Carlson wins and accepts the nomination for the Presidency for the Republican party, then the market resolves to Yes.",
@@ -3408,7 +3404,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B132500",
@@ -3448,7 +3444,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-T149999.99",
@@ -3488,7 +3484,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESPERSON-28-JVAN",
@@ -3505,15 +3501,15 @@
    "yes_bid_dollars": "0.1300",
    "yes_ask_dollars": "0.1400",
    "yes_bid_size_fp": "1282.05",
-   "yes_ask_size_fp": "678.28",
+   "yes_ask_size_fp": "640.43",
    "no_bid_dollars": "0.8600",
    "no_ask_dollars": "0.8700",
    "last_price_dollars": "0.1400",
    "previous_price_dollars": "0.1400",
-   "volume_fp": "11604195.71",
-   "volume_24h_fp": "7124.12",
-   "open_interest_fp": "3058221.80",
-   "est_traded_dollars": 1624587.4,
+   "volume_fp": "11604233.56",
+   "volume_24h_fp": "7140.48",
+   "open_interest_fp": "3058259.65",
+   "est_traded_dollars": 1624592.7,
    "close_time": "2029-11-07T15:00:00Z",
    "expected_expiration_time": "2029-01-21T15:00:00Z",
    "rules_primary": "If J.D. Vance is the next person inaugurated as President for the term beginning in 2029, then the market resolves to Yes.",
@@ -3528,51 +3524,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
-  },
-  {
-   "ticker": "KXPRESNOMD-28-HBID",
-   "event_ticker": "KXPRESNOMD-28",
-   "series_ticker": "KXPRESNOMD",
-   "topic": "elections",
-   "title": "Will Hunter Biden be the nominee for the Presidency for the Democratic party?",
-   "status": "active",
-   "result": "",
-   "price": 0.003,
-   "price_field": "last_price_dollars",
-   "book_inconsistent": false,
-   "reciprocity_error": null,
-   "yes_bid_dollars": "0.0020",
-   "yes_ask_dollars": "0.0030",
-   "yes_bid_size_fp": "166666.66",
-   "yes_ask_size_fp": "55555.55",
-   "no_bid_dollars": "0.9970",
-   "no_ask_dollars": "0.9980",
-   "last_price_dollars": "0.0030",
-   "previous_price_dollars": "0.0030",
-   "volume_fp": "537225528.29",
-   "volume_24h_fp": "8077.73",
-   "open_interest_fp": "140195139.11",
-   "est_traded_dollars": 1611676.58,
-   "close_time": "2028-11-07T15:00:00Z",
-   "expected_expiration_time": "2028-11-07T15:00:00Z",
-   "rules_primary": "If Hunter Biden wins and accepts the nomination for the Presidency for the Democratic party, then the market resolves to Yes.",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESNOM.pdf",
-   "contract_url": "https://kalshi-public-docs-staging.s3.us-east-1.amazonaws.com/regulatory/product-certifications/PRESNOM.pdf",
-   "settlement_sources": [
-    {
-     "name": "Republican Party",
-     "url": "https://gop.com/"
-    },
-    {
-     "name": "Democratic Party",
-     "url": "https://democrats.org/"
-    }
-   ],
-   "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B77500",
@@ -3612,7 +3564,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B37500",
@@ -3635,7 +3587,7 @@
    "last_price_dollars": "0.0300",
    "previous_price_dollars": "0.0400",
    "volume_fp": "52323528.29",
-   "volume_24h_fp": "8333.33",
+   "volume_24h_fp": "13888.88",
    "open_interest_fp": "7033302.41",
    "est_traded_dollars": 1569705.85,
    "close_time": "2027-01-01T05:00:00Z",
@@ -3652,7 +3604,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESPERSON-28-VRAM",
@@ -3669,15 +3621,15 @@
    "yes_bid_dollars": "0.0020",
    "yes_ask_dollars": "0.0030",
    "yes_bid_size_fp": "83333.33",
-   "yes_ask_size_fp": "55552.64",
+   "yes_ask_size_fp": "55508.89",
    "no_bid_dollars": "0.9970",
    "no_ask_dollars": "0.9980",
    "last_price_dollars": "0.0030",
-   "previous_price_dollars": "0.0030",
-   "volume_fp": "507697296.94",
-   "volume_24h_fp": "7066.70",
-   "open_interest_fp": "190196457.00",
-   "est_traded_dollars": 1523091.89,
+   "previous_price_dollars": "0.0040",
+   "volume_fp": "507697340.69",
+   "volume_24h_fp": "7075.90",
+   "open_interest_fp": "190196500.75",
+   "est_traded_dollars": 1523092.02,
    "close_time": "2029-11-07T15:00:00Z",
    "expected_expiration_time": "2029-01-21T15:00:00Z",
    "rules_primary": "If Vivek Ramaswamy is the next person inaugurated as President for the term beginning in 2029, then the market resolves to Yes.",
@@ -3692,7 +3644,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESNOMD-28-LJAM",
@@ -3736,7 +3688,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B82500",
@@ -3776,7 +3728,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B107500",
@@ -3816,7 +3768,51 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
+  },
+  {
+   "ticker": "KXPRESNOMD-28-HBID",
+   "event_ticker": "KXPRESNOMD-28",
+   "series_ticker": "KXPRESNOMD",
+   "topic": "elections",
+   "title": "Will Hunter Biden be the nominee for the Presidency for the Democratic party?",
+   "status": "active",
+   "result": "",
+   "price": 0.0025,
+   "price_field": "book midpoint (yes 0.002 / 0.003) — last_price_dollars 0.811 is further than $0.25 from a tight book",
+   "book_inconsistent": true,
+   "reciprocity_error": null,
+   "yes_bid_dollars": "0.0020",
+   "yes_ask_dollars": "0.0030",
+   "yes_bid_size_fp": "166666.66",
+   "yes_ask_size_fp": "55555.55",
+   "no_bid_dollars": "0.9970",
+   "no_ask_dollars": "0.9980",
+   "last_price_dollars": "0.8110",
+   "previous_price_dollars": "0.0040",
+   "volume_fp": "537225566.46",
+   "volume_24h_fp": "8090.15",
+   "open_interest_fp": "140195165.30",
+   "est_traded_dollars": 1343063.92,
+   "close_time": "2028-11-07T15:00:00Z",
+   "expected_expiration_time": "2028-11-07T15:00:00Z",
+   "rules_primary": "If Hunter Biden wins and accepts the nomination for the Presidency for the Democratic party, then the market resolves to Yes.",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESNOM.pdf",
+   "contract_url": "https://kalshi-public-docs-staging.s3.us-east-1.amazonaws.com/regulatory/product-certifications/PRESNOM.pdf",
+   "settlement_sources": [
+    {
+     "name": "Republican Party",
+     "url": "https://gop.com/"
+    },
+    {
+     "name": "Democratic Party",
+     "url": "https://democrats.org/"
+    }
+   ],
+   "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B142500",
@@ -3856,7 +3852,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   },
   {
    "ticker": "KXPRESPERSON-28-KHAR",
@@ -3873,15 +3869,15 @@
    "yes_bid_dollars": "0.0320",
    "yes_ask_dollars": "0.0330",
    "yes_bid_size_fp": "20833.32",
-   "yes_ask_size_fp": "13319.94",
+   "yes_ask_size_fp": "13280.99",
    "no_bid_dollars": "0.9670",
    "no_ask_dollars": "0.9680",
    "last_price_dollars": "0.0330",
    "previous_price_dollars": "0.0350",
-   "volume_fp": "38283967.11",
-   "volume_24h_fp": "22257.14",
-   "open_interest_fp": "8513489.23",
-   "est_traded_dollars": 1263370.91,
+   "volume_fp": "38284006.06",
+   "volume_24h_fp": "22263.99",
+   "open_interest_fp": "8513528.18",
+   "est_traded_dollars": 1263372.2,
    "close_time": "2029-11-07T15:00:00Z",
    "expected_expiration_time": "2029-01-21T15:00:00Z",
    "rules_primary": "If Kamala Harris is the next person inaugurated as President for the term beginning in 2029, then the market resolves to Yes.",
@@ -3896,7 +3892,7 @@
     }
    ],
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&status=open&limit=200",
-   "sampled_at": "2026-11-20T19:15:55.000Z"
+   "sampled_at": "2026-11-20T19:22:09.000Z"
   }
  ],
  "by_topic": {
@@ -3941,7 +3937,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-3.80",
@@ -3981,7 +3977,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASW-26NOV23-3.6200",
@@ -4003,10 +3999,10 @@
      "no_ask_dollars": "0.1400",
      "last_price_dollars": "0.9700",
      "previous_price_dollars": "0.9200",
-     "volume_fp": "14826.30",
-     "volume_24h_fp": "3535.79",
-     "open_interest_fp": "11681.43",
-     "est_traded_dollars": 14381.51,
+     "volume_fp": "14847.61",
+     "volume_24h_fp": "3534.81",
+     "open_interest_fp": "11693.19",
+     "est_traded_dollars": 14402.18,
      "close_time": "2026-11-23T04:59:00Z",
      "expected_expiration_time": "2026-11-23T15:00:00Z",
      "rules_primary": "If average regular gas prices for United States are strictly greater than $3.6200 on Nov 23, 2026 according to AAA, then the market resolves to Yes.",
@@ -4021,7 +4017,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASW&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASW-26NOV23-3.6000",
@@ -4061,7 +4057,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASW&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-3.50",
@@ -4101,7 +4097,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASW-26NOV23-3.6400",
@@ -4118,15 +4114,15 @@
      "yes_bid_dollars": "0.0000",
      "yes_ask_dollars": "0.0800",
      "yes_bid_size_fp": "0.00",
-     "yes_ask_size_fp": "1198.73",
+     "yes_ask_size_fp": "1186.66",
      "no_bid_dollars": "0.9200",
      "no_ask_dollars": "1.0000",
      "last_price_dollars": "0.0800",
      "previous_price_dollars": "0.1800",
-     "volume_fp": "43182.08",
-     "volume_24h_fp": "25160.75",
-     "open_interest_fp": "32814.32",
-     "est_traded_dollars": 3454.57,
+     "volume_fp": "43222.45",
+     "volume_24h_fp": "25158.85",
+     "open_interest_fp": "32822.91",
+     "est_traded_dollars": 3457.8,
      "close_time": "2026-11-23T04:59:00Z",
      "expected_expiration_time": "2026-11-23T15:00:00Z",
      "rules_primary": "If average regular gas prices for United States are strictly greater than $3.6400 on Nov 23, 2026 according to AAA, then the market resolves to Yes.",
@@ -4141,7 +4137,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASW&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-3.40",
@@ -4181,7 +4177,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-4.80",
@@ -4221,7 +4217,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-3.70",
@@ -4261,7 +4257,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-4.40",
@@ -4301,7 +4297,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-4.60",
@@ -4341,7 +4337,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-4.70",
@@ -4381,7 +4377,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-4.00",
@@ -4421,7 +4417,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-4.50",
@@ -4461,7 +4457,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-4.30",
@@ -4501,7 +4497,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASW-26NOV23-3.6600",
@@ -4524,7 +4520,7 @@
      "last_price_dollars": "0.0200",
      "previous_price_dollars": "0.0200",
      "volume_fp": "37250.81",
-     "volume_24h_fp": "2996.82",
+     "volume_24h_fp": "2980.50",
      "open_interest_fp": "26934.78",
      "est_traded_dollars": 745.02,
      "close_time": "2026-11-23T04:59:00Z",
@@ -4541,7 +4537,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASW&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-3.60",
@@ -4581,7 +4577,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-4.10",
@@ -4621,7 +4617,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-3.30",
@@ -4661,7 +4657,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASW-26NOV23-3.5800",
@@ -4701,7 +4697,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASW&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-3.10",
@@ -4741,7 +4737,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-3.00",
@@ -4781,7 +4777,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26NOV30-3.20",
@@ -4821,7 +4817,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -4836,10 +4832,10 @@
      "book_inconsistent": false,
      "reciprocity_error": null,
      "yes_bid_dollars": "0.2900",
-     "yes_ask_dollars": "0.7000",
+     "yes_ask_dollars": "0.6900",
      "yes_bid_size_fp": "51.26",
      "yes_ask_size_fp": "10.06",
-     "no_bid_dollars": "0.3000",
+     "no_bid_dollars": "0.3100",
      "no_ask_dollars": "0.7100",
      "last_price_dollars": "0.7100",
      "previous_price_dollars": "0.7000",
@@ -4861,7 +4857,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     }
    ]
   },
@@ -4910,7 +4906,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-JP",
@@ -4920,22 +4916,22 @@
      "title": "Will Jared Polis be the Democratic Presidential nominee in 2028?",
      "status": "active",
      "result": "",
-     "price": 0.944,
+     "price": 0.945,
      "price_field": "last_price_dollars",
      "book_inconsistent": false,
      "reciprocity_error": null,
      "yes_bid_dollars": "0.0100",
-     "yes_ask_dollars": "0.9440",
+     "yes_ask_dollars": "0.9450",
      "yes_bid_size_fp": "1.00",
-     "yes_ask_size_fp": "18.37",
-     "no_bid_dollars": "0.0560",
+     "yes_ask_size_fp": "1082.44",
+     "no_bid_dollars": "0.0550",
      "no_ask_dollars": "0.9900",
-     "last_price_dollars": "0.9440",
+     "last_price_dollars": "0.9450",
      "previous_price_dollars": "0.9370",
-     "volume_fp": "186515511.32",
-     "volume_24h_fp": "8190.28",
+     "volume_fp": "186515546.25",
+     "volume_24h_fp": "8196.30",
      "open_interest_fp": "89344735.06",
-     "est_traded_dollars": 176070642.69,
+     "est_traded_dollars": 176257191.21,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Jared Polis wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -4954,7 +4950,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-HCLI",
@@ -4998,7 +4994,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMR-28-NMIN",
@@ -5042,7 +5038,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-RW",
@@ -5059,15 +5055,15 @@
      "yes_bid_dollars": "0.0350",
      "yes_ask_dollars": "0.0380",
      "yes_bid_size_fp": "4.47",
-     "yes_ask_size_fp": "4385.54",
+     "yes_ask_size_fp": "4344.45",
      "no_bid_dollars": "0.9620",
      "no_ask_dollars": "0.9650",
      "last_price_dollars": "0.0380",
      "previous_price_dollars": "0.0330",
-     "volume_fp": "414924936.54",
-     "volume_24h_fp": "17573.87",
+     "volume_fp": "414924977.63",
+     "volume_24h_fp": "22353.60",
      "open_interest_fp": "189529515.91",
-     "est_traded_dollars": 15767147.59,
+     "est_traded_dollars": 15767149.15,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Raphael Warnock wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -5086,7 +5082,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-JOSS",
@@ -5103,15 +5099,15 @@
      "yes_bid_dollars": "0.2600",
      "yes_ask_dollars": "0.2720",
      "yes_bid_size_fp": "641.02",
-     "yes_ask_size_fp": "144.63",
+     "yes_ask_size_fp": "96.04",
      "no_bid_dollars": "0.7280",
      "no_ask_dollars": "0.7400",
      "last_price_dollars": "0.2720",
      "previous_price_dollars": "0.2700",
-     "volume_fp": "54532539.75",
-     "volume_24h_fp": "8086.08",
+     "volume_fp": "54532588.34",
+     "volume_24h_fp": "8108.60",
      "open_interest_fp": "10488392.76",
-     "est_traded_dollars": 14832850.81,
+     "est_traded_dollars": 14832864.03,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Jon Ossoff wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -5130,7 +5126,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMR-28-MG",
@@ -5174,7 +5170,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-AOC",
@@ -5191,15 +5187,15 @@
      "yes_bid_dollars": "0.1400",
      "yes_ask_dollars": "0.1510",
      "yes_bid_size_fp": "1190.47",
-     "yes_ask_size_fp": "394.19",
+     "yes_ask_size_fp": "351.86",
      "no_bid_dollars": "0.8490",
      "no_ask_dollars": "0.8600",
      "last_price_dollars": "0.1510",
      "previous_price_dollars": "0.1500",
-     "volume_fp": "59044526.42",
-     "volume_24h_fp": "8149.83",
+     "volume_fp": "59044568.75",
+     "volume_24h_fp": "8163.63",
      "open_interest_fp": "14795886.21",
-     "est_traded_dollars": 8915723.49,
+     "est_traded_dollars": 8915729.88,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Alexandria Ocasio-Cortez wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -5218,7 +5214,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-KH",
@@ -5235,15 +5231,15 @@
      "yes_bid_dollars": "0.0480",
      "yes_ask_dollars": "0.0500",
      "yes_bid_size_fp": "10416.66",
-     "yes_ask_size_fp": "8948.68",
+     "yes_ask_size_fp": "8918.61",
      "no_bid_dollars": "0.9500",
      "no_ask_dollars": "0.9520",
      "last_price_dollars": "0.0500",
      "previous_price_dollars": "0.0500",
-     "volume_fp": "134222640.99",
-     "volume_24h_fp": "7958.35",
+     "volume_fp": "134222671.06",
+     "volume_24h_fp": "7952.48",
      "open_interest_fp": "17647637.07",
-     "est_traded_dollars": 6711132.05,
+     "est_traded_dollars": 6711133.55,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Kamala Harris wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -5262,7 +5258,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-MK",
@@ -5279,15 +5275,15 @@
      "yes_bid_dollars": "0.0320",
      "yes_ask_dollars": "0.0330",
      "yes_bid_size_fp": "5208.33",
-     "yes_ask_size_fp": "2075.98",
+     "yes_ask_size_fp": "2043.19",
      "no_bid_dollars": "0.9670",
      "no_ask_dollars": "0.9680",
      "last_price_dollars": "0.0330",
      "previous_price_dollars": "0.0330",
-     "volume_fp": "201921158.31",
-     "volume_24h_fp": "8013.64",
+     "volume_fp": "201921191.10",
+     "volume_24h_fp": "8019.38",
      "open_interest_fp": "38595763.54",
-     "est_traded_dollars": 6663398.22,
+     "est_traded_dollars": 6663399.31,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Mark Kelly wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -5306,7 +5302,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-PB",
@@ -5323,15 +5319,15 @@
      "yes_bid_dollars": "0.0520",
      "yes_ask_dollars": "0.0540",
      "yes_bid_size_fp": "6410.24",
-     "yes_ask_size_fp": "4889.93",
+     "yes_ask_size_fp": "4856.18",
      "no_bid_dollars": "0.9460",
      "no_ask_dollars": "0.9480",
      "last_price_dollars": "0.0540",
      "previous_price_dollars": "0.0540",
-     "volume_fp": "118660652.56",
-     "volume_24h_fp": "8433.50",
+     "volume_fp": "118660686.31",
+     "volume_24h_fp": "8437.18",
      "open_interest_fp": "34090026.08",
-     "est_traded_dollars": 6407675.24,
+     "est_traded_dollars": 6407677.06,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Pete Buttigieg wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -5350,7 +5346,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESPERSON-28-JOSS",
@@ -5367,15 +5363,15 @@
      "yes_bid_dollars": "0.1700",
      "yes_ask_dollars": "0.1800",
      "yes_bid_size_fp": "980.39",
-     "yes_ask_size_fp": "52.66",
+     "yes_ask_size_fp": "22.81",
      "no_bid_dollars": "0.8200",
      "no_ask_dollars": "0.8300",
      "last_price_dollars": "0.1800",
      "previous_price_dollars": "0.1810",
-     "volume_fp": "33461639.18",
-     "volume_24h_fp": "6134.93",
-     "open_interest_fp": "5250401.50",
-     "est_traded_dollars": 6023095.05,
+     "volume_fp": "33461669.03",
+     "volume_24h_fp": "6125.51",
+     "open_interest_fp": "5250431.35",
+     "est_traded_dollars": 6023100.43,
      "close_time": "2029-11-07T15:00:00Z",
      "expected_expiration_time": "2029-01-21T15:00:00Z",
      "rules_primary": "If Jon Ossoff is the next person inaugurated as President for the term beginning in 2029, then the market resolves to Yes.",
@@ -5390,7 +5386,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-JTAL",
@@ -5407,15 +5403,15 @@
      "yes_bid_dollars": "0.0170",
      "yes_ask_dollars": "0.0180",
      "yes_bid_size_fp": "49019.60",
-     "yes_ask_size_fp": "15775.25",
+     "yes_ask_size_fp": "15737.92",
      "no_bid_dollars": "0.9820",
      "no_ask_dollars": "0.9830",
      "last_price_dollars": "0.0180",
      "previous_price_dollars": "0.0200",
-     "volume_fp": "311522766.05",
-     "volume_24h_fp": "8253.15",
+     "volume_fp": "311522803.38",
+     "volume_24h_fp": "8256.32",
      "open_interest_fp": "82392481.21",
-     "est_traded_dollars": 5607409.79,
+     "est_traded_dollars": 5607410.46,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If James Talarico wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -5434,7 +5430,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-AB",
@@ -5451,15 +5447,15 @@
      "yes_bid_dollars": "0.0350",
      "yes_ask_dollars": "0.0380",
      "yes_bid_size_fp": "9523.80",
-     "yes_ask_size_fp": "6063.53",
+     "yes_ask_size_fp": "6032.23",
      "no_bid_dollars": "0.9620",
      "no_ask_dollars": "0.9650",
      "last_price_dollars": "0.0380",
      "previous_price_dollars": "0.0380",
-     "volume_fp": "145034429.33",
-     "volume_24h_fp": "8151.41",
+     "volume_fp": "145034460.63",
+     "volume_24h_fp": "8149.74",
      "open_interest_fp": "27740224.39",
-     "est_traded_dollars": 5511308.31,
+     "est_traded_dollars": 5511309.5,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Andy Beshear wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -5478,7 +5474,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-ESLO",
@@ -5495,15 +5491,15 @@
      "yes_bid_dollars": "0.0080",
      "yes_ask_dollars": "0.0090",
      "yes_bid_size_fp": "26047.03",
-     "yes_ask_size_fp": "34242.00",
+     "yes_ask_size_fp": "34206.89",
      "no_bid_dollars": "0.9910",
      "no_ask_dollars": "0.9920",
      "last_price_dollars": "0.0090",
      "previous_price_dollars": "0.8020",
-     "volume_fp": "468264423.05",
-     "volume_24h_fp": "44595.25",
-     "open_interest_fp": "150320965.24",
-     "est_traded_dollars": 4214379.81,
+     "volume_fp": "468264458.16",
+     "volume_24h_fp": "44603.67",
+     "open_interest_fp": "150321000.35",
+     "est_traded_dollars": 4214380.12,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Elissa Slotkin wins and accepts the nomination for the Presidency for the Democratic party, then the market resolves to Yes.",
@@ -5522,139 +5518,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
-    },
-    {
-     "ticker": "KXPRESNOMD-28-GN",
-     "event_ticker": "KXPRESNOMD-28",
-     "series_ticker": "KXPRESNOMD",
-     "topic": "elections",
-     "title": "Will Gavin Newsom be the Democratic Presidential nominee in 2028?",
-     "status": "active",
-     "result": "",
-     "price": 0.11,
-     "price_field": "last_price_dollars",
-     "book_inconsistent": false,
-     "reciprocity_error": null,
-     "yes_bid_dollars": "0.1000",
-     "yes_ask_dollars": "0.1100",
-     "yes_bid_size_fp": "4999.98",
-     "yes_ask_size_fp": "1514.39",
-     "no_bid_dollars": "0.8900",
-     "no_ask_dollars": "0.9000",
-     "last_price_dollars": "0.1100",
-     "previous_price_dollars": "0.1100",
-     "volume_fp": "32268049.07",
-     "volume_24h_fp": "8129.16",
-     "open_interest_fp": "9513861.88",
-     "est_traded_dollars": 3549485.4,
-     "close_time": "2028-11-07T15:00:00Z",
-     "expected_expiration_time": "2028-11-07T15:00:00Z",
-     "rules_primary": "If Gavin Newsom wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
-     "settlement_ts": null,
-     "settlement_value_dollars": null,
-     "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESNOM.pdf",
-     "contract_url": "https://kalshi-public-docs-staging.s3.us-east-1.amazonaws.com/regulatory/product-certifications/PRESNOM.pdf",
-     "settlement_sources": [
-      {
-       "name": "Republican Party",
-       "url": "https://gop.com/"
-      },
-      {
-       "name": "Democratic Party",
-       "url": "https://democrats.org/"
-      }
-     ],
-     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
-    },
-    {
-     "ticker": "KXPRESNOMD-28-JS",
-     "event_ticker": "KXPRESNOMD-28",
-     "series_ticker": "KXPRESNOMD",
-     "topic": "elections",
-     "title": "Will Josh Shapiro be the Democratic Presidential nominee in 2028?",
-     "status": "active",
-     "result": "",
-     "price": 0.049,
-     "price_field": "last_price_dollars",
-     "book_inconsistent": false,
-     "reciprocity_error": null,
-     "yes_bid_dollars": "0.0470",
-     "yes_ask_dollars": "0.0490",
-     "yes_bid_size_fp": "14184.36",
-     "yes_ask_size_fp": "9778.76",
-     "no_bid_dollars": "0.9510",
-     "no_ask_dollars": "0.9530",
-     "last_price_dollars": "0.0490",
-     "previous_price_dollars": "0.0490",
-     "volume_fp": "60152991.45",
-     "volume_24h_fp": "8128.94",
-     "open_interest_fp": "18109605.17",
-     "est_traded_dollars": 2947496.58,
-     "close_time": "2028-11-07T15:00:00Z",
-     "expected_expiration_time": "2028-11-07T15:00:00Z",
-     "rules_primary": "If Josh Shapiro wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
-     "settlement_ts": null,
-     "settlement_value_dollars": null,
-     "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESNOM.pdf",
-     "contract_url": "https://kalshi-public-docs-staging.s3.us-east-1.amazonaws.com/regulatory/product-certifications/PRESNOM.pdf",
-     "settlement_sources": [
-      {
-       "name": "Republican Party",
-       "url": "https://gop.com/"
-      },
-      {
-       "name": "Democratic Party",
-       "url": "https://democrats.org/"
-      }
-     ],
-     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
-    },
-    {
-     "ticker": "KXPRESNOMD-28-REMA",
-     "event_ticker": "KXPRESNOMD-28",
-     "series_ticker": "KXPRESNOMD",
-     "topic": "elections",
-     "title": "Will Rahm Emanuel be the nominee for the Presidency for the Democratic party?",
-     "status": "active",
-     "result": "",
-     "price": 0.023,
-     "price_field": "last_price_dollars",
-     "book_inconsistent": false,
-     "reciprocity_error": null,
-     "yes_bid_dollars": "0.0220",
-     "yes_ask_dollars": "0.0230",
-     "yes_bid_size_fp": "15151.50",
-     "yes_ask_size_fp": "11628.90",
-     "no_bid_dollars": "0.9770",
-     "no_ask_dollars": "0.9780",
-     "last_price_dollars": "0.0230",
-     "previous_price_dollars": "0.0250",
-     "volume_fp": "125514124.71",
-     "volume_24h_fp": "30032.41",
-     "open_interest_fp": "36007716.59",
-     "est_traded_dollars": 2886824.87,
-     "close_time": "2028-11-07T15:00:00Z",
-     "expected_expiration_time": "2028-11-07T15:00:00Z",
-     "rules_primary": "If Rahm Emanuel wins and accepts the nomination for the Presidency for the Democratic party, then the market resolves to Yes.",
-     "settlement_ts": null,
-     "settlement_value_dollars": null,
-     "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESNOM.pdf",
-     "contract_url": "https://kalshi-public-docs-staging.s3.us-east-1.amazonaws.com/regulatory/product-certifications/PRESNOM.pdf",
-     "settlement_sources": [
-      {
-       "name": "Republican Party",
-       "url": "https://gop.com/"
-      },
-      {
-       "name": "Democratic Party",
-       "url": "https://democrats.org/"
-      }
-     ],
-     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-WM",
@@ -5664,22 +5528,22 @@
      "title": "Will Wes Moore be the Democratic Presidential nominee in 2028?",
      "status": "active",
      "result": "",
-     "price": 0.02,
+     "price": 0.028,
      "price_field": "last_price_dollars",
      "book_inconsistent": false,
      "reciprocity_error": null,
-     "yes_bid_dollars": "0.0170",
-     "yes_ask_dollars": "0.0200",
-     "yes_bid_size_fp": "29411.76",
-     "yes_ask_size_fp": "8900.45",
-     "no_bid_dollars": "0.9800",
-     "no_ask_dollars": "0.9830",
-     "last_price_dollars": "0.0200",
+     "yes_bid_dollars": "0.0250",
+     "yes_ask_dollars": "0.0280",
+     "yes_bid_size_fp": "6666.66",
+     "yes_ask_size_fp": "5917.01",
+     "no_bid_dollars": "0.9720",
+     "no_ask_dollars": "0.9750",
+     "last_price_dollars": "0.0280",
      "previous_price_dollars": "0.0180",
-     "volume_fp": "143959164.72",
-     "volume_24h_fp": "29094.59",
-     "open_interest_fp": "43027213.68",
-     "est_traded_dollars": 2879183.29,
+     "volume_fp": "143968103.16",
+     "volume_24h_fp": "79708.75",
+     "open_interest_fp": "43035547.01",
+     "est_traded_dollars": 4031106.89,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Wes Moore wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -5698,7 +5562,139 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
+    },
+    {
+     "ticker": "KXPRESNOMD-28-GN",
+     "event_ticker": "KXPRESNOMD-28",
+     "series_ticker": "KXPRESNOMD",
+     "topic": "elections",
+     "title": "Will Gavin Newsom be the Democratic Presidential nominee in 2028?",
+     "status": "active",
+     "result": "",
+     "price": 0.11,
+     "price_field": "last_price_dollars",
+     "book_inconsistent": false,
+     "reciprocity_error": null,
+     "yes_bid_dollars": "0.1000",
+     "yes_ask_dollars": "0.1100",
+     "yes_bid_size_fp": "4999.98",
+     "yes_ask_size_fp": "1474.92",
+     "no_bid_dollars": "0.8900",
+     "no_ask_dollars": "0.9000",
+     "last_price_dollars": "0.1100",
+     "previous_price_dollars": "0.1100",
+     "volume_fp": "32268088.54",
+     "volume_24h_fp": "8137.77",
+     "open_interest_fp": "9513861.88",
+     "est_traded_dollars": 3549489.74,
+     "close_time": "2028-11-07T15:00:00Z",
+     "expected_expiration_time": "2028-11-07T15:00:00Z",
+     "rules_primary": "If Gavin Newsom wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
+     "settlement_ts": null,
+     "settlement_value_dollars": null,
+     "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESNOM.pdf",
+     "contract_url": "https://kalshi-public-docs-staging.s3.us-east-1.amazonaws.com/regulatory/product-certifications/PRESNOM.pdf",
+     "settlement_sources": [
+      {
+       "name": "Republican Party",
+       "url": "https://gop.com/"
+      },
+      {
+       "name": "Democratic Party",
+       "url": "https://democrats.org/"
+      }
+     ],
+     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
+     "sampled_at": "2026-11-20T19:22:09.000Z"
+    },
+    {
+     "ticker": "KXPRESNOMD-28-JS",
+     "event_ticker": "KXPRESNOMD-28",
+     "series_ticker": "KXPRESNOMD",
+     "topic": "elections",
+     "title": "Will Josh Shapiro be the Democratic Presidential nominee in 2028?",
+     "status": "active",
+     "result": "",
+     "price": 0.049,
+     "price_field": "last_price_dollars",
+     "book_inconsistent": false,
+     "reciprocity_error": null,
+     "yes_bid_dollars": "0.0470",
+     "yes_ask_dollars": "0.0490",
+     "yes_bid_size_fp": "14184.36",
+     "yes_ask_size_fp": "9739.56",
+     "no_bid_dollars": "0.9510",
+     "no_ask_dollars": "0.9530",
+     "last_price_dollars": "0.0490",
+     "previous_price_dollars": "0.0490",
+     "volume_fp": "60153030.65",
+     "volume_24h_fp": "8136.78",
+     "open_interest_fp": "18109644.37",
+     "est_traded_dollars": 2947498.5,
+     "close_time": "2028-11-07T15:00:00Z",
+     "expected_expiration_time": "2028-11-07T15:00:00Z",
+     "rules_primary": "If Josh Shapiro wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
+     "settlement_ts": null,
+     "settlement_value_dollars": null,
+     "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESNOM.pdf",
+     "contract_url": "https://kalshi-public-docs-staging.s3.us-east-1.amazonaws.com/regulatory/product-certifications/PRESNOM.pdf",
+     "settlement_sources": [
+      {
+       "name": "Republican Party",
+       "url": "https://gop.com/"
+      },
+      {
+       "name": "Democratic Party",
+       "url": "https://democrats.org/"
+      }
+     ],
+     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
+     "sampled_at": "2026-11-20T19:22:09.000Z"
+    },
+    {
+     "ticker": "KXPRESNOMD-28-REMA",
+     "event_ticker": "KXPRESNOMD-28",
+     "series_ticker": "KXPRESNOMD",
+     "topic": "elections",
+     "title": "Will Rahm Emanuel be the nominee for the Presidency for the Democratic party?",
+     "status": "active",
+     "result": "",
+     "price": 0.023,
+     "price_field": "last_price_dollars",
+     "book_inconsistent": false,
+     "reciprocity_error": null,
+     "yes_bid_dollars": "0.0220",
+     "yes_ask_dollars": "0.0230",
+     "yes_bid_size_fp": "15151.50",
+     "yes_ask_size_fp": "11594.23",
+     "no_bid_dollars": "0.9770",
+     "no_ask_dollars": "0.9780",
+     "last_price_dollars": "0.0230",
+     "previous_price_dollars": "0.0250",
+     "volume_fp": "125514159.38",
+     "volume_24h_fp": "30038.66",
+     "open_interest_fp": "36007751.26",
+     "est_traded_dollars": 2886825.67,
+     "close_time": "2028-11-07T15:00:00Z",
+     "expected_expiration_time": "2028-11-07T15:00:00Z",
+     "rules_primary": "If Rahm Emanuel wins and accepts the nomination for the Presidency for the Democratic party, then the market resolves to Yes.",
+     "settlement_ts": null,
+     "settlement_value_dollars": null,
+     "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESNOM.pdf",
+     "contract_url": "https://kalshi-public-docs-staging.s3.us-east-1.amazonaws.com/regulatory/product-certifications/PRESNOM.pdf",
+     "settlement_sources": [
+      {
+       "name": "Republican Party",
+       "url": "https://gop.com/"
+      },
+      {
+       "name": "Democratic Party",
+       "url": "https://democrats.org/"
+      }
+     ],
+     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-JBP",
@@ -5715,15 +5711,15 @@
      "yes_bid_dollars": "0.0250",
      "yes_ask_dollars": "0.0280",
      "yes_bid_size_fp": "33333.30",
-     "yes_ask_size_fp": "29265.30",
+     "yes_ask_size_fp": "29246.48",
      "no_bid_dollars": "0.9720",
      "no_ask_dollars": "0.9750",
      "last_price_dollars": "0.0280",
      "previous_price_dollars": "0.0270",
-     "volume_fp": "101971256.94",
-     "volume_24h_fp": "8375.84",
-     "open_interest_fp": "21061326.53",
-     "est_traded_dollars": 2855195.19,
+     "volume_fp": "101971275.76",
+     "volume_24h_fp": "8366.28",
+     "open_interest_fp": "21061345.35",
+     "est_traded_dollars": 2855195.72,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If J.B. Pritzker wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -5742,7 +5738,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMR-28-RDS",
@@ -5759,15 +5755,15 @@
      "yes_bid_dollars": "0.1500",
      "yes_ask_dollars": "0.1600",
      "yes_bid_size_fp": "3333.33",
-     "yes_ask_size_fp": "1097.70",
+     "yes_ask_size_fp": "1064.03",
      "no_bid_dollars": "0.8400",
      "no_ask_dollars": "0.8500",
      "last_price_dollars": "0.1600",
      "previous_price_dollars": "0.1600",
-     "volume_fp": "17625186.61",
-     "volume_24h_fp": "7918.45",
+     "volume_fp": "17625220.28",
+     "volume_24h_fp": "7919.63",
      "open_interest_fp": "5301004.41",
-     "est_traded_dollars": 2820029.86,
+     "est_traded_dollars": 2820035.24,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Ron DeSantis wins and accepts the nomination for the Presidency for the Republican party in 2028, then the market resolves to Yes.",
@@ -5786,7 +5782,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESPERSON-28-AOCA",
@@ -5803,15 +5799,15 @@
      "yes_bid_dollars": "0.0900",
      "yes_ask_dollars": "0.0910",
      "yes_bid_size_fp": "3703.70",
-     "yes_ask_size_fp": "2776.51",
+     "yes_ask_size_fp": "2747.88",
      "no_bid_dollars": "0.9090",
      "no_ask_dollars": "0.9100",
      "last_price_dollars": "0.0910",
      "previous_price_dollars": "0.0910",
-     "volume_fp": "30323891.79",
-     "volume_24h_fp": "7151.28",
+     "volume_fp": "30323920.42",
+     "volume_24h_fp": "7161.51",
      "open_interest_fp": "6541990.54",
-     "est_traded_dollars": 2759474.15,
+     "est_traded_dollars": 2759476.76,
      "close_time": "2029-11-07T15:00:00Z",
      "expected_expiration_time": "2029-01-21T15:00:00Z",
      "rules_primary": "If Alexandria Ocasio-Cortez is the next person inaugurated as President for the term beginning in 2029, then the market resolves to Yes.",
@@ -5826,7 +5822,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-EWAR",
@@ -5841,17 +5837,17 @@
      "book_inconsistent": false,
      "reciprocity_error": null,
      "yes_bid_dollars": "0.0000",
-     "yes_ask_dollars": "1.0000",
+     "yes_ask_dollars": "0.0100",
      "yes_bid_size_fp": "0.00",
-     "yes_ask_size_fp": "0.00",
-     "no_bid_dollars": "0.0000",
+     "yes_ask_size_fp": "16651.54",
+     "no_bid_dollars": "0.9900",
      "no_ask_dollars": "1.0000",
      "last_price_dollars": "0.0100",
      "previous_price_dollars": "0.0100",
-     "volume_fp": "271940339.89",
-     "volume_24h_fp": "60544.08",
-     "open_interest_fp": "19112960.09",
-     "est_traded_dollars": 2719403.4,
+     "volume_fp": "271940372.31",
+     "volume_24h_fp": "66102.98",
+     "open_interest_fp": "19112960.39",
+     "est_traded_dollars": 2719403.72,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Elizabeth Warren wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -5870,7 +5866,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPRESNOMD-28-GW",
@@ -5887,15 +5883,15 @@
      "yes_bid_dollars": "0.0050",
      "yes_ask_dollars": "0.0060",
      "yes_bid_size_fp": "100001.99",
-     "yes_ask_size_fp": "80067.69",
+     "yes_ask_size_fp": "80042.08",
      "no_bid_dollars": "0.9940",
      "no_ask_dollars": "0.9950",
      "last_price_dollars": "0.0060",
      "previous_price_dollars": "0.0060",
-     "volume_fp": "432107266.33",
-     "volume_24h_fp": "8248.48",
+     "volume_fp": "432107291.94",
+     "volume_24h_fp": "8242.39",
      "open_interest_fp": "169497438.62",
-     "est_traded_dollars": 2592643.6,
+     "est_traded_dollars": 2592643.75,
      "close_time": "2028-11-07T15:00:00Z",
      "expected_expiration_time": "2028-11-07T15:00:00Z",
      "rules_primary": "If Gretchen Whitmer wins and accepts the nomination for the Presidency for the Democratic party in 2028, then the market resolves to Yes.",
@@ -5914,7 +5910,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     }
    ]
   },
@@ -5963,7 +5959,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B62500",
@@ -6003,7 +5999,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B57500",
@@ -6043,7 +6039,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B67500",
@@ -6083,7 +6079,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B52500",
@@ -6106,7 +6102,7 @@
      "last_price_dollars": "0.0900",
      "previous_price_dollars": "0.0800",
      "volume_fp": "61716672.39",
-     "volume_24h_fp": "2175.09",
+     "volume_24h_fp": "5585.83",
      "open_interest_fp": "7787531.90",
      "est_traded_dollars": 5554500.52,
      "close_time": "2027-01-01T05:00:00Z",
@@ -6123,7 +6119,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B122500",
@@ -6146,7 +6142,7 @@
      "last_price_dollars": "0.0300",
      "previous_price_dollars": "0.0100",
      "volume_fp": "162214680.45",
-     "volume_24h_fp": "16666.66",
+     "volume_24h_fp": "30555.54",
      "open_interest_fp": "23505706.64",
      "est_traded_dollars": 4866440.41,
      "close_time": "2027-01-01T05:00:00Z",
@@ -6163,7 +6159,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B47500",
@@ -6203,7 +6199,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B42500",
@@ -6243,7 +6239,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B72500",
@@ -6266,7 +6262,7 @@
      "last_price_dollars": "0.0800",
      "previous_price_dollars": "0.0900",
      "volume_fp": "35277885.41",
-     "volume_24h_fp": "0.00",
+     "volume_24h_fp": "2083.33",
      "open_interest_fp": "4723628.03",
      "est_traded_dollars": 2822230.83,
      "close_time": "2027-01-01T05:00:00Z",
@@ -6283,7 +6279,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B127500",
@@ -6323,7 +6319,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B102500",
@@ -6346,7 +6342,7 @@
      "last_price_dollars": "0.0300",
      "previous_price_dollars": "0.0100",
      "volume_fp": "73856637.25",
-     "volume_24h_fp": "16666.66",
+     "volume_24h_fp": "30555.54",
      "open_interest_fp": "6911267.06",
      "est_traded_dollars": 2215699.12,
      "close_time": "2027-01-01T05:00:00Z",
@@ -6363,7 +6359,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B97500",
@@ -6386,7 +6382,7 @@
      "last_price_dollars": "0.0300",
      "previous_price_dollars": "0.9700",
      "volume_fp": "72284863.12",
-     "volume_24h_fp": "47222.20",
+     "volume_24h_fp": "61111.08",
      "open_interest_fp": "7322453.32",
      "est_traded_dollars": 2168545.89,
      "close_time": "2027-01-01T05:00:00Z",
@@ -6403,7 +6399,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B27500",
@@ -6443,7 +6439,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B92500",
@@ -6483,7 +6479,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B112500",
@@ -6523,7 +6519,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B132500",
@@ -6563,7 +6559,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-T149999.99",
@@ -6603,7 +6599,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B77500",
@@ -6643,7 +6639,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B37500",
@@ -6666,7 +6662,7 @@
      "last_price_dollars": "0.0300",
      "previous_price_dollars": "0.0400",
      "volume_fp": "52323528.29",
-     "volume_24h_fp": "8333.33",
+     "volume_24h_fp": "13888.88",
      "open_interest_fp": "7033302.41",
      "est_traded_dollars": 1569705.85,
      "close_time": "2027-01-01T05:00:00Z",
@@ -6683,7 +6679,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B82500",
@@ -6723,7 +6719,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B107500",
@@ -6763,7 +6759,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B142500",
@@ -6803,7 +6799,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B117500",
@@ -6843,7 +6839,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXBTCY-27JAN0100-B32500",
@@ -6883,7 +6879,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     }
    ]
   },
@@ -6905,15 +6901,15 @@
      "yes_bid_dollars": "0.0210",
      "yes_ask_dollars": "0.0250",
      "yes_bid_size_fp": "7936.50",
-     "yes_ask_size_fp": "3937.73",
+     "yes_ask_size_fp": "3891.41",
      "no_bid_dollars": "0.9750",
      "no_ask_dollars": "0.9790",
      "last_price_dollars": "0.0250",
      "previous_price_dollars": "0.0100",
-     "volume_fp": "761350.77",
-     "volume_24h_fp": "449005.45",
+     "volume_fp": "761397.09",
+     "volume_24h_fp": "449012.72",
      "open_interest_fp": "681894.62",
-     "est_traded_dollars": 19033.77,
+     "est_traded_dollars": 19034.93,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Sepp Straka wins the The RSM Classic, then the market resolves to Yes.",
@@ -6936,7 +6932,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-MAST27-MFIT",
@@ -6984,7 +6980,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-MTHO",
@@ -7001,15 +6997,15 @@
      "yes_bid_dollars": "0.1300",
      "yes_ask_dollars": "0.1400",
      "yes_bid_size_fp": "1282.05",
-     "yes_ask_size_fp": "1187.36",
+     "yes_ask_size_fp": "1150.76",
      "no_bid_dollars": "0.8600",
      "no_ask_dollars": "0.8700",
      "last_price_dollars": "0.1400",
      "previous_price_dollars": "0.0320",
-     "volume_fp": "86214.05",
-     "volume_24h_fp": "41765.96",
+     "volume_fp": "86250.65",
+     "volume_24h_fp": "41769.98",
      "open_interest_fp": "54338.89",
-     "est_traded_dollars": 12069.97,
+     "est_traded_dollars": 12075.09,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Michael Thorbjornsen wins the The RSM Classic, then the market resolves to Yes.",
@@ -7032,7 +7028,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-KMIT",
@@ -7049,15 +7045,15 @@
      "yes_bid_dollars": "0.0780",
      "yes_ask_dollars": "0.0830",
      "yes_bid_size_fp": "2136.75",
-     "yes_ask_size_fp": "2003.31",
+     "yes_ask_size_fp": "1953.06",
      "no_bid_dollars": "0.9170",
      "no_ask_dollars": "0.9220",
      "last_price_dollars": "0.0830",
      "previous_price_dollars": "0.0370",
-     "volume_fp": "130710.32",
-     "volume_24h_fp": "60286.31",
+     "volume_fp": "130760.57",
+     "volume_24h_fp": "60305.60",
      "open_interest_fp": "123001.68",
-     "est_traded_dollars": 10848.96,
+     "est_traded_dollars": 10853.13,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Keith Mitchell wins the The RSM Classic, then the market resolves to Yes.",
@@ -7080,7 +7076,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-MAST27-SSCH",
@@ -7128,7 +7124,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-TMOO",
@@ -7145,15 +7141,15 @@
      "yes_bid_dollars": "0.0030",
      "yes_ask_dollars": "0.0050",
      "yes_bid_size_fp": "277777.75",
-     "yes_ask_size_fp": "91797.77",
+     "yes_ask_size_fp": "91754.27",
      "no_bid_dollars": "0.9950",
      "no_ask_dollars": "0.9970",
      "last_price_dollars": "0.0050",
      "previous_price_dollars": "0.0060",
-     "volume_fp": "1157366.21",
-     "volume_24h_fp": "841633.21",
-     "open_interest_fp": "1151877.32",
-     "est_traded_dollars": 5786.83,
+     "volume_fp": "1157409.71",
+     "volume_24h_fp": "841649.32",
+     "open_interest_fp": "1151920.82",
+     "est_traded_dollars": 5787.05,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Taylor Moore wins the The RSM Classic, then the market resolves to Yes.",
@@ -7176,7 +7172,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-MGRE",
@@ -7193,15 +7189,15 @@
      "yes_bid_dollars": "0.0420",
      "yes_ask_dollars": "0.0450",
      "yes_bid_size_fp": "3968.25",
-     "yes_ask_size_fp": "3700.96",
+     "yes_ask_size_fp": "3666.66",
      "no_bid_dollars": "0.9550",
      "no_ask_dollars": "0.9580",
      "last_price_dollars": "0.0450",
      "previous_price_dollars": "0.0330",
-     "volume_fp": "127159.21",
-     "volume_24h_fp": "110749.57",
+     "volume_fp": "127193.51",
+     "volume_24h_fp": "110756.10",
      "open_interest_fp": "111780.78",
-     "est_traded_dollars": 5722.16,
+     "est_traded_dollars": 5723.71,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Max Greyserman wins the The RSM Classic, then the market resolves to Yes.",
@@ -7224,7 +7220,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-DGHI",
@@ -7241,15 +7237,15 @@
      "yes_bid_dollars": "0.0240",
      "yes_ask_dollars": "0.0270",
      "yes_bid_size_fp": "6944.44",
-     "yes_ask_size_fp": "6168.77",
+     "yes_ask_size_fp": "6122.56",
      "no_bid_dollars": "0.9730",
      "no_ask_dollars": "0.9760",
      "last_price_dollars": "0.0270",
      "previous_price_dollars": "0.0290",
-     "volume_fp": "193954.96",
-     "volume_24h_fp": "102966.75",
-     "open_interest_fp": "91323.49",
-     "est_traded_dollars": 5236.78,
+     "volume_fp": "194001.17",
+     "volume_24h_fp": "102971.53",
+     "open_interest_fp": "91369.70",
+     "est_traded_dollars": 5238.03,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Doug Ghim wins the The RSM Classic, then the market resolves to Yes.",
@@ -7272,7 +7268,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-JSVE",
@@ -7289,15 +7285,15 @@
      "yes_bid_dollars": "0.0360",
      "yes_ask_dollars": "0.0380",
      "yes_bid_size_fp": "4629.62",
-     "yes_ask_size_fp": "4384.62",
+     "yes_ask_size_fp": "4343.86",
      "no_bid_dollars": "0.9620",
      "no_ask_dollars": "0.9640",
      "last_price_dollars": "0.0380",
-     "previous_price_dollars": "0.0050",
-     "volume_fp": "137146.80",
-     "volume_24h_fp": "8520.21",
-     "open_interest_fp": "126477.29",
-     "est_traded_dollars": 5211.58,
+     "previous_price_dollars": "0.0030",
+     "volume_fp": "137187.56",
+     "volume_24h_fp": "8521.02",
+     "open_interest_fp": "126518.05",
+     "est_traded_dollars": 5213.13,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Jesper Svensson wins the The RSM Classic, then the market resolves to Yes.",
@@ -7320,7 +7316,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-RCAS",
@@ -7343,7 +7339,7 @@
      "last_price_dollars": "0.0220",
      "previous_price_dollars": "0.0220",
      "volume_fp": "232463.76",
-     "volume_24h_fp": "7543.35",
+     "volume_24h_fp": "7531.47",
      "open_interest_fp": "224563.74",
      "est_traded_dollars": 5114.2,
      "close_time": "2026-12-06T00:00:00Z",
@@ -7368,7 +7364,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-EGRI",
@@ -7385,15 +7381,15 @@
      "yes_bid_dollars": "0.0250",
      "yes_ask_dollars": "0.0280",
      "yes_bid_size_fp": "6666.66",
-     "yes_ask_size_fp": "5950.97",
+     "yes_ask_size_fp": "5914.19",
      "no_bid_dollars": "0.9720",
      "no_ask_dollars": "0.9750",
      "last_price_dollars": "0.0280",
      "previous_price_dollars": "0.0230",
-     "volume_fp": "178349.16",
-     "volume_24h_fp": "36226.23",
-     "open_interest_fp": "112701.51",
-     "est_traded_dollars": 4993.78,
+     "volume_fp": "178385.94",
+     "volume_24h_fp": "36232.10",
+     "open_interest_fp": "112738.29",
+     "est_traded_dollars": 4994.81,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Emiliano Grillo wins the The RSM Classic, then the market resolves to Yes.",
@@ -7416,7 +7412,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-LHOD",
@@ -7433,15 +7429,15 @@
      "yes_bid_dollars": "0.0200",
      "yes_ask_dollars": "0.0220",
      "yes_bid_size_fp": "8333.33",
-     "yes_ask_size_fp": "7575.26",
+     "yes_ask_size_fp": "7531.98",
      "no_bid_dollars": "0.9780",
      "no_ask_dollars": "0.9800",
      "last_price_dollars": "0.0220",
      "previous_price_dollars": "0.0080",
-     "volume_fp": "223212.63",
-     "volume_24h_fp": "210144.88",
+     "volume_fp": "223255.91",
+     "volume_24h_fp": "210154.40",
      "open_interest_fp": "210491.73",
-     "est_traded_dollars": 4910.68,
+     "est_traded_dollars": 4911.63,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Lee Hodges wins the The RSM Classic, then the market resolves to Yes.",
@@ -7464,7 +7460,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-JKOI",
@@ -7481,15 +7477,15 @@
      "yes_bid_dollars": "0.0260",
      "yes_ask_dollars": "0.0300",
      "yes_bid_size_fp": "6410.25",
-     "yes_ask_size_fp": "5553.89",
+     "yes_ask_size_fp": "5520.20",
      "no_bid_dollars": "0.9700",
      "no_ask_dollars": "0.9740",
      "last_price_dollars": "0.0300",
      "previous_price_dollars": "0.0330",
-     "volume_fp": "131199.66",
-     "volume_24h_fp": "72748.69",
-     "open_interest_fp": "122717.86",
-     "est_traded_dollars": 3935.99,
+     "volume_fp": "131233.35",
+     "volume_24h_fp": "72752.08",
+     "open_interest_fp": "122751.55",
+     "est_traded_dollars": 3937,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Jackson Koivun wins the The RSM Classic, then the market resolves to Yes.",
@@ -7512,7 +7508,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-NSHI",
@@ -7535,7 +7531,7 @@
      "last_price_dollars": "0.0200",
      "previous_price_dollars": "0.0200",
      "volume_fp": "192022.20",
-     "volume_24h_fp": "7499.71",
+     "volume_24h_fp": "7486.63",
      "open_interest_fp": "184139.81",
      "est_traded_dollars": 3840.44,
      "close_time": "2026-12-06T00:00:00Z",
@@ -7560,7 +7556,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-GHIG",
@@ -7577,15 +7573,15 @@
      "yes_bid_dollars": "0.0170",
      "yes_ask_dollars": "0.0200",
      "yes_bid_size_fp": "9803.92",
-     "yes_ask_size_fp": "5793.07",
+     "yes_ask_size_fp": "5750.27",
      "no_bid_dollars": "0.9800",
      "no_ask_dollars": "0.9830",
      "last_price_dollars": "0.0200",
      "previous_price_dollars": "0.0050",
-     "volume_fp": "190301.85",
-     "volume_24h_fp": "177096.59",
+     "volume_fp": "190344.65",
+     "volume_24h_fp": "177105.78",
      "open_interest_fp": "178279.94",
-     "est_traded_dollars": 3806.04,
+     "est_traded_dollars": 3806.89,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Garrick Higgo wins the The RSM Classic, then the market resolves to Yes.",
@@ -7608,7 +7604,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-MMCN",
@@ -7625,15 +7621,15 @@
      "yes_bid_dollars": "0.0480",
      "yes_ask_dollars": "0.0500",
      "yes_bid_size_fp": "3472.22",
-     "yes_ask_size_fp": "3330.32",
+     "yes_ask_size_fp": "3283.91",
      "no_bid_dollars": "0.9500",
      "no_ask_dollars": "0.9520",
      "last_price_dollars": "0.0500",
      "previous_price_dollars": "0.0660",
-     "volume_fp": "68140.77",
-     "volume_24h_fp": "39868.97",
-     "open_interest_fp": "58986.78",
-     "est_traded_dollars": 3407.04,
+     "volume_fp": "68187.18",
+     "volume_24h_fp": "39883.96",
+     "open_interest_fp": "59033.19",
+     "est_traded_dollars": 3409.36,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Maverick McNealy wins the The RSM Classic, then the market resolves to Yes.",
@@ -7656,7 +7652,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-HENG",
@@ -7673,15 +7669,15 @@
      "yes_bid_dollars": "0.0190",
      "yes_ask_dollars": "0.0200",
      "yes_bid_size_fp": "8771.92",
-     "yes_ask_size_fp": "5730.76",
+     "yes_ask_size_fp": "5691.18",
      "no_bid_dollars": "0.9800",
      "no_ask_dollars": "0.9810",
      "last_price_dollars": "0.0200",
      "previous_price_dollars": "0.0380",
-     "volume_fp": "167918.87",
-     "volume_24h_fp": "88796.97",
-     "open_interest_fp": "162996.28",
-     "est_traded_dollars": 3358.38,
+     "volume_fp": "167958.45",
+     "volume_24h_fp": "88795.80",
+     "open_interest_fp": "163035.86",
+     "est_traded_dollars": 3359.17,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Harris English wins the The RSM Classic, then the market resolves to Yes.",
@@ -7704,7 +7700,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-HLI",
@@ -7727,7 +7723,7 @@
      "last_price_dollars": "0.0130",
      "previous_price_dollars": "0.0130",
      "volume_fp": "235220.42",
-     "volume_24h_fp": "7788.36",
+     "volume_24h_fp": "7766.37",
      "open_interest_fp": "227063.18",
      "est_traded_dollars": 3057.87,
      "close_time": "2026-12-06T00:00:00Z",
@@ -7752,7 +7748,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-MAST27-RGER",
@@ -7800,7 +7796,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-JVAN",
@@ -7817,15 +7813,15 @@
      "yes_bid_dollars": "0.0050",
      "yes_ask_dollars": "0.0080",
      "yes_bid_size_fp": "1.98",
-     "yes_ask_size_fp": "18890.05",
+     "yes_ask_size_fp": "18864.63",
      "no_bid_dollars": "0.9920",
      "no_ask_dollars": "0.9950",
      "last_price_dollars": "0.0080",
      "previous_price_dollars": "0.0050",
-     "volume_fp": "346650.47",
-     "volume_24h_fp": "166749.03",
+     "volume_fp": "346675.89",
+     "volume_24h_fp": "166744.47",
      "open_interest_fp": "301789.71",
-     "est_traded_dollars": 2773.2,
+     "est_traded_dollars": 2773.41,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If John VanDerLaan wins the The RSM Classic, then the market resolves to Yes.",
@@ -7848,7 +7844,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-MBRE",
@@ -7871,7 +7867,7 @@
      "last_price_dollars": "0.0300",
      "previous_price_dollars": "0.0300",
      "volume_fp": "89301.88",
-     "volume_24h_fp": "7546.00",
+     "volume_24h_fp": "7526.99",
      "open_interest_fp": "76196.61",
      "est_traded_dollars": 2679.06,
      "close_time": "2026-12-06T00:00:00Z",
@@ -7896,7 +7892,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-MPEN",
@@ -7913,15 +7909,15 @@
      "yes_bid_dollars": "0.0050",
      "yes_ask_dollars": "0.0060",
      "yes_bid_size_fp": "122692.54",
-     "yes_ask_size_fp": "27775.84",
+     "yes_ask_size_fp": "27745.83",
      "no_bid_dollars": "0.9940",
      "no_ask_dollars": "0.9950",
      "last_price_dollars": "0.0060",
      "previous_price_dollars": "0.0050",
-     "volume_fp": "429487.54",
-     "volume_24h_fp": "191017.54",
+     "volume_fp": "429517.55",
+     "volume_24h_fp": "191012.91",
      "open_interest_fp": "419786.51",
-     "est_traded_dollars": 2576.93,
+     "est_traded_dollars": 2577.11,
      "close_time": "2026-12-06T00:00:00Z",
      "expected_expiration_time": "2026-11-22T00:00:00Z",
      "rules_primary": "If Marco Penge wins the The RSM Classic, then the market resolves to Yes.",
@@ -7944,7 +7940,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-JPOS",
@@ -7967,7 +7963,7 @@
      "last_price_dollars": "0.0180",
      "previous_price_dollars": "0.0180",
      "volume_fp": "132091.96",
-     "volume_24h_fp": "7606.79",
+     "volume_24h_fp": "7582.35",
      "open_interest_fp": "130015.07",
      "est_traded_dollars": 2377.66,
      "close_time": "2026-12-06T00:00:00Z",
@@ -7992,7 +7988,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     },
     {
      "ticker": "KXPGATOUR-THRC26-BJAM",
@@ -8015,7 +8011,7 @@
      "last_price_dollars": "0.0460",
      "previous_price_dollars": "0.0450",
      "volume_fp": "49743.69",
-     "volume_24h_fp": "7818.18",
+     "volume_24h_fp": "7800.00",
      "open_interest_fp": "44194.51",
      "est_traded_dollars": 2288.21,
      "close_time": "2026-12-06T00:00:00Z",
@@ -8040,7 +8036,7 @@
       }
      ],
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=200",
-     "sampled_at": "2026-11-20T19:15:55.000Z"
+     "sampled_at": "2026-11-20T19:22:09.000Z"
     }
    ]
   }
@@ -8052,7 +8048,7 @@
     {
      "series_ticker": "KXAAAGASW",
      "title": "US gas price up",
-     "volume_fp": 94715393,
+     "volume_fp": 94715454,
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil+and+energy&include_volume=true&limit=200"
     },
     {
@@ -8105,19 +8101,19 @@
     {
      "series_ticker": "KXPRESNOMD",
      "title": "Democratic Primary winner",
-     "volume_fp": 7982950178,
+     "volume_fp": 7982995446,
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=200"
     },
     {
      "series_ticker": "KXPRESPERSON",
      "title": "Pres person",
-     "volume_fp": 1442710623,
+     "volume_fp": 1442784363,
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=200"
     },
     {
      "series_ticker": "KXPRESNOMR",
      "title": "Republican Primary winner",
-     "volume_fp": 1027370613,
+     "volume_fp": 1027449408,
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=200"
     },
     {
@@ -8156,14 +8152,14 @@
    "count": 2,
    "top": [
     {
-     "series_ticker": "KXXBANNEDMURRAYHILLGUY1",
-     "title": "Will @MurrayHillGuy1 get banned from X this year?",
+     "series_ticker": "KXXBANNEDGROK",
+     "title": "Will Grok be banned this year",
      "volume_fp": 0,
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true&limit=200"
     },
     {
-     "series_ticker": "KXXBANNEDGROK",
-     "title": "Will Grok be banned this year",
+     "series_ticker": "KXXBANNEDMURRAYHILLGUY1",
+     "title": "Will @MurrayHillGuy1 get banned from X this year?",
      "volume_fp": 0,
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true&limit=200"
     }
@@ -8175,13 +8171,13 @@
     {
      "series_ticker": "KXBTCD",
      "title": "Bitcoin price Above/below",
-     "volume_fp": 5726388423,
+     "volume_fp": 5726397305,
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true&limit=200"
     },
     {
      "series_ticker": "KXBTCY",
      "title": "BTC price range EOY",
-     "volume_fp": 1973013278,
+     "volume_fp": 1973065995,
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true&limit=200"
     },
     {
@@ -8199,7 +8195,7 @@
     {
      "series_ticker": "KXETHD",
      "title": "Ethereum price Above/below",
-     "volume_fp": 142617465,
+     "volume_fp": 142617668,
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true&limit=200"
     },
     {
@@ -8228,7 +8224,7 @@
     {
      "series_ticker": "KXPGATOUR",
      "title": "PGA Tour",
-     "volume_fp": 42199748098,
+     "volume_fp": 42199805791,
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=200"
     },
     {
@@ -8252,7 +8248,7 @@
     {
      "series_ticker": "KXLPGATOUR",
      "title": "PGA Tour",
-     "volume_fp": 871628029,
+     "volume_fp": 871767991,
      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=200"
     },
     {
@@ -8305,6 +8301,10 @@
    [
     1795202155,
     0.99
+   ],
+   [
+    1795202529,
+    0.99
    ]
   ],
   "KXPRESNOMD-28-JP": [
@@ -8335,6 +8335,10 @@
    [
     1795202155,
     0.944
+   ],
+   [
+    1795202529,
+    0.945
    ]
   ],
   "KXPRESNOMD-28-HCLI": [
@@ -8364,6 +8368,10 @@
    ],
    [
     1795202155,
+    0.99
+   ],
+   [
+    1795202529,
     0.99
    ]
   ],
@@ -8395,6 +8403,10 @@
    [
     1795202155,
     0.98
+   ],
+   [
+    1795202529,
+    0.98
    ]
   ],
   "KXPRESNOMR-28-NMIN": [
@@ -8424,6 +8436,10 @@
    ],
    [
     1795202155,
+    0.98
+   ],
+   [
+    1795202529,
     0.98
    ]
   ],
@@ -8455,6 +8471,10 @@
    [
     1795202155,
     0.24
+   ],
+   [
+    1795202529,
+    0.24
    ]
   ],
   "KXBTCY-27JAN0100-B57500": [
@@ -8484,6 +8504,10 @@
    ],
    [
     1795202155,
+    0.16
+   ],
+   [
+    1795202529,
     0.16
    ]
   ],
@@ -8515,6 +8539,10 @@
    [
     1795202155,
     0.17
+   ],
+   [
+    1795202529,
+    0.17
    ]
   ]
  },
@@ -8533,7 +8561,7 @@
    "source": "orderbook_fp",
    "ticker": "KXPRESNOMD-28-GPLA",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-GPLA/orderbook",
-   "sampled_at": "2026-11-20T19:16:02.784Z"
+   "sampled_at": "2026-11-20T19:22:16.363Z"
   },
   "KXPRESNOMD-28-JP": {
    "yes_bids": [
@@ -8761,25 +8789,21 @@
     },
     {
      "price": 0.055,
-     "count": 1099
-    },
-    {
-     "price": 0.056,
-     "count": 17.27
+     "count": 1082.44
     }
    ],
    "best_yes_bid": 0.01,
-   "best_no_bid": 0.056,
-   "implied_yes_ask": 0.944,
+   "best_no_bid": 0.055,
+   "implied_yes_ask": 0.945,
    "implied_no_ask": 0.99,
    "cumulative_contracts": {
     "yes": 1,
-    "no": 57623.98
+    "no": 57590.15
    },
    "source": "orderbook_fp",
    "ticker": "KXPRESNOMD-28-JP",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-JP/orderbook",
-   "sampled_at": "2026-11-20T19:16:03.114Z"
+   "sampled_at": "2026-11-20T19:22:16.677Z"
   },
   "KXPRESNOMD-28-HCLI": {
    "yes_bids": [
@@ -8800,7 +8824,7 @@
    "source": "orderbook_fp",
    "ticker": "KXPRESNOMD-28-HCLI",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-HCLI/orderbook",
-   "sampled_at": "2026-11-20T19:16:03.442Z"
+   "sampled_at": "2026-11-20T19:22:16.991Z"
   },
   "KXBTCY-27JAN0100-B147500": {
    "yes_bids": [
@@ -8821,7 +8845,7 @@
    "source": "orderbook_fp",
    "ticker": "KXBTCY-27JAN0100-B147500",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B147500/orderbook",
-   "sampled_at": "2026-11-20T19:16:03.772Z"
+   "sampled_at": "2026-11-20T19:22:17.305Z"
   },
   "KXPRESNOMR-28-NMIN": {
    "yes_bids": [],
@@ -8837,13 +8861,13 @@
    "source": "orderbook_fp",
    "ticker": "KXPRESNOMR-28-NMIN",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMR-28-NMIN/orderbook",
-   "sampled_at": "2026-11-20T19:16:04.101Z"
+   "sampled_at": "2026-11-20T19:22:17.619Z"
   },
   "KXPRESNOMD-28-RW": {
    "yes_bids": [
     {
      "price": 0.001,
-     "count": 120
+     "count": 100
     },
     {
      "price": 0.01,
@@ -9677,7 +9701,7 @@
     },
     {
      "price": 0.962,
-     "count": 4383.33
+     "count": 4344.45
     }
    ],
    "best_yes_bid": 0.035,
@@ -9685,13 +9709,13 @@
    "implied_yes_ask": 0.038,
    "implied_no_ask": 0.965,
    "cumulative_contracts": {
-    "yes": 26796.2,
-    "no": 427585.46
+    "yes": 26776.2,
+    "no": 427546.58
    },
    "source": "orderbook_fp",
    "ticker": "KXPRESNOMD-28-RW",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-RW/orderbook",
-   "sampled_at": "2026-11-20T19:16:04.430Z"
+   "sampled_at": "2026-11-20T19:22:17.934Z"
   },
   "KXPRESNOMD-28-JOSS": {
    "yes_bids": [
@@ -9751,7 +9775,7 @@
     },
     {
      "price": 0.728,
-     "count": 143.52
+     "count": 93.19
     }
    ],
    "best_yes_bid": 0.26,
@@ -9760,12 +9784,12 @@
    "implied_no_ask": 0.74,
    "cumulative_contracts": {
     "yes": 17272.71,
-    "no": 1225.15
+    "no": 1174.82
    },
    "source": "orderbook_fp",
    "ticker": "KXPRESNOMD-28-JOSS",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-JOSS/orderbook",
-   "sampled_at": "2026-11-20T19:16:04.759Z"
+   "sampled_at": "2026-11-20T19:22:18.247Z"
   },
   "KXPRESNOMR-28-MG": {
    "yes_bids": [
@@ -9786,7 +9810,7 @@
    "source": "orderbook_fp",
    "ticker": "KXPRESNOMR-28-MG",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMR-28-MG/orderbook",
-   "sampled_at": "2026-11-20T19:16:05.088Z"
+   "sampled_at": "2026-11-20T19:22:18.561Z"
   }
  }
 }
