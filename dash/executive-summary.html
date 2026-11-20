@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Executive Summary — KalshiDash1</title>
+<meta name="description" content="Executive summary of the Kalshi demo dashboard: environment, verified facts, focus-topic activity, alerting, trading simulation and flagged items.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+  <h1>Executive Summary</h1>
+  <p class="sub">KalshiDash1 — a live demo dashboard for the Kalshi <strong>demo</strong> Trade API, focused on the
+  highest-dollar live events in <strong>gas prices, elections, culture, crypto and golf</strong>. Every figure below links
+  the official source it was verified from; values that could not be confirmed are left blank and flagged
+  (<a href="flagged.html">Flagged for Review</a>). Nothing on this site is inferred.</p>
+
+  <h2>1. Environment</h2>
+  <div class="grid cols-3" id="es-env"></div>
+
+  <h2>2. Verified facts (official sources)</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Fact</th><th>Verified detail</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Demo endpoints</strong></td>
+          <td>REST <code>https://external-api.demo.kalshi.co/trade-api/v2</code> (also <code>https://demo-api.kalshi.co/trade-api/v2</code>); WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code>.</td>
+          <td class="src"><a href="https://docs.kalshi.com/getting_started/api_environments" target="_blank" rel="noopener">API Environments</a> · <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo Env</a></td>
+        </tr>
+        <tr>
+          <td><strong>Public market data needs no auth</strong></td>
+          <td>Series, events, markets, orderbook, trades and candlesticks are documented unauthenticated endpoints — the dashboard uses only these.</td>
+          <td class="src"><a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Quick Start: Market Data</a></td>
+        </tr>
+        <tr>
+          <td><strong>Portfolio/orders need signed API keys</strong></td>
+          <td>Auth uses KALSHI-ACCESS-KEY / -SIGNATURE / -TIMESTAMP headers (RSA-PSS or Ed25519). Current order path is <code>POST /portfolio/events/orders</code>; legacy <code>/portfolio/orders</code> writes return 410 Gone. The static site never handles credentials — trading is simulated.</td>
+          <td class="src"><a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">Authenticated Requests</a> · <a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a></td>
+        </tr>
+        <tr>
+          <td><strong>Resolution pays $1 per winning contract</strong></td>
+          <td><code>result</code> ∈ {"yes","no","scalar",""}; winning side receives $1/contract; <code>settlement_value_dollars</code> shows the YES payout. Events are tracked until resolution.</td>
+          <td class="src"><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a> · <a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market</a></td>
+        </tr>
+        <tr>
+          <td><strong>Candlesticks: 1 / 60 / 1440-minute periods</strong></td>
+          <td>No sub-minute public candles; the 5-minute chart window therefore uses browser-accumulated second-granularity samples. ≤ 5,000 periods per request.</td>
+          <td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Get Market Candlesticks</a></td>
+        </tr>
+        <tr>
+          <td><strong>Trade-by-trade prices are public</strong></td>
+          <td><code>GET /markets/trades?ticker=…</code> returns trade prices (<code>yes_price_dollars</code>) with ticker/min_ts/max_ts filters — the basis of the ≥ $0.10 swing alerts.</td>
+          <td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-trades" target="_blank" rel="noopener">Get Trades</a></td>
+        </tr>
+        <tr>
+          <td><strong>WebSocket needs an authenticated session</strong></td>
+          <td>Public channels (ticker, trade, market_lifecycle_v2) still use an authenticated WS session; browsers cannot set custom WS headers, so the site polls REST (flagged F-04).</td>
+          <td class="src"><a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">WebSockets Quick Start</a></td>
+        </tr>
+        <tr>
+          <td><strong>Demo prices are mock</strong></td>
+          <td>Kalshi states demo prices and behavior may not reflect real markets; trading uses mock funds.</td>
+          <td class="src"><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo Environment</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>3. Focus-topic activity (latest verified capture)</h2>
+  <p class="sub">Captured from the official demo API on <span id="es-captured"></span>. Dollar volume = contracts × $1
+  notional per binary contract. Topics are kept separate; events within each topic are grouped by series.</p>
+  <div class="table-wrap">
+    <table id="es-topics">
+      <thead><tr><th>Topic</th><th class="num">Series tracked</th><th class="num">Live markets at capture</th><th>Top market by dollar volume</th><th>State</th><th>Source</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <h2>4. Dashboard capabilities</h2>
+  <div class="grid cols-2">
+    <div class="panel">
+      <h3>Live alerting</h3>
+      <p>Two scrolling chats watch the top-dollar markets for contract-price swings <strong>≥ $0.10 either direction</strong>
+      using verified trade-by-trade prices: an <strong>all-events</strong> feed and a <strong>high-ROI model filter</strong>
+      (transparent 40/30/30 liquidity/open-interest/opportunity heuristic — F-09). Each alert links its API source and the
+      settlement-source websites that may have caused the jump. See <a href="alerts.html">Live Alerts</a>.</p>
+    </div>
+    <div class="panel">
+      <h3>Tracking, trading, analysis</h3>
+      <p>Markets are tracked until resolution (<code>yes</code>/<code>no</code>). An <strong>automated simulated-trade
+      engine</strong> tests five strategies against live prices; trades are recorded, settled at resolution, and analyzed by
+      topic and strategy with P&amp;L, win rate and an equity curve. See <a href="autotrade.html">Automated Trading</a>,
+      <a href="portfolio.html">Portfolio</a> and <a href="analysis.html">Trade Analysis</a>.</p>
+    </div>
+    <div class="panel">
+      <h3>Charts and liquidity</h3>
+      <p>Live interactive price graph: X = time (5-minute seconds-granularity samples; 1h/6h/24h minute candles; 7d hourly
+      candles), Y = current contract price. The orderbook ladder shows contracts available at each price (bids straight from
+      the API, asks implied from NO bids). See <a href="market.html">Market Detail</a>.</p>
+    </div>
+    <div class="panel">
+      <h3>Verification discipline</h3>
+      <p>Every table row links the official endpoint or documentation page it came from. Unconfirmed values are left blank
+      and flagged. <a href="sources.html">Sources</a> lists every capture; <a href="flagged.html">Flagged for Review</a>
+      publishes all irregularities.</p>
+    </div>
+  </div>
+
+  <h2>5. Key findings</h2>
+  <div class="panel">
+    <ol id="es-findings">
+      <li><strong>Liquidity is concentrated in a few markets.</strong> At the latest capture the elections market
+      <code>KXELECTIONEMERGENCY-27JAN01</code> led the focus topics with 7,475.30 contracts traded and equal open interest,
+      followed by the demo hourly BTC market with 2,820.00 total volume (crypto series volume leader KXLTCMAXY: 71,118.00).
+      Gas, golf and culture had no open markets at capture — their series trade on daily/tournament schedules.</li>
+      <li><strong>Swings happen fast on the hourly demo BTC markets</strong> — verified trades show ≥ $0.30 price moves
+      within minutes, so alert polling at 10-second cadence is the best public-data approximation (F-08).</li>
+      <li><strong>No server-side volume ranking exists</strong> (Get Markets sorts by creation time), so "highest dollar"
+      rankings are computed client-side from verified series/market rows (F-03).</li>
+      <li><strong>Real account sync and real order execution remain unverified</strong> — they require the account holder's
+      demo API keys, which this session must never request or store (F-02).</li>
+    </ol>
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/kalshi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app-common.js"></script>
+<script>
+(function () {
+  'use strict';
+  App.renderHeader('executive-summary.html');
+  App.renderFooter();
+  var K = window.K;
+
+  function mk(url, text) { return '<a href="' + K.esc(url) + '" target="_blank" rel="noopener">' + K.esc(text) + '</a>'; }
+
+  Data.snapshotMeta().then(function (meta) {
+    document.getElementById('es-captured').textContent = meta.captured_at.replace('T', ' ').replace('Z', ' UTC');
+    document.getElementById('es-env').innerHTML =
+      '<div class="stat"><div class="label">Environment</div><div class="value">Demo</div><div class="note">' + mk(K.cfg.docs.demoEnv, 'mock funds · separate keys') + '</div></div>' +
+      '<div class="stat"><div class="label">REST endpoint</div><div class="value" style="font-size:13px">external-api.demo.kalshi.co</div><div class="note">' + mk(K.cfg.endpoints.primary, 'trade-api/v2') + '</div></div>' +
+      '<div class="stat"><div class="label">WebSocket</div><div class="value" style="font-size:13px">external-api-ws.demo.kalshi.co</div><div class="note">' + mk(K.cfg.docs.environments ? K.cfg.docs.environments : 'https://docs.kalshi.com/getting_started/api_environments', 'session auth required') + '</div></div>';
+  });
+
+  Data.snapshot().then(function (snap) {
+    var tb = document.querySelector('#es-topics tbody');
+    tb.innerHTML = '';
+    K.cfg.topics.forEach(function (t) {
+      var topic = snap.topics[t.id] || {};
+      var series = topic.series || [], markets = topic.live_markets || [];
+      var best = markets.slice().sort(function (a, b) {
+        return (K.fp(b.volume_24h_fp) || 0) - (K.fp(a.volume_24h_fp) || 0) || (K.fp(b.volume_fp) || 0) - (K.fp(a.volume_fp) || 0);
+      })[0];
+      var bestCell = best
+        ? mk(K.marketUrl(best.ticker), best.title || best.ticker) + ' <br><code class="small">' + K.esc(best.ticker) + '</code> · ' + K.num(K.fp(best.volume_fp)) + ' contracts'
+        : '<span class="muted">no open markets at capture</span>';
+      var stateCell = markets.length
+        ? '<span class="badge live">' + markets.length + ' live</span>'
+        : '<span class="badge warn">none open at capture</span>';
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td><strong>' + t.label + '</strong></td>' +
+        '<td class="num">' + series.length + '</td>' +
+        '<td class="num">' + markets.length + '</td>' +
+        '<td>' + bestCell + '</td>' +
+        '<td>' + stateCell + '</td>' +
+        '<td class="src">' + K.apiLink(topic.series_query || snap.meta.api_root, 'series query') + '</td>';
+      tb.appendChild(tr);
+    });
+  });
+})();
+</script>
+</body>
+</html>

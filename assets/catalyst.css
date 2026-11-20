@@ -1,0 +1,41 @@
+/* catalyst.css — page-scoped styles for catalyst.html (session-7f90cf50).
+   Sits on top of assets/style.css (shared root stylesheet). */
+
+.btn-row { display: inline-flex; gap: 6px; flex-wrap: wrap; margin-left: 8px; }
+.btn.small { padding: 5px 10px; font-size: 12.5px; border-radius: 7px; }
+.btn.primary { background: #1d4ed8; border-color: #1d4ed8; }
+.linklike {
+  background: none; border: 0; padding: 0; color: #1d4ed8; font: inherit;
+  font-size: 13px; cursor: pointer; text-decoration: underline; text-align: left;
+}
+.chart-wrap {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 8px; margin: 8px 0 4px;
+}
+.chart-wrap svg { width: 100%; height: auto; display: block; }
+.row-active td { background: #eef2ff; }
+
+.feed {
+  max-height: 480px; overflow-y: auto; border: 1px solid var(--line);
+  border-radius: var(--radius); background: var(--panel); padding: 8px 10px;
+}
+.feed-item {
+  border-bottom: 1px dashed var(--line); padding: 8px 4px; font-size: 13.5px;
+}
+.feed-item:last-child { border-bottom: 0; }
+.feed-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.feed-time { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--muted); }
+.feed-body { margin: 3px 0; }
+.feed-links { font-size: 12px; line-height: 1.7; }
+.feed-links a { margin-right: 2px; }
+.feed-links a.disc { color: #92400e; }
+.badge.up { background: #dcfce7; color: #166534; }
+.badge.down { background: #fee2e2; color: #991b1b; }
+.badge.neutral { background: #eef1f6; color: #4b5563; }
+.panel {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 4px 16px; margin: 10px 0;
+}
+.panel ul { margin: 8px 0; padding-left: 18px; }
+.panel li { margin: 5px 0; font-size: 13.5px; }
+table td.num, table th.num { text-align: right; }

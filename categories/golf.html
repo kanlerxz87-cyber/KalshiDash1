@@ -1,49 +1,2699 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Golf · Kalshi Demo Dashboard</title>
-<meta name="description" content="Golf markets on the Kalshi demo: open markets ranked by open-interest dollars, and recently resolved YES/NO outcomes.">
+<title>Golf — KalshiDash1</title>
+<meta name="description" content="Kalshi demo Golf markets: series, highest-dollar open markets, order-book liquidity and resolved events, each row linked to its official source.">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
-<body data-page="topic" data-topic="golf">
-<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
-<a class="brand" href="../index.html">Kalshi Demo Dashboard</a>
-<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
-<div class="layout">
-<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="../index.html" class="">Home</a><a href="../executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="../categories/gas.html" class="">Gas prices</a><a href="../categories/elections.html" class="">Elections</a><a href="../categories/culture.html" class="">Culture</a><a href="../categories/crypto.html" class="">Crypto</a><a href="../categories/golf.html" class="active">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="../dashboard.html" class="">Live dashboard</a><a href="../alerts/index.html" class="">Live alerts (2 chats)</a><a href="../portfolio.html" class="">Portfolio</a><a href="../trading.html" class="">Trading</a><a href="../analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="../questions.html" class="">Questions & answers</a><a href="../suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="../sources.html" class="">Sources</a><a href="../flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="../docs/index.html" class="">Docs dashboard</a><a href="../docs/events.html" class="">Events & resolutions</a><a href="../docs/methodology.html" class="">Methodology</a><a href="../docs/flagged.html" class="">Docs flagged page</a></div></nav>
-<main class="content">
+<body data-page="category" data-topic="golf">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta"><span id="mode-badge" class="badge warn">data: probing…</span><span id="clock" class="mono small muted"></span></div>
+  </div>
+  <nav class="site"><div class="nav-inner"><a href="../index.html">Home</a><a href="../dashboard.html">Dashboard</a><a href="../markets.html">Markets</a><a href="../portfolio.html">Portfolio</a><a href="../analysis.html">Analysis</a><a href="../strategies.html">Strategies</a><a href="../sources.html">Sources</a><a href="../flagged.html">Flagged for review</a><span class="nav-sep">Topics</span><a href="../categories/gas.html">Gas Prices</a><a href="../categories/elections.html">Elections</a><a href="../categories/culture.html">Culture</a><a href="../categories/crypto.html">Crypto</a><a href="../categories/golf.html">Golf</a><span class="nav-sep">More</span><a href="../questions.html">Questions</a><a href="../suggestions.html">Suggestions</a><a href="../api.html">API reference</a><a href="../demo-account.html">Demo account</a><a href="../catalyst.html">Swing catalysts</a><a href="../strategylab.html">Strategy lab</a><a href="../alerts/index.html">Live alerts (engine, 2 chats)</a><a href="../dash/alerts.html">Alert feeds (dash suite)</a><a href="../dash/autotrade.html">Auto-trade engine (dash suite)</a></div></nav>
+</header>
+<main><div class="wrap">
+  <div class="page-head">
+    <div class="grow">
+      <h1><span class="tag golf">Golf</span> Golf markets</h1>
+      <p class="sub">Every event in this topic stays on one page: the series that define it, the open markets ranked by
+      dollar volume, the liquidity sitting at the touch, and the events that have already resolved yes or no.
+      Live values replace the captured table as soon as your browser can reach the demo API.</p>
+    </div>
+  </div>
+  <div id="mode-notice" class="notice">Probing the official demo API…</div>
 
-<h1>Golf</h1>
-<p class="lead">Series in Kalshi's <code>Sports</code> category that carry the <code>Golf</code> tag (for example Masters, Ryder Cup and PGA Tour markets).</p>
-<div class="cards" id="topic-cards">
-  <div class="card"><div class="k">Series in scope</div><div class="v" id="t-series">…</div><div class="s">Top 8 by series volume (contracts)</div></div>
-  <div class="card"><div class="k">Open markets (loaded)</div><div class="v" id="t-open">…</div><div class="s">From up to 2 pages of open events per series</div></div>
-  <div class="card"><div class="k">Open interest, $ (derived)</div><div class="v" id="t-oi">…</div><div class="s">Σ open interest × $1 notional per contract</div></div>
-  <div class="card"><div class="k">Resolved, last 14 days</div><div class="v" id="t-res">…</div><div class="s">Markets with result yes / no</div></div>
-</div>
-<p class="muted" id="t-status">Loading live data from the Kalshi demo API…</p>
+  <h2>Selection rule</h2>
+  <div class="panel"><p>Category &quot;Sports&quot; plus the official tag &quot;Golf&quot; (verified in GET /search/tags_by_categories -&gt; Sports -&gt; [&quot;Golf&quot;]).</p>
+  <p class="small muted">Series query used for this topic:
+  <a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener" class="srcline">https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true</a></p></div>
 
-<h2>Open markets: ranked by open-interest $ (derived)</h2>
-<p class="muted">Ranking field is derived (see <a class="flag" href="../flagged.html#F-03">F-03</a>). Click a ticker to open the live chart and order book. Prices are dollars per $1 contract.</p>
-<input class="filter" id="open-filter" placeholder="Filter rows (title, ticker, series)…" aria-label="Filter open markets">
-<div id="open-table"></div>
+  <h2>Series in this topic</h2>
+  <div class="table-wrap"><table class="compact"><thead><tr>
+    <th>Series ticker</th><th>Title</th><th>Category</th><th>Official tags</th><th class="num">Volume (contracts)</th>
+    <th>Official settlement source(s)</th><th>Source</th></tr></thead>
+    <tbody id="series-body"><tr>
+    <td><code>KXPGATOUR</code></td>
+    <td>PGA Tour</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">42,199,618,988</td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXDPWORLDTOUR</code></td>
+    <td>DP World Tour Tournament Winner</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">8,245,802,181</td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGAR1LEAD</code></td>
+    <td>PGA Round 1 Leader</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">6,949,777,084</td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGATOP20</code></td>
+    <td>PGA Top 20 Finisher</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">1,316,278,327</td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXLPGATOUR</code></td>
+    <td>PGA Tour</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">871,516,918</td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGATOP10</code></td>
+    <td>PGA Top 10 Finisher</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">625,419,077</td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXDPWORLDTOURR1LEAD</code></td>
+    <td>DP World Tour R1 Leader</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">619,481,537</td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a>, <a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGATOP5</code></td>
+    <td>PGA Top 5 Finisher</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">349,639,459</td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXLIVTOUR</code></td>
+    <td>LIV Tour</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">137,599,223</td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGAR2LEAD</code></td>
+    <td>PGA Round 2 Leader</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">54,935,923</td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGAMAKECUT</code></td>
+    <td>PGA To Make Cut</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">49,703,997</td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGAR3LEAD</code></td>
+    <td>PGA Round 3 Leader</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">31,020,816</td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXKFTOUR</code></td>
+    <td>Korn Ferry Tour</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">14,100,448</td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGAROUNDSCORE</code></td>
+    <td>Golf Round Scores</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">6,536,908</td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPRESCUP</code></td>
+    <td>President&#39;s Cup</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">4,217,727</td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPRESCUPPTSLEAD</code></td>
+    <td>Presidents Cup Points Leader</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">2,117,850</td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGATOP40</code></td>
+    <td>PGA Top 40 Finisher</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">1,791,408</td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGAWINNERWITHOUT</code></td>
+    <td>PGA Winner Without</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">1,573,612</td>
+    <td><a href="https://espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPRESCUPMATCH</code></td>
+    <td>Presidents Cup Match Winner</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">1,114,965</td>
+    <td><a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXTHEOPEN</code></td>
+    <td>The Open Championship</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">227,705</td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">AP</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXDPWORLDTOURR2LEAD</code></td>
+    <td>DP World Tour R2 Leader</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">157,259</td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a>, <a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGAMASTERS</code></td>
+    <td>Golfers to Participate in the Masters</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">50,260</td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGASOLHEIM</code></td>
+    <td>Solheim Cup</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">45,123</td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGARYDER</code></td>
+    <td>Ryder Cup</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">43,303</td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXSCOTTIESLAM</code></td>
+    <td>Scottie grand slam</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">18,853</td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGAHOLEINONE</code></td>
+    <td>PGA Hole in One</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">12,583</td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a>, <a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGAMAJORTOP10</code></td>
+    <td>PGA Top 10 for All 4 Majors</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">4,920</td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXMASTERS</code></td>
+    <td>Masters Tournament</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">1,538</td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXDPWT3BALL</code></td>
+    <td>DPWT 3-Ball</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">1,464</td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a>, <a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://foxsports.com" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPGAR1TOP10</code></td>
+    <td>PGA Round 1 Top 10 FInishers</td>
+    <td>Sports</td>
+    <td>Golf</td>
+    <td class="num">1,308</td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr></tbody></table></div>
 
-<h2>Recently resolved (YES / NO)</h2>
-<p class="muted">Settled events closed in the last 14 days, from the API's <code>status=settled</code> list. A market's result is its <code>result</code> field.</p>
-<div id="settled-table"></div>
+  <h2>Open markets — highest dollar amount first</h2>
+  <p class="sub">Dollar volume = contracts traded x the contract's settlement value
+  (<code>notional_value_dollars</code>). Rows are sorted by 24h dollar volume. Live values replace this table in place.</p>
+  <div class="table-wrap"><table class="compact"><thead><tr><th>Market</th><th>Topic</th><th class="num">Last</th><th class="num">Bid / Ask</th>
+  <th class="num">Spread</th><th class="num">24h vol ($)</th><th class="num">Total vol ($)</th>
+  <th class="num">Open int ($)</th><th>Status</th><th>Result</th><th>Source</th></tr></thead><tbody id="market-body"><tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-TMOO">The RSM Classic: Taylor Moore wins</a><br><span class="ticker">KXPGATOUR-THRC26-TMOO</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0040 / $0.0050</td>
+      <td class="num">$0.0010</td>
+      <td class="num">841,159</td>
+      <td class="num">1,155,550</td>
+      <td class="num">1,150,061</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-SSTR">The RSM Classic: Sepp Straka wins</a><br><span class="ticker">KXPGATOUR-THRC26-SSTR</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0250</td>
+      <td class="num">$0.0220 / $0.0250</td>
+      <td class="num">$0.0030</td>
+      <td class="num">515,331</td>
+      <td class="num">759,578</td>
+      <td class="num">681,895</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-KROY">The RSM Classic: Kevin Roy wins</a><br><span class="ticker">KXPGATOUR-THRC26-KROY</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">465,007</td>
+      <td class="num">579,120</td>
+      <td class="num">575,510</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MMEI">The RSM Classic: Mac Meissner wins</a><br><span class="ticker">KXPGATOUR-THRC26-MMEI</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0050</td>
+      <td class="num">$0.0030</td>
+      <td class="num">457,123</td>
+      <td class="num">493,803</td>
+      <td class="num">346,231</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MPEN">The RSM Classic: Marco Penge wins</a><br><span class="ticker">KXPGATOUR-THRC26-MPEN</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0070</td>
+      <td class="num">$0.0060 / $0.0070</td>
+      <td class="num">$0.0010</td>
+      <td class="num">407,847</td>
+      <td class="num">427,670</td>
+      <td class="num">418,468</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MPAV">The RSM Classic: Matthieu Pavon wins</a><br><span class="ticker">KXPGATOUR-THRC26-MPAV</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">396,247</td>
+      <td class="num">408,118</td>
+      <td class="num">401,594</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-SSTE">The RSM Classic: Sam Stevens wins</a><br><span class="ticker">KXPGATOUR-THRC26-SSTE</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0040 / $0.0050</td>
+      <td class="num">$0.0010</td>
+      <td class="num">347,544</td>
+      <td class="num">401,070</td>
+      <td class="num">393,257</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-JVAN">The RSM Classic: John VanDerLaan wins</a><br><span class="ticker">KXPGATOUR-THRC26-JVAN</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0080</td>
+      <td class="num">$0.0050 / $0.0080</td>
+      <td class="num">$0.0030</td>
+      <td class="num">332,910</td>
+      <td class="num">344,782</td>
+      <td class="num">301,790</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-CBLA">The RSM Classic: Chandler Blanchet wins</a><br><span class="ticker">KXPGATOUR-THRC26-CBLA</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0050</td>
+      <td class="num">$0.0030</td>
+      <td class="num">298,336</td>
+      <td class="num">364,209</td>
+      <td class="num">364,075</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-HSPR">The RSM Classic: Hayden Springer wins</a><br><span class="ticker">KXPGATOUR-THRC26-HSPR</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">261,681</td>
+      <td class="num">273,358</td>
+      <td class="num">270,121</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-JKEE">The RSM Classic: Johnny Keefer wins</a><br><span class="ticker">KXPGATOUR-THRC26-JKEE</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">257,916</td>
+      <td class="num">269,856</td>
+      <td class="num">194,827</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-ZBLA">The RSM Classic: Zac Blair wins</a><br><span class="ticker">KXPGATOUR-THRC26-ZBLA</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">229,900</td>
+      <td class="num">265,289</td>
+      <td class="num">259,515</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-KHIR">The RSM Classic: Kensei Hirata wins</a><br><span class="ticker">KXPGATOUR-THRC26-KHIR</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">229,879</td>
+      <td class="num">241,903</td>
+      <td class="num">240,163</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-TCRO">The RSM Classic: Trace Crowe wins</a><br><span class="ticker">KXPGATOUR-THRC26-TCRO</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">224,170</td>
+      <td class="num">257,343</td>
+      <td class="num">247,934</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-HLI">The RSM Classic: Haotong Li wins</a><br><span class="ticker">KXPGATOUR-THRC26-HLI</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0130</td>
+      <td class="num">$0.0120 / $0.0130</td>
+      <td class="num">$0.0010</td>
+      <td class="num">219,272</td>
+      <td class="num">233,963</td>
+      <td class="num">227,063</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-RCAS">The RSM Classic: Ricky Castillo wins</a><br><span class="ticker">KXPGATOUR-THRC26-RCAS</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0220</td>
+      <td class="num">$0.0190 / $0.0220</td>
+      <td class="num">$0.0030</td>
+      <td class="num">215,897</td>
+      <td class="num">231,210</td>
+      <td class="num">224,564</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-AECK">The RSM Classic: Austin Eckroat wins</a><br><span class="ticker">KXPGATOUR-THRC26-AECK</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">211,308</td>
+      <td class="num">278,684</td>
+      <td class="num">277,387</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-LHOD">The RSM Classic: Lee Hodges wins</a><br><span class="ticker">KXPGATOUR-THRC26-LHOD</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0230</td>
+      <td class="num">$0.0210 / $0.0230</td>
+      <td class="num">$0.0020</td>
+      <td class="num">209,637</td>
+      <td class="num">221,336</td>
+      <td class="num">208,616</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-GHIG">The RSM Classic: Garrick Higgo wins</a><br><span class="ticker">KXPGATOUR-THRC26-GHIG</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0200</td>
+      <td class="num">$0.0170 / $0.0200</td>
+      <td class="num">$0.0030</td>
+      <td class="num">176,578</td>
+      <td class="num">188,430</td>
+      <td class="num">178,280</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-RHOE">The RSM Classic: Rico Hoey wins</a><br><span class="ticker">KXPGATOUR-THRC26-RHOE</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">175,340</td>
+      <td class="num">191,697</td>
+      <td class="num">183,900</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-NSHI">The RSM Classic: Neal Shipley wins</a><br><span class="ticker">KXPGATOUR-THRC26-NSHI</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0200</td>
+      <td class="num">$0.0190 / $0.0200</td>
+      <td class="num">$0.0010</td>
+      <td class="num">174,620</td>
+      <td class="num">190,773</td>
+      <td class="num">184,140</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-ADUM">The RSM Classic: Adrien Dumont De Chassart wins</a><br><span class="ticker">KXPGATOUR-THRC26-ADUM</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0030 / $0.0050</td>
+      <td class="num">$0.0020</td>
+      <td class="num">174,433</td>
+      <td class="num">239,665</td>
+      <td class="num">233,762</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-BSIL">The RSM Classic: Ben Silverman wins</a><br><span class="ticker">KXPGATOUR-THRC26-BSIL</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">160,436</td>
+      <td class="num">247,188</td>
+      <td class="num">202,187</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-CBEZ">The RSM Classic: Christiaan Bezuidenhout wins</a><br><span class="ticker">KXPGATOUR-THRC26-CBEZ</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0060</td>
+      <td class="num">$0.0040 / $0.0060</td>
+      <td class="num">$0.0020</td>
+      <td class="num">152,642</td>
+      <td class="num">168,993</td>
+      <td class="num">168,535</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-NDUN">The RSM Classic: Nick Dunlap wins</a><br><span class="ticker">KXPGATOUR-THRC26-NDUN</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0060</td>
+      <td class="num">$0.0050 / $0.0060</td>
+      <td class="num">$0.0010</td>
+      <td class="num">137,714</td>
+      <td class="num">264,775</td>
+      <td class="num">255,631</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-JSUB">The RSM Classic: Jackson Suber wins</a><br><span class="ticker">KXPGATOUR-THRC26-JSUB</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0110</td>
+      <td class="num">$0.0100 / $0.0110</td>
+      <td class="num">$0.0010</td>
+      <td class="num">132,336</td>
+      <td class="num">152,172</td>
+      <td class="num">151,699</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MHUG">The RSM Classic: Mackenzie Hughes wins</a><br><span class="ticker">KXPGATOUR-THRC26-MHUG</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0130</td>
+      <td class="num">$0.0000 / $0.0130</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">119,782</td>
+      <td class="num">136,049</td>
+      <td class="num">128,590</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-JSVE">The RSM Classic: Jesper Svensson wins</a><br><span class="ticker">KXPGATOUR-THRC26-JSVE</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0380</td>
+      <td class="num">$0.0330 / $0.0380</td>
+      <td class="num">$0.0050</td>
+      <td class="num">119,064</td>
+      <td class="num">135,231</td>
+      <td class="num">124,561</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-APUT">The RSM Classic: Andrew Putnam wins</a><br><span class="ticker">KXPGATOUR-THRC26-APUT</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">118,859</td>
+      <td class="num">130,901</td>
+      <td class="num">127,331</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-CRAM">The RSM Classic: Chad Ramey wins</a><br><span class="ticker">KXPGATOUR-THRC26-CRAM</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0060</td>
+      <td class="num">$0.0050 / $0.0060</td>
+      <td class="num">$0.0010</td>
+      <td class="num">110,863</td>
+      <td class="num">155,211</td>
+      <td class="num">152,536</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-KVIL">The RSM Classic: Karl Vilips wins</a><br><span class="ticker">KXPGATOUR-THRC26-KVIL</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0030 / $0.0050</td>
+      <td class="num">$0.0020</td>
+      <td class="num">110,304</td>
+      <td class="num">148,448</td>
+      <td class="num">147,313</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MGRE">The RSM Classic: Max Greyserman wins</a><br><span class="ticker">KXPGATOUR-THRC26-MGRE</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0480</td>
+      <td class="num">$0.0430 / $0.0480</td>
+      <td class="num">$0.0050</td>
+      <td class="num">109,265</td>
+      <td class="num">125,337</td>
+      <td class="num">111,781</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-DGHI">The RSM Classic: Doug Ghim wins</a><br><span class="ticker">KXPGATOUR-THRC26-DGHI</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0250</td>
+      <td class="num">$0.0230 / $0.0250</td>
+      <td class="num">$0.0020</td>
+      <td class="num">108,559</td>
+      <td class="num">192,153</td>
+      <td class="num">89,522</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-JDAH">The RSM Classic: Joel Dahmen wins</a><br><span class="ticker">KXPGATOUR-THRC26-JDAH</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0130</td>
+      <td class="num">$0.0120 / $0.0130</td>
+      <td class="num">$0.0010</td>
+      <td class="num">101,815</td>
+      <td class="num">153,936</td>
+      <td class="num">136,410</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-BBRO">The RSM Classic: Blades Brown wins</a><br><span class="ticker">KXPGATOUR-THRC26-BBRO</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0130</td>
+      <td class="num">$0.0120 / $0.0130</td>
+      <td class="num">$0.0010</td>
+      <td class="num">99,796</td>
+      <td class="num">115,261</td>
+      <td class="num">85,056</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MMCG">The RSM Classic: Max McGreevy wins</a><br><span class="ticker">KXPGATOUR-THRC26-MMCG</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">92,697</td>
+      <td class="num">112,617</td>
+      <td class="num">111,308</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-BHOR">The RSM Classic: Billy Horschel wins</a><br><span class="ticker">KXPGATOUR-THRC26-BHOR</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">92,597</td>
+      <td class="num">112,547</td>
+      <td class="num">106,019</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-KBRA">The RSM Classic: Keegan Bradley wins</a><br><span class="ticker">KXPGATOUR-THRC26-KBRA</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0080</td>
+      <td class="num">$0.0060 / $0.0080</td>
+      <td class="num">$0.0020</td>
+      <td class="num">91,555</td>
+      <td class="num">184,285</td>
+      <td class="num">154,140</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-HENG">The RSM Classic: Harris English wins</a><br><span class="ticker">KXPGATOUR-THRC26-HENG</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0200</td>
+      <td class="num">$0.0190 / $0.0200</td>
+      <td class="num">$0.0010</td>
+      <td class="num">87,477</td>
+      <td class="num">166,222</td>
+      <td class="num">161,299</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-CPHI">The RSM Classic: Chandler Phillips wins</a><br><span class="ticker">KXPGATOUR-THRC26-CPHI</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0080 / $0.0100</td>
+      <td class="num">$0.0020</td>
+      <td class="num">79,490</td>
+      <td class="num">95,527</td>
+      <td class="num">92,050</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-EGRI">The RSM Classic: Emiliano Grillo wins</a><br><span class="ticker">KXPGATOUR-THRC26-EGRI</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0250</td>
+      <td class="num">$0.0240 / $0.0250</td>
+      <td class="num">$0.0010</td>
+      <td class="num">76,990</td>
+      <td class="num">176,518</td>
+      <td class="num">112,700</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-BHAR">The RSM Classic: Brian Harman wins</a><br><span class="ticker">KXPGATOUR-THRC26-BHAR</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0040 / $0.0050</td>
+      <td class="num">$0.0010</td>
+      <td class="num">74,446</td>
+      <td class="num">143,837</td>
+      <td class="num">110,492</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-JKOI">The RSM Classic: Jackson Koivun wins</a><br><span class="ticker">KXPGATOUR-THRC26-JKOI</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0280</td>
+      <td class="num">$0.0270 / $0.0280</td>
+      <td class="num">$0.0010</td>
+      <td class="num">72,408</td>
+      <td class="num">129,411</td>
+      <td class="num">120,930</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-JPOS">The RSM Classic: J.T. Poston wins</a><br><span class="ticker">KXPGATOUR-THRC26-JPOS</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0180</td>
+      <td class="num">$0.0070 / $0.0180</td>
+      <td class="num">$0.0110</td>
+      <td class="num">68,347</td>
+      <td class="num">130,842</td>
+      <td class="num">128,765</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXLPGATOUR-CMEGTC26-PATTAV">CME Group Tour Championship: Patty Tavatanakit wins</a><br><span class="ticker">KXLPGATOUR-CMEGTC26-PATTAV</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0100 / $0.0110</td>
+      <td class="num">$0.0010</td>
+      <td class="num">66,667</td>
+      <td class="num">66,667</td>
+      <td class="num">66,667</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXLPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-DRIL">The RSM Classic: Davis Riley wins</a><br><span class="ticker">KXPGATOUR-THRC26-DRIL</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0030 / $0.0050</td>
+      <td class="num">$0.0020</td>
+      <td class="num">62,488</td>
+      <td class="num">125,111</td>
+      <td class="num">63,187</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-ZBAU">The RSM Classic: Zachary Bauchou wins</a><br><span class="ticker">KXPGATOUR-THRC26-ZBAU</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">62,457</td>
+      <td class="num">78,570</td>
+      <td class="num">75,731</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-ASVE">The RSM Classic: Adam Svensson wins</a><br><span class="ticker">KXPGATOUR-THRC26-ASVE</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">62,279</td>
+      <td class="num">185,701</td>
+      <td class="num">129,898</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-SNOH">The RSM Classic: S.Y. Noh wins</a><br><span class="ticker">KXPGATOUR-THRC26-SNOH</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">62,065</td>
+      <td class="num">66,404</td>
+      <td class="num">65,210</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-ATOS">The RSM Classic: Alejandro Tosti wins</a><br><span class="ticker">KXPGATOUR-THRC26-ATOS</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $1.0000</td>
+      <td class="num">$0.9980</td>
+      <td class="num">62,022</td>
+      <td class="num">183,355</td>
+      <td class="num">126,550</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-JHIG">The RSM Classic: Joe Highsmith wins</a><br><span class="ticker">KXPGATOUR-THRC26-JHIG</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">61,556</td>
+      <td class="num">127,070</td>
+      <td class="num">124,247</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-KMIT">The RSM Classic: Keith Mitchell wins</a><br><span class="ticker">KXPGATOUR-THRC26-KMIT</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0790</td>
+      <td class="num">$0.0780 / $0.0790</td>
+      <td class="num">$0.0010</td>
+      <td class="num">59,227</td>
+      <td class="num">128,864</td>
+      <td class="num">123,002</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-DFOR">The RSM Classic: David Ford wins</a><br><span class="ticker">KXPGATOUR-THRC26-DFOR</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0080 / $0.0100</td>
+      <td class="num">$0.0020</td>
+      <td class="num">57,818</td>
+      <td class="num">115,786</td>
+      <td class="num">106,034</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-DTHO">The RSM Classic: Davis Thompson wins</a><br><span class="ticker">KXPGATOUR-THRC26-DTHO</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0080 / $0.0100</td>
+      <td class="num">$0.0020</td>
+      <td class="num">57,692</td>
+      <td class="num">106,551</td>
+      <td class="num">88,983</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-WGOR">The RSM Classic: Will Gordon wins</a><br><span class="ticker">KXPGATOUR-THRC26-WGOR</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">56,589</td>
+      <td class="num">64,424</td>
+      <td class="num">63,504</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXLPGATOUR-CMEGTC26-ROSZHA">CME Group Tour Championship: Rose Zhang wins</a><br><span class="ticker">KXLPGATOUR-CMEGTC26-ROSZHA</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">55,556</td>
+      <td class="num">55,556</td>
+      <td class="num">55,556</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXLPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-BKOH">The RSM Classic: Ben Kohles wins</a><br><span class="ticker">KXPGATOUR-THRC26-BKOH</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0200</td>
+      <td class="num">$0.0170 / $0.0200</td>
+      <td class="num">$0.0030</td>
+      <td class="num">51,271</td>
+      <td class="num">96,825</td>
+      <td class="num">71,583</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MBRE">The RSM Classic: Michael Brennan wins</a><br><span class="ticker">KXPGATOUR-THRC26-MBRE</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0300</td>
+      <td class="num">$0.0290 / $0.0300</td>
+      <td class="num">$0.0010</td>
+      <td class="num">50,533</td>
+      <td class="num">88,021</td>
+      <td class="num">74,916</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THRC26-ANOV">The RSM Classic: Andrew Novak wins</a><br><span class="ticker">KXPGATOUR-THRC26-ANOV</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0080</td>
+      <td class="num">$0.0050 / $0.0080</td>
+      <td class="num">$0.0030</td>
+      <td class="num">48,591</td>
+      <td class="num">82,521</td>
+      <td class="num">78,123</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXLPGATOUR-CMEGTC26-ALIKIM">CME Group Tour Championship: A Lim Kim wins</a><br><span class="ticker">KXLPGATOUR-CMEGTC26-ALIKIM</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0490</td>
+      <td class="num">$0.0620 / $0.0790</td>
+      <td class="num">$0.0170</td>
+      <td class="num">44,685</td>
+      <td class="num">44,685</td>
+      <td class="num">44,685</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXLPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr></tbody></table></div>
 
-<h2>Series in scope</h2>
-<div id="series-table"></div>
+  <h2>Liquidity at the captured snapshot</h2>
+  <p class="sub">Contracts available at each price, captured from the order book of the busiest markets at snapshot time.</p>
+  <div class="table-wrap"><table class="compact"><thead><tr>
+    <th>Market</th><th>Topic</th><th class="num">Best yes bid</th><th class="num">Best no bid</th>
+    <th class="num">Price levels</th><th class="num">Contracts in book</th><th>Source</th></tr></thead>
+    <tbody id="liquidity-body"><tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-TMOO">The RSM Classic: Taylor Moore wins</a><br><span class="ticker">KXPGATOUR-THRC26-TMOO</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0040</td>
+    <td class="num">$0.9950</td>
+    <td class="num">10</td>
+    <td class="num">5,147,529</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-TMOO/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-SSTR">The RSM Classic: Sepp Straka wins</a><br><span class="ticker">KXPGATOUR-THRC26-SSTR</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0220</td>
+    <td class="num">$0.9750</td>
+    <td class="num">12</td>
+    <td class="num">840,755</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-SSTR/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-KROY">The RSM Classic: Kevin Roy wins</a><br><span class="ticker">KXPGATOUR-THRC26-KROY</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">5</td>
+    <td class="num">380,554</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-KROY/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MMEI">The RSM Classic: Mac Meissner wins</a><br><span class="ticker">KXPGATOUR-THRC26-MMEI</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">7</td>
+    <td class="num">2,234,667</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MMEI/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MPEN">The RSM Classic: Marco Penge wins</a><br><span class="ticker">KXPGATOUR-THRC26-MPEN</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0060</td>
+    <td class="num">$0.9930</td>
+    <td class="num">10</td>
+    <td class="num">3,133,650</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MPEN/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MPAV">The RSM Classic: Matthieu Pavon wins</a><br><span class="ticker">KXPGATOUR-THRC26-MPAV</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">5</td>
+    <td class="num">380,556</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MPAV/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-SSTE">The RSM Classic: Sam Stevens wins</a><br><span class="ticker">KXPGATOUR-THRC26-SSTE</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0040</td>
+    <td class="num">$0.9950</td>
+    <td class="num">7</td>
+    <td class="num">7,560,354</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-SSTE/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-JVAN">The RSM Classic: John VanDerLaan wins</a><br><span class="ticker">KXPGATOUR-THRC26-JVAN</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0050</td>
+    <td class="num">$0.9920</td>
+    <td class="num">8</td>
+    <td class="num">403,756</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-JVAN/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-CBLA">The RSM Classic: Chandler Blanchet wins</a><br><span class="ticker">KXPGATOUR-THRC26-CBLA</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">8</td>
+    <td class="num">863,656</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-CBLA/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-HSPR">The RSM Classic: Hayden Springer wins</a><br><span class="ticker">KXPGATOUR-THRC26-HSPR</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0010</td>
+    <td class="num">$0.9870</td>
+    <td class="num">4</td>
+    <td class="num">104,292</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-HSPR/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-JKEE">The RSM Classic: Johnny Keefer wins</a><br><span class="ticker">KXPGATOUR-THRC26-JKEE</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">7</td>
+    <td class="num">397,195</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-JKEE/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-ZBLA">The RSM Classic: Zac Blair wins</a><br><span class="ticker">KXPGATOUR-THRC26-ZBLA</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">5</td>
+    <td class="num">380,556</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-ZBLA/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-KHIR">The RSM Classic: Kensei Hirata wins</a><br><span class="ticker">KXPGATOUR-THRC26-KHIR</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">5</td>
+    <td class="num">669,861</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-KHIR/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-TCRO">The RSM Classic: Trace Crowe wins</a><br><span class="ticker">KXPGATOUR-THRC26-TCRO</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">5</td>
+    <td class="num">380,556</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-TCRO/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr></tbody></table></div>
 
-<h2>Sources for this page</h2>
-<ul><li><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?tags=Golf&category=Sports&include_volume=true" target="_blank" rel="noopener" title="Kalshi demo API: Golf series (live)">Golf series (live) ↗</a></li><li><a href="https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Tags for Series Categories">Get Tags for Series Categories ↗</a></li><li><a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a></li><li><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a></li></ul>
-<p class="muted">Unverified or missing values appear as “—”. Open <a href="../flagged.html">Flagged for review</a> for caveats.</p>
+  <h2>Resolved events (yes / no)</h2>
+  <p class="sub">Events that have already been determined, with the market-level result the exchange published.</p>
+  <div class="table-wrap"><table class="compact"><thead><tr>
+    <th>Event</th><th>Market side</th><th>Result</th><th class="num">Settlement value</th><th class="num">Volume (contracts)</th>
+    <th>Settled at</th><th>Official settlement source(s)</th><th>Source</th></tr></thead>
+    <tbody id="resolved-body"><tr>
+    <td>Austin Championship presented by Compliance Solutions Winner<br><span class="ticker">KXPGATOUR-AUCPBCS26</span></td>
+    <td>Zachary Bauchou<br><span class="ticker">KXPGATOUR-AUCPBCS26-ZBAU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">226,900</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions Winner<br><span class="ticker">KXPGATOUR-AUCPBCS26</span></td>
+    <td>Daniel Berger<br><span class="ticker">KXPGATOUR-AUCPBCS26-DBER</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">42,624</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions Winner<br><span class="ticker">KXPGATOUR-AUCPBCS26</span></td>
+    <td>Christiaan Bezuidenhout<br><span class="ticker">KXPGATOUR-AUCPBCS26-CBEZ</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">169,356</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions Winner<br><span class="ticker">KXPGATOUR-AUCPBCS26</span></td>
+    <td>Zac Blair<br><span class="ticker">KXPGATOUR-AUCPBCS26-ZBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">235,600</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions Winner<br><span class="ticker">KXPGATOUR-AUCPBCS26</span></td>
+    <td>Chandler Blanchet<br><span class="ticker">KXPGATOUR-AUCPBCS26-CBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">442,737</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions Winner<br><span class="ticker">KXPGATOUR-AUCPBCS26</span></td>
+    <td>Blades Brown<br><span class="ticker">KXPGATOUR-AUCPBCS26-BBRO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">138,103</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions Winner<br><span class="ticker">KXPGATOUR-AUCPBCS26</span></td>
+    <td>Rafael Campos<br><span class="ticker">KXPGATOUR-AUCPBCS26-RCAM</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">182,236</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions Winner<br><span class="ticker">KXPGATOUR-AUCPBCS26</span></td>
+    <td>Ricky Castillo<br><span class="ticker">KXPGATOUR-AUCPBCS26-RCAS</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">252,034</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions Winner<br><span class="ticker">KXPGATOUR-AUCPBCS26</span></td>
+    <td>Davis Chatfield<br><span class="ticker">KXPGATOUR-AUCPBCS26-DCHA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">189,230</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions Winner<br><span class="ticker">KXPGATOUR-AUCPBCS26</span></td>
+    <td>Luke Clanton<br><span class="ticker">KXPGATOUR-AUCPBCS26-LCLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">47,590</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions Winner<br><span class="ticker">KXPGATOUR-AUCPBCS26</span></td>
+    <td>Eric Cole<br><span class="ticker">KXPGATOUR-AUCPBCS26-ECOL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">37,652</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions Winner<br><span class="ticker">KXPGATOUR-AUCPBCS26</span></td>
+    <td>Pierceson Coody<br><span class="ticker">KXPGATOUR-AUCPBCS26-PCOO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">191,066</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship Winner<br><span class="ticker">KXPGATOUR-WOWTC26</span></td>
+    <td>Zachary Bauchou<br><span class="ticker">KXPGATOUR-WOWTC26-ZBAU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">131,881</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship Winner<br><span class="ticker">KXPGATOUR-WOWTC26</span></td>
+    <td>Christiaan Bezuidenhout<br><span class="ticker">KXPGATOUR-WOWTC26-CBEZ</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">98,776</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship Winner<br><span class="ticker">KXPGATOUR-WOWTC26</span></td>
+    <td>Zac Blair<br><span class="ticker">KXPGATOUR-WOWTC26-ZBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">199,826</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship Winner<br><span class="ticker">KXPGATOUR-WOWTC26</span></td>
+    <td>Chandler Blanchet<br><span class="ticker">KXPGATOUR-WOWTC26-CBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">59,678</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship Winner<br><span class="ticker">KXPGATOUR-WOWTC26</span></td>
+    <td>Blades Brown<br><span class="ticker">KXPGATOUR-WOWTC26-BBRO</span></td>
+    <td><span class="badge good">yes</span></td>
+    <td class="num">$1.0000</td>
+    <td class="num">181,688</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship Winner<br><span class="ticker">KXPGATOUR-WOWTC26</span></td>
+    <td>Rafael Campos<br><span class="ticker">KXPGATOUR-WOWTC26-RCAM</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">282,822</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship Winner<br><span class="ticker">KXPGATOUR-WOWTC26</span></td>
+    <td>Davis Chatfield<br><span class="ticker">KXPGATOUR-WOWTC26-DCHA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">171,047</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship Winner<br><span class="ticker">KXPGATOUR-WOWTC26</span></td>
+    <td>Luke Clanton<br><span class="ticker">KXPGATOUR-WOWTC26-LCLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">68,323</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship Winner<br><span class="ticker">KXPGATOUR-WOWTC26</span></td>
+    <td>Tyler Collet<br><span class="ticker">KXPGATOUR-WOWTC26-TCOL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">342</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship Winner<br><span class="ticker">KXPGATOUR-WOWTC26</span></td>
+    <td>Pierceson Coody<br><span class="ticker">KXPGATOUR-WOWTC26-PCOO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">97,507</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship Winner<br><span class="ticker">KXPGATOUR-WOWTC26</span></td>
+    <td>Trace Crowe<br><span class="ticker">KXPGATOUR-WOWTC26-TCRO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">16,801</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship Winner<br><span class="ticker">KXPGATOUR-WOWTC26</span></td>
+    <td>Joel Dahmen<br><span class="ticker">KXPGATOUR-WOWTC26-JDAH</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">265,795</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>DP World Tour Championship Winner<br><span class="ticker">KXDPWORLDTOUR-DPWTC26</span></td>
+    <td>Marcus Armitage<br><span class="ticker">KXDPWORLDTOUR-DPWTC26-MARM</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">227,467</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>DP World Tour Championship Winner<br><span class="ticker">KXDPWORLDTOUR-DPWTC26</span></td>
+    <td>Angel Ayora<br><span class="ticker">KXDPWORLDTOUR-DPWTC26-AAYO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">166,061</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>DP World Tour Championship Winner<br><span class="ticker">KXDPWORLDTOUR-DPWTC26</span></td>
+    <td>Dan Bradbury<br><span class="ticker">KXDPWORLDTOUR-DPWTC26-DBRA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">195,017</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>DP World Tour Championship Winner<br><span class="ticker">KXDPWORLDTOUR-DPWTC26</span></td>
+    <td>Davis Bryant<br><span class="ticker">KXDPWORLDTOUR-DPWTC26-DBRY</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">182,320</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>DP World Tour Championship Winner<br><span class="ticker">KXDPWORLDTOUR-DPWTC26</span></td>
+    <td>Jorge Campillo<br><span class="ticker">KXDPWORLDTOUR-DPWTC26-JCAM</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">211,586</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>DP World Tour Championship Winner<br><span class="ticker">KXDPWORLDTOUR-DPWTC26</span></td>
+    <td>Martin Couvra<br><span class="ticker">KXDPWORLDTOUR-DPWTC26-MCOU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">93,347</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>DP World Tour Championship Winner<br><span class="ticker">KXDPWORLDTOUR-DPWTC26</span></td>
+    <td>Gregorio De Leo<br><span class="ticker">KXDPWORLDTOUR-DPWTC26-GDEL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">80,452</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>DP World Tour Championship Winner<br><span class="ticker">KXDPWORLDTOUR-DPWTC26</span></td>
+    <td>Joe Dean<br><span class="ticker">KXDPWORLDTOUR-DPWTC26-JDEA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">500,759</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>DP World Tour Championship Winner<br><span class="ticker">KXDPWORLDTOUR-DPWTC26</span></td>
+    <td>Hennie Du Plessis<br><span class="ticker">KXDPWORLDTOUR-DPWTC26-HDUP</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">367,275</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>DP World Tour Championship Winner<br><span class="ticker">KXDPWORLDTOUR-DPWTC26</span></td>
+    <td>Manuel Elvira<br><span class="ticker">KXDPWORLDTOUR-DPWTC26-MELV</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">232,509</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>DP World Tour Championship Winner<br><span class="ticker">KXDPWORLDTOUR-DPWTC26</span></td>
+    <td>Nacho Elvira<br><span class="ticker">KXDPWORLDTOUR-DPWTC26-NELV</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">478,189</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>DP World Tour Championship Winner<br><span class="ticker">KXDPWORLDTOUR-DPWTC26</span></td>
+    <td>Ewen Ferguson<br><span class="ticker">KXDPWORLDTOUR-DPWTC26-EFER</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">303,556</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Abu Dhabi Aldar Championship Winner<br><span class="ticker">KXDPWORLDTOUR-ABDAC26</span></td>
+    <td>Marcus Armitage<br><span class="ticker">KXDPWORLDTOUR-ABDAC26-MARM</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">254,507</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Abu Dhabi Aldar Championship Winner<br><span class="ticker">KXDPWORLDTOUR-ABDAC26</span></td>
+    <td>Angel Ayora<br><span class="ticker">KXDPWORLDTOUR-ABDAC26-AAYO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">48,756</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Abu Dhabi Aldar Championship Winner<br><span class="ticker">KXDPWORLDTOUR-ABDAC26</span></td>
+    <td>Sam Bairstow<br><span class="ticker">KXDPWORLDTOUR-ABDAC26-SBAI</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">335,899</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Abu Dhabi Aldar Championship Winner<br><span class="ticker">KXDPWORLDTOUR-ABDAC26</span></td>
+    <td>Dan Bradbury<br><span class="ticker">KXDPWORLDTOUR-ABDAC26-DBRA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">2,050</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Abu Dhabi Aldar Championship Winner<br><span class="ticker">KXDPWORLDTOUR-ABDAC26</span></td>
+    <td>Davis Bryant<br><span class="ticker">KXDPWORLDTOUR-ABDAC26-DBRY</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">132,966</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Abu Dhabi Aldar Championship Winner<br><span class="ticker">KXDPWORLDTOUR-ABDAC26</span></td>
+    <td>Jorge Campillo<br><span class="ticker">KXDPWORLDTOUR-ABDAC26-JCAM</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">57,648</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Abu Dhabi Aldar Championship Winner<br><span class="ticker">KXDPWORLDTOUR-ABDAC26</span></td>
+    <td>Filippo Celli<br><span class="ticker">KXDPWORLDTOUR-ABDAC26-FCEL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">338,246</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Abu Dhabi Aldar Championship Winner<br><span class="ticker">KXDPWORLDTOUR-ABDAC26</span></td>
+    <td>Ugo Coussaud<br><span class="ticker">KXDPWORLDTOUR-ABDAC26-UCOU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">188,700</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Abu Dhabi Aldar Championship Winner<br><span class="ticker">KXDPWORLDTOUR-ABDAC26</span></td>
+    <td>Martin Couvra<br><span class="ticker">KXDPWORLDTOUR-ABDAC26-MCOU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">148,564</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Abu Dhabi Aldar Championship Winner<br><span class="ticker">KXDPWORLDTOUR-ABDAC26</span></td>
+    <td>Gregorio De Leo<br><span class="ticker">KXDPWORLDTOUR-ABDAC26-GDEL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">2,621</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Abu Dhabi Aldar Championship Winner<br><span class="ticker">KXDPWORLDTOUR-ABDAC26</span></td>
+    <td>Joe Dean<br><span class="ticker">KXDPWORLDTOUR-ABDAC26-JDEA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">293,260</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Abu Dhabi Aldar Championship Winner<br><span class="ticker">KXDPWORLDTOUR-ABDAC26</span></td>
+    <td>Alejandro Del Rey<br><span class="ticker">KXDPWORLDTOUR-ABDAC26-ADEL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">348,875</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.europeantour.com/dpworld-tour/schedule/" target="_blank" rel="noopener">DP World Tour</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDPWORLDTOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The RSM Classic End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-THRC26</span></td>
+    <td>Ludvig Aberg<br><span class="ticker">KXPGAR1LEAD-THRC26-LABE</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The RSM Classic End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-THRC26</span></td>
+    <td>Zachary Bauchou<br><span class="ticker">KXPGAR1LEAD-THRC26-ZBAU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">9,188</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The RSM Classic End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-THRC26</span></td>
+    <td>Daniel Berger<br><span class="ticker">KXPGAR1LEAD-THRC26-DBER</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The RSM Classic End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-THRC26</span></td>
+    <td>Christiaan Bezuidenhout<br><span class="ticker">KXPGAR1LEAD-THRC26-CBEZ</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">8,451</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The RSM Classic End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-THRC26</span></td>
+    <td>Francisco Bide<br><span class="ticker">KXPGAR1LEAD-THRC26-FBID</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The RSM Classic End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-THRC26</span></td>
+    <td>Zac Blair<br><span class="ticker">KXPGAR1LEAD-THRC26-ZBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">6,997</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The RSM Classic End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-THRC26</span></td>
+    <td>Chandler Blanchet<br><span class="ticker">KXPGAR1LEAD-THRC26-CBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">8,075</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The RSM Classic End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-THRC26</span></td>
+    <td>Keegan Bradley<br><span class="ticker">KXPGAR1LEAD-THRC26-KBRA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">8,214</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The RSM Classic End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-THRC26</span></td>
+    <td>Michael Brennan<br><span class="ticker">KXPGAR1LEAD-THRC26-MBRE</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">8,408</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The RSM Classic End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-THRC26</span></td>
+    <td>Blades Brown<br><span class="ticker">KXPGAR1LEAD-THRC26-BBRO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">8,357</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The RSM Classic End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-THRC26</span></td>
+    <td>Rafael Campos<br><span class="ticker">KXPGAR1LEAD-THRC26-RCAM</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The RSM Classic End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-THRC26</span></td>
+    <td>Ricky Castillo<br><span class="ticker">KXPGAR1LEAD-THRC26-RCAS</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">8,398</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26</span></td>
+    <td>Zachary Bauchou<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26-ZBAU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">2,482</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26</span></td>
+    <td>Daniel Berger<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26-DBER</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">8,758</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26</span></td>
+    <td>Christiaan Bezuidenhout<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26-CBEZ</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">8,115</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26</span></td>
+    <td>Zac Blair<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26-ZBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">7,435</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26</span></td>
+    <td>Chandler Blanchet<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26-CBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">11,800</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26</span></td>
+    <td>Blades Brown<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26-BBRO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">8,599</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26</span></td>
+    <td>Rafael Campos<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26-RCAM</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">7,852</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26</span></td>
+    <td>Ricky Castillo<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26-RCAS</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">8,545</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26</span></td>
+    <td>Davis Chatfield<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26-DCHA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">8,350</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26</span></td>
+    <td>Luke Clanton<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26-LCLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">8,555</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26</span></td>
+    <td>Eric Cole<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26-ECOL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">12,683</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship presented by Compliance Solutions End of Round 1 Leader<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26</span></td>
+    <td>Pierceson Coody<br><span class="ticker">KXPGAR1LEAD-AUCPBCS26-PCOO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">12,919</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAR1LEAD&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 20 Finishers<br><span class="ticker">KXPGATOP20-AUCPBCS26</span></td>
+    <td>Zachary Bauchou<br><span class="ticker">KXPGATOP20-AUCPBCS26-ZBAU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 20 Finishers<br><span class="ticker">KXPGATOP20-AUCPBCS26</span></td>
+    <td>Daniel Berger<br><span class="ticker">KXPGATOP20-AUCPBCS26-DBER</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 20 Finishers<br><span class="ticker">KXPGATOP20-AUCPBCS26</span></td>
+    <td>Christiaan Bezuidenhout<br><span class="ticker">KXPGATOP20-AUCPBCS26-CBEZ</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 20 Finishers<br><span class="ticker">KXPGATOP20-AUCPBCS26</span></td>
+    <td>Zac Blair<br><span class="ticker">KXPGATOP20-AUCPBCS26-ZBLA</span></td>
+    <td><span class="badge good">yes</span></td>
+    <td class="num">$1.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 20 Finishers<br><span class="ticker">KXPGATOP20-AUCPBCS26</span></td>
+    <td>Chandler Blanchet<br><span class="ticker">KXPGATOP20-AUCPBCS26-CBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 20 Finishers<br><span class="ticker">KXPGATOP20-AUCPBCS26</span></td>
+    <td>Blades Brown<br><span class="ticker">KXPGATOP20-AUCPBCS26-BBRO</span></td>
+    <td><span class="badge good">yes</span></td>
+    <td class="num">$1.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 20 Finishers<br><span class="ticker">KXPGATOP20-AUCPBCS26</span></td>
+    <td>Rafael Campos<br><span class="ticker">KXPGATOP20-AUCPBCS26-RCAM</span></td>
+    <td><span class="badge good">yes</span></td>
+    <td class="num">$1.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 20 Finishers<br><span class="ticker">KXPGATOP20-AUCPBCS26</span></td>
+    <td>Ricky Castillo<br><span class="ticker">KXPGATOP20-AUCPBCS26-RCAS</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 20 Finishers<br><span class="ticker">KXPGATOP20-AUCPBCS26</span></td>
+    <td>Davis Chatfield<br><span class="ticker">KXPGATOP20-AUCPBCS26-DCHA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 20 Finishers<br><span class="ticker">KXPGATOP20-AUCPBCS26</span></td>
+    <td>Luke Clanton<br><span class="ticker">KXPGATOP20-AUCPBCS26-LCLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 20 Finishers<br><span class="ticker">KXPGATOP20-AUCPBCS26</span></td>
+    <td>Eric Cole<br><span class="ticker">KXPGATOP20-AUCPBCS26-ECOL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 20 Finishers<br><span class="ticker">KXPGATOP20-AUCPBCS26</span></td>
+    <td>Pierceson Coody<br><span class="ticker">KXPGATOP20-AUCPBCS26-PCOO</span></td>
+    <td><span class="badge good">yes</span></td>
+    <td class="num">$1.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 20 Finishers<br><span class="ticker">KXPGATOP20-WOWTC26</span></td>
+    <td>Zachary Bauchou<br><span class="ticker">KXPGATOP20-WOWTC26-ZBAU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">18</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 20 Finishers<br><span class="ticker">KXPGATOP20-WOWTC26</span></td>
+    <td>Christiaan Bezuidenhout<br><span class="ticker">KXPGATOP20-WOWTC26-CBEZ</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 20 Finishers<br><span class="ticker">KXPGATOP20-WOWTC26</span></td>
+    <td>Zac Blair<br><span class="ticker">KXPGATOP20-WOWTC26-ZBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 20 Finishers<br><span class="ticker">KXPGATOP20-WOWTC26</span></td>
+    <td>Chandler Blanchet<br><span class="ticker">KXPGATOP20-WOWTC26-CBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 20 Finishers<br><span class="ticker">KXPGATOP20-WOWTC26</span></td>
+    <td>Blades Brown<br><span class="ticker">KXPGATOP20-WOWTC26-BBRO</span></td>
+    <td><span class="badge good">yes</span></td>
+    <td class="num">$1.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 20 Finishers<br><span class="ticker">KXPGATOP20-WOWTC26</span></td>
+    <td>Rafael Campos<br><span class="ticker">KXPGATOP20-WOWTC26-RCAM</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 20 Finishers<br><span class="ticker">KXPGATOP20-WOWTC26</span></td>
+    <td>Davis Chatfield<br><span class="ticker">KXPGATOP20-WOWTC26-DCHA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 20 Finishers<br><span class="ticker">KXPGATOP20-WOWTC26</span></td>
+    <td>Luke Clanton<br><span class="ticker">KXPGATOP20-WOWTC26-LCLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 20 Finishers<br><span class="ticker">KXPGATOP20-WOWTC26</span></td>
+    <td>Tyler Collet<br><span class="ticker">KXPGATOP20-WOWTC26-TCOL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 20 Finishers<br><span class="ticker">KXPGATOP20-WOWTC26</span></td>
+    <td>Pierceson Coody<br><span class="ticker">KXPGATOP20-WOWTC26-PCOO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 20 Finishers<br><span class="ticker">KXPGATOP20-WOWTC26</span></td>
+    <td>Trace Crowe<br><span class="ticker">KXPGATOP20-WOWTC26-TCRO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 20 Finishers<br><span class="ticker">KXPGATOP20-WOWTC26</span></td>
+    <td>Joel Dahmen<br><span class="ticker">KXPGATOP20-WOWTC26-JDAH</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP20&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The ANNIKA driven by Gainbridge at Pelican Winner<br><span class="ticker">KXLPGATOUR-THEADBGAP26</span></td>
+    <td>Na Rin An<br><span class="ticker">KXLPGATOUR-THEADBGAP26-NAAN</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The ANNIKA driven by Gainbridge at Pelican Winner<br><span class="ticker">KXLPGATOUR-THEADBGAP26</span></td>
+    <td>Natasha Andrea Oon<br><span class="ticker">KXLPGATOUR-THEADBGAP26-NATAND</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The ANNIKA driven by Gainbridge at Pelican Winner<br><span class="ticker">KXLPGATOUR-THEADBGAP26</span></td>
+    <td>Saki Baba<br><span class="ticker">KXLPGATOUR-THEADBGAP26-SAKBAB</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The ANNIKA driven by Gainbridge at Pelican Winner<br><span class="ticker">KXLPGATOUR-THEADBGAP26</span></td>
+    <td>Jenny Bae<br><span class="ticker">KXLPGATOUR-THEADBGAP26-JENBAE</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The ANNIKA driven by Gainbridge at Pelican Winner<br><span class="ticker">KXLPGATOUR-THEADBGAP26</span></td>
+    <td>Laetitia Beck<br><span class="ticker">KXLPGATOUR-THEADBGAP26-LAEBEC</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The ANNIKA driven by Gainbridge at Pelican Winner<br><span class="ticker">KXLPGATOUR-THEADBGAP26</span></td>
+    <td>Ana Belac<br><span class="ticker">KXLPGATOUR-THEADBGAP26-ANABEL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The ANNIKA driven by Gainbridge at Pelican Winner<br><span class="ticker">KXLPGATOUR-THEADBGAP26</span></td>
+    <td>Celine Boutier<br><span class="ticker">KXLPGATOUR-THEADBGAP26-CELBOU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The ANNIKA driven by Gainbridge at Pelican Winner<br><span class="ticker">KXLPGATOUR-THEADBGAP26</span></td>
+    <td>Nicole Broch Estrup<br><span class="ticker">KXLPGATOUR-THEADBGAP26-NICBRO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The ANNIKA driven by Gainbridge at Pelican Winner<br><span class="ticker">KXLPGATOUR-THEADBGAP26</span></td>
+    <td>Ashleigh Buhai<br><span class="ticker">KXLPGATOUR-THEADBGAP26-ASHBUH</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The ANNIKA driven by Gainbridge at Pelican Winner<br><span class="ticker">KXLPGATOUR-THEADBGAP26</span></td>
+    <td>Briana Chacon<br><span class="ticker">KXLPGATOUR-THEADBGAP26-BRICHA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The ANNIKA driven by Gainbridge at Pelican Winner<br><span class="ticker">KXLPGATOUR-THEADBGAP26</span></td>
+    <td>Hye-Jin Choi<br><span class="ticker">KXLPGATOUR-THEADBGAP26-HYECHO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">10,003</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>The ANNIKA driven by Gainbridge at Pelican Winner<br><span class="ticker">KXLPGATOUR-THEADBGAP26</span></td>
+    <td>Robyn Choi<br><span class="ticker">KXLPGATOUR-THEADBGAP26-ROBCHO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>TOTO Japan Classic Winner<br><span class="ticker">KXLPGATOUR-TOTJC26</span></td>
+    <td>Haruka Amamoto<br><span class="ticker">KXLPGATOUR-TOTJC26-HARAMA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>TOTO Japan Classic Winner<br><span class="ticker">KXLPGATOUR-TOTJC26</span></td>
+    <td>Pajaree Anannarukarn<br><span class="ticker">KXLPGATOUR-TOTJC26-PAJANA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>TOTO Japan Classic Winner<br><span class="ticker">KXLPGATOUR-TOTJC26</span></td>
+    <td>Serena Aoki<br><span class="ticker">KXLPGATOUR-TOTJC26-SERAOK</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>TOTO Japan Classic Winner<br><span class="ticker">KXLPGATOUR-TOTJC26</span></td>
+    <td>Yuna Araki<br><span class="ticker">KXLPGATOUR-TOTJC26-YUNARA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>TOTO Japan Classic Winner<br><span class="ticker">KXLPGATOUR-TOTJC26</span></td>
+    <td>Aditi Ashok<br><span class="ticker">KXLPGATOUR-TOTJC26-ADIASH</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>TOTO Japan Classic Winner<br><span class="ticker">KXLPGATOUR-TOTJC26</span></td>
+    <td>Robyn Choi<br><span class="ticker">KXLPGATOUR-TOTJC26-ROBCHO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>TOTO Japan Classic Winner<br><span class="ticker">KXLPGATOUR-TOTJC26</span></td>
+    <td>In Gee Chun<br><span class="ticker">KXLPGATOUR-TOTJC26-INGCHU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>TOTO Japan Classic Winner<br><span class="ticker">KXLPGATOUR-TOTJC26</span></td>
+    <td>Manon De Roey<br><span class="ticker">KXLPGATOUR-TOTJC26-MANDER</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>TOTO Japan Classic Winner<br><span class="ticker">KXLPGATOUR-TOTJC26</span></td>
+    <td>Perrine Delacour<br><span class="ticker">KXLPGATOUR-TOTJC26-PERDEL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>TOTO Japan Classic Winner<br><span class="ticker">KXLPGATOUR-TOTJC26</span></td>
+    <td>Lindy Duncan<br><span class="ticker">KXLPGATOUR-TOTJC26-LINDUN</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>TOTO Japan Classic Winner<br><span class="ticker">KXLPGATOUR-TOTJC26</span></td>
+    <td>Aina Fujimoto<br><span class="ticker">KXLPGATOUR-TOTJC26-AINFUJ</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>TOTO Japan Classic Winner<br><span class="ticker">KXLPGATOUR-TOTJC26</span></td>
+    <td>Ayaka Furue<br><span class="ticker">KXLPGATOUR-TOTJC26-AYAFUR</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com/" target="_blank" rel="noopener">Fox Sports</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXLPGATOUR&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 10 Finishers<br><span class="ticker">KXPGATOP10-AUCPBCS26</span></td>
+    <td>Zachary Bauchou<br><span class="ticker">KXPGATOP10-AUCPBCS26-ZBAU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 10 Finishers<br><span class="ticker">KXPGATOP10-AUCPBCS26</span></td>
+    <td>Daniel Berger<br><span class="ticker">KXPGATOP10-AUCPBCS26-DBER</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 10 Finishers<br><span class="ticker">KXPGATOP10-AUCPBCS26</span></td>
+    <td>Christiaan Bezuidenhout<br><span class="ticker">KXPGATOP10-AUCPBCS26-CBEZ</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 10 Finishers<br><span class="ticker">KXPGATOP10-AUCPBCS26</span></td>
+    <td>Zac Blair<br><span class="ticker">KXPGATOP10-AUCPBCS26-ZBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 10 Finishers<br><span class="ticker">KXPGATOP10-AUCPBCS26</span></td>
+    <td>Chandler Blanchet<br><span class="ticker">KXPGATOP10-AUCPBCS26-CBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 10 Finishers<br><span class="ticker">KXPGATOP10-AUCPBCS26</span></td>
+    <td>Blades Brown<br><span class="ticker">KXPGATOP10-AUCPBCS26-BBRO</span></td>
+    <td><span class="badge good">yes</span></td>
+    <td class="num">$1.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 10 Finishers<br><span class="ticker">KXPGATOP10-AUCPBCS26</span></td>
+    <td>Rafael Campos<br><span class="ticker">KXPGATOP10-AUCPBCS26-RCAM</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 10 Finishers<br><span class="ticker">KXPGATOP10-AUCPBCS26</span></td>
+    <td>Ricky Castillo<br><span class="ticker">KXPGATOP10-AUCPBCS26-RCAS</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 10 Finishers<br><span class="ticker">KXPGATOP10-AUCPBCS26</span></td>
+    <td>Davis Chatfield<br><span class="ticker">KXPGATOP10-AUCPBCS26-DCHA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 10 Finishers<br><span class="ticker">KXPGATOP10-AUCPBCS26</span></td>
+    <td>Luke Clanton<br><span class="ticker">KXPGATOP10-AUCPBCS26-LCLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 10 Finishers<br><span class="ticker">KXPGATOP10-AUCPBCS26</span></td>
+    <td>Eric Cole<br><span class="ticker">KXPGATOP10-AUCPBCS26-ECOL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Austin Championship Presented By Compliance Solutions: Top 10 Finishers<br><span class="ticker">KXPGATOP10-AUCPBCS26</span></td>
+    <td>Pierceson Coody<br><span class="ticker">KXPGATOP10-AUCPBCS26-PCOO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 10 Finishers<br><span class="ticker">KXPGATOP10-WOWTC26</span></td>
+    <td>Zachary Bauchou<br><span class="ticker">KXPGATOP10-WOWTC26-ZBAU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 10 Finishers<br><span class="ticker">KXPGATOP10-WOWTC26</span></td>
+    <td>Christiaan Bezuidenhout<br><span class="ticker">KXPGATOP10-WOWTC26-CBEZ</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 10 Finishers<br><span class="ticker">KXPGATOP10-WOWTC26</span></td>
+    <td>Zac Blair<br><span class="ticker">KXPGATOP10-WOWTC26-ZBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 10 Finishers<br><span class="ticker">KXPGATOP10-WOWTC26</span></td>
+    <td>Chandler Blanchet<br><span class="ticker">KXPGATOP10-WOWTC26-CBLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 10 Finishers<br><span class="ticker">KXPGATOP10-WOWTC26</span></td>
+    <td>Blades Brown<br><span class="ticker">KXPGATOP10-WOWTC26-BBRO</span></td>
+    <td><span class="badge good">yes</span></td>
+    <td class="num">$1.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 10 Finishers<br><span class="ticker">KXPGATOP10-WOWTC26</span></td>
+    <td>Rafael Campos<br><span class="ticker">KXPGATOP10-WOWTC26-RCAM</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 10 Finishers<br><span class="ticker">KXPGATOP10-WOWTC26</span></td>
+    <td>Davis Chatfield<br><span class="ticker">KXPGATOP10-WOWTC26-DCHA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 10 Finishers<br><span class="ticker">KXPGATOP10-WOWTC26</span></td>
+    <td>Luke Clanton<br><span class="ticker">KXPGATOP10-WOWTC26-LCLA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 10 Finishers<br><span class="ticker">KXPGATOP10-WOWTC26</span></td>
+    <td>Tyler Collet<br><span class="ticker">KXPGATOP10-WOWTC26-TCOL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 10 Finishers<br><span class="ticker">KXPGATOP10-WOWTC26</span></td>
+    <td>Pierceson Coody<br><span class="ticker">KXPGATOP10-WOWTC26-PCOO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 10 Finishers<br><span class="ticker">KXPGATOP10-WOWTC26</span></td>
+    <td>Trace Crowe<br><span class="ticker">KXPGATOP10-WOWTC26-TCRO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>World Wide Technology Championship: Top 10 Finishers<br><span class="ticker">KXPGATOP10-WOWTC26</span></td>
+    <td>Joel Dahmen<br><span class="ticker">KXPGATOP10-WOWTC26-JDAH</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">0</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOP10&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr></tbody></table></div>
 
-<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="../flagged.html">Flagged for review</a>.</footer>
-</main>
-</div>
-<script src="../assets/app.js" type="module"></script>
+  <h2>What a trader should do on this page</h2>
+  <div class="panel">
+    <ol>
+      <li>Open <a href="../dashboard.html">Dashboard</a> and watch the two chat panes for moves of at least $0.10.</li>
+      <li>Pick the market, open its <a href="../market.html">detail page</a> and read the chart, the order book and the settlement rules.</li>
+      <li>Check the ROI score and the liquidity before acting — the model is documented on <a href="../strategies.html">Strategies</a>.</li>
+      <li>Record the trade on the <a href="../portfolio.html">Portfolio</a> page; the auto-trader will also run the published strategies for you.</li>
+    </ol>
+  </div>
+</div></main>
+<footer class="site">
+  <div class="nav-inner">
+    <p><strong>KalshiDash1</strong> — a static dashboard for the official Kalshi <em>demo</em> exchange.
+    Demo only: mock funds, and demo prices may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
+    <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
+       WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
+       Snapshot captured 2026-11-20 14:09:32 UTC ·
+       <a href="../sources.html">Sources</a> ·
+       <a href="../flagged.html">Flagged for review</a> ·
+       <a href="../COORDINATION.md">Coordination board</a></p>
+    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
+    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+  </div></footer>
+<script src="../assets/app.js"></script>
 </body>
 </html>

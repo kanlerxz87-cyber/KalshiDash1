@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flagged for Review: repo review and verified facts · Kalshi Demo Dashboard</title>
+<meta name="description" content="Line-by-line check of the Kalshi facts this repository relies on, each against an official Kalshi page or the live demo API, plus repo irregularities. Unconfirmed items are flagged, not filled in.">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .vt{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0 16px}
+  .vt th,.vt td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid #dfe3ea}
+  .vt th{background:#eef1f6}
+  .tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:600;white-space:nowrap}
+  .verified{background:#e3f5ec;color:#0b7a4b}.partial{background:#fff3dc;color:#9a5b00}.unverified{background:#fde7e8;color:#a1262c}
+  .note{font-size:13px;color:#5b6475}
+</style>
+</head>
+<body data-page="audit">
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="../index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="../index.html" class="">Home</a><a href="../executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="../categories/gas.html" class="">Gas prices</a><a href="../categories/elections.html" class="">Elections</a><a href="../categories/culture.html" class="">Culture</a><a href="../categories/crypto.html" class="">Crypto</a><a href="../categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="../dashboard.html" class="">Live dashboard</a><a href="../portfolio.html" class="">Portfolio</a><a href="../archive/legacy-root/trading.html" class="">Trading</a><a href="../analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="../questions.html" class="">Questions & answers</a><a href="../suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="../sources.html" class="">Sources</a><a href="../audit/index.html" class="active">Repo review &amp; verified facts</a><a href="../flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="../docs/index.html" class="">Docs dashboard</a><a href="../docs/events.html" class="">Events & resolutions</a><a href="../docs/methodology.html" class="">Methodology</a><a href="../docs/flagged.html" class="">Docs flagged page</a></div></nav>
+<main class="content">
+
+<h1>Repo review, verified facts and Flagged for Review</h1>
+<p class="lead">Session <code>bf16f2dd</code> · branch <code>arena/bf16f2dd-kalshidash1</code> · checked 2026-11-20 (UTC). Not linked from the shared site navigation.</p>
+
+<div class="card">
+  <strong>How this was checked.</strong>
+  Each row names one fact the repository relies on. It was checked against an official Kalshi documentation page (docs.kalshi.com) or against the live Kalshi demo Trade API, using the fetch tool at the time shown. Where a value could not be confirmed, the row says so and is flagged. No value was inferred. Links go to the exact page or endpoint that was read.
+  <br><span class="note">The build sandbox cannot reach Kalshi hosts directly (outbound access is limited to GitHub, npm and PyPI), so live values were read with the fetch tool. Anyone can reproduce them with the links below.</span>
+</div>
+
+<h2>1. Live values captured on 2026-11-20</h2>
+<table>
+  <thead><tr><th>Item</th><th>Captured value</th><th>Source (official)</th></tr></thead>
+  <tbody>
+    <tr><td>Exchange status</td><td><code>exchange_active: true</code>, <code>trading_active: true</code> (all four exchange shards, indexes 0–3, report active)</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/exchange/status">Demo API · exchange/status</a></td></tr>
+    <tr><td>Settled gas example</td><td>Ticker <code>KXAAAGASM-26OCT31-2.50</code>: <code>result: "yes"</code>, <code>status: "finalized"</code>, <code>settlement_value_dollars: "1.0000"</code>, rules “according to AAA”</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&amp;status=settled&amp;with_nested_markets=true">Demo API · events (settled, KXAAAGASM)</a></td></tr>
+    <tr><td>Category tags</td><td>Categories returned include <code>Elections</code>, <code>Entertainment</code>, <code>Crypto</code>, <code>Sports</code> (tag <code>Golf</code>), <code>Commodities</code> (tag <code>Oil &amp; Gas</code>). No category named <code>Culture</code> or <code>Gas</code>.</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories">Demo API · search/tags_by_categories</a></td></tr>
+  </tbody>
+</table>
+
+<h2>2. Line-by-line verification</h2>
+<table>
+  <thead><tr><th>#</th><th>Fact checked</th><th>Official source</th><th>Result</th><th>Note</th></tr></thead>
+  <tbody>
+    <tr><td>V1</td><td>Recommended demo REST root is <code>https://external-api.demo.kalshi.co/trade-api/v2</code>; alternate <code>https://demo-api.kalshi.co/trade-api/v2</code></td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo environment</a></td><td><span class="tag verified">Verified</span></td><td>Read from the endpoint table on the page.</td></tr>
+    <tr><td>V2</td><td>Recommended demo WebSocket is <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code>; alternate <code>wss://demo-api.kalshi.co/trade-api/ws/v2</code></td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo environment</a></td><td><span class="tag verified">Verified</span></td><td>Same table as V1.</td></tr>
+    <tr><td>V3</td><td>The demo environment uses mock funds and its prices and behaviour may not match real markets</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo environment</a></td><td><span class="tag verified">Verified</span></td><td>Quoted by the site as a caveat (flag F-06 on the site).</td></tr>
+    <tr><td>V4</td><td>Resolved markets carry <code>result</code> = <code>yes</code>/<code>no</code> and <code>status</code> = <code>finalized</code></td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&amp;status=settled&amp;with_nested_markets=true">Demo API · settled events</a></td><td><span class="tag verified">Verified</span></td><td>Checked on one settled series (KXAAAGASM). Not checked for every series.</td></tr>
+    <tr><td>V5</td><td>Gas markets in this sample are settled by AAA</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&amp;status=settled&amp;with_nested_markets=true">Demo API · settled events</a></td><td><span class="tag partial">Partial</span></td><td>The sampled rules text says “according to AAA”. The mapping of every gas series to AAA is not verified (site flag F-05).</td></tr>
+    <tr><td>V6</td><td>Kalshi has categories Elections, Crypto, Entertainment and Sports; Golf is a tag under Sports</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories">Demo API · tags_by_categories</a></td><td><span class="tag verified">Verified</span></td><td>Read from the live response.</td></tr>
+    <tr><td>V7</td><td>“Culture” is not a Kalshi category; the site maps it to Entertainment (interpretation)</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories">Demo API · tags_by_categories</a></td><td><span class="tag verified">Verified</span></td><td>No <code>Culture</code> key in the response. The mapping itself is our interpretation (site flag F-04).</td></tr>
+    <tr><td>V8</td><td>The market object has no dollar-volume field; the site derives dollar figures and labels them</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets">Get Markets</a></td><td><span class="tag verified">Verified</span></td><td>Documented fields are contract counts (<code>volume_fp</code>, <code>open_interest_fp</code>) and prices. No dollar-volume field is listed.</td></tr>
+    <tr><td>V9</td><td><code>notional_value_dollars</code> is “a per-contract settlement value” ($1 for binary markets)</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets">Get Markets</a></td><td><span class="tag partial">Partial</span></td><td>Live binary markets show <code>"1.0000"</code>. The definition wording was not found on the page read, so the wording is unconfirmed.</td></tr>
+    <tr><td>V10</td><td>Candlestick <code>period_interval</code> is 1, 60 or 1440 minutes; the REST API has no sub-minute candles</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks">Get Market Candlesticks</a></td><td><span class="tag verified">Verified</span></td><td>The seconds view on the site is browser-recorded, as the site states (flag F-02).</td></tr>
+    <tr><td>V11</td><td>WebSocket connections require an API key</td><td><a href="https://docs.kalshi.com/websockets/websocket-connection">WebSocket connection</a></td><td><span class="tag verified">Verified</span></td><td>The page's security scheme says “API key authentication required for WebSocket connections”. Live price streaming therefore needs credentials.</td></tr>
+    <tr><td>V12</td><td>Balance endpoint: once per second on Basic and Advanced tiers, five per second on higher tiers</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits">Rate limits and tiers</a></td><td><span class="tag verified">Verified</span></td><td>Read from the balance-endpoint section.</td></tr>
+    <tr><td>V13</td><td>Numeric rate limit for unauthenticated public requests</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits">Rate limits and tiers</a></td><td><span class="tag unverified">Unverified</span></td><td>The page says public requests have separate limits and gives no number. Clients should back off on HTTP 429.</td></tr>
+    <tr><td>V14</td><td>Candlestick requests return at most 5,000 periods</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks">Get Market Candlesticks</a></td><td><span class="tag unverified">Unverified</span></td><td>The number appears in a repo file, but the parameter section was not read to that point. Not confirmed here.</td></tr>
+    <tr><td>V15</td><td>Live news or events that cause price jumps (requested in the brief)</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets">Get Markets</a>, <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks">Get Market Candlesticks</a></td><td><span class="tag unverified">Not in API</span></td><td>No news or cause field appears in the market, event or candlestick responses read. Any cause link would come from outside Kalshi and must be sourced separately.</td></tr>
+    <tr><td>V16</td><td>Portfolio, balance and order endpoints need a demo API key</td><td>Not re-read in this session</td><td><span class="tag unverified">Not re-checked</span></td><td>Carried over from the earlier sessions’ notes. Not re-verified here.</td></tr>
+  </tbody>
+</table>
+
+<h2>3. Repository irregularities</h2>
+<table>
+  <thead><tr><th>ID</th><th>Irregularity</th><th>Evidence</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>R-01</td><td>Generated Python bytecode (<code>tools/__pycache__/*.pyc</code>, 2 files) was tracked in git.</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/tree/main/tools/__pycache__">tools/__pycache__ on main</a></td><td><span class="tag verified">Fixed on this branch (R1)</span></td></tr>
+    <tr><td>R-02</td><td><code>.gitignore</code> had no Python cache patterns.</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/.gitignore">.gitignore on main</a></td><td><span class="tag verified">Fixed on this branch (R1)</span></td></tr>
+    <tr><td>R-03</td><td>The <code>docs/</code> section of the README says “No market data is committed anywhere in this repository”, but <code>dash/data/snapshot.json</code> (28 KB, orderbook and candlestick samples) is committed. The same README describes it as “the only market data committed”.</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/dash/data/snapshot.json">dash/data/snapshot.json</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/README.md">README.md</a></td><td><span class="tag unverified">Open · flagged for owner</span></td></tr>
+    <tr><td>R-04</td><td>Three overlapping site trees (root, <code>docs/</code>, <code>dash/</code>) plus <code>archive/</code> with the same topics and different claims.</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/tree/main/docs">docs/</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/tree/main/dash">dash/</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/tree/main/archive">archive/</a></td><td><span class="tag unverified">Open · claimed by 7d6d2fcb (I2)</span></td></tr>
+    <tr><td>R-05</td><td>Three link checkers exist (<code>scripts/check-links.mjs</code>, <code>scripts/check_links.js</code>, <code>tools/linkcheck.py</code>). They cover different trees, and the two JavaScript checkers overlap in name.</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/tree/main/scripts">scripts/</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/tools/linkcheck.py">tools/linkcheck.py</a></td><td><span class="tag unverified">Open · maintenance</span></td></tr>
+    <tr><td>R-06</td><td>The staleness gate in <code>pages.yml</code> compares only <code>*.html</code>, <code>assets</code> and <code>categories</code>. Changes under <code>docs/</code>, <code>dash/</code> and <code>archive/</code> are not regenerated or checked for staleness by it.</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/.github/workflows/pages.yml">.github/workflows/pages.yml</a></td><td><span class="tag unverified">Open</span></td></tr>
+    <tr><td>R-07</td><td>The notional-value definition is stated more firmly in the repo than the source page confirms (see V9).</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets">Get Markets</a></td><td><span class="tag unverified">Open · flagged</span></td></tr>
+    <tr><td>R-08</td><td>The coordination board’s old top section describes a branch that was already merged. Several earlier records mark files “done” that are not on their branch.</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/COORDINATION.md">COORDINATION.md</a></td><td><span class="tag unverified">Open · record only</span></td></tr>
+    <tr><td>R-09</td><td>On the root flagged page, F-16 appears before F-14 (numbering out of order).</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/flagged.html">flagged.html</a></td><td><span class="tag unverified">Open · cosmetic</span></td></tr>
+    <tr><td>R-10</td><td>Browser access (CORS) from the public site to the demo API has not been tested. The sandbox cannot reach Kalshi hosts directly.</td><td><a href="../flagged.html#F-01">Site flag F-01</a></td><td><span class="tag unverified">Open · needs a browser test</span></td></tr>
+  </tbody>
+</table>
+
+<h2>4. Blocked or not done in this session</h2>
+<div class="card">
+  <ul>
+    <li><strong>Portfolio, trades and automated trading:</strong> these need a demo API key and a signed request, which this session does not have. Creating credentials would require manual input, which the brief rules out. Nothing was simulated here.</li>
+    <li><strong>Live alerts and the two chat feeds:</strong> they need the WebSocket feed, which requires an API key (V11). They are claimed by other sessions on the board.</li>
+    <li><strong>Shared site index and navigation:</strong> not changed here. They belong to the final integration session.</li>
+  </ul>
+</div>
+
+<h2>5. Reproduce the checks</h2>
+<div class="card">
+  <p class="note">Run these from any machine with internet access. Each returns the JSON that the table cites.</p>
+  <ul>
+    <li><code>curl https://external-api.demo.kalshi.co/trade-api/v2/exchange/status</code></li>
+    <li><code>curl "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&amp;status=settled&amp;with_nested_markets=true"</code></li>
+    <li><code>curl https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories</code></li>
+  </ul>
+</div>
+
+<footer>
+  Not financial advice. Demo environment only; demo prices may not reflect real markets (<a href="https://docs.kalshi.com/getting_started/demo_env">source</a>). Flagged or unverified items are not blocking and are listed on <a href="../flagged.html">Flagged for review</a>.
+</footer>
+</main>
+</div>
+<script src="../assets/app.js" type="module"></script>
+</body>
+</html>

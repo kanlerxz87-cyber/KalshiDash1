@@ -22,7 +22,10 @@
     { id: 'momentum', label: 'Momentum', desc: 'Enter in the direction of recent price movement; exit on reversal or time stop.' },
     { id: 'mean-reversion', label: 'Mean reversion', desc: 'Fade extreme prices near 0 or 1 when liquidity is thin and the event is not resolved.' },
     { id: 'liquidity-provision', label: 'Liquidity provision', desc: 'Rest bids/asks inside the spread to earn the spread; inventory risk is the cost.' },
-    { id: 'event-catalyst', label: 'Event catalyst', desc: 'Position ahead of a scheduled data release or event (e.g. AAA gas price publish, election certification).' }
+    { id: 'event-catalyst', label: 'Event catalyst', desc: 'Position ahead of a scheduled data release or event (e.g. AAA gas price publish, election certification).' },
+    /* added additively by session arena-f89b55f7 — automated strategies driven by the ≥$0.10 swing engine on alerts.html */
+    { id: 'momentum-10c', label: 'Momentum ≥ $0.10 (auto)', desc: 'Automated (alerts.html): when a market the model likes (score ≥ 70) jumps ≥ $0.10 with an executable quote, enter on that side at the quote; exit at ±$0.10 or a 15-minute time stop. Simulated only.' },
+    { id: 'fade-jump', label: 'Fade ≥ $0.10 jump (auto)', desc: 'Automated (alerts.html): when a ≥ $0.10 jump hits a market the model does NOT like, take the opposite side at the current quote; exit at ±$0.10 or a 15-minute time stop. Simulated only.' }
   ];
 
   function seedTrades() {
@@ -129,7 +132,23 @@
         { id: 'S-08', title: 'Category mapping cleanup for "culture"', impact: 'low', effort: 'low', status: 'proposed',
           body: 'Kalshi\'s API category "Culture" currently lists only X-ban series; entertainment/culture-adjacent products live under "Entertainment" and "Mentions". A mapping table (documented on api.html) keeps the user-facing topic stable as Kalshi re-categorizes.',
           rationale: 'Verified live: /series?category=Culture returned 2 series; "Entertainment" and "Mentions" are separate categories.',
-          source: 'https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&limit=50' }
+          source: 'https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&limit=50' },
+        { id: 'S-09', title: 'Server-side swing scanner for stricter alert latency', impact: 'high', effort: 'medium', status: 'proposed',
+          body: 'Alerts currently poll trade-by-trade prices every 10 seconds (F-08). A scheduled scanner (cron) could stream GET /markets/trades per watched ticker, fire alerts on >= $0.10 moves and commit them as a JSON feed, removing the poll-latency gap and working even when the browser cannot reach the API.',
+          rationale: 'Verified in Get Trades docs: ticker/min_ts/max_ts filters exist; no server-side alerting exists in the Trade API.',
+          source: 'https://docs.kalshi.com/api-reference/market/get-trades' },
+        { id: 'S-10', title: 'Price-alert watchlist with sound / desktop notifications', impact: 'medium', effort: 'low', status: 'proposed',
+          body: 'Add per-market threshold alerts (any threshold, not just the global $0.10), with browser Notifications API and an optional sound cue, plus a watchlist page to pin markets from any topic.',
+          rationale: 'The alert engine and trade-price detection already exist; this layers user-defined thresholds on the same verified pipeline.',
+          source: 'https://docs.kalshi.com/api-reference/market/get-trades' },
+        { id: 'S-11', title: 'Catalyst timeline per market', impact: 'medium', effort: 'medium', status: 'proposed',
+          body: 'For each market, show a timeline of its settlement-source events (AAA gas price publishes, EIA releases, CF Benchmarks fixes, election certifications) near its close time, so a jump can be correlated with the likely catalyst automatically.',
+          rationale: 'Settlement sources are verified per series (series settlement_sources); event dates would be derived from the same official sources, never guessed.',
+          source: 'https://docs.kalshi.com/api-reference/market/get-series-list' },
+        { id: 'S-12', title: 'Backtest the strategies on historical candles', impact: 'high', effort: 'medium', status: 'proposed',
+          body: 'Run the five simulated strategies offline against verified 1m/60m/1440m candlesticks (up to 5,000 periods per request) to estimate strategy performance before deploying them on the live simulated engine.',
+          rationale: 'Candlestick schema and 5,000-period limit verified in Get Market Candlesticks doc; strategy definitions already mapped on analysis.html.',
+          source: 'https://docs.kalshi.com/api-reference/market/get-market-candlesticks' }
       ];
       setJSON('suggestions', s);
     }

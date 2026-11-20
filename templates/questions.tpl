@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Questions and gaps — KalshiDash1</title>
+<meta name="description" content="What is known, what is not, and how to find out — the open questions behind the Kalshi demo dashboard, with the official source for each answer.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="questions">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta">
+      <span id="mode-badge" class="badge warn">data: probing…</span>
+      <span id="clock" class="mono small muted"></span>
+    </div>
+  </div>
+  <nav class="site"><div class="nav-inner">{{NAV}}</div></nav>
+</header>
+
+<main><div class="wrap">
+  <div class="page-head">
+    <div class="grow">
+      <h1>Questions and gaps</h1>
+      <p class="sub">What this dashboard knows, what it deliberately does not know, and where to look for each answer.
+      Every "how to find out" line points at an official Kalshi source.</p>
+    </div>
+  </div>
+
+  <h2>Resolved questions</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:300px">Question</th><th>Answer</th><th style="width:240px">Source</th></tr></thead>
+      <tbody>
+        <tr><td>Which endpoints should the dashboard use?</td>
+          <td>REST <code>https://external-api.demo.kalshi.co/trade-api/v2</code> (recommended) or
+          <code>https://demo-api.kalshi.co/trade-api/v2</code>; WebSocket
+          <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> or <code>wss://demo-api.kalshi.co/trade-api/ws/v2</code>.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment</a> ·
+          <a href="https://docs.kalshi.com/getting_started/api_environments" target="_blank" rel="noopener">API environments</a></td></tr>
+        <tr><td>Can the dashboard read market data without an account?</td>
+          <td>Yes. Series, events, markets, order books and candlesticks are public endpoints that need no authentication.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Quick Start: Market Data</a></td></tr>
+        <tr><td>How does a market resolve, and how is a winner paid?</td>
+          <td><code>result</code> becomes <code>yes</code>, <code>no</code> or <code>scalar</code>. The winning side receives $1.00
+          per contract; only net positions are settled.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a> ·
+          <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a></td></tr>
+        <tr><td>How do I read my demo account?</td>
+          <td>Sign each request: <code>base64(sign(timestamp + METHOD + path))</code> with RSA-PSS/SHA-256 or Ed25519, and send
+          the <code>KALSHI-ACCESS-KEY</code>, <code>KALSHI-ACCESS-TIMESTAMP</code> and <code>KALSHI-ACCESS-SIGNATURE</code> headers.
+          The path excludes the query string.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">Quick Start: Authenticated Requests</a></td></tr>
+        <tr><td>How do I place an order?</td>
+          <td><code>POST /portfolio/events/orders</code> with <code>ticker</code>, <code>side</code> (<code>bid</code> or
+          <code>ask</code>), <code>count</code>, <code>price</code> and the remaining order fields.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a></td></tr>
+        <tr><td>Why is there no live streaming feed?</td>
+          <td>The WebSocket endpoint requires API-key authentication during the handshake, even for public market-data channels.
+          The dashboard therefore polls REST, which is cached briefly by the exchange and can lag a few seconds.</td>
+          <td><a href="https://docs.kalshi.com/websockets/websocket-connection" target="_blank" rel="noopener">WebSocket Connection</a> ·
+          <a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Data freshness</a></td></tr>
+        <tr><td>Which series count as "gas prices"?</td>
+          <td>The AAA gasoline series (ticker prefix <code>KXAAAGAS</code>, or a title containing "gas price"). Each settles
+          against AAA. Crude-oil and coal series in the broader "Oil and energy" tag are excluded by that rule.</td>
+          <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">Live series query</a></td></tr>
+        <tr><td>Does Kalshi have a "Culture" category?</td>
+          <td>Yes, as a series category. <code>GET /series?category=Culture</code> returns series such as
+          "Will Grok be banned this year". The official tag taxonomy has no Culture entry, which is what caused an earlier page in
+          this repository to claim the category did not exist.</td>
+          <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&amp;include_volume=true" target="_blank" rel="noopener">Live series query</a> ·
+          <a href="https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories" target="_blank" rel="noopener">Live tag taxonomy</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Open questions</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:300px">Question</th><th>Why it matters</th><th style="width:300px">How to find out</th></tr></thead>
+      <tbody>
+        <tr><td>Can a browser call the demo API directly?</td>
+          <td>If the exchange does not send permissive CORS headers, every visitor sees the committed snapshot instead of live data.</td>
+          <td>Open the dashboard in a browser on a network that allows <code>external-api.demo.kalshi.co</code> and read the
+          data-mode badge in the header. The site reports <em>LIVE</em> or <em>SNAPSHOT</em> either way.</td></tr>
+        <tr><td>What does a real demo order cost in fees?</td>
+          <td>It changes the expected value of every strategy, so the simulator's P&amp;L is currently an upper bound.</td>
+          <td>Read the fee schedule for your account and the <code>fee_type</code> on the series
+          (<a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a>),
+          then compare one settled paper trade with the matching fill in your demo account.</td></tr>
+        <tr><td>Which market actually caused a swing?</td>
+          <td>The API has no news feed, so the dashboard can only show the official settlement source as a candidate.</td>
+          <td>Open the Kalshi market page for the contract and read the linked settlement source for the underlying at the time of
+          the move, then check the trade tape.</td></tr>
+        <tr><td>How long do settled markets stay queryable?</td>
+          <td>Older resolutions drop out of the public endpoints, which shortens the back-testable history.</td>
+          <td>Use <code>GET /historical/markets</code> and the historical candlestick route described in
+          <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>.</td></tr>
+        <tr><td>Does the demo exchange have a real order book for the busiest contracts?</td>
+          <td>Empty books make the liquidity view and the depth term of the ROI score unusable for those rows.</td>
+          <td>Call <code>GET /markets/{ticker}/orderbook?depth=20</code> for the contract and look at
+          <code>orderbook_fp.yes_dollars</code> and <code>orderbook_fp.no_dollars</code>.</td></tr>
+        <tr><td>How often can the dashboard poll without hitting a limit?</td>
+          <td>Polling too fast is throttled; the answer determines the right refresh interval for the alert feed.</td>
+          <td>Read the token-bucket rules in
+          <a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate Limits and Tiers</a> and
+          watch the <code>X-RateLimit-*</code> response headers.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Known gaps in this build</h2>
+  <div class="panel">
+    <ul>
+      <li>No demo API key is stored, so no real order has been placed and the signed-request path is unverified against the exchange.</li>
+      <li>Sub-minute price history only exists while a page is open — the REST candle period is 1, 60 or 1440 minutes.</li>
+      <li>The ROI score, the strategies and the swing alerts are this project's own heuristics; each formula is published so it can be
+      checked or replaced.</li>
+      <li>Only the five requested topics are covered; the demo exchange lists many more categories.</li>
+    </ul>
+    <p class="small muted">Full list with sources: <a href="flagged.html">Flagged for Review</a>.</p>
+  </div>
+</div></main>
+
+<footer class="site">{{FOOTER}}</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>

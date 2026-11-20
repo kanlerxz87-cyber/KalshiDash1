@@ -1,66 +1,160 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Live dashboard · Kalshi Demo Dashboard</title>
-<meta name="description" content="Live price chart (seconds, minutes, hours, days) and order-book liquidity for a Kalshi demo market.">
+<title>Live dashboard — KalshiDash1</title>
+<meta name="description" content="Two real-time scrolling chats for Kalshi demo markets: every move of at least $0.10, and only the moves the published ROI model likes. With live movers, ROI ranking and liquidity.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body data-page="dashboard">
-<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
-<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
-<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
-<div class="layout">
-<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="active">Live dashboard</a><a href="alerts/index.html" class="">Live alerts (2 chats)</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="docs/index.html" class="">Docs dashboard</a><a href="docs/events.html" class="">Events & resolutions</a><a href="docs/methodology.html" class="">Methodology</a><a href="docs/flagged.html" class="">Docs flagged page</a></div></nav>
-<main class="content">
-
-<h1>Live market dashboard</h1>
-<p class="lead">Price over time for one market. X axis = time, Y axis = last traded YES price (dollars). Liquidity = resting orders by price from the order book.</p>
-<div class="controls">
-  <label>Market <select id="market-select"><option value="">Choose from a category page…</option></select></label>
-  <label>Granularity <select id="gran">
-    <option value="sec">Seconds (live, recorded here)</option>
-    <option value="min" selected>Minutes (1-min candles)</option>
-    <option value="hour">Hours (1-hour candles)</option>
-    <option value="day">Days (1-day candles)</option>
-  </select></label>
-  <label>Range <select id="range"></select></label>
-  <button id="refresh" class="btn">Refresh now</button>
-</div>
-<p class="muted" id="m-status">Loading…</p>
-
-<div class="cards" id="m-cards">
-  <div class="card"><div class="k">Last price (YES)</div><div class="v" id="c-last">—</div></div>
-  <div class="card"><div class="k">Best YES bid</div><div class="v" id="c-bid">—</div></div>
-  <div class="card"><div class="k">Best YES ask</div><div class="v" id="c-ask">—</div></div>
-  <div class="card"><div class="k">Open interest (contracts)</div><div class="v" id="c-oi">—</div></div>
-  <div class="card"><div class="k">Status</div><div class="v" id="c-status">—</div></div>
-</div>
-
-<div class="chart-wrap"><svg id="chart" viewBox="0 0 900 360" role="img" aria-label="Price chart"></svg></div>
-<p class="muted small" id="chart-note"></p>
-
-<div class="two-col">
-  <div>
-    <h2>Liquidity: resting YES bids</h2>
-    <p class="muted small">Buy orders for YES. Contracts = quantity resting at that price (highest first).</p>
-    <div id="bids-table"></div>
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta">
+      <span id="mode-badge" class="badge warn">data: probing…</span>
+      <span id="clock" class="mono small muted"></span>
+    </div>
   </div>
-  <div>
-    <h2>Liquidity: implied YES asks</h2>
-    <p class="muted small">Derived: a NO bid at P is a YES ask at 1 − P (per the order book reference). Lowest first.</p>
-    <div id="asks-table"></div>
+  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">More</span><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="catalyst.html">Swing catalysts</a><a href="strategylab.html">Strategy lab</a><a href="alerts/index.html">Live alerts (engine, 2 chats)</a><a href="dash/alerts.html">Alert feeds (dash suite)</a><a href="dash/autotrade.html">Auto-trade engine (dash suite)</a></div></nav>
+</header>
+
+<main><div class="wrap">
+  <div class="page-head">
+    <div class="grow">
+      <h1>Live alert dashboard</h1>
+      <p class="sub">Two scrolling chats. The left pane posts <strong>every</strong> tracked contract that moves at least
+      <strong>$0.10</strong> in either direction, with the official sources that decide the outcome.
+      The right pane posts only the moves the <a href="strategies.html">ROI model</a> likes.
+      Resolution announcements are posted in both panes the moment a market is determined yes or no.</p>
+    </div>
+    <div class="btnrow">
+      <button class="btn" id="pause-btn">Pause feed</button>
+      <a class="btn" href="markets.html">All markets</a>
+    </div>
   </div>
-</div>
 
-<h2>Market rules &amp; sources</h2>
-<div id="m-rules" class="rules"></div>
-<p class="muted small">Sources: <a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a> · <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Orderbook">Get Market Orderbook ↗</a> · <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Candlesticks">Get Market Candlesticks ↗</a>. Seconds granularity is recorded in this browser only (no API history at seconds resolution). See <a class="flag" href="flagged.html#F-02">F-02</a>.</p>
+  <div id="mode-notice" class="notice">Probing the official demo API…</div>
 
-<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
-</main>
-</div>
-<script src="assets/app.js" type="module"></script>
+  <div class="toolbar">
+    <div class="group">
+      <label for="threshold-input">Swing threshold ($)</label>
+      <input type="number" id="threshold-input" min="0.01" max="0.50" step="0.01" style="width:90px">
+    </div>
+    <div class="group">
+      <label for="roi-input">ROI filter (≥)</label>
+      <input type="number" id="roi-input" min="0" max="100" step="1" style="width:80px">
+    </div>
+    <div class="group">
+      <label for="dir-filter">Direction</label>
+      <select id="dir-filter" style="width:130px">
+        <option value="all">Both directions</option>
+        <option value="up">Up only (▲)</option>
+        <option value="down">Down only (▼)</option>
+      </select>
+    </div>
+    <div class="group" id="topic-chips"></div>
+    <div class="group">
+      <a class="btn small" href="api.html">How the feed works</a>
+    </div>
+  </div>
+
+  <div class="chat-shell">
+    <div class="chat" id="chat-all">
+      <header>
+        <h3>All events</h3>
+        <span class="badge neutral">every move ≥ threshold</span>
+        <span class="count">0 messages</span>
+      </header>
+      <div class="log"></div>
+    </div>
+    <div class="chat" id="chat-roi">
+      <header>
+        <h3>High-ROI filter</h3>
+        <span class="badge accent">model-ranked</span>
+        <span class="count">0 messages</span>
+      </header>
+      <div class="log"></div>
+    </div>
+  </div>
+
+  <h2>Highest-dollar live markets</h2>
+  <p class="sub">The tracked universe, ranked by 24-hour dollar volume. Click a row's market to open the detail page.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Market</th><th>Topic</th><th class="num">Last</th><th class="num">Bid / Ask</th><th class="num">Spread</th><th class="num">24h vol ($)</th><th class="num">Total vol ($)</th><th class="num">Open int ($)</th><th class="num">ROI</th><th>Status</th><th>Result</th><th>Source</th></tr></thead>
+      <tbody id="movers"></tbody>
+    </table>
+  </div>
+
+  <h2>ROI ranking</h2>
+  <p class="sub">The score used by the right-hand chat. Every component is computed from fields the Kalshi API returns and the
+  weights are published on <a href="strategies.html">Strategies</a>. It is a heuristic ranking aid, not a recommendation.</p>
+  <div class="table-wrap">
+    <table class="compact">
+      <thead><tr><th>Market</th><th>Topic</th><th class="num">Score</th><th class="num">Liquidity</th><th class="num">Depth</th><th class="num">Tightness</th><th class="num">Volume</th><th class="num">Volatility</th><th class="num">Spread</th><th class="num">Contracts at touch</th></tr></thead>
+      <tbody id="roi-table"></tbody>
+    </table>
+  </div>
+
+  <h2>What the two panes contain</h2>
+  <div class="grid cols-2">
+    <div class="panel">
+      <h3>Left pane — all events</h3>
+      <p>Every tracked contract whose reference price (last traded price, or the mid of the touch when there is no trade)
+      moves by at least the threshold in one poll. Each message carries the time, the topic, the direction, the old and new
+      price, the ROI score and links to:</p>
+      <ul>
+        <li>the Kalshi market page for that contract;</li>
+        <li>the <strong>official settlement source</strong> the exchange itself names for the event — for example
+        <a href="https://gasprices.aaa.com/" target="_blank" rel="noopener">AAA</a> for the gas series, the Texas Secretary of State
+        for election series, as named in each series record (the Texas Secretary of State is the example the registry cites);</li>
+        <li>the exact API endpoint the row was read from.</li>
+      </ul>
+      <p class="small muted">The Kalshi API publishes no news feed, so a link is a <em>candidate</em> source for the move, not a
+      proven cause. That limitation is listed on the <a href="flagged.html">Flagged for Review</a> page.</p>
+    </div>
+    <div class="panel">
+      <h3>Right pane — high ROI only</h3>
+      <p>The same messages, filtered to the contracts whose ROI score clears the filter shown in the toolbar. The score
+      rewards liquidity at the touch, depth in the book, a tight spread, real 24-hour volume and enough recent movement to be
+      worth acting on. Set the filter to 0 to see every message the left pane shows.</p>
+      <p class="small muted">Scoring is fully deterministic and published on <a href="strategies.html">Strategies</a>, so a
+      reader can recompute any score from the same public fields.</p>
+    </div>
+  </div>
+
+  <h2>How the feed gets its data</h2>
+  <div class="panel">
+    <ul>
+      <li>Discovery: <code>GET /series?category=…&amp;tags=…&amp;include_volume=true</code> for each topic, then
+      <code>GET /markets?series_ticker=…&amp;status=open</code>.</li>
+      <li>Refresh: <code>GET /markets?tickers=…</code> in batches of 40 tickers, every few seconds.</li>
+      <li>Detail: <code>GET /markets/{ticker}/orderbook?depth=20</code> for the liquidity ladder.</li>
+      <li>The WebSocket feed is <strong>not</strong> used: the official
+      <a href="https://docs.kalshi.com/websockets/websocket-connection" target="_blank" rel="noopener">WebSocket connection</a>
+      requires API-key authentication even for public channels, so a keyless static site polls REST.
+      REST responses are cached server-side for a few seconds, so a quote can lag the exchange slightly.</li>
+    </ul>
+    <p class="small muted">Source: <a href="sources.html">Sources</a> · <a href="api.html">API reference</a></p>
+  </div>
+</div></main>
+
+<footer class="site">
+  <div class="nav-inner">
+    <p><strong>KalshiDash1</strong> — a static dashboard for the official Kalshi <em>demo</em> exchange.
+    Demo only: mock funds, and demo prices may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
+    <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
+       WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
+       Snapshot captured 2026-11-20 14:09:32 UTC ·
+       <a href="sources.html">Sources</a> ·
+       <a href="flagged.html">Flagged for review</a> ·
+       <a href="COORDINATION.md">Coordination board</a></p>
+    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
+    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+  </div></footer>
+<script src="assets/app.js"></script>
+<script src="assets/chart.js"></script>
 </body>
 </html>

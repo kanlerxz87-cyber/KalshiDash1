@@ -1,49 +1,1499 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Elections · Kalshi Demo Dashboard</title>
-<meta name="description" content="Elections markets on the Kalshi demo: open markets ranked by open-interest dollars, and recently resolved YES/NO outcomes.">
+<title>Elections — KalshiDash1</title>
+<meta name="description" content="Kalshi demo Elections markets: series, highest-dollar open markets, order-book liquidity and resolved events, each row linked to its official source.">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
-<body data-page="topic" data-topic="elections">
-<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
-<a class="brand" href="../index.html">Kalshi Demo Dashboard</a>
-<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
-<div class="layout">
-<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="../index.html" class="">Home</a><a href="../executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="../categories/gas.html" class="">Gas prices</a><a href="../categories/elections.html" class="active">Elections</a><a href="../categories/culture.html" class="">Culture</a><a href="../categories/crypto.html" class="">Crypto</a><a href="../categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="../dashboard.html" class="">Live dashboard</a><a href="../alerts/index.html" class="">Live alerts (2 chats)</a><a href="../portfolio.html" class="">Portfolio</a><a href="../trading.html" class="">Trading</a><a href="../analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="../questions.html" class="">Questions & answers</a><a href="../suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="../sources.html" class="">Sources</a><a href="../flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="../docs/index.html" class="">Docs dashboard</a><a href="../docs/events.html" class="">Events & resolutions</a><a href="../docs/methodology.html" class="">Methodology</a><a href="../docs/flagged.html" class="">Docs flagged page</a></div></nav>
-<main class="content">
+<body data-page="category" data-topic="elections">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta"><span id="mode-badge" class="badge warn">data: probing…</span><span id="clock" class="mono small muted"></span></div>
+  </div>
+  <nav class="site"><div class="nav-inner"><a href="../index.html">Home</a><a href="../dashboard.html">Dashboard</a><a href="../markets.html">Markets</a><a href="../portfolio.html">Portfolio</a><a href="../analysis.html">Analysis</a><a href="../strategies.html">Strategies</a><a href="../sources.html">Sources</a><a href="../flagged.html">Flagged for review</a><span class="nav-sep">Topics</span><a href="../categories/gas.html">Gas Prices</a><a href="../categories/elections.html">Elections</a><a href="../categories/culture.html">Culture</a><a href="../categories/crypto.html">Crypto</a><a href="../categories/golf.html">Golf</a><span class="nav-sep">More</span><a href="../questions.html">Questions</a><a href="../suggestions.html">Suggestions</a><a href="../api.html">API reference</a><a href="../demo-account.html">Demo account</a><a href="../catalyst.html">Swing catalysts</a><a href="../strategylab.html">Strategy lab</a><a href="../alerts/index.html">Live alerts (engine, 2 chats)</a><a href="../dash/alerts.html">Alert feeds (dash suite)</a><a href="../dash/autotrade.html">Auto-trade engine (dash suite)</a></div></nav>
+</header>
+<main><div class="wrap">
+  <div class="page-head">
+    <div class="grow">
+      <h1><span class="tag elections">Elections</span> Elections markets</h1>
+      <p class="sub">Every event in this topic stays on one page: the series that define it, the open markets ranked by
+      dollar volume, the liquidity sitting at the touch, and the events that have already resolved yes or no.
+      Live values replace the captured table as soon as your browser can reach the demo API.</p>
+    </div>
+  </div>
+  <div id="mode-notice" class="notice">Probing the official demo API…</div>
 
-<h1>Elections</h1>
-<p class="lead">Series in Kalshi's <code>Elections</code> category (US and international races, primaries, nominations and related combos).</p>
-<div class="cards" id="topic-cards">
-  <div class="card"><div class="k">Series in scope</div><div class="v" id="t-series">…</div><div class="s">Top 8 by series volume (contracts)</div></div>
-  <div class="card"><div class="k">Open markets (loaded)</div><div class="v" id="t-open">…</div><div class="s">From up to 2 pages of open events per series</div></div>
-  <div class="card"><div class="k">Open interest, $ (derived)</div><div class="v" id="t-oi">…</div><div class="s">Σ open interest × $1 notional per contract</div></div>
-  <div class="card"><div class="k">Resolved, last 14 days</div><div class="v" id="t-res">…</div><div class="s">Markets with result yes / no</div></div>
-</div>
-<p class="muted" id="t-status">Loading live data from the Kalshi demo API…</p>
+  <h2>Selection rule</h2>
+  <div class="panel"><p>Category query only: every series whose categories list contains &quot;Elections&quot; is in this topic.</p>
+  <p class="small muted">Series query used for this topic:
+  <a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener" class="srcline">https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true</a></p></div>
 
-<h2>Open markets: ranked by open-interest $ (derived)</h2>
-<p class="muted">Ranking field is derived (see <a class="flag" href="../flagged.html#F-03">F-03</a>). Click a ticker to open the live chart and order book. Prices are dollars per $1 contract.</p>
-<input class="filter" id="open-filter" placeholder="Filter rows (title, ticker, series)…" aria-label="Filter open markets">
-<div id="open-table"></div>
+  <h2>Series in this topic</h2>
+  <div class="table-wrap"><table class="compact"><thead><tr>
+    <th>Series ticker</th><th>Title</th><th>Category</th><th>Official tags</th><th class="num">Volume (contracts)</th>
+    <th>Official settlement source(s)</th><th>Source</th></tr></thead>
+    <tbody id="series-body"><tr>
+    <td><code>KXPRESNOMD</code></td>
+    <td>Democratic Primary winner</td>
+    <td>Elections</td>
+    <td>2028, US Elections</td>
+    <td class="num">7,982,721,590</td>
+    <td><a href="https://gop.com/" target="_blank" rel="noopener">Republican Party</a>, <a href="https://democrats.org/" target="_blank" rel="noopener">Democratic Party</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPRESPERSON</code></td>
+    <td>Pres person</td>
+    <td>Elections</td>
+    <td>2028, US Elections</td>
+    <td class="num">1,442,407,129</td>
+    <td><a href="https://www.whitehouse.gov/administration/executive-office-of-the-president/" target="_blank" rel="noopener">Office of the Presidency</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPRESNOMR</code></td>
+    <td>Republican Primary winner</td>
+    <td>Elections</td>
+    <td>2028, US Elections</td>
+    <td class="num">1,026,905,184</td>
+    <td><a href="https://gop.com/" target="_blank" rel="noopener">Republican Party</a>, <a href="https://democrats.org/" target="_blank" rel="noopener">Democratic Party</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXGOVCA</code></td>
+    <td>California Governor&#39;s race</td>
+    <td>Elections</td>
+    <td>US Elections, Governor</td>
+    <td class="num">571,993,582</td>
+    <td><a href="https://abcnews.go.com/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.bloomberg.com/news" target="_blank" rel="noopener">Bloomberg News</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.nbcnews.com/" target="_blank" rel="noopener">NBC</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXGOVCAPRIMARY</code></td>
+    <td>CA primary</td>
+    <td>Elections</td>
+    <td>Primaries</td>
+    <td class="num">370,787,041</td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXGOVAK</code></td>
+    <td>Alaska governor</td>
+    <td>Elections</td>
+    <td>US Elections, Governor</td>
+    <td class="num">326,117,531</td>
+    <td><a href="https://abcnews.go.com/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.bloomberg.com/news" target="_blank" rel="noopener">Bloomberg News</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.nbcnews.com/" target="_blank" rel="noopener">NBC</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXMAYORLA</code></td>
+    <td>Los Angeles Mayor winner?</td>
+    <td>Elections</td>
+    <td>US Elections, Other US Elections</td>
+    <td class="num">198,718,967</td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXCAGOVPRIMARYTOP3</code></td>
+    <td>CA Gov: Top 3</td>
+    <td>Elections</td>
+    <td>Primaries</td>
+    <td class="num">198,536,843</td>
+    <td><a href="https://www.bls.gov/news.release/empsit.nr0.htm" target="_blank" rel="noopener">Bureau of Labor Statistics</a>, <a href="https://www.bls.gov/cpi/" target="_blank" rel="noopener">Bureau of Labor Statistics</a>, <a href="https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm" target="_blank" rel="noopener">Federal Reserve Board of Governors</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXCAGOVPRIMARY1ST</code></td>
+    <td>Who will finish first in the California Governor primary?</td>
+    <td>Elections</td>
+    <td>Primaries, US Elections</td>
+    <td class="num">161,230,942</td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">official election authority responsible for certifying results in geography</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPRIMARYMOV</code></td>
+    <td>Primary margins of victory</td>
+    <td>Elections</td>
+    <td>Primaries</td>
+    <td class="num">106,783,169</td>
+    <td><a href="https://www.nass.org/can-I-vote" target="_blank" rel="noopener">official election authority responsible for certifying results in </a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXMOVVAREDISTRICT</code></td>
+    <td>Virginia redistricting referendum margin of victory?</td>
+    <td>Elections</td>
+    <td>US Elections</td>
+    <td class="num">106,636,548</td>
+    <td><a href="https://www.nass.org/can-I-vote" target="_blank" rel="noopener">official election authority responsible for certifying results in </a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXVOTEPRIMARY</code></td>
+    <td>Vote percentages in primaries</td>
+    <td>Elections</td>
+    <td>Primaries</td>
+    <td class="num">88,890,009</td>
+    <td><a href="https://www.vote.gov/" target="_blank" rel="noopener">official state or local election division websites</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXGOVFLNOMR</code></td>
+    <td>Florida Governor Republican nominee</td>
+    <td>Elections</td>
+    <td>Primaries</td>
+    <td class="num">81,388,918</td>
+    <td><a href="https://gop.com/" target="_blank" rel="noopener">Republican Party</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXBALANCEPOWERCOMBO</code></td>
+    <td>Congress balance of power combo</td>
+    <td>Elections</td>
+    <td>Senate, House, Mixed Combos, US Elections, Election Combos</td>
+    <td class="num">67,364,712</td>
+    <td><a href="https://www.bls.gov/news.release/empsit.nr0.htm" target="_blank" rel="noopener">Bureau of Labor Statistics</a>, <a href="https://www.bls.gov/cpi/" target="_blank" rel="noopener">Bureau of Labor Statistics</a>, <a href="https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm" target="_blank" rel="noopener">Federal Reserve Board of Governors</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXBRPRES</code></td>
+    <td>Brazil Presidency</td>
+    <td>Elections</td>
+    <td>International elections, Brazil</td>
+    <td class="num">62,854,604</td>
+    <td><a href="https://apnews.com/" target="_blank" rel="noopener">AP</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXSCRSENS</code></td>
+    <td>South Carolina Special Republican primary</td>
+    <td>Elections</td>
+    <td>Primaries</td>
+    <td class="num">43,867,323</td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXNEXTIRANLEADER</code></td>
+    <td>Who will be Khamenei&#39;s successor?</td>
+    <td>Elections</td>
+    <td>Iran</td>
+    <td class="num">34,872,882</td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>CONTROLH</code></td>
+    <td>House winner</td>
+    <td>Elections</td>
+    <td>US Elections</td>
+    <td class="num">34,023,614</td>
+    <td><a href="https://www.congress.gov/" target="_blank" rel="noopener">Library of Congress</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXPERUPRES</code></td>
+    <td>Peru Presidency</td>
+    <td>Elections</td>
+    <td>International elections, Peru</td>
+    <td class="num">31,621,660</td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">the official electoral commission, constitutional court, or equivalent electoral authority of the relevant jurisdiction</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXSENATEMID</code></td>
+    <td>MID</td>
+    <td>Elections</td>
+    <td>Primaries</td>
+    <td class="num">31,461,890</td>
+    <td><a href="https://gop.com/" target="_blank" rel="noopener">Republican Party</a>, <a href="https://democrats.org/" target="_blank" rel="noopener">Democratic Party</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXSENATEMED</code></td>
+    <td>MED</td>
+    <td>Elections</td>
+    <td>Primaries</td>
+    <td class="num">30,729,546</td>
+    <td><a href="https://gop.com/" target="_blank" rel="noopener">Republican Party</a>, <a href="https://democrats.org/" target="_blank" rel="noopener">Democratic Party</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXGOVWINOMD</code></td>
+    <td>Gov WI Nom D</td>
+    <td>Elections</td>
+    <td>Primaries</td>
+    <td class="num">25,153,271</td>
+    <td><a href="https://gop.com/" target="_blank" rel="noopener">Republican Party</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>RSENATESEATS</code></td>
+    <td>Republican senate seats</td>
+    <td>Elections</td>
+    <td>Senate, Senate Combos, Election Combos</td>
+    <td class="num">24,403,052</td>
+    <td><a href="https://www.congress.gov/" target="_blank" rel="noopener">United States Congress</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXKHAMENEIOUT</code></td>
+    <td>Ali Khamenei out?</td>
+    <td>Elections</td>
+    <td>Iran</td>
+    <td class="num">20,986,607</td>
+    <td><a href="https://abcnews.go.com/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.bloomberg.com/news" target="_blank" rel="noopener">Bloomberg News</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.nbcnews.com/" target="_blank" rel="noopener">NBC</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>SENATETX</code></td>
+    <td>Texas Senate race</td>
+    <td>Elections</td>
+    <td>Senate</td>
+    <td class="num">19,962,417</td>
+    <td><a href="https://www.congress.gov/" target="_blank" rel="noopener">United States Congress</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXLEADERSOUT</code></td>
+    <td>World leaders out this year?</td>
+    <td>Elections</td>
+    <td>International</td>
+    <td class="num">18,650,515</td>
+    <td><a href="https://abcnews.go.com/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.bloomberg.com/news" target="_blank" rel="noopener">Bloomberg News</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.nbcnews.com/" target="_blank" rel="noopener">NBC</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.cnn.com" target="_blank" rel="noopener">CNN</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXCOLOMBIAPRES</code></td>
+    <td>Colombia presidency</td>
+    <td>Elections</td>
+    <td>International elections</td>
+    <td class="num">17,371,835</td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">the official electoral commission, constitutional court, or equivalent electoral authority of the relevant jurisdiction</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXSENATETXR</code></td>
+    <td>Texas Republican Senate nominee</td>
+    <td>Elections</td>
+    <td>Primaries</td>
+    <td class="num">14,005,162</td>
+    <td><a href="https://gop.com/" target="_blank" rel="noopener">Republican Party</a>, <a href="https://democrats.org/" target="_blank" rel="noopener">Democratic Party</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXDSENATESEATS</code></td>
+    <td>Democratic Senate seats</td>
+    <td>Elections</td>
+    <td>Senate, Senate Combos, Election Combos</td>
+    <td class="num">13,481,234</td>
+    <td><a href="https://www.congress.gov/" target="_blank" rel="noopener">United States Congress</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXTXRSENRUNOFFMOV</code></td>
+    <td>Texas Republican Senate Runoff: Margin of Victory</td>
+    <td>Elections</td>
+    <td>Primaries, US Elections</td>
+    <td class="num">11,528,033</td>
+    <td><a href="https://www.nass.org/can-I-vote" target="_blank" rel="noopener">official election authority responsible for certifying results in </a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr></tbody></table></div>
 
-<h2>Recently resolved (YES / NO)</h2>
-<p class="muted">Settled events closed in the last 14 days, from the API's <code>status=settled</code> list. A market's result is its <code>result</code> field.</p>
-<div id="settled-table"></div>
+  <h2>Open markets — highest dollar amount first</h2>
+  <p class="sub">Dollar volume = contracts traded x the contract's settlement value
+  (<code>notional_value_dollars</code>). Rows are sorted by 24h dollar volume. Live values replace this table in place.</p>
+  <div class="table-wrap"><table class="compact"><thead><tr><th>Market</th><th>Topic</th><th class="num">Last</th><th class="num">Bid / Ask</th>
+  <th class="num">Spread</th><th class="num">24h vol ($)</th><th class="num">Total vol ($)</th>
+  <th class="num">Open int ($)</th><th>Status</th><th>Result</th><th>Source</th></tr></thead><tbody id="market-body"><tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-AYAN">Will Andrew Yang be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-AYAN</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">174,541</td>
+      <td class="num">141,753,546</td>
+      <td class="num">47,102,417</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-LHOG">Will Larry Hogan be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-LHOG</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">173,647</td>
+      <td class="num">1,352,477</td>
+      <td class="num">563,521</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-ETRU">Will Eric Trump be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-ETRU</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">173,345</td>
+      <td class="num">42,527,732</td>
+      <td class="num">17,920,760</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-MPEN">Will Mike Pence be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-MPEN</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">173,225</td>
+      <td class="num">37,443,355</td>
+      <td class="num">20,990,982</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-MOBA">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-MOBA</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">173,061</td>
+      <td class="num">243,894</td>
+      <td class="num">236,270</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-MTG">Will Marjorie Taylor Greene be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-MTG</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0040 / $0.0050</td>
+      <td class="num">$0.0010</td>
+      <td class="num">130,102</td>
+      <td class="num">38,238,428</td>
+      <td class="num">18,714,262</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-EM">Will Elon Musk be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-EM</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">117,969</td>
+      <td class="num">12,172,643</td>
+      <td class="num">4,362,074</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-MTAY">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-MTAY</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">116,189</td>
+      <td class="num">953,988</td>
+      <td class="num">660,128</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-JAM">Will Jamie Dimon be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-JAM</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">112,575</td>
+      <td class="num">120,241,981</td>
+      <td class="num">36,198,556</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-JDIM">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-JDIM</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">111,649</td>
+      <td class="num">12,300,322</td>
+      <td class="num">8,954,478</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-RC">Will Roy Cooper be the Democratic Presidential nominee in 2028?</a><br><span class="ticker">KXPRESNOMD-28-RC</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">110,918</td>
+      <td class="num">152,825,349</td>
+      <td class="num">50,370,376</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-TSCO">Will Tim Scott be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-TSCO</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">96,046</td>
+      <td class="num">775,455</td>
+      <td class="num">451,203</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-RCOO">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-RCOO</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">90,445</td>
+      <td class="num">686,804</td>
+      <td class="num">452,133</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-WM">Will Wes Moore be the Democratic Presidential nominee in 2028?</a><br><span class="ticker">KXPRESNOMD-28-WM</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0180</td>
+      <td class="num">$0.0170 / $0.0180</td>
+      <td class="num">$0.0010</td>
+      <td class="num">82,938</td>
+      <td class="num">143,894,758</td>
+      <td class="num">43,009,183</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-AELS">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-AELS</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0040 / $0.0050</td>
+      <td class="num">$0.0010</td>
+      <td class="num">73,296</td>
+      <td class="num">311,414</td>
+      <td class="num">308,576</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-GWHI">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-GWHI</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0040 / $0.0050</td>
+      <td class="num">$0.0010</td>
+      <td class="num">73,278</td>
+      <td class="num">43,070,759</td>
+      <td class="num">17,310,943</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-SBRO">Will Sherrod Brown be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-SBRO</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">65,508</td>
+      <td class="num">757,016</td>
+      <td class="num">422,256</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-AELS">Will Abdul El-Sayed be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-AELS</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $0.0100</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">65,245</td>
+      <td class="num">4,816,770</td>
+      <td class="num">1,711,794</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-AHAM">Will Adam Hamilton be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-AHAM</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">64,965</td>
+      <td class="num">802,350</td>
+      <td class="num">507,113</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-BOBA">Will Barack Obama be the Democratic Presidential nominee in 2028?</a><br><span class="ticker">KXPRESNOMD-28-BOBA</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">63,154</td>
+      <td class="num">418,775,657</td>
+      <td class="num">137,412,591</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-BORO">Will Beto O&#39;Rourke be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-BORO</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">62,326</td>
+      <td class="num">2,307,143</td>
+      <td class="num">1,624,046</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-HBID">Will Hunter Biden be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-HBID</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">62,258</td>
+      <td class="num">537,223,752</td>
+      <td class="num">140,195,139</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-SAS">Will Stephen A. Smith be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-SAS</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">62,257</td>
+      <td class="num">358,761,395</td>
+      <td class="num">162,254,270</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-JT">Will John Thune be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-JT</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">62,256</td>
+      <td class="num">35,526,796</td>
+      <td class="num">8,405,302</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-ZMAM">Will Zohran Mamdani be the Democratic Presidential nominee in 2028?</a><br><span class="ticker">KXPRESNOMD-28-ZMAM</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">62,161</td>
+      <td class="num">137,256,312</td>
+      <td class="num">38,698,616</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-AKLO">Will Amy Klobuchar be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-AKLO</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">61,891</td>
+      <td class="num">203,082,824</td>
+      <td class="num">100,653,378</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-VRAM">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-VRAM</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">61,227</td>
+      <td class="num">507,695,519</td>
+      <td class="num">190,195,429</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-GABB">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-GABB</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.8030</td>
+      <td class="num">$0.8010</td>
+      <td class="num">61,181</td>
+      <td class="num">136,141,330</td>
+      <td class="num">65,749,943</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-BDON">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-BDON</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">60,659</td>
+      <td class="num">734,521</td>
+      <td class="num">388,824</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-CMUR">Will Chris Murphy be the Democratic Presidential nominee in 2028?</a><br><span class="ticker">KXPRESNOMD-28-CMUR</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">60,629</td>
+      <td class="num">43,394,053</td>
+      <td class="num">22,220,656</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-EWAR">Will Elizabeth Warren be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-EWAR</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $0.0100</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">60,447</td>
+      <td class="num">271,908,789</td>
+      <td class="num">19,112,960</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-SSMI">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-SSMI</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">59,755</td>
+      <td class="num">40,378,739</td>
+      <td class="num">14,332,686</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-JSTE">Will Jon Stewart be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-JSTE</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">57,941</td>
+      <td class="num">292,803,268</td>
+      <td class="num">116,959,697</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-JHAW">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-JHAW</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">57,918</td>
+      <td class="num">720,327</td>
+      <td class="num">385,801</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-EKIR">Will Erika Kirk be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-EKIR</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">56,658</td>
+      <td class="num">80,382,927</td>
+      <td class="num">58,983,088</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-VR">Will Vivek Ramaswamy be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-VR</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">55,413</td>
+      <td class="num">17,344,014</td>
+      <td class="num">8,947,646</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-STE">Will Steve Bannon be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-STE</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">55,218</td>
+      <td class="num">7,154,628</td>
+      <td class="num">4,761,720</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-ESLO">Will Elissa Slotkin be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-ESLO</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0090</td>
+      <td class="num">$0.0080 / $0.0090</td>
+      <td class="num">$0.0010</td>
+      <td class="num">44,144</td>
+      <td class="num">468,262,548</td>
+      <td class="num">150,319,090</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-GY">Will Glenn Youngkin be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-GY</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0280</td>
+      <td class="num">$0.0270 / $0.0280</td>
+      <td class="num">$0.0010</td>
+      <td class="num">42,962</td>
+      <td class="num">27,586,298</td>
+      <td class="num">10,688,150</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-DTRU">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-DTRU</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0080 / $0.0100</td>
+      <td class="num">$0.0020</td>
+      <td class="num">40,068</td>
+      <td class="num">51,644,622</td>
+      <td class="num">17,161,797</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-MK">Will Mark Kelly be the Democratic Presidential nominee in 2028?</a><br><span class="ticker">KXPRESNOMD-28-MK</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0330</td>
+      <td class="num">$0.0320 / $0.0330</td>
+      <td class="num">$0.0010</td>
+      <td class="num">37,388</td>
+      <td class="num">201,919,324</td>
+      <td class="num">38,595,764</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-CSUN">Will Chris Sununu be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-CSUN</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">35,889</td>
+      <td class="num">686,854</td>
+      <td class="num">406,848</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-TMAS">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-TMAS</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0400</td>
+      <td class="num">$0.0000 / $0.0400</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">35,582</td>
+      <td class="num">899,642</td>
+      <td class="num">625,403</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-HJEF">Will Hakeem Jeffries be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-HJEF</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $0.0100</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">35,423</td>
+      <td class="num">559,679</td>
+      <td class="num">389,406</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-COWE">Will Candace Owens be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-COWE</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $0.0100</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">34,961</td>
+      <td class="num">691,715</td>
+      <td class="num">389,582</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-TCRU">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-TCRU</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0200</td>
+      <td class="num">$0.0100 / $0.0400</td>
+      <td class="num">$0.0300</td>
+      <td class="num">34,543</td>
+      <td class="num">676,139</td>
+      <td class="num">448,639</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-CHOL">Will Chris Van Hollen be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-CHOL</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">34,357</td>
+      <td class="num">814,757</td>
+      <td class="num">491,011</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-RKHA">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-RKHA</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $0.0100</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">34,128</td>
+      <td class="num">901,859</td>
+      <td class="num">447,022</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-JKEN">Will John Kennedy be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-JKEN</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">33,523</td>
+      <td class="num">740,897</td>
+      <td class="num">441,729</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-JTAL">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-JTAL</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0200</td>
+      <td class="num">$0.0100 / $0.0200</td>
+      <td class="num">$0.0100</td>
+      <td class="num">32,837</td>
+      <td class="num">1,912,127</td>
+      <td class="num">570,807</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-DBUR">Will Doug Burgum be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-DBUR</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $0.0100</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">31,576</td>
+      <td class="num">675,975</td>
+      <td class="num">415,602</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-REMA">Will Rahm Emanuel be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-REMA</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0230</td>
+      <td class="num">$0.0220 / $0.0230</td>
+      <td class="num">$0.0010</td>
+      <td class="num">29,021</td>
+      <td class="num">125,512,224</td>
+      <td class="num">36,005,816</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-KHAR">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-KHAR</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0330</td>
+      <td class="num">$0.0320 / $0.0330</td>
+      <td class="num">$0.0010</td>
+      <td class="num">21,853</td>
+      <td class="num">38,282,182</td>
+      <td class="num">8,511,704</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-REMA">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-REMA</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0200</td>
+      <td class="num">$0.0100 / $0.0200</td>
+      <td class="num">$0.0100</td>
+      <td class="num">13,291</td>
+      <td class="num">7,494,496</td>
+      <td class="num">1,601,322</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESPERSON-28-GNEWS">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-GNEWS</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0780</td>
+      <td class="num">$0.0770 / $0.0780</td>
+      <td class="num">$0.0010</td>
+      <td class="num">12,936</td>
+      <td class="num">15,291,823</td>
+      <td class="num">4,694,918</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-MR">Will Marco Rubio be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-MR</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.2200</td>
+      <td class="num">$0.2100 / $0.2200</td>
+      <td class="num">$0.0100</td>
+      <td class="num">11,421</td>
+      <td class="num">11,563,471</td>
+      <td class="num">2,689,579</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-JDV">Will J.D. Vance be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-JDV</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.3300</td>
+      <td class="num">$0.3200 / $0.3300</td>
+      <td class="num">$0.0100</td>
+      <td class="num">10,490</td>
+      <td class="num">6,779,515</td>
+      <td class="num">3,085,752</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMR-28-TCAR">Will Tucker Carlson be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-TCAR</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0280</td>
+      <td class="num">$0.0270 / $0.0280</td>
+      <td class="num">$0.0010</td>
+      <td class="num">7,960</td>
+      <td class="num">68,974,265</td>
+      <td class="num">19,484,043</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-PB">Will Pete Buttigieg be the Democratic Presidential nominee in 2028?</a><br><span class="ticker">KXPRESNOMD-28-PB</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0540</td>
+      <td class="num">$0.0520 / $0.0540</td>
+      <td class="num">$0.0020</td>
+      <td class="num">7,896</td>
+      <td class="num">118,658,799</td>
+      <td class="num">34,089,456</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPRESNOMD-28-BS">Will Bernie Sanders be the Democratic Presidential nominee in 2028?</a><br><span class="ticker">KXPRESNOMD-28-BS</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0040 / $0.0050</td>
+      <td class="num">$0.0010</td>
+      <td class="num">7,866</td>
+      <td class="num">430,914,105</td>
+      <td class="num">126,693,213</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr></tbody></table></div>
 
-<h2>Series in scope</h2>
-<div id="series-table"></div>
+  <h2>Liquidity at the captured snapshot</h2>
+  <p class="sub">Contracts available at each price, captured from the order book of the busiest markets at snapshot time.</p>
+  <div class="table-wrap"><table class="compact"><thead><tr>
+    <th>Market</th><th>Topic</th><th class="num">Best yes bid</th><th class="num">Best no bid</th>
+    <th class="num">Price levels</th><th class="num">Contracts in book</th><th>Source</th></tr></thead>
+    <tbody id="liquidity-body"><tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-TMOO">The RSM Classic: Taylor Moore wins</a><br><span class="ticker">KXPGATOUR-THRC26-TMOO</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0040</td>
+    <td class="num">$0.9950</td>
+    <td class="num">10</td>
+    <td class="num">5,147,529</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-TMOO/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-SSTR">The RSM Classic: Sepp Straka wins</a><br><span class="ticker">KXPGATOUR-THRC26-SSTR</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0220</td>
+    <td class="num">$0.9750</td>
+    <td class="num">12</td>
+    <td class="num">840,755</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-SSTR/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-KROY">The RSM Classic: Kevin Roy wins</a><br><span class="ticker">KXPGATOUR-THRC26-KROY</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">5</td>
+    <td class="num">380,554</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-KROY/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MMEI">The RSM Classic: Mac Meissner wins</a><br><span class="ticker">KXPGATOUR-THRC26-MMEI</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">7</td>
+    <td class="num">2,234,667</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MMEI/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MPEN">The RSM Classic: Marco Penge wins</a><br><span class="ticker">KXPGATOUR-THRC26-MPEN</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0060</td>
+    <td class="num">$0.9930</td>
+    <td class="num">10</td>
+    <td class="num">3,133,650</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MPEN/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-MPAV">The RSM Classic: Matthieu Pavon wins</a><br><span class="ticker">KXPGATOUR-THRC26-MPAV</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">5</td>
+    <td class="num">380,556</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MPAV/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-SSTE">The RSM Classic: Sam Stevens wins</a><br><span class="ticker">KXPGATOUR-THRC26-SSTE</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0040</td>
+    <td class="num">$0.9950</td>
+    <td class="num">7</td>
+    <td class="num">7,560,354</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-SSTE/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-JVAN">The RSM Classic: John VanDerLaan wins</a><br><span class="ticker">KXPGATOUR-THRC26-JVAN</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0050</td>
+    <td class="num">$0.9920</td>
+    <td class="num">8</td>
+    <td class="num">403,756</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-JVAN/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-CBLA">The RSM Classic: Chandler Blanchet wins</a><br><span class="ticker">KXPGATOUR-THRC26-CBLA</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">8</td>
+    <td class="num">863,656</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-CBLA/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-HSPR">The RSM Classic: Hayden Springer wins</a><br><span class="ticker">KXPGATOUR-THRC26-HSPR</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0010</td>
+    <td class="num">$0.9870</td>
+    <td class="num">4</td>
+    <td class="num">104,292</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-HSPR/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-JKEE">The RSM Classic: Johnny Keefer wins</a><br><span class="ticker">KXPGATOUR-THRC26-JKEE</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">7</td>
+    <td class="num">397,195</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-JKEE/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-ZBLA">The RSM Classic: Zac Blair wins</a><br><span class="ticker">KXPGATOUR-THRC26-ZBLA</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">5</td>
+    <td class="num">380,556</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-ZBLA/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-KHIR">The RSM Classic: Kensei Hirata wins</a><br><span class="ticker">KXPGATOUR-THRC26-KHIR</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">5</td>
+    <td class="num">669,861</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-KHIR/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr>
+<tr>
+    <td><a href="../market.html?ticker=KXPGATOUR-THRC26-TCRO">The RSM Classic: Trace Crowe wins</a><br><span class="ticker">KXPGATOUR-THRC26-TCRO</span></td>
+    <td><span class="tag golf">Golf</span></td>
+    <td class="num">$0.0020</td>
+    <td class="num">$0.9970</td>
+    <td class="num">5</td>
+    <td class="num">380,556</td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-TCRO/orderbook?depth=20" target="_blank" rel="noopener">orderbook</a></td>
+  </tr></tbody></table></div>
 
-<h2>Sources for this page</h2>
-<ul><li><a href="https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Tags for Series Categories">Get Tags for Series Categories ↗</a></li><li><a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a></li><li><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a></li></ul>
-<p class="muted">Unverified or missing values appear as “—”. Open <a href="../flagged.html">Flagged for review</a> for caveats.</p>
+  <h2>Resolved events (yes / no)</h2>
+  <p class="sub">Events that have already been determined, with the market-level result the exchange published.</p>
+  <div class="table-wrap"><table class="compact"><thead><tr>
+    <th>Event</th><th>Market side</th><th>Result</th><th class="num">Settlement value</th><th class="num">Volume (contracts)</th>
+    <th>Settled at</th><th>Official settlement source(s)</th><th>Source</th></tr></thead>
+    <tbody id="resolved-body"><tr>
+    <td>Who will be the next governor of California?<br><span class="ticker">KXGOVCA-26</span></td>
+    <td>Toni Atkins<br><span class="ticker">KXGOVCA-26-TATK</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">24,229</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.politico.com/" target="_blank" rel="noopener">Politico</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.abc.net.au/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will be the next governor of California?<br><span class="ticker">KXGOVCA-26</span></td>
+    <td>Kyle Langford<br><span class="ticker">KXGOVCA-26-KLAN</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">142,076</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.politico.com/" target="_blank" rel="noopener">Politico</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.abc.net.au/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will be the next governor of California?<br><span class="ticker">KXGOVCA-26</span></td>
+    <td>Xavier Becerra<br><span class="ticker">KXGOVCA-26-XBEC</span></td>
+    <td><span class="badge good">yes</span></td>
+    <td class="num">$1.0000</td>
+    <td class="num">19,465,780</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.politico.com/" target="_blank" rel="noopener">Politico</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.abc.net.au/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will be the next governor of California?<br><span class="ticker">KXGOVCA-26</span></td>
+    <td>Chad Bianco<br><span class="ticker">KXGOVCA-26-CBIA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">135,124,018</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.politico.com/" target="_blank" rel="noopener">Politico</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.abc.net.au/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will be the next governor of California?<br><span class="ticker">KXGOVCA-26</span></td>
+    <td>Antonio Villaraigosa<br><span class="ticker">KXGOVCA-26-AVIL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">57,627,622</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.politico.com/" target="_blank" rel="noopener">Politico</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.abc.net.au/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will be the next governor of California?<br><span class="ticker">KXGOVCA-26</span></td>
+    <td>Stephen Cloobeck<br><span class="ticker">KXGOVCA-26-SCLO</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">50,478</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.politico.com/" target="_blank" rel="noopener">Politico</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.abc.net.au/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will be the next governor of California?<br><span class="ticker">KXGOVCA-26</span></td>
+    <td>Steve Hilton<br><span class="ticker">KXGOVCA-26-SHIL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">43,760,549</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.politico.com/" target="_blank" rel="noopener">Politico</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.abc.net.au/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will be the next governor of California?<br><span class="ticker">KXGOVCA-26</span></td>
+    <td>Eleni Kounalakis<br><span class="ticker">KXGOVCA-26-EKOU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">27,258</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.politico.com/" target="_blank" rel="noopener">Politico</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.abc.net.au/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will be the next governor of California?<br><span class="ticker">KXGOVCA-26</span></td>
+    <td>Daniel Mercuri<br><span class="ticker">KXGOVCA-26-DMER</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">147,516</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.politico.com/" target="_blank" rel="noopener">Politico</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.abc.net.au/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will be the next governor of California?<br><span class="ticker">KXGOVCA-26</span></td>
+    <td>Katie Porter<br><span class="ticker">KXGOVCA-26-KPOR</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">67,641,041</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.politico.com/" target="_blank" rel="noopener">Politico</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.abc.net.au/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will be the next governor of California?<br><span class="ticker">KXGOVCA-26</span></td>
+    <td>Tony Thurmond<br><span class="ticker">KXGOVCA-26-TTHU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">12,242,115</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.politico.com/" target="_blank" rel="noopener">Politico</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.abc.net.au/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will be the next governor of California?<br><span class="ticker">KXGOVCA-26</span></td>
+    <td>Butch Ware<br><span class="ticker">KXGOVCA-26-BWAR</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">36,401</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://www.nytimes.com/" target="_blank" rel="noopener">The New York Times</a>, <a href="https://apnews.com/" target="_blank" rel="noopener">the Associated Press</a>, <a href="https://www.reuters.com/" target="_blank" rel="noopener">Reuters</a>, <a href="https://www.axios.com/" target="_blank" rel="noopener">Axios</a>, <a href="https://www.politico.com/" target="_blank" rel="noopener">Politico</a>, <a href="https://www.semafor.com/" target="_blank" rel="noopener">Semafor</a>, <a href="https://www.theinformation.com/" target="_blank" rel="noopener">The Information</a>, <a href="https://www.washingtonpost.com/" target="_blank" rel="noopener">The Washington Post</a>, <a href="https://www.wsj.com/" target="_blank" rel="noopener">The Wall Street Journal</a>, <a href="https://www.abc.net.au/" target="_blank" rel="noopener">ABC</a>, <a href="https://www.cbsnews.com/" target="_blank" rel="noopener">CBS</a>, <a href="https://www.cnn.com/" target="_blank" rel="noopener">CNN</a>, <a href="https://www.foxnews.com/" target="_blank" rel="noopener">Fox News</a>, <a href="https://www.msnbc.com/" target="_blank" rel="noopener">MSNBC</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will win California&#39;s top-two primary for governor?<br><span class="ticker">KXGOVCAPRIMARY-26</span></td>
+    <td>Eleni Kounalakis<br><span class="ticker">KXGOVCAPRIMARY-26-EKOUN</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">20,716,724</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">The Source Agencies are</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">in hierarchical order: the relevant state Secretary of State or chief election officer</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCAPRIMARY&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will win California&#39;s top-two primary for governor?<br><span class="ticker">KXGOVCAPRIMARY-26</span></td>
+    <td>Betty Yee<br><span class="ticker">KXGOVCAPRIMARY-26-BYEE</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">1,218,342</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">The Source Agencies are</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">in hierarchical order: the relevant state Secretary of State or chief election officer</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCAPRIMARY&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will win California&#39;s top-two primary for governor?<br><span class="ticker">KXGOVCAPRIMARY-26</span></td>
+    <td>Antonio Villaraigosa<br><span class="ticker">KXGOVCAPRIMARY-26-AVIL</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">14,920,032</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">The Source Agencies are</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">in hierarchical order: the relevant state Secretary of State or chief election officer</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCAPRIMARY&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will win California&#39;s top-two primary for governor?<br><span class="ticker">KXGOVCAPRIMARY-26</span></td>
+    <td>Katie Porter<br><span class="ticker">KXGOVCAPRIMARY-26-KPOR</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">39,580,704</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">The Source Agencies are</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">in hierarchical order: the relevant state Secretary of State or chief election officer</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCAPRIMARY&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will win California&#39;s top-two primary for governor?<br><span class="ticker">KXGOVCAPRIMARY-26</span></td>
+    <td>Kamala Harris<br><span class="ticker">KXGOVCAPRIMARY-26-KHAR</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">22,715,438</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">The Source Agencies are</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">in hierarchical order: the relevant state Secretary of State or chief election officer</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCAPRIMARY&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will win California&#39;s top-two primary for governor?<br><span class="ticker">KXGOVCAPRIMARY-26</span></td>
+    <td>Xavier Becerra<br><span class="ticker">KXGOVCAPRIMARY-26-XBEC</span></td>
+    <td><span class="badge good">yes</span></td>
+    <td class="num">$1.0000</td>
+    <td class="num">1,151,586</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">The Source Agencies are</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">in hierarchical order: the relevant state Secretary of State or chief election officer</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCAPRIMARY&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will win California&#39;s top-two primary for governor?<br><span class="ticker">KXGOVCAPRIMARY-26</span></td>
+    <td>Tony Thurmond<br><span class="ticker">KXGOVCAPRIMARY-26-TTHU</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">900,362</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">The Source Agencies are</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">in hierarchical order: the relevant state Secretary of State or chief election officer</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCAPRIMARY&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will win California&#39;s top-two primary for governor?<br><span class="ticker">KXGOVCAPRIMARY-26</span></td>
+    <td>Rick Caruso<br><span class="ticker">KXGOVCAPRIMARY-26-RCAR</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">7,400,573</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">The Source Agencies are</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">in hierarchical order: the relevant state Secretary of State or chief election officer</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCAPRIMARY&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will win California&#39;s top-two primary for governor?<br><span class="ticker">KXGOVCAPRIMARY-26</span></td>
+    <td>Chad Bianco<br><span class="ticker">KXGOVCAPRIMARY-26-CBIA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">86,100,926</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">The Source Agencies are</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">in hierarchical order: the relevant state Secretary of State or chief election officer</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCAPRIMARY&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will win California&#39;s top-two primary for governor?<br><span class="ticker">KXGOVCAPRIMARY-26</span></td>
+    <td>Steve Hilton<br><span class="ticker">KXGOVCAPRIMARY-26-SHIL</span></td>
+    <td><span class="badge good">yes</span></td>
+    <td class="num">$1.0000</td>
+    <td class="num">3,401,954</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">The Source Agencies are</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">in hierarchical order: the relevant state Secretary of State or chief election officer</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCAPRIMARY&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will win California&#39;s top-two primary for governor?<br><span class="ticker">KXGOVCAPRIMARY-26</span></td>
+    <td>Ethan Agarwal<br><span class="ticker">KXGOVCAPRIMARY-26-EAGA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">23,401,327</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">The Source Agencies are</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">in hierarchical order: the relevant state Secretary of State or chief election officer</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCAPRIMARY&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>Who will win California&#39;s top-two primary for governor?<br><span class="ticker">KXGOVCAPRIMARY-26</span></td>
+    <td>Eric Swalwell<br><span class="ticker">KXGOVCAPRIMARY-26-ESWA</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">15,566,714</td>
+    <td><span class="muted">—</span></td>
+    <td><a href="https://kalshi.com/" target="_blank" rel="noopener">The Source Agencies are</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">in hierarchical order: the relevant state Secretary of State or chief election officer</a>, <a href="https://www.fec.gov" target="_blank" rel="noopener">the Federal Election Commission</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">state board of elections or canvassing board</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant county clerk or board of elections</a>, <a href="https://kalshi.com/" target="_blank" rel="noopener">relevant city/municipal clerk</a>, <a href="https://www.justice.gov/ag" target="_blank" rel="noopener">Attorney General of the United States</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXGOVCAPRIMARY&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr></tbody></table></div>
 
-<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="../flagged.html">Flagged for review</a>.</footer>
-</main>
-</div>
-<script src="../assets/app.js" type="module"></script>
+  <h2>What a trader should do on this page</h2>
+  <div class="panel">
+    <ol>
+      <li>Open <a href="../dashboard.html">Dashboard</a> and watch the two chat panes for moves of at least $0.10.</li>
+      <li>Pick the market, open its <a href="../market.html">detail page</a> and read the chart, the order book and the settlement rules.</li>
+      <li>Check the ROI score and the liquidity before acting — the model is documented on <a href="../strategies.html">Strategies</a>.</li>
+      <li>Record the trade on the <a href="../portfolio.html">Portfolio</a> page; the auto-trader will also run the published strategies for you.</li>
+    </ol>
+  </div>
+</div></main>
+<footer class="site">
+  <div class="nav-inner">
+    <p><strong>KalshiDash1</strong> — a static dashboard for the official Kalshi <em>demo</em> exchange.
+    Demo only: mock funds, and demo prices may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
+    <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
+       WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
+       Snapshot captured 2026-11-20 14:09:32 UTC ·
+       <a href="../sources.html">Sources</a> ·
+       <a href="../flagged.html">Flagged for review</a> ·
+       <a href="../COORDINATION.md">Coordination board</a></p>
+    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
+    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+  </div></footer>
+<script src="../assets/app.js"></script>
 </body>
 </html>

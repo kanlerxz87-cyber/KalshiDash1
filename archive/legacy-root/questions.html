@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Questions &amp; answers · Kalshi Demo Dashboard</title>
+<meta name="description" content="Questions that must be answered before decisions, with what is known, the source, and how to find what is missing.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body >
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="active">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="../../docs/index.html" class="">Docs dashboard</a><a href="../../docs/events.html" class="">Events & resolutions</a><a href="../../docs/methodology.html" class="">Methodology</a><a href="../../docs/flagged.html" class="">Docs flagged page</a></div></nav>
+<main class="content">
+
+<h1>Questions, answers and missing information</h1>
+<p class="muted">Answers are shown only where an official source supports them. Items marked “Missing” need information we do not yet have.</p>
+
+<h2>A. Answered (with official source)</h2>
+<div class="table-wrap"><table  class="compact"><thead><tr><th>ID</th><th>Question</th><th>Answer</th><th>Source</th></tr></thead><tbody>
+<tr><td>Q-01</td><td>What is the demo REST root?</td><td><code>https://external-api.demo.kalshi.co/trade-api/v2</code></td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener" title="Kalshi docs: Demo environment">Demo environment ↗</a></td></tr>
+<tr><td>Q-02</td><td>Is the demo environment's price data a real-market proxy?</td><td>Docs: demo behaviour "may not be reflective of" real markets.</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener" title="Kalshi docs: Demo environment">Demo environment ↗</a></td></tr>
+<tr><td>Q-03</td><td>Can public market data be read without credentials?</td><td>Yes for events, series, orderbook and exchange status (HTTP 200 observed with no credentials on 2026-11-20).</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Orderbook">Get Market Orderbook ↗</a> · <a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a></td></tr>
+<tr><td>Q-04</td><td>Can the WebSocket feed be used without credentials?</td><td>No: the handshake is authenticated for all channels.</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start WebSockets">Quick Start WebSockets ↗</a></td></tr>
+<tr><td>Q-05</td><td>How is a resolved outcome recorded?</td><td>Field <code>result</code> = yes or no; status <code>finalized</code>. Observed on US gas price markets.</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=settled&with_nested_markets=true" target="_blank" rel="noopener" title="Kalshi demo API: settled US gas price events (live)">settled US gas price events (live) ↗</a></td></tr>
+<tr><td>Q-06</td><td>What does a winning contract pay?</td><td>$1.00 per contract.</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener" title="Kalshi docs: Market Settlement">Market Settlement ↗</a></td></tr>
+<tr><td>Q-07</td><td>What candle sizes exist?</td><td>1, 60 and 1440 minutes.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Candlesticks">Get Market Candlesticks ↗</a></td></tr>
+<tr><td>Q-08</td><td>How many candles per request?</td><td>At most 5,000 periods; longer ranges are rejected with 400.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Candlesticks">Get Market Candlesticks ↗</a></td></tr>
+<tr><td>Q-09</td><td>What does an order book show?</td><td>Resting YES bids and NO bids only, as price/quantity pairs; asks are implied.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Orderbook">Get Market Orderbook ↗</a></td></tr>
+</tbody></table></div>
+
+<h2>B. Missing information (needs discovery)</h2>
+<div class="table-wrap"><table  class="compact"><thead><tr><th>ID</th><th>Question</th><th>Why it matters</th><th>How to discover it</th></tr></thead><tbody>
+<tr><td>M-01</td><td>Exact unauthenticated rate limits</td><td>Sets how often the dashboard may poll.</td><td>Read <code>X-RateLimit-*</code> headers on a test call; the docs say unauthenticated limits are separate but give no numbers (<a href="https://docs.kalshi.com/getting_started/rate_limits.md" target="_blank" rel="noopener" title="Kalshi docs: Rate Limits and Tiers">Rate Limits and Tiers ↗</a>).</td></tr>
+<tr><td>M-02</td><td>Whether browsers can call the demo API cross-origin (CORS)</td><td>Without it, live tables cannot load on GitHub Pages.</td><td>Open the live site in a normal browser and check the console (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener" title="Kalshi docs: Demo environment">Demo environment ↗</a> for the API host). If blocked, see S-01 (proxy).</td></tr>
+<tr><td>M-03</td><td>A dollar-volume field</td><td>The brief asks for the highest dollar amount; the API has no such field.</td><td>Confirm by reading all market fields in the Get Market reference (<a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a>); rank by OI $ as a stated proxy (<a class="flag" href="flagged.html#F-03">F-03</a>).</td></tr>
+<tr><td>M-04</td><td>Demo account balance, positions and fills</td><td>Needed for portfolio and P&amp;L.</td><td>Provide a demo key through a secure channel (S-02); signing rules in <a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a>.</td></tr>
+<tr><td>M-05</td><td>Fee schedule for each series</td><td>Net P&amp;L needs fees. Series records carry a fee_type (<a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a>); the schedule itself is not verified.</td><td>Read the fee schedule linked from the docs and the series record (<a class="flag" href="flagged.html#F-10">F-10</a>).</td></tr>
+<tr><td>M-06</td><td>History before the API cutoff</td><td>Settled markets older than the cutoff are not in nested market lists (<a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a>).</td><td>Use the historical endpoints in the Historical Data reference (<a href="https://docs.kalshi.com/getting_started/historical_data.md" target="_blank" rel="noopener">Kalshi docs: Historical Data ↗</a>, not yet read).</td></tr>
+<tr><td>M-07</td><td>Seconds-level price history</td><td>REST candles are at least 1 minute (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Candlesticks">Get Market Candlesticks ↗</a>).</td><td>Record samples or use the authenticated WebSocket (<a href="https://docs.kalshi.com/getting_started/quick_start_websockets.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start WebSockets">Quick Start WebSockets ↗</a>; <a class="flag" href="flagged.html#F-02">F-02</a>).</td></tr>
+<tr><td>M-08</td><td>Whether the AAA gas series settles on the AAA page as named</td><td>The series record names AAA as settlement source (<a href="https://external-api.demo.kalshi.co/trade-api/v2/series?tags=Oil%20%26%20Gas&include_volume=true" target="_blank" rel="noopener" title="Kalshi demo API: Oil &amp; Gas series (live)">Oil &amp; Gas series (live) ↗</a>); the rules are on each market.</td><td>Compare the market rules text with AAA's published data (<a href="https://gasprices.aaa.com/" target="_blank" rel="noopener" title="AAA (settlement source named in the API series record for gas markets; not independently fetched)">AAA (settlement source named in the API series r ↗</a>; <a class="flag" href="flagged.html#F-05">F-05</a>).</td></tr>
+</tbody></table></div>
+
+<h2>C. Decisions blocked until M-items are answered</h2>
+<ul>
+  <li>Choosing which markets to trade (blocked: no trade data, no key).</li>
+  <li>Any strategy conclusion (blocked: no trades; see Trade analysis).</li>
+  <li>Whether the site can run without a proxy (blocked: M-02).</li>
+</ul>
+
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
+</main>
+</div>
+<script src="assets/app.js" type="module"></script>
+</body>
+</html>

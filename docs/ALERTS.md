@@ -20,7 +20,7 @@ sources.
 | **Second chat**, selective, "events our model likes as high ROI" | done | `#log-roi` + `scoreHighROI()` / `modelScore()` |
 | Track events **until they resolve**, yes/no | done | `collectResolutions()`; "Resolved events" table |
 | Automated **simulated trades** to test strategies | partly — see §6 | engine data feeds the simulator already on the site; no auto-trader is committed |
-| Portfolio performance on the **demo account** | blocked without the account holder's key | see F-A8 below and the existing Portfolio page |
+| Portfolio performance on the **demo account** | blocked without the account holder's key | see F-24 on the flagged page and the existing Portfolio page |
 | Categorise trades, build strategies by trade type | existing | `portfolio.html`, `analysis.html` (simulated) |
 | Price graph, **X = time (seconds/minutes/hours), Y = price** | done | `#chart`, window buttons 5 min → 7 days |
 | Current **liquidity**: contracts available at a price | done | orderbook ladder, bids + derived asks |
@@ -60,7 +60,7 @@ sources.
 | Golf | `Sports` + tag `Golf` | none | a dedicated tag exists (S11) |
 
 A run **fails loudly** if a tag disappears from a category that publishes tags, so an empty
-board can never be caused silently by a stale filter. See irregularity **F-A1** for the one
+board can never be caused silently by a stale filter. See irregularity **F-28** for the one
 category that the taxonomy does not key.
 
 ### 3.2 The tracked price — and why this is the most important rule here
@@ -150,7 +150,7 @@ Two layers, and the page always says which one it is showing:
    If it is not, the page says so and continues on the engine feed.
 
 The WebSocket ticker channel would remove the polling delay, but its handshake requires a signed
-API key (S10), which this site does not hold and will not ask for. That is recorded as F-A7.
+API key (S10), which this site does not hold and will not ask for. That is recorded as F-29.
 
 ---
 
@@ -159,7 +159,7 @@ API key (S10), which this site does not hold and will not ask for. That is recor
 | # | Check | Command / method | Result |
 |---|---|---|---|
 | V-01 | Endpoint list in the brief matches the official docs character for character | read S1 | **PASS** — brief and docs agree |
-| V-02 | Every configured category/tag exists in the live taxonomy, or is documented | S11 fetched, compared to `TOPICS` | **PASS with one note** — `Culture` is not keyed (F-A1) |
+| V-02 | Every configured category/tag exists in the live taxonomy, or is documented | S11 fetched, compared to `TOPICS` | **PASS with one note** — `Culture` is not keyed (F-28) |
 | V-03 | Gas-price markets really exist | `GET /series?category=Economics&tags=Oil and energy` | **PASS** — AAA series returned (e.g. `KXAAAGASMTX`) |
 | V-04 | Natural-gas markets are reachable | `GET /series?category=Commodities&tags=Oil & Gas`, then `GET /markets?series_ticker=KXNATGASW` | **PASS** — strikes such as `KXNATGASW-26NOV2717-T5.899` |
 | V-05 | Culture category works despite the missing taxonomy key | `GET /series?category=Culture` | **PASS** — series `KXXBANNEDGROK` etc., `category: "Culture"` |
@@ -179,7 +179,7 @@ regression in any of these rules fails CI rather than reaching the site.
 
 | Run | Result | What it proved / found |
 |---|---|---|
-| 1 | failed (by design) | Reached the API; the taxonomy guard stopped the run because `Culture` is unkeyed. This is F-A1, found by the engine's own check, not by inspection. |
+| 1 | failed (by design) | Reached the API; the taxonomy guard stopped the run because `Culture` is unkeyed. This is F-28, found by the engine's own check, not by inspection. |
 | 2 | success | First real sample: series for all five topics found; the data exposed three defects (below). |
 | 3 | success | Per-topic **series** budget added. |
 | 4 | success | Per-topic **candle** and **history** budgets added; per-run counters fixed. |
@@ -193,7 +193,7 @@ Defects found in real data and fixed (each would have been invisible without run
 3. **Wrong counters** — `markets_sampled` reported 0 because the state was reset on the second
    `applySample()` call of the same run. Fixed with a `run_id`-scoped accumulator.
 
-A fifth and sixth pass then fixed the **price-coherence defect** (F-A9) in four layers —
+A fifth and sixth pass then fixed the **price-coherence defect** (F-27) in four layers —
 reciprocity, stale-last-price, corroboration, and a clean state reset — after the demo API was
 caught returning `last_price_dollars: 0.8030` for a market whose book was `yes 0.0020 / 0.0030`
 and whose `previous_price_dollars` was `0.0030`. That is a $0.80 jump from $0.003, and every
@@ -202,7 +202,7 @@ re-reading the single-market endpoint after an alert looked implausible, not by 
 
 Alerts so far: **0 after the reset**, and that is the honest result. The demo exchange is quiet — repeated samples
 of the top contracts returned identical prices (0.99, 0.94, 0.98) across runs. The feeds say so;
-nothing was seeded to make the page look busy. See F-A6.
+nothing was seeded to make the page look busy. See F-31.
 
 ---
 
@@ -220,18 +220,18 @@ nothing was seeded to make the page look busy. See F-A6.
 
 ## 7. Irregularities
 
-Full list with links: [Flagged for review](../flagged.html#F-A1). Alert-specific items:
+Full list with links: [Flagged for review](../flagged.html#F-28). Alert-specific items (IDs as published on the flagged page):
 
 | ID | Item |
 |---|---|
-| F-A1 | `/search/tags_by_categories` omits `Culture` while `GET /series?category=Culture` serves it — upstream API inconsistency, verified both ways |
-| F-A2 | Browser→API CORS could not be confirmed from the sandbox; the page detects and reports it |
-| F-A3 | No traded-dollar field exists; ranking is `volume_fp × price`, labelled as an estimate |
-| F-A4 | The high-ROI model is a documented heuristic, not a back-tested model |
-| F-A5 | "Gas prices" excludes crude oil that shares the `Oil & Gas` tag — a judgement call, stated openly |
-| F-A6 | Zero alerts so far because the demo is quiet; nothing is seeded |
-| F-A7 | No streaming: schedule + polling only, because the WS handshake needs a key |
-| F-A8 | Demo-account portfolio sync still needs the owner's key |
+| F-28 | `/search/tags_by_categories` omits `Culture` while `GET /series?category=Culture` serves it — upstream API inconsistency, verified both ways |
+| F-29 | Browser→API CORS could not be confirmed from the sandbox; the page detects and reports it |
+| F-03 (existing) | No traded-dollar field exists; ranking is `volume_fp × price`, labelled as an estimate |
+| F-31 | The high-ROI model is a documented heuristic, not a back-tested model |
+| F-05 (existing) | "Gas prices" excludes crude oil that shares the `Oil & Gas` tag — a judgement call, stated openly |
+| F-31 | Zero alerts so far because the demo is quiet; nothing is seeded |
+| F-29 | No streaming: schedule + polling only, because the WS handshake needs a key |
+| F-24 (existing) | Demo-account portfolio sync still needs the owner's key |
 
 ---
 

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio · Kalshi Demo Dashboard</title>
+<meta name="description" content="Portfolio tracking for the Kalshi demo account: status, required access and what is still missing.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body >
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="active">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="../../docs/index.html" class="">Docs dashboard</a><a href="../../docs/events.html" class="">Events & resolutions</a><a href="../../docs/methodology.html" class="">Methodology</a><a href="../../docs/flagged.html" class="">Docs flagged page</a></div></nav>
+<main class="content">
+
+<h1>Portfolio performance (demo account)</h1>
+<div class="notice"><strong>Status: not connected.</strong> Portfolio endpoints require signed requests with a demo API key (KALSHI-ACCESS-KEY, -SIGNATURE, -TIMESTAMP). No key was provided or requested, and no key is stored in this site. No values are shown because none could be verified. See <a class="flag" href="flagged.html#F-07">F-07</a>.</div>
+
+<h2>Required endpoints and their status</h2>
+<div class="table-wrap"><table  class="compact"><thead><tr><th>Item</th><th>Official endpoint / reference</th><th>Value on this site</th><th>Status</th></tr></thead><tbody>
+<tr><td>Cash balance</td><td><code>GET /portfolio/balance</code> · <a href="https://docs.kalshi.com/getting_started/rate_limits.md" target="_blank" rel="noopener" title="Kalshi docs: Rate Limits and Tiers">Rate Limits and Tiers ↗</a> (balance bucket) · <a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a> (signing)</td><td></td><td><span class="badge warn">UNVERIFIED — no key</span></td></tr>
+<tr><td>Open positions</td><td>Not verified in this session (endpoint list not fetched). <a class="flag" href="flagged.html#F-09">F-09</a></td><td></td><td><span class="badge warn">UNVERIFIED</span></td></tr>
+<tr><td>Fills / trade history</td><td>Not verified in this session. <a class="flag" href="flagged.html#F-09">F-09</a></td><td></td><td><span class="badge warn">UNVERIFIED</span></td></tr>
+<tr><td>Realised P&amp;L</td><td>Not an API field we have verified. Derived P&amp;L would need fees and fills; see <a class="flag" href="flagged.html#F-10">F-10</a></td><td></td><td><span class="badge warn">NOT COMPUTED</span></td></tr>
+</tbody></table></div>
+
+<h2>What is needed to switch this on</h2>
+<ol>
+  <li>A demo API key pair. Keys are created on the account page or with <code>POST /trade-api/v2/api_keys/generate</code> (<a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a>).</li>
+  <li>Signing must happen server-side. A static page cannot hold a private key safely. See suggestion S-02 on the Suggestions page.</li>
+  <li>Rate-limit handling: the balance endpoint has its own bucket, one call per second on Basic and Advanced tiers (<a href="https://docs.kalshi.com/getting_started/rate_limits.md" target="_blank" rel="noopener" title="Kalshi docs: Rate Limits and Tiers">Rate Limits and Tiers ↗</a>).</li>
+</ol>
+
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
+</main>
+</div>
+<script src="assets/app.js" type="module"></script>
+</body>
+</html>

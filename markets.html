@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>All markets — KalshiDash1</title>
+<meta name="description" content="Every tracked Kalshi demo market in the five focus topics, filterable by topic, by open or resolved state, and by ticker or title.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="markets">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta">
+      <span id="mode-badge" class="badge warn">data: probing…</span>
+      <span id="clock" class="mono small muted"></span>
+    </div>
+  </div>
+  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">More</span><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="catalyst.html">Swing catalysts</a><a href="strategylab.html">Strategy lab</a><a href="alerts/index.html">Live alerts (engine, 2 chats)</a><a href="dash/alerts.html">Alert feeds (dash suite)</a><a href="dash/autotrade.html">Auto-trade engine (dash suite)</a></div></nav>
+</header>
+
+<main><div class="wrap">
+  <div class="page-head">
+    <div class="grow">
+      <h1>Tracked markets</h1>
+      <p class="sub">Every contract the dashboard follows in the five focus topics, kept from <code>active</code> through
+      <code>determined</code> to <code>finalized</code>. The <strong>Result</strong> column shows how the market resolved —
+      <span class="badge good">yes</span> or <span class="badge bad">no</span> — exactly as the exchange published it.</p>
+    </div>
+    <div class="btnrow"><span class="badge neutral" id="markets-count">0 markets</span></div>
+  </div>
+
+  <div id="mode-notice" class="notice">Probing the official demo API…</div>
+
+  <div class="toolbar">
+    <div class="group" id="markets-topic-chips"></div>
+    <div class="group">
+      <label for="status-filter">State</label>
+      <select id="status-filter" style="width:170px">
+        <option value="open">Open (still trading)</option>
+        <option value="resolved">Resolved (yes / no)</option>
+        <option value="all">Everything</option>
+      </select>
+    </div>
+    <div class="group">
+      <label for="search-input">Search ticker or title</label>
+      <input type="text" id="search-input" placeholder="e.g. KXAAAGAS" style="width:220px">
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead id="markets-head"></thead>
+      <tbody id="markets-body"></tbody>
+    </table>
+  </div>
+
+  <h2>Market states used by this tracker</h2>
+  <div class="panel">
+    <p>The REST API returns these lifecycle statuses for a market, and <code>result</code> becomes <code>yes</code>,
+    <code>no</code> or <code>scalar</code> once the outcome is known:</p>
+    <div class="pill-list">
+      <span class="pill">initialized — created, not yet trading</span>
+      <span class="pill">active — open for trading</span>
+      <span class="pill">inactive — paused by the exchange</span>
+      <span class="pill">closed — past close time, awaiting determination</span>
+      <span class="pill">determined — result known, settlement timer running</span>
+      <span class="pill">disputed — result challenged</span>
+      <span class="pill">amended — re-determined after a dispute</span>
+      <span class="pill">finalized — settled, positions paid</span>
+    </div>
+    <p class="small muted">Source: <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a>.
+    On a YES outcome the YES holders receive $1.00 per contract; on a NO outcome the NO holders receive $1.00 per contract —
+    <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>.</p>
+  </div>
+
+  <noscript><div class="notice warn">JavaScript is disabled. The captured snapshot for all five topics is still available on the
+  topic pages, each row linked to its source.</div></noscript>
+</div></main>
+
+<footer class="site">
+  <div class="nav-inner">
+    <p><strong>KalshiDash1</strong> — a static dashboard for the official Kalshi <em>demo</em> exchange.
+    Demo only: mock funds, and demo prices may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
+    <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
+       WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
+       Snapshot captured 2026-11-20 14:09:32 UTC ·
+       <a href="sources.html">Sources</a> ·
+       <a href="flagged.html">Flagged for review</a> ·
+       <a href="COORDINATION.md">Coordination board</a></p>
+    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
+    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+  </div></footer>
+<script src="assets/app.js"></script>
+</body>
+</html>

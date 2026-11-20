@@ -50,7 +50,7 @@
           <td>Server-side fetches of the demo API succeed; browsers may still block cross-origin reads depending on the API's CORS headers, which this environment cannot inspect.</td>
           <td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">docs show browser fetch examples</a></td>
           <td>—</td>
-          <td>Open the live site and check the data badge. If it shows SNAPSHOT mode, use <code>scripts/local-proxy.mjs</code> locally or the S-03 scanner.</td>
+          <td>Open the live site and check the data badge. <strong>Update 2026-11-20 (session arena-f89b55f7): a live fetch of https://kanlerxz87-cyber.github.io/KalshiDash1/dash/alerts.html after the PR #21 deploy showed the engine in LIVE mode (batched quotes + trade walk on the official demo API) — the demo API is reachable cross-origin from the deployed Pages site.</strong> If your own browser shows SNAPSHOT mode, use <code>scripts/local-proxy.mjs</code> locally or the S-03 scanner.</td>
         </tr>
         <tr>
           <td><strong>F-05</strong></td>
@@ -75,6 +75,47 @@
           <td>Build log 2026-11-20 (curl → SSL_ERROR_SYSCALL)</td>
           <td>—</td>
           <td>No action needed for the site; noted for transparency about how verification was performed.</td>
+        </tr>
+        <tr>
+          <td><strong>F-08</strong></td>
+          <td>Alert detection depends on REST polling — fast swings may be missed</td>
+          <td>The demo API has no server-side swing alerting, and the official WebSocket requires an authenticated session even for public channels (this site never handles credentials — F-02), so alerts run on REST: a 15&nbsp;s batched quote poll (<code>GET /markets?tickers=…</code>) plus a trade-by-trade walk (<code>GET /markets/trades</code>) of the 4 highest-dollar tracked markets, each trade processed exactly once. Swings shorter than the cycle, or occurring between cycles, may be missed or detected with delayed magnitude. REST responses are cached and can lag the exchange by several seconds.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-trades" target="_blank" rel="noopener">Get Trades docs</a> · <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets (caching caveat)</a> · <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">WebSocket quick start (session auth)</a></td>
+          <td>— (alerts only fire on verified ≥ $0.10 price differences actually observed; no sub-second latency is claimed anywhere).</td>
+          <td>Confirm whether a sub-15s poll or a server-side scanner (S-03/S-09) is acceptable for stricter latency; with demo API keys a WebSocket client can replace the poller.</td>
+        </tr>
+        <tr>
+          <td><strong>F-09</strong></td>
+          <td>The "high-ROI" chat filter is a transparent heuristic, not an official Kalshi model</td>
+          <td>Two deterministic, published scores filter and rank: (1) four-component score 0.35·liquidity + 0.20·spread + 0.25·momentum + 0.20·band (gates the selective chat at ≥ 70 and the automated momentum-10c/fade-jump strategies); (2) normalized ROI proxy 0.40·liquidity + 0.30·open interest + 0.30·opportunity (shown on every alert, used by the Automated Trading engine). No Kalshi model or ROI data exists in the public API, so the filter is the site's own documented heuristic.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market schema</a> · <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a></td>
+          <td>The scores and their inputs are shown on every alert and in the ranking table; "model" is the brief's terminology, with both formulas published on the Alerts page.</td>
+          <td>Review the weightings; adjust if desired (single constants block in <code>dash/js/alerts.js</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>F-10</strong></td>
+          <td>Automated simulated trading concentrates on the hourly demo BTC markets</td>
+          <td>The most active focus-topic markets are the demo hourly BTC series (KXDEMOFUTHOURLY-*) — they settle hourly and carry most of the observed volume. Automated strategies therefore exercise simulated positions mostly on these markets; gas/golf/culture/elections markets are thin or absent at capture.</td>
+          <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXDEMOFUTHOURLY&status=open&limit=10" target="_blank" rel="noopener">live market query</a> · <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo_env (mock prices)</a></td>
+          <td>No inference about real-market behavior is made; all P&amp;L from these simulated trades is labeled simulated.</td>
+          <td>Confirm the strategy set should keep trading the thinner topics or restrict to the most liquid markets.</td>
+        </tr>
+        <tr>
+          <td><strong>F-11</strong> <span class="badge warn">new — session arena-f89b55f7</span></td>
+          <td>Alerting and automated simulated trading run only while their page is open in your browser</td>
+          <td>Both engines are browser-local by design (a static GitHub Pages site has no server process): the Live Alerts engine (chat filter + momentum-10c/fade-jump strategies) runs on <code>dash/alerts.html</code>; the five-strategy engine runs on <code>dash/autotrade.html</code>. Feeds, price history and SIM trades persist in <code>localStorage</code>. No server-side watcher exists, so nothing alerts or trades while the page is closed. Automated trades are SIMULATED paper trades — real demo-account order execution needs credentials (F-02) and is intentionally not implemented.</td>
+          <td><code>dash/js/alerts.js</code> · <code>dash/js/autotrade.js</code> (both in-repo)</td>
+          <td>—</td>
+          <td>If 24/7 alerting is wanted, the S-03/S-09 scheduled-scanner proposal could be extended to post alert digests.</td>
+        </tr>
+        <tr>
+          <td><strong>F-12</strong> <span class="badge warn">new — session arena-f89b55f7</span></td>
+          <td>Jump-cause links: two kinds, clearly labeled</td>
+          <td>Each jump shows (1) the market's official settlement-source links — from the API's <code>settlement_sources</code> fields, official; (2) a Google News search link built from the market title — an <strong>auto-generated research pointer, not a verified source, and no causal claim is made</strong>; (3) the market rules page; (4) the exact API query or trade-capture URL that produced the row.</td>
+          <td><code>dash/js/alerts.js</code> (<code>renderCause</code>) · <a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List (settlement_sources field)</a></td>
+          <td>The dashboard never states what caused a jump — it only links research starting points.</td>
+          <td>Review whether auto-generated news-search links are wanted at all; they can be removed from <code>renderCause</code> in one line.</td>
+        </tr>
         </tr>
       </tbody>
     </table>

@@ -1,50 +1,447 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Home · Kalshi Demo Dashboard</title>
-<meta name="description" content="Live Kalshi demo dashboard: highest-activity gas, election, culture, crypto and golf markets.">
+<title>KalshiDash1 — live Kalshi demo dashboard for gas, elections, culture, crypto and golf</title>
+<meta name="description" content="Live dashboard for the Kalshi demo exchange: highest-dollar open events in gas prices, elections, culture, crypto and golf; two real-time swing-alert chats; price charts, order-book liquidity, simulated portfolio and strategy analysis. Every row links to its official source.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
-<body data-page="home">
-<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
-<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
-<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
-<div class="layout">
-<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="active">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="alerts/index.html" class="">Live alerts (2 chats)</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="docs/index.html" class="">Docs dashboard</a><a href="docs/events.html" class="">Events & resolutions</a><a href="docs/methodology.html" class="">Methodology</a><a href="docs/flagged.html" class="">Docs flagged page</a></div></nav>
-<main class="content">
+<body data-page="index">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta">
+      <span id="mode-badge" class="badge warn">data: probing…</span>
+      <span id="clock" class="mono small muted"></span>
+    </div>
+  </div>
+  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">More</span><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="catalyst.html">Swing catalysts</a><a href="strategylab.html">Strategy lab</a><a href="alerts/index.html">Live alerts (engine, 2 chats)</a><a href="dash/alerts.html">Alert feeds (dash suite)</a><a href="dash/autotrade.html">Auto-trade engine (dash suite)</a></div></nav>
+</header>
 
-<h1>Kalshi Demo Dashboard</h1>
-<p class="lead">A simple, read-only dashboard of the <strong>Kalshi demo</strong> exchange. It ranks open markets by open-interest dollar value in five topics, tracks resolved outcomes (YES / NO), and shows price history and order-book liquidity.</p>
+<main><div class="wrap">
+  <div class="page-head">
+    <div class="grow">
+      <h1>Kalshi demo dashboard</h1>
+      <p class="sub">Tracks the highest-dollar live events on the Kalshi <strong>demo</strong> exchange across five focus topics —
+      gas prices, elections, culture, crypto and golf — until each market resolves <strong>yes</strong> or <strong>no</strong>.
+      Two scrolling chat panes turn any move of at least <strong>$0.10</strong> into a live alert, and every number on the site
+      links to the official endpoint or document it came from.</p>
+    </div>
+    <div class="btnrow">
+      <a class="btn primary" href="dashboard.html">Open the live dashboard</a>
+      <a class="btn" href="executive-summary.html">Executive summary</a>
+    </div>
+  </div>
 
-<div class="cards" id="status-cards">
-  <div class="card"><div class="k">Exchange status (demo, live)</div><div class="v" id="ex-status">Loading…</div><div class="s" id="ex-detail"></div></div>
-  <div class="card"><div class="k">Data as of</div><div class="v" id="asof">—</div><div class="s">Read live in your browser from the demo API.</div></div>
-  <div class="card"><div class="k">Portfolio &amp; trading</div><div class="v">Not connected</div><div class="s">Needs a demo API key. See <a href='portfolio.html'>Portfolio</a>.</div></div>
-</div>
+  <div id="mode-notice" class="notice">Probing the official demo API…</div>
 
-<h2>Topics</h2>
-<div class="cards topic-cards">
-  <a class="card link" href="categories/gas.html"><div class="k">Category</div><div class="v">Gas prices</div><div class="s">AAA-settled US gas price markets</div></a>
-  <a class="card link" href="categories/elections.html"><div class="k">Category</div><div class="v">Elections</div><div class="s">Kalshi "Elections" category</div></a>
-  <a class="card link" href="categories/culture.html"><div class="k">Category</div><div class="v">Culture</div><div class="s">Kalshi "Entertainment" category (see flag F-04)</div></a>
-  <a class="card link" href="categories/crypto.html"><div class="k">Category</div><div class="v">Crypto</div><div class="s">Kalshi "Crypto" category</div></a>
-  <a class="card link" href="categories/golf.html"><div class="k">Category</div><div class="v">Golf</div><div class="s">Kalshi "Sports" category, "Golf" tag</div></a>
-</div>
+  <div class="grid cols-4" id="status-cards"></div>
 
-<h2>Key findings (short)</h2>
-<ul>
-  <li>Public market data (events, series, markets, order books, candlesticks) is readable without credentials. Verified on 2026-11-20 (see <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Orderbook">Get Market Orderbook ↗</a> and <a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a>).</li>
-  <li>Resolved markets carry <code>result</code> = <code>yes</code> or <code>no</code> and <code>status</code> = <code>finalized</code> (example: KXAAAGASM-26OCT31-2.50 resolved <code>yes</code>, <a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=settled&with_nested_markets=true" target="_blank" rel="noopener" title="Kalshi demo API: settled US gas price events (live)">settled US gas price events (live) ↗</a>).</li>
-  <li>The API has no "dollar volume" field. Dollar figures on this site are derived and labelled as such (see flag F-03).</li>
-  <li>No trades have been placed and no portfolio data is available: no demo API key was provided. See <a class="flag" href="flagged.html#F-07">F-07</a>.</li>
-</ul>
-<p><a href="executive-summary.html">Read the full executive summary →</a></p>
+  <h2>Executive summary</h2>
+  <div class="panel">
+    <p><strong>What this is.</strong> A static, dependency-free dashboard for Kalshi's official demo Trade API.
+    The recommended REST root is <code>https://external-api.demo.kalshi.co/trade-api/v2</code> (also supported:
+    <code>https://demo-api.kalshi.co/trade-api/v2</code>); the WebSocket root is
+    <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> (also supported:
+    <code>wss://demo-api.kalshi.co/trade-api/ws/v2</code>). These match the endpoint table in
+    <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Test In The Demo Environment</a>
+    and <a href="https://docs.kalshi.com/getting_started/api_environments" target="_blank" rel="noopener">API Environments and Endpoints</a> exactly.</p>
 
-<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
-</main>
-</div>
-<script src="assets/app.js" type="module"></script>
+    <p><strong>Verified facts this site is built on.</strong></p>
+    <ul>
+      <li>Public market data — series, events, markets, order books and candlesticks — is reachable
+      <em>without authentication</em>
+      (<a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Quick Start: Market Data</a>).
+      Only those endpoints are used for the live feed.</li>
+      <li>Balances, positions and orders require request signing
+      (<code>KALSHI-ACCESS-KEY</code>, <code>-TIMESTAMP</code>, <code>-SIGNATURE</code>;
+      <code>timestamp + METHOD + path</code> signed with RSA-PSS/SHA-256 or Ed25519) —
+      <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">Quick Start: Authenticated Requests</a>.
+      The <a href="demo-account.html">Demo account</a> page signs requests in your browser from a key you paste; the key is never stored and never leaves your browser.</li>
+      <li>Markets resolve with <code>result</code> of <code>yes</code>, <code>no</code> or <code>scalar</code>, and the winning side is paid <strong>$1.00 per contract</strong>
+      (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>,
+      <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a>).
+      The tracker follows each market from active → determined → finalized and announces the resolution in the chat.</li>
+      <li>The demo environment uses mock funds and separate credentials, and Kalshi warns that demo prices may not reflect real markets —
+      <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo_env</a>. Nothing on this site is a trading recommendation.</li>
+    </ul>
+
+    <p><strong>At the verified snapshot (2026-11-20 14:09:32 UTC):</strong> the capture found
+    <strong>3386</strong> open markets across the five topics and
+    <strong>122</strong> matching series, using <strong>185</strong> documented endpoints.
+    The highest-dollar focus-topic rows are listed below and carry their own source links.</p>
+
+    <p><strong>What is deliberately blank or flagged.</strong> Anything the API did not return is left blank and published on the
+    <a href="flagged.html">Flagged for Review</a> page with the reason. The site never fills a gap with a guess.</p>
+  </div>
+
+  <h2>Focus topics</h2>
+  <p class="sub">Topics are kept separate; the events inside a topic stay grouped together on that topic's own page.</p>
+  <div class="topic-cards">
+    <a class="topic-card" href="categories/gas.html"><h3>Gas Prices</h3><div class="big">143</div><div class="muted small">open markets at capture</div></a>
+    <a class="topic-card" href="categories/elections.html"><h3>Elections</h3><div class="big">318</div><div class="muted small">open markets at capture</div></a>
+    <a class="topic-card" href="categories/culture.html"><h3>Culture</h3><div class="big">0</div><div class="muted small">open markets at capture</div></a>
+    <a class="topic-card" href="categories/crypto.html"><h3>Crypto</h3><div class="big">1756</div><div class="muted small">open markets at capture</div></a>
+    <a class="topic-card" href="categories/golf.html"><h3>Golf</h3><div class="big">1169</div><div class="muted small">open markets at capture</div></a>
+  </div>
+
+  <h2>Topic summary</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Topic</th><th class="num">Series tracked</th><th class="num">Open markets</th><th class="num">24h volume ($)</th><th>Highest-dollar row</th><th>Source</th></tr></thead>
+      <tbody><tr>
+      <td><strong><a href="categories/gas.html">Gas Prices</a></strong></td>
+      <td class="num">30</td>
+      <td class="num">143</td>
+      <td class="num">39,447</td>
+      <td><a href="market.html?ticker=KXAAAGASW-26NOV23-3.6400">Will average **gas prices** be above $3.6400?</a></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
+    </tr>
+<tr>
+      <td><strong><a href="categories/elections.html">Elections</a></strong></td>
+      <td class="num">30</td>
+      <td class="num">318</td>
+      <td class="num">3,892,407</td>
+      <td><a href="market.html?ticker=KXPRESNOMD-28-AYAN">Will Andrew Yang be the nominee for the Presidency for the Democratic party?</a></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
+    </tr>
+<tr>
+      <td><strong><a href="categories/culture.html">Culture</a></strong></td>
+      <td class="num">2</td>
+      <td class="num">0</td>
+      <td class="num">0</td>
+      <td><span class="muted">no open market at capture</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
+    </tr>
+<tr>
+      <td><strong><a href="categories/crypto.html">Crypto</a></strong></td>
+      <td class="num">30</td>
+      <td class="num">1,756</td>
+      <td class="num">589,178</td>
+      <td><a href="market.html?ticker=KXBTCY-27JAN0100-T149999.99">BTC price  on Jan 1, 2027?</a></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
+    </tr>
+<tr>
+      <td><strong><a href="categories/golf.html">Golf</a></strong></td>
+      <td class="num">30</td>
+      <td class="num">1,169</td>
+      <td class="num">10,061,073</td>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-TMOO">The RSM Classic: Taylor Moore wins</a></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
+    </tr></tbody>
+    </table>
+  </div>
+
+  <h2>Highest-dollar live rows right now</h2>
+  <p class="sub">Ranked by 24-hour dollar volume (contracts × the contract's settlement value). The live feed replaces this table in place when your browser can reach the demo API.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Market</th><th>Topic</th><th class="num">Last</th><th class="num">Bid / Ask</th><th class="num">Spread</th><th class="num">24h vol ($)</th><th class="num">Total vol ($)</th><th class="num">Open int ($)</th><th>Status</th><th>Result</th><th>Source</th></tr></thead>
+      <tbody id="top-table-body"><tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-TMOO">The RSM Classic: Taylor Moore wins</a><br><span class="ticker">KXPGATOUR-THRC26-TMOO</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0040 / $0.0050</td>
+      <td class="num">$0.0010</td>
+      <td class="num">841,159</td>
+      <td class="num">1,155,550</td>
+      <td class="num">1,150,061</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-SSTR">The RSM Classic: Sepp Straka wins</a><br><span class="ticker">KXPGATOUR-THRC26-SSTR</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0250</td>
+      <td class="num">$0.0220 / $0.0250</td>
+      <td class="num">$0.0030</td>
+      <td class="num">515,331</td>
+      <td class="num">759,578</td>
+      <td class="num">681,895</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-KROY">The RSM Classic: Kevin Roy wins</a><br><span class="ticker">KXPGATOUR-THRC26-KROY</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">465,007</td>
+      <td class="num">579,120</td>
+      <td class="num">575,510</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-MMEI">The RSM Classic: Mac Meissner wins</a><br><span class="ticker">KXPGATOUR-THRC26-MMEI</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0050</td>
+      <td class="num">$0.0030</td>
+      <td class="num">457,123</td>
+      <td class="num">493,803</td>
+      <td class="num">346,231</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-MPEN">The RSM Classic: Marco Penge wins</a><br><span class="ticker">KXPGATOUR-THRC26-MPEN</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0070</td>
+      <td class="num">$0.0060 / $0.0070</td>
+      <td class="num">$0.0010</td>
+      <td class="num">407,847</td>
+      <td class="num">427,670</td>
+      <td class="num">418,468</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-MPAV">The RSM Classic: Matthieu Pavon wins</a><br><span class="ticker">KXPGATOUR-THRC26-MPAV</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">396,247</td>
+      <td class="num">408,118</td>
+      <td class="num">401,594</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-SSTE">The RSM Classic: Sam Stevens wins</a><br><span class="ticker">KXPGATOUR-THRC26-SSTE</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0040 / $0.0050</td>
+      <td class="num">$0.0010</td>
+      <td class="num">347,544</td>
+      <td class="num">401,070</td>
+      <td class="num">393,257</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-JVAN">The RSM Classic: John VanDerLaan wins</a><br><span class="ticker">KXPGATOUR-THRC26-JVAN</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0080</td>
+      <td class="num">$0.0050 / $0.0080</td>
+      <td class="num">$0.0030</td>
+      <td class="num">332,910</td>
+      <td class="num">344,782</td>
+      <td class="num">301,790</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-CBLA">The RSM Classic: Chandler Blanchet wins</a><br><span class="ticker">KXPGATOUR-THRC26-CBLA</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0050</td>
+      <td class="num">$0.0030</td>
+      <td class="num">298,336</td>
+      <td class="num">364,209</td>
+      <td class="num">364,075</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-HSPR">The RSM Classic: Hayden Springer wins</a><br><span class="ticker">KXPGATOUR-THRC26-HSPR</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">261,681</td>
+      <td class="num">273,358</td>
+      <td class="num">270,121</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-JKEE">The RSM Classic: Johnny Keefer wins</a><br><span class="ticker">KXPGATOUR-THRC26-JKEE</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">257,916</td>
+      <td class="num">269,856</td>
+      <td class="num">194,827</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-ZBLA">The RSM Classic: Zac Blair wins</a><br><span class="ticker">KXPGATOUR-THRC26-ZBLA</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">229,900</td>
+      <td class="num">265,289</td>
+      <td class="num">259,515</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-KHIR">The RSM Classic: Kensei Hirata wins</a><br><span class="ticker">KXPGATOUR-THRC26-KHIR</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">229,879</td>
+      <td class="num">241,903</td>
+      <td class="num">240,163</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-TCRO">The RSM Classic: Trace Crowe wins</a><br><span class="ticker">KXPGATOUR-THRC26-TCRO</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">224,170</td>
+      <td class="num">257,343</td>
+      <td class="num">247,934</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-HLI">The RSM Classic: Haotong Li wins</a><br><span class="ticker">KXPGATOUR-THRC26-HLI</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0130</td>
+      <td class="num">$0.0120 / $0.0130</td>
+      <td class="num">$0.0010</td>
+      <td class="num">219,272</td>
+      <td class="num">233,963</td>
+      <td class="num">227,063</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-RCAS">The RSM Classic: Ricky Castillo wins</a><br><span class="ticker">KXPGATOUR-THRC26-RCAS</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0220</td>
+      <td class="num">$0.0190 / $0.0220</td>
+      <td class="num">$0.0030</td>
+      <td class="num">215,897</td>
+      <td class="num">231,210</td>
+      <td class="num">224,564</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-AECK">The RSM Classic: Austin Eckroat wins</a><br><span class="ticker">KXPGATOUR-THRC26-AECK</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">211,308</td>
+      <td class="num">278,684</td>
+      <td class="num">277,387</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-LHOD">The RSM Classic: Lee Hodges wins</a><br><span class="ticker">KXPGATOUR-THRC26-LHOD</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0230</td>
+      <td class="num">$0.0210 / $0.0230</td>
+      <td class="num">$0.0020</td>
+      <td class="num">209,637</td>
+      <td class="num">221,336</td>
+      <td class="num">208,616</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-GHIG">The RSM Classic: Garrick Higgo wins</a><br><span class="ticker">KXPGATOUR-THRC26-GHIG</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0200</td>
+      <td class="num">$0.0170 / $0.0200</td>
+      <td class="num">$0.0030</td>
+      <td class="num">176,578</td>
+      <td class="num">188,430</td>
+      <td class="num">178,280</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-RHOE">The RSM Classic: Rico Hoey wins</a><br><span class="ticker">KXPGATOUR-THRC26-RHOE</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">175,340</td>
+      <td class="num">191,697</td>
+      <td class="num">183,900</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr></tbody>
+    </table>
+  </div>
+
+  <h2>How to use this site</h2>
+  <div class="grid cols-2">
+    <div class="panel">
+      <h3>Watch and decide</h3>
+      <ol>
+        <li><a href="dashboard.html">Dashboard</a> — two scrolling chats: every move ≥ $0.10, and only the moves the ROI model likes.</li>
+        <li><a href="markets.html">Markets</a> — the full tracked list, filterable by topic and by open/resolved, with each market's result.</li>
+        <li><a href="categories/gas.html">Topic pages</a> — series, open markets, liquidity and resolved events for one topic at a time.</li>
+        <li><a href="market.html">Market detail</a> — price chart (30 s → 24 h), order-book ladder, settlement rules, paper trade.</li>
+      </ol>
+    </div>
+    <div class="panel">
+      <h3>Trade and verify</h3>
+      <ol>
+        <li><a href="portfolio.html">Portfolio</a> — the simulated portfolio, the auto-trader and the equity curve.</li>
+        <li><a href="analysis.html">Analysis</a> — trades categorised by strategy and topic so you can build a strategy from the results.</li>
+        <li><a href="strategies.html">Strategies</a> — the exact rule behind every strategy and behind the ROI score.</li>
+        <li><a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for review</a> · <a href="questions.html">Questions</a> — provenance and open items.</li>
+      </ol>
+    </div>
+  </div>
+
+  <noscript><div class="notice warn">JavaScript is disabled, so the live feed is off. The captured tables above still show the
+  verified snapshot with source links. Enable JavaScript for the live dashboard, the alert chats and the charts.</div></noscript>
+</div></main>
+
+<footer class="site">
+  <div class="nav-inner">
+    <p><strong>KalshiDash1</strong> — a static dashboard for the official Kalshi <em>demo</em> exchange.
+    Demo only: mock funds, and demo prices may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
+    <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
+       WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
+       Snapshot captured 2026-11-20 14:09:32 UTC ·
+       <a href="sources.html">Sources</a> ·
+       <a href="flagged.html">Flagged for review</a> ·
+       <a href="COORDINATION.md">Coordination board</a></p>
+    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
+    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+  </div></footer>
+<script src="assets/app.js"></script>
+<script src="assets/chart.js"></script>
 </body>
 </html>

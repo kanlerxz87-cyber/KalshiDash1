@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Alerts — KalshiDash1</title>
+<meta name="description" content="Live alerting for Kalshi demo contract-price swings ≥ $0.10 in either direction: two scrolling chats (all markets vs the high-ROI model filter), jump-cause research links, an orderbook ladder, and automated simulated strategies.">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* page-local styles (sessions arena-f89b55f7 + arena/815b546d, merged) */
+  .chats { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 900px) { .chats { grid-template-columns: 1fr; } }
+  .chat-box { border: 1px solid var(--line, #dbe2ea); border-radius: 10px; background: #fff; overflow: hidden; }
+  .chat-box > h3 { margin: 0; padding: .6rem .9rem; border-bottom: 1px solid var(--line, #dbe2ea); background: #f7f9fb; font-size: .95rem; }
+  .chat { height: 340px; overflow-y: auto; padding: .4rem 0; font-size: .85rem; }
+  .chat-row { display: flex; flex-wrap: wrap; gap: .45rem; align-items: baseline; padding: .3rem .9rem; border-bottom: 1px dashed #eef1f5; }
+  .chat-row.liked { background: #f2fbf5; }
+  .chat-row.sim { background: #f5f8ff; }
+  .chat-row.replay { background: #fffbeb; }
+  .chat-row .t { font-family: ui-monospace, monospace; color: #5b6b7b; font-size: .75rem; white-space: nowrap; }
+  .chat-row .arrow { font-weight: 700; white-space: nowrap; }
+  .chat-row .arrow.up { color: #15803d; }
+  .chat-row .arrow.down { color: #b91c1c; }
+  .chat-row .arrow.sim { color: #14568f; }
+  .chat-row .topic { color: #5b6b7b; font-size: .72rem; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; }
+  .chat-row .tk { color: #14568f; }
+  .chat-row .px { color: #24303c; }
+  .chat-row .cat { flex-basis: 100%; }
+  .score-badge { background: #dcfce7; color: #166534; border-radius: 999px; padding: 0 .45rem; font-size: .72rem; font-weight: 700; }
+  .roi-badge { background: #e0e7ff; color: #3730a3; border-radius: 999px; padding: 0 .45rem; font-size: .72rem; font-weight: 700; }
+  .btn.tiny { padding: 0 .5rem; font-size: .72rem; }
+  .chart-box { position: relative; border: 1px solid var(--line, #dbe2ea); border-radius: 10px; background: #fff; }
+  #price-chart { width: 100%; height: 320px; display: block; }
+  #chart-tip { position: absolute; display: none; background: #fff; border: 1px solid var(--line, #dbe2ea); border-radius: 8px; padding: .35rem .55rem; font-size: .75rem; pointer-events: none; box-shadow: 0 2px 8px rgba(16,32,48,.12); z-index: 5; }
+  .legend { font-size: .75rem; color: #5b6b7b; padding: .35rem .9rem .55rem; border-top: 1px dashed #eef1f5; background: #fbfcfe; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Live Alerts — swings ≥ $0.10, both directions</h1>
+  <p class="sub">An alerting engine polls the tracked highest-dollar live markets of the five focus topics
+  (gas · elections · culture · crypto · golf). Each 15&nbsp;s cycle makes <strong>one batched</strong>
+  <code>GET /markets?tickers=…</code> quote request (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">docs: a <code>tickers</code>-only request returns every matching market in one response</a>)
+  and additionally walks the most recent trades of the 4 highest-dollar tracked markets
+  (<a href="https://docs.kalshi.com/api-reference/market/get-trades" target="_blank" rel="noopener">Get Trades</a> — each trade processed exactly once, so alerts carry exact trade timestamps).
+  When a market's YES price moves <strong>≥ $0.10</strong>, both chats get a row: the left chat logs <em>every</em> swing,
+  the right chat only what the ROI model likes (score ≥ 70) plus every automated simulated trade it takes.
+  Markets stay in the watch set until they resolve — resolution (yes/no) is logged from the API <code>result</code> field
+  and settles open paper trades (see also <a href="events.html">Live Events</a>).</p>
+
+  <div class="notice" id="engine-notice">starting engine…</div>
+
+  <div class="grid cols-4" id="alert-stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:1rem"></div>
+
+  <div class="grid cols-4" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat"><div class="label">Swing threshold</div><div class="value">≥ $0.10</div><div class="note">either direction; REST responses are cached briefly per the docs, so timestamps can lag fills (<a href="flagged.html">F-08</a>)</div></div>
+    <div class="stat"><div class="label">High-ROI filter</div><div class="value">score ≥ 70</div><div class="note">transparent 4-component model below; normalized ROI proxy shown alongside (<a href="flagged.html">F-09</a>)</div></div>
+    <div class="stat"><div class="label">Auto-trading</div><div class="value">Simulated</div><div class="note">momentum-10c / fade-jump, $5 entries, ±$0.10 exit, 15-min time stop, max 3 open; a second engine lives on <a href="autotrade.html">Automated Trading</a></div></div>
+    <div class="stat"><div class="label">Rate safety</div><div class="value">~5 req / 15 s</div><div class="note">+ exponential backoff on failures (<a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">unauthenticated limits</a>)</div></div>
+  </div>
+
+  <div class="btnrow">
+    <button class="btn small" id="at-toggle">Auto-trading: ON (simulated)</button>
+    <button class="btn" id="pause-btn">Pause alerts</button>
+    <button class="btn small" id="clear-btn">Clear local alert history</button>
+    <span class="small muted" id="engine-status"></span>
+  </div>
+  <div class="small muted" id="at-stats-txt" style="margin-bottom:1rem"></div>
+
+  <div class="chats">
+    <div class="chat-box">
+      <h3>Chat 1 — All markets: every ≥ $0.10 swing</h3>
+      <div class="chat" id="chat-all"></div>
+      <div class="legend">Every tracked market, both directions. Hover pauses scrolling; scroll up to read — it re-sticks at the bottom. Rows are kept in this browser (max 300). Rows marked <em>replay</em> come from the verified snapshot trades capture, not a live poll.</div>
+    </div>
+    <div class="chat-box">
+      <h3>Chat 2 — Model picks: high-ROI filter (score ≥ 70) + SIM trades</h3>
+      <div class="chat" id="chat-model"></div>
+      <div class="legend">Only jumps on markets the model likes (green rows, score shown, normalized ROI proxy alongside) plus automated simulated entries/exits (SIM ▶ / SIM ■). Simulated P&amp;L flows into <a href="portfolio.html">Portfolio</a> and <a href="analysis.html">Trade Analysis</a> under the strategy names.</div>
+    </div>
+  </div>
+
+  <h2 id="model">ROI model ranking (watch set)</h2>
+  <p class="sub" id="model-note"><strong>Two transparent models, both shown (no black box):</strong><br>
+  <strong>1. Four-component score</strong> (<code>js/alerts.js</code>, <code>AlertsEngineCore.scoreMarket</code>):
+  <code>score = 100 × (0.35·liquidity + 0.20·spread + 0.25·momentum + 0.20·band)</code>.
+  <em>Liquidity</em>: log-scaled 24h dollar volume (contracts × $1 notional; $2,000 → 1.0, calibrated to the 2026-11-20 demo snapshot top rows).
+  <em>Spread</em>: $0.01 → 1, $0.10 → 0 (prices tick $0.01, <code>linear_cent</code>, verified live).
+  <em>Momentum</em>: largest observed move in the last 30 min ÷ $0.10 (warms up while the page polls).
+  <em>Band</em>: mid-price $0.15–$0.85 → 1, falling to 0 near $0.02/$0.98. “Model likes” = score ≥ 70 — this gates chat 2 and the automated strategies.<br>
+  <strong>2. Normalized ROI proxy</strong> (<code>Alerts.modelScore</code>, also used by the
+  <a href="autotrade.html">Automated Trading</a> engine): <code>0.40·liquidity + 0.30·open interest + 0.30·opportunity</code>,
+  normalized against the current watch set; <code>roiYes/roiNo</code> estimate per-side return potential. Heuristic, not an official Kalshi model (F-09).</p>
+  <div class="table-wrap">
+    <table id="model-table">
+      <thead>
+        <tr>
+          <th>Market</th><th>Topic</th><th class="num">Score</th>
+          <th class="num">Liq.</th><th class="num">Spread</th><th class="num">Mom.</th><th class="num">Band</th>
+          <th class="num">ROI proxy</th>
+          <th class="num">Bid / Ask</th><th class="num">24h vol ($)</th><th>Source</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <h2>Jump detail — chart, liquidity ladder, cause research</h2>
+  <p class="sub">Click <em>“why / chart”</em> on any chat row. X axis = time (choose seconds/minutes/hours windows), Y axis = contract price.
+  Dashed vertical lines mark ≥ $0.10 jumps for this market within the window. The ladder shows how many contracts are
+  available at each price (YES bids from the book; YES asks implied from NO bids at 1 − price, per the
+  <a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">official orderbook semantics</a>).</p>
+  <h3 id="d-title" style="margin-bottom:.5rem"></h3>
+  <div class="btnrow" id="window-btns"></div>
+  <div class="chart-box">
+    <canvas id="price-chart"></canvas>
+    <div id="chart-tip"></div>
+  </div>
+  <div id="cause" class="notice" style="margin-top:1rem"></div>
+
+  <h3>Liquidity ladder (contracts available at each price)</h3>
+  <div class="table-wrap" style="max-width:520px">
+    <table id="ladder">
+      <thead><tr><th>Price (YES)</th><th class="num">Bid size</th><th class="num">Ask size</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="small muted" id="book-summary"></p>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/kalshi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app-common.js"></script>
+<script src="js/alerts.js"></script>
+</body>
+</html>
