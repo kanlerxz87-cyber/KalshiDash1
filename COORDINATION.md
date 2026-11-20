@@ -2,7 +2,28 @@
 
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
-## Session on this branch
+## Session on this branch — session-d5b935f4 (current)
+
+- Session ID: `session-d5b935f4`
+- Branch: `arena/d5b935f4-kalshidash1` (base `8f80f34`, `main`) — Arena manages this one branch; no other branches/worktrees are created by this session.
+- Position: **final integration session** for the remaining brief gaps. All prior session tasks (below) are `done` and merged (PRs #1–#4, #10). Per the board rules, shared outputs (generator, index/nav, table data) may now be changed by this integration session; nothing built by earlier sessions is deleted or discarded.
+- Claimed 2026-11-20, tasks A1–A7 (see board below). Prior session records are preserved verbatim after this section.
+
+### Task board — session-d5b935f4 (gaps against the original brief)
+
+| ID | Task | Status | Owner | Files touched | Sources | Irregularities |
+|---|---|---|---|---|---|---|
+| A1 | Live data + engine pipeline: collector for the 5 focus topics (gas, elections, culture, crypto, golf), ≥$0.10 swing alert engine, high-ROI model picks, automated simulated-trade engine (5 strategies), resolution ledger; scheduled GitHub Actions refresh with committed `data/` snapshots | in progress | session-d5b935f4 | `scripts/livefeed.mjs`, `.github/workflows/livefeed.yml`, `data/` | demo Trade API endpoints (verified live this session) + docs.kalshi.com refs on Sources page | Prior convention "no market data committed" revised: small bounded `data/` snapshots are required so alerts/trades/resolutions persist across page loads (logged here; nothing large is committed) |
+| A2 | Live alerting UI: two scrolling chat feeds (All events / Model picks – high ROI), real-time ≥$0.10 swing alerts with links | unclaimed→next | session-d5b935f4 | `alerts.html` (via generator), `assets/feed.js` | A1 endpoints | — |
+| A3 | Dashboard upgrades: price chart jump markers (≥$0.10) with event/website links, liquidity depth summary | unclaimed→next | session-d5b935f4 | `dashboard.html` (via generator), `assets/app.js`, `assets/charts.js` | market, orderbook, candlesticks, trades endpoints | Causality of linked sources to price jumps is never asserted (coincidence only) |
+| A4 | Portfolio + trading + analysis: automated simulated portfolio/performance, trade log with strategy × topic categorisation, live demo-account path (keys via GitHub Secrets only, never in repo) | unclaimed→next | session-d5b935f4 | `portfolio.html`, `trading.html`, `analysis.html` (via generator), `assets/feed.js` | market_settlement, api_keys, create-order docs | Live-account execution needs demo API keys (owner action; simulated trading is active meanwhile) — flagged |
+| A5 | Event lifecycle tracking until resolution (yes/no) with resolution ledger page | unclaimed→next | session-d5b935f4 | `tracked-events.html` (via generator) | events/markets endpoints (`result`, `status`) | — |
+| A6 | Docs + verification: executive summary refresh, sources/flagged/questions/suggestions updates, README, line-by-line verification with per-row source links | unclaimed→next | session-d5b935f4 | `README.md`, `EXECUTIVE_SUMMARY.md`, generator pages | docs.kalshi.com + live API | F-01 to be resolved by header check in Actions (CORS) |
+| A7 | Final integration: QA (link check, JS syntax, staleness), PR → main, merge, GitHub Pages deploy confirmation, record here | unclaimed→next | session-d5b935f4 | `COORDINATION.md`, `.github/workflows/pages.yml` | `gh` + Pages API | — |
+
+Status key: `unclaimed` · `in progress` · `done` · `needs review` (published on the Flagged page; does not block).
+
+## Session on this branch (previous — session-ef745c36, preserved)
 
 - Session ID: `session-ef745c36`
 - Branch: `arena/ef745c36-kalshidash1` (base `f1fa6aa`, `main`)
