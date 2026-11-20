@@ -96,11 +96,7 @@ trade/portfolio engine, and a suggestions review queue.
 |------|---------|
 | `dash/index.html` | Executive summary + focus-topic glance + highest-dollar rows + live-alerting intro (live or verified snapshot) |
 | `dash/events.html` | Topic boards ranked by dollar volume, tracked to resolution (yes/no) + resolution log |
-<<<<<<< HEAD
-| `dash/alerts.html` | **Live alerting (session arena-f89b55f7):** two scrolling chats — every ≥ $0.10 swing vs. the high-ROI model filter (score ≥ 70) — plus the ROI model ranking, jump-cause research links, a compact liquidity ladder, a chart with seconds→days windows and jump markers, and automated simulated strategies (`momentum-10c`, `fade-jump`) that write into Portfolio/Analysis. REST-polled (`GET /markets?tickers=…`, 1 batched request / 15 s + backoff); see `dash/flagged.html` F-08–F-10. |
-=======
 | `dash/alerts.html` | **Live alerting (merged engine, sessions arena-f89b55f7 + arena/815b546d):** two scrolling chats — every ≥ $0.10 swing vs. the high-ROI model filter (score ≥ 70) — plus the ROI model ranking, jump-cause research links, a compact liquidity ladder, a chart with seconds→days windows and jump markers, resolutions logged from the API `result` field, snapshot trades replay, and automated simulated strategies (`momentum-10c`, `fade-jump`) that write into Portfolio/Analysis. Each 15 s cycle: 1 batched `GET /markets?tickers=…` + trade-walk of the top 4 markets (`GET /markets/trades`); see `dash/flagged.html` F-08–F-12. |
->>>>>>> origin/main
 | `dash/market.html` | Price chart (X = time: 5 min seconds-granularity / 1 h / 6 h / 24 h / 7 d; Y = contract price), orderbook ladder (contracts available at each price), rules + settlement sources, simulated trade ticket |
 | `dash/autotrade.html` | Automated simulated-trade engine: five strategies run automatically against live prices; decisions, controls and stats logged |
 | `dash/portfolio.html` | Simulated P&L, win rate, exposure, equity curve, category breakdown (real demo-account sync needs the owner's keys — see `dash/flagged.html` F-02) |
