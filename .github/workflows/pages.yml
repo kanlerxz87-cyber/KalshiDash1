@@ -33,4 +33,9 @@ jobs:
           node scripts/check-links.mjs
           node --check assets/app.js
       - name: Fail if the committed site is stale
-        run: git diff --exit-code -- '*.html' assets categories
+        run: |
+          if [ -n "$(git status --porcelain -- '*.html' assets categories data)" ]; then
+            git status --porcelain -- '*.html' assets categories data
+            echo "Generated site is stale: run node scripts/build-site.mjs and commit the result."
+            exit 1
+          fi

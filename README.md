@@ -12,6 +12,7 @@ A simple, read-only dashboard for the **Kalshi demo** exchange, published with G
   No dependencies are needed (Node 22 or later).
 - **Live data:** read in the visitor's browser from the official demo Trade API, `https://external-api.demo.kalshi.co/trade-api/v2`, using public endpoints only. No credentials are requested, stored or sent.
 - **Pages:** the repository's Pages source is the legacy `main` branch, root folder (set by the repository owner; the automation token could not change it). `.github/workflows/pages.yml` rebuilds the site, checks links, and fails if the committed site is stale.
+- **Layout:** page templates are `templates/*.tpl` (stored with a `.tpl` extension so the whole-tree HTML link checker never treats them as pages); the generator fills them with snapshot data and writes the root pages and `categories/`. `dash/` and `docs/` are independent suites that are kept in place. The earlier root-site files are preserved verbatim in `archive/legacy-root/`.
 - **Coordination:** see `COORDINATION.md` for the task board, sources, verification and flagged items.
 
 Official references: [Demo environment](https://docs.kalshi.com/getting_started/demo_env) · [API index](https://docs.kalshi.com/llms.txt) · [Sources page in the site](sources.html).

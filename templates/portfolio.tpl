@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulated portfolio — KalshiDash1</title>
+<meta name="description" content="Simulated Kalshi demo portfolio: paper trades, realised and unrealised P&amp;L, win rate, exposure, equity curve and the auto-trader that runs the published strategies.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="portfolio">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta">
+      <span id="mode-badge" class="badge warn">data: probing…</span>
+      <span id="clock" class="mono small muted"></span>
+    </div>
+  </div>
+  <nav class="site"><div class="nav-inner">{{NAV}}</div></nav>
+</header>
+
+<main><div class="wrap">
+  <div class="page-head">
+    <div class="grow">
+      <h1>Simulated portfolio</h1>
+      <p class="sub">Paper trades executed in your browser against live demo prices, settled the way Kalshi settles:
+      the winning side receives $1.00 per contract when the market is determined.
+      <strong>No real order is ever sent from this site.</strong> For your actual demo account, see
+      <a href="demo-account.html">Demo account</a>.</p>
+    </div>
+    <div class="btnrow">
+      <button class="btn" id="reset-trades">Clear simulated trades</button>
+    </div>
+  </div>
+
+  <div id="mode-notice" class="notice">Probing the official demo API…</div>
+
+  <div class="grid cols-4" id="portfolio-stats"></div>
+
+  <h2>Equity curve</h2>
+  <div class="chart-box">
+    <canvas id="equity-chart" class="short"></canvas>
+    <div class="chart-legend"><span><i style="background:#4c9aff"></i>cumulative realised P&amp;L per settled paper trade</span></div>
+  </div>
+
+  <h2>Auto-trader</h2>
+  <div class="panel">
+    <div class="row">
+      <div class="shrink"><label class="switch"><input type="checkbox" id="auto-trade"> Run the published strategies automatically</label></div>
+      <div><p class="small muted" style="margin:0">Each strategy is defined with exact thresholds on
+      <a href="strategies.html">Strategies</a>. The auto-trader opens one paper position per market per strategy, fills at the
+      current touch, and settles automatically when the market is determined.</p></div>
+    </div>
+  </div>
+
+  <h2>Trade log</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Time</th><th>Market</th><th>Topic</th><th>Side</th><th class="num">Contracts</th><th class="num">Entry</th><th class="num">Last</th><th>Strategy</th><th>P&amp;L</th><th>Result</th><th>Source</th></tr></thead>
+      <tbody id="portfolio-trades"></tbody>
+    </table>
+  </div>
+
+  <h2>How the settlement rule is applied</h2>
+  <div class="panel">
+    <ul>
+      <li>On a <strong>yes</strong> outcome the YES holders receive $1.00 per contract; on a <strong>no</strong> outcome the NO
+      holders receive $1.00 per contract — <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>.</li>
+      <li>A paper trade is settled when the market reaches <code>determined</code> or <code>finalized</code> with a result of
+      yes or no — <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a>.</li>
+      <li>Realised P&amp;L = (payout − entry price) × contracts. Fees are not applied: Kalshi states settlement fees are zero for
+      simple yes/no determinations, and the simulator does not model a trading fee.</li>
+      <li>Mark-to-market uses the last observed price, not a guaranteed exit price.</li>
+    </ul>
+    <p class="small muted">Trades are stored in this browser's local storage only. Clearing the browser data removes them.</p>
+  </div>
+</div></main>
+
+<footer class="site">{{FOOTER}}</footer>
+<script src="assets/app.js"></script>
+<script src="assets/chart.js"></script>
+</body>
+</html>

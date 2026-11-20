@@ -2,6 +2,44 @@
 
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
+## Session on this branch (FINAL INTEGRATION — read this first)
+
+- Session ID: `session-7d6d2fcb`
+- Branch: `arena/7d6d2fcb-kalshidash1` (base `8f80f34`, `main`)
+- Role: **final integration session** — all other sessions' tasks are already merged into `main`
+  (PRs #1–#4 and #10). This session re-verifies the combined data line by line, consolidates the
+  duplicated site trees into one canonical site, publishes to GitHub Pages, and opens/merges the PR to `main`.
+- Scope (files this session edits):
+  - `COORDINATION.md` (this board), `README.md`
+  - site generator `scripts/build-site.mjs`, `scripts/check-links.mjs`, `scripts/fetch-snapshot.mjs`
+  - canonical site at the repo root: `index.html`, `dashboard.html`, `markets.html`, `market.html`,
+    `portfolio.html`, `analysis.html`, `strategies.html`, `categories/*.html`, `sources.html`,
+    `flagged.html`, `questions.html`, `suggestions.html`, `api.html`, `executive-summary.html`, `404.html`
+  - `assets/style.css`, `assets/app.js`, `assets/chart.js`
+  - `data/snapshot.json`, `data/sources.json`
+  - `.github/workflows/pages.yml`, `.github/workflows/refresh-data.yml`, `.github/workflows/site-qa.yml`
+- Consolidation rule: the three overlapping site trees that exist on `main` today
+  (root site, `dash/`, `docs/`, plus `archive/`) are preserved **verbatim** under `archive/`
+  (nothing is deleted from git history) and are removed from the published navigation so the
+  live site has exactly one canonical experience.
+- Claimed tasks: see "Task board — session-7d6d2fcb" below. All prior records are preserved verbatim below.
+
+---
+
+## Session on this branch (prior — session-ef745c36)
+
+---
+
+<!-- merged from origin/main at integration (session-7d6d2fcb): session-d5b935f4 and earlier board sections preserved verbatim below -->
+
+---
+
+<!-- merged from origin/main (PR #19, session-7f90cf50) at integration; kept verbatim -->
+
+---
+
+<!-- merged from origin/main (PR #21, session-f89b55f7) at integration; kept verbatim -->
+
 ## Active session — arena-f89b55f7 (2026-11-20; acting integration session for the alerts engines)
 ## Claims & record — session-7f90cf50 (branch `arena/7f90cf50-kalshidash1`, base `8f80f34`)
 
@@ -650,6 +688,55 @@ Decision: this session did the full site on its own branch, because it may only 
 | T8 | Build, link check, Pages workflow, PR, merge, deploy check | done (merged PR #4; Pages built) | session-ef745c36 | `scripts/*`, `.github/workflows/pages.yml`, `COORDINATION.md`, `README.md` | `node scripts/check-links.mjs` | F-14 (Pages source could not be changed by the token; site published from repo root) |
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review` (published on the Flagged page; does not block).
+
+### Task board — session-7d6d2fcb (final integration)
+
+| ID | Task | Status | Owner | Files touched | Sources | Irregularities |
+|---|---|---|---|---|---|---|
+| I1 | Repo review, line by line (all files, all branches, all prior records) | done | session-7d6d2fcb | whole repo (read) | `git log`, `gh api`, repo tree; official pages listed on the Sources page | F-20, F-21, and the flagged list on the Flagged for Review page |
+| I2 | Consolidate the overlapping site trees into one canonical site at the repo root; preserve the others under `archive/` | done | session-7d6d2fcb | `scripts/build-site.mjs`, `templates/*.tpl`, root pages, `archive/legacy-root/`, `archive/` | — | F-20 (prior sessions shipped 3 parallel site trees). `dash/` and `docs/` were moved to `archive/` and then restored in place because existing QA workflows (`suite-qa.yml`, `site-qa.yml`) and other sessions reference them; they remain independent suites. |
+| I3 | Live alert engine: two scrolling chats (all events + high-ROI model filter), swing threshold ≥ $0.10 | done | session-7d6d2fcb | `assets/app.js`, `templates/dashboard.tpl` | get-market, orderbook | F-21 (no news feed in the Kalshi API; news links only where a source is published) |
+| I4 | Market page: price chart (30 s → 24 h windows), orderbook ladder (contracts available at each price) | done | session-7d6d2fcb | `templates/market.tpl`, `assets/chart.js`, `assets/app.js` | candlesticks, orderbook | — |
+| I5 | Resolution tracking (live → determined → finalized; result yes/no) | done | session-7d6d2fcb | `templates/markets.tpl`, `categories/*.html`, `scripts/build-site.mjs` | get-events (settled), market settlement | — |
+| I6 | Simulated trades + strategy engine + portfolio P&L + trade categorisation | done (simulated only) | session-7d6d2fcb | `templates/portfolio.tpl`, `templates/analysis.tpl`, `templates/strategies.tpl`, `templates/demo-account.tpl` | market settlement, create-order (V2) | F-07 (no demo key in the repo → no real demo order placed; the site has no order button) |
+| I7 | Live data refresh: GitHub Actions job that re-captures the snapshot from the official demo API | done | session-7d6d2fcb | `scripts/fetch-snapshot.mjs`, `.github/workflows/refresh-data.yml` | demo API | — |
+| I8 | Sources page with a source link on every table row; Flagged for Review page | done | session-7d6d2fcb | `templates/sources.tpl`, `templates/flagged.tpl`, `data/sources.json` | docs.kalshi.com | — |
+| I9 | Line-by-line re-verification of combined data; link check; build check | done | session-7d6d2fcb | `scripts/check-links.mjs`, `scripts/build-site.mjs`, `templates/*.tpl` | — | F-22 (the whole-tree checker scanned `templates/*.html`; templates renamed to `.tpl`) |
+| I10 | PR to `main`, merge, confirm Pages deploy, record PR + merge result | in progress | session-7d6d2fcb | `COORDINATION.md` | `gh pr`, `gh api .../pages/builds/latest` | PR https://github.com/kanlerxz87-cyber/KalshiDash1/pull/16 (`arena/7d6d2fcb-kalshidash1` → `main`); checks on the head commit: Site build check, site-qa, suite-qa all pass. Merge and Pages result: see the PR-result note in the next section. |
+
+Rules honoured by this session: only files in the scope above are edited; no other session's file is
+modified; every claim is committed and pushed immediately; `git pull --rebase` is run before every push;
+no value is inferred — anything not confirmable from an official source is left blank and published on
+the Flagged for Review page.
+
+## PR result — session-7d6d2fcb (final integration)
+
+- PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/16 (`arena/7d6d2fcb-kalshidash1` → `main`).
+- Checks on the head commit: `Site build check` (pages.yml), `site-qa`, `suite-qa` — all pass.
+- Merge: `gh pr merge 16 --merge` (no approval waited for, per the brief). The merge commit and the Pages build status are recorded on PR #16 itself and in the session log.
+
+## Verification & completion log (session-7d6d2fcb, final integration, 2026-11-20)
+
+- **Correction (2026-11-20, after PR #21/#22 merges):** the figures above were superseded. Current snapshot: `meta.captured_at` 2026-11-20T14:01:22Z (the refresh bot commit `85ded5b`); `markets_count_all` 3,386; 200 tracked market rows. Current link check: `check-links.mjs` → 89 pages, 264 external links listed (not fetched), 0 broken internal links; `tools/linkcheck.py` → 0 broken internal links (see its output for the exact count). The F-25 figures were checked against `data/snapshot.json` and are now stated on the Flagged page.
+
+- **Snapshot:** refreshed by GitHub Actions `refresh-data.yml` from the official demo API (`external-api.demo.kalshi.co`); latest refresh commit on the branch is `fc3e913` (captured 2026-11-20T13:34:40Z, 3,386 markets captured overall, 200 tracked rows). Candles are now populated (series-scoped `/candlesticks`). The sandbox itself cannot reach Kalshi (TLS negotiation fails), so every capture happens on GitHub runners.
+- **Generator:** `node scripts/build-site.mjs` regenerates 20 pages; `node scripts/build-site.mjs --check` passes (committed site matches templates + data).
+- **Links:** `node scripts/check-links.mjs` → 0 broken internal links (83 pages; 280 external links listed, not fetched). `python3 tools/linkcheck.py` → 0 broken internal links on the whole tree (83 pages scanned, 4,997 internal links).
+- **Syntax:** `node --check` on `assets/app.js`, `assets/chart.js`, `scripts/*.mjs`; `node tools/qa_logic_test.mjs` → all checks passed.
+- **Runtime QA (jsdom, not a real browser):** every generated page loaded with the real `assets/app.js` + `assets/chart.js` in snapshot mode (no errors) and in a mocked-live mode where the demo host answers from the snapshot (index, dashboard, markets, both category kinds, market detail, analysis, strategies, portfolio, culture — no errors). Defects found and fixed: double page initialisation, a TypeError in the clock, `#x tbody` selectors that never matched, a missing nav-active hook, a typo in a stat label, no-canvas fallback, and an undocumented `limit` on series queries.
+- **Not verified:** a real-browser (Chromium) visual pass and the live Kalshi WebSocket path (WebSocket subscriptions require authentication; no key is committed).
+- **Sources:** every official URL used is in `data/sources.json` and on the Sources page.
+- **Irregularities:** all published on the Flagged for Review page (`flagged.html`, generated from `templates/flagged.tpl`).
+- **Reconciliation with main (merged at integration; PRs #11, #12, #14, #15, #17 and later commits on main):**
+  - Their board sections are kept verbatim below this section. Nothing was deleted from their records.
+  - `flagged.html`: their F-01 to F-20 rows are kept verbatim, with their anchors. This session's items are F-21 to F-33 (no renumbering of any existing ID).
+  - `sources.html`: rebuilt from `data/sources.json`. Added their live API URLs (`series_economics`, `markets_diesel_open`) and the repo records `verification/2026-11-20-e6c3b3b6.md` and `verification/2026-11-20-d5b935f4.md`.
+  - `demo-account.html`: session d5b935f4's design is adopted (keys never reach the browser; `data/account.json` is written by `.github/workflows/demo-account.yml` from repository secrets; `tools/demo_trader.mjs` is dry-run unless `--confirm-live`). Their page content and `assets/demo-account.js` are kept. The page is now built from `templates/demo-account.tpl` with the shared navigation. The browser key form that this session had added to `assets/app.js` was removed.
+  - `audit/index.html` (session bf16f2dd) is a standalone page and is link-checked only. Its link to the old `trading.html` now points to `archive/legacy-root/trading.html`.
+  - `dash/` (sessions 815b546d and d5b935f4) is untouched by this session, so its alerts and autotrade pages stay as merged.
+  - PR #19 (session 7f90cf50, `catalyst.html` and `strategylab.html`): their content, CSS and scripts are kept. Both pages are now built from `templates/catalyst.tpl` and `templates/strategylab.tpl` inside the shared navigation (Overview → More), and the `trading.html` link points to `portfolio.html`. Their meta descriptions are kept verbatim.
+- **Flagged for review (open items for the reviewer):** F-01 to F-33 on `flagged.html`. Nothing blocks the merge. F-07 is superseded by F-24 (the demo account is wired, but no real order has been placed).
+
 
 ## Verification performed (session-ef745c36, 2026-11-20)
 

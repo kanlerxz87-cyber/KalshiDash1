@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suggestions · Kalshi Demo Dashboard</title>
+<meta name="description" content="Suggestions to improve the site and decision-making. Nothing is implemented until you choose.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body >
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="active">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="../../docs/index.html" class="">Docs dashboard</a><a href="../../docs/events.html" class="">Events & resolutions</a><a href="../../docs/methodology.html" class="">Methodology</a><a href="../../docs/flagged.html" class="">Docs flagged page</a></div></nav>
+<main class="content">
+
+<h1>Suggestions: review and choose</h1>
+<div class="notice"><strong>Nothing here is implemented.</strong> Each item is a proposal. Choose the path you want; only chosen items will be built.</div>
+<div class="table-wrap"><table  class="compact"><thead><tr><th>ID</th><th>Suggestion</th><th>Why</th><th>Evidence / source</th><th>Decision</th></tr></thead><tbody>
+<tr><td>S-01</td><td>Add a small server-side proxy that caches public Kalshi data.</td><td>Avoids browser CORS limits (M-02) and reduces repeated polling.</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits.md" target="_blank" rel="noopener" title="Kalshi docs: Rate Limits and Tiers">Rate Limits and Tiers ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-02</td><td>Add portfolio tracking using a demo key that is stored only as a server secret.</td><td>Needed for balances, positions, fills and P&amp;L.</td><td><a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-03</td><td>Record a dollar-volume history by snapshotting markets on a schedule.</td><td>The API has no dollar-volume field; history must be built.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-04</td><td>Add WebSocket streaming for seconds-level prices (requires credentials).</td><td>Only path to true second-by-second data.</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start WebSockets">Quick Start WebSockets ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-05</td><td>Define the trade categorisation schema before any order is placed.</td><td>Makes later strategy analysis comparable.</td><td>Internal proposal — see Trade analysis page; no external source.</td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-06</td><td>Add a paper-trade log (no orders sent) to test ideas first.</td><td>Reduces risk of unplanned demo trades.</td><td>Internal proposal — no external source; orders would need <a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start Create your first order">Quick Start Create your first order ↗</a>.</td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-07</td><td>Show fee-adjusted expected value per market once fee schedule is verified.</td><td>Fees change the answer.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a> (fee_type field)</td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-08</td><td>Add a reviewer checklist that each market has an official source and a verified result before it is used in analysis.</td><td>Keeps the verification rule the brief asks for.</td><td><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
+</tbody></table></div>
+<p class="muted small">Decision recording: this site cannot store choices. Record yours in <code>COORDINATION.md</code> or in your reply.</p>
+
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
+</main>
+</div>
+<script src="assets/app.js" type="module"></script>
+</body>
+</html>

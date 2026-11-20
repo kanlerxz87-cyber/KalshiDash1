@@ -1,43 +1,91 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Trade analysis · Kalshi Demo Dashboard</title>
-<meta name="description" content="How trades would be categorised and analysed once demo fills exist. Currently no trade data.">
+<title>Trade analysis — KalshiDash1</title>
+<meta name="description" content="Simulated Kalshi demo trades categorised by strategy and by topic, with win rate, P&amp;L and average trade so new strategies can be built from the results.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
-<body >
-<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
-<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
-<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
-<div class="layout">
-<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="active">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="docs/index.html" class="">Docs dashboard</a><a href="docs/events.html" class="">Events & resolutions</a><a href="docs/methodology.html" class="">Methodology</a><a href="docs/flagged.html" class="">Docs flagged page</a></div></nav>
-<main class="content">
+<body data-page="analysis">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta">
+      <span id="mode-badge" class="badge warn">data: probing…</span>
+      <span id="clock" class="mono small muted"></span>
+    </div>
+  </div>
+  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">More</span><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="catalyst.html">Swing catalysts</a><a href="strategylab.html">Strategy lab</a><a href="dash/alerts.html">Alert feeds (dash suite)</a><a href="dash/autotrade.html">Auto-trade engine (dash suite)</a></div></nav>
+</header>
 
-<h1>Trade analysis &amp; strategy categories</h1>
-<div class="notice"><strong>No trade data yet.</strong> There are zero fills, so no results, win rates or strategy returns are shown. Nothing here is computed from real trades.</div>
+<main><div class="wrap">
+  <div class="page-head">
+    <div class="grow">
+      <h1>Trade analysis</h1>
+      <p class="sub">Every simulated trade is tagged with the strategy that produced it and the topic it belongs to, so a
+      strategy can be judged on its own results: win rate, total P&amp;L and average trade.</p>
+    </div>
+    <div class="btnrow"><a class="btn" href="portfolio.html">Open the portfolio</a></div>
+  </div>
 
-<h2>Proposed categorisation schema (our proposal, not an official Kalshi classification)</h2>
-<div class="table-wrap"><table  class="compact"><thead><tr><th>Dimension</th><th>Possible values</th><th>Data needed</th><th>Available now?</th><th>Source</th></tr></thead><tbody>
-<tr><td>Topic</td><td>Gas, Elections, Culture, Crypto, Golf</td><td>Market → series → category (from API)</td><td>Yes (live)</td><td><a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a></td></tr>
-<tr><td>Side</td><td>YES / NO</td><td>Fill side</td><td><span class="badge warn">No fills</span></td><td><a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener" title="Kalshi docs: Market Settlement">Market Settlement ↗</a></td></tr>
-<tr><td>Entry price band</td><td>Price in $0.00–$1.00 buckets</td><td>Fill price</td><td><span class="badge warn">No fills</span></td><td><a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a></td></tr>
-<tr><td>Time to close</td><td>< 1 day, 1–7 days, > 7 days</td><td>Fill time and close_time (API)</td><td><span class="badge warn">No fills</span></td><td><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a></td></tr>
-<tr><td>Liquidity at entry</td><td>Resting contracts at best price</td><td>Orderbook snapshot at fill time</td><td><span class="badge warn">Not recorded</span></td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Orderbook">Get Market Orderbook ↗</a></td></tr>
-<tr><td>Strategy label</td><td>Analyst-defined (proposal only)</td><td>Analyst label per trade</td><td><span class="badge warn">Not defined</span></td><td>Internal proposal — no external source</td></tr>
-</tbody></table></div>
-<p class="muted small">Strategy labels are a human decision and have no external source.</p>
+  <div id="mode-notice" class="notice">Probing the official demo API…</div>
 
-<h2>What is needed</h2>
-<ul>
-  <li>Demo fills history (see <a class="flag" href="flagged.html#F-07">F-07</a>).</li>
-  <li>Agreement on the schema above (see Questions and Suggestions).</li>
-</ul>
+  <div class="grid cols-2">
+    <div class="panel pad-0">
+      <div style="padding:12px 14px 4px"><h3 style="margin:0">Performance by strategy</h3></div>
+      <div class="table-wrap" style="border:0;border-radius:0">
+        <table class="compact"><thead><tr><th>Strategy</th><th class="num">Closed</th><th class="num">Open</th><th class="num">Win rate</th><th class="num">Total P&amp;L</th><th class="num">Avg trade</th></tr></thead>
+        <tbody id="strategy-stats"></tbody></table>
+      </div>
+    </div>
+    <div class="panel pad-0">
+      <div style="padding:12px 14px 4px"><h3 style="margin:0">Performance by topic</h3></div>
+      <div class="table-wrap" style="border:0;border-radius:0">
+        <table class="compact"><thead><tr><th>Topic</th><th class="num">Closed</th><th class="num">Open</th><th class="num">Win rate</th><th class="num">Total P&amp;L</th></tr></thead>
+        <tbody id="topic-stats"></tbody></table>
+      </div>
+    </div>
+  </div>
 
-<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
-</main>
-</div>
-<script src="assets/app.js" type="module"></script>
+  <h2>Every simulated trade</h2>
+  <div class="table-wrap">
+    <table class="compact">
+      <thead><tr><th>Time</th><th>Market</th><th>Topic</th><th>Strategy</th><th>Side</th><th class="num">Contracts</th><th class="num">Entry</th><th>P&amp;L</th><th>Result</th><th>Why it was taken</th></tr></thead>
+      <tbody id="analysis-body"></tbody>
+    </table>
+  </div>
+
+  <h2>Trade categories used by this page</h2>
+  <div class="panel">
+    <p>A trade is categorised twice, and both tags come from public API fields:</p>
+    <ul>
+      <li><strong>Strategy</strong> — which rule fired (momentum, mean reversion, favorite, longshot, volume catalyst, or manual).</li>
+      <li><strong>Topic</strong> — the focus topic of the series the market belongs to, taken from the series query that
+      discovered the market.</li>
+    </ul>
+    <p>The exact rule for each strategy, including its thresholds, is published on <a href="strategies.html">Strategies</a>,
+    so a result can be reproduced rather than taken on trust.</p>
+    <p class="small muted">Trade-type categories come from the simulated order record itself; the market's topic comes from
+    <code>GET /markets?series_ticker=…&amp;status=open</code> filtered by the series queries on
+    <a href="api.html">API reference</a>.</p>
+  </div>
+</div></main>
+
+<footer class="site">
+  <div class="nav-inner">
+    <p><strong>KalshiDash1</strong> — a static dashboard for the official Kalshi <em>demo</em> exchange.
+    Demo only: mock funds, and demo prices may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
+    <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
+       WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
+       Snapshot captured 2026-11-20 14:01:22 UTC ·
+       <a href="sources.html">Sources</a> ·
+       <a href="flagged.html">Flagged for review</a> ·
+       <a href="COORDINATION.md">Coordination board</a></p>
+    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
+    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+  </div></footer>
+<script src="assets/app.js"></script>
 </body>
 </html>
