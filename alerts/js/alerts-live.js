@@ -72,6 +72,8 @@
    * instead and the row is marked. A wide but reciprocal book keeps its last traded price,
    * because the midpoint of a 0.01/0.94 book means nothing. */
   var RECIPROCITY_TOLERANCE = 0.02;
+  var MAX_COHERENT_SPREAD = 0.10;
+  var MAX_LAST_PRICE_BOOK_GAP = 0.25;
   function bookReciprocity(m) {
     var yb = num(m.yes_bid_dollars), ya = num(m.yes_ask_dollars);
     var nb = num(m.no_bid_dollars), na = num(m.no_ask_dollars);
@@ -90,8 +92,15 @@
     var directOk = yb !== null && ya !== null && yb > 0 && ya > 0 && yb < 1 && ya < 1 && ya >= yb;
     var impliedOk = nb !== null && na !== null && nb > 0 && na > 0 && nb < 1 && na < 1;
     if (recip.ok !== false) {
-      if (last !== null && last > 0 && last < 1) return { price: last, field: 'last_price_dollars' };
-      if (directOk) return { price: round((yb + ya) / 2), field: 'mid' };
+      var mid = directOk ? round((yb + ya) / 2) : impliedOk ? round(((1 - na) + (1 - nb)) / 2) : null;
+      var spread = directOk ? round(ya - yb, 4) : null;
+      if (last !== null && last > 0 && last < 1) {
+        if (mid !== null && spread !== null && spread <= MAX_COHERENT_SPREAD && Math.abs(last - mid) > MAX_LAST_PRICE_BOOK_GAP) {
+          return { price: mid, field: 'book midpoint (stale last price)', book_inconsistent: true };
+        }
+        return { price: last, field: 'last_price_dollars' };
+      }
+      if (directOk) return { price: mid, field: 'mid' };
       if (impliedOk) return { price: round(((1 - na) + (1 - nb)) / 2), field: 'mid(1 - no)' };
       return { price: null, field: null };
     }

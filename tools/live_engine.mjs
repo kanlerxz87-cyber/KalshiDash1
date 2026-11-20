@@ -193,6 +193,12 @@ export function round(x, dp = 4) {
  * Nothing is manufactured: every branch returns a published quote or null.
  */
 export const RECIPROCITY_TOLERANCE = 0.02;
+/* A last traded price is only cross-checked against the book when the book is tight enough to
+ * be informative; on a 0.01/0.94 book the midpoint says nothing and the last trade is the best
+ * available price. Measured case: KXPRESNOMD-28-JP really trades at 0.943 inside a 0.01–0.94
+ * spread, while KXPRESPERSON-28-GABB reported a last price of 0.803 inside a 0.002–0.003 book. */
+export const MAX_COHERENT_SPREAD = 0.10;
+export const MAX_LAST_PRICE_BOOK_GAP = 0.25;
 
 export function bookReciprocity(m) {
   const yb = num(m.yes_bid_dollars);
@@ -219,7 +225,19 @@ export function trackedPrice(m) {
   const impliedOk = nb !== null && na !== null && nb > 0 && na > 0 && nb < 1 && na < 1;
 
   if (recip.ok !== false) {
-    if (last !== null && last > 0 && last < 1) return { price: last, field: 'last_price_dollars' };
+    const mid = directOk ? round((yb + ya) / 2) : impliedOk ? round(((1 - na) + (1 - nb)) / 2) : null;
+    const spread = directOk ? round(ya - yb, 4) : null;
+    if (last !== null && last > 0 && last < 1) {
+      // Stale-last-price guard, applied only to a tight book where the midpoint is meaningful.
+      if (mid !== null && spread !== null && spread <= MAX_COHERENT_SPREAD && Math.abs(last - mid) > MAX_LAST_PRICE_BOOK_GAP) {
+        return {
+          price: mid,
+          field: `book midpoint (yes ${yb} / ${ya}) — last_price_dollars ${last} is further than $${MAX_LAST_PRICE_BOOK_GAP} from a tight book`,
+          book_inconsistent: true,
+        };
+      }
+      return { price: last, field: 'last_price_dollars' };
+    }
     if (directOk) return { price: round((yb + ya) / 2), field: 'mid(yes_bid_dollars,yes_ask_dollars)' };
     if (impliedOk) return { price: round(((1 - na) + (1 - nb)) / 2), field: 'mid(1 − no prices)' };
     return { price: null, field: null };
@@ -1346,6 +1364,14 @@ export function selftest() {
   ok(wideBook.price === 0.943, 'a wide but reciprocal book keeps the last traded price, not the midpoint (got ' + wideBook.price + ')');
   ok(bookReciprocity({ yes_ask_dollars: '0.9430', no_bid_dollars: '0.0570', yes_bid_dollars: '0.0100', no_ask_dollars: '0.9900' }).ok === true, 'reciprocity passes for the wide book');
   ok(bookReciprocity({ yes_ask_dollars: '0.8030', no_bid_dollars: '0.9970' }).ok === false, 'reciprocity fails for the corrupt book');
+  // A stale last price inside a TIGHT, reciprocal book must be replaced by the book.
+  const staleOnTight = trackedPrice({
+    last_price_dollars: '0.8030', previous_price_dollars: '0.0030',
+    yes_bid_dollars: '0.0020', yes_ask_dollars: '0.0030',
+    no_bid_dollars: '0.9970', no_ask_dollars: '0.9980', result: '',
+  });
+  ok(staleOnTight.price === 0.0025, 'a stale last price on a tight book is replaced by the book (got ' + staleOnTight.price + ')');
+  ok(staleOnTight.book_inconsistent === true, 'the replaced row is flagged');
   const coherent = trackedPrice({ last_price_dollars: '0.4400', yes_bid_dollars: '0.4300', yes_ask_dollars: '0.4500', no_bid_dollars: '0.5500', no_ask_dollars: '0.5700' });
   ok(coherent.price === 0.44 && coherent.field === 'last_price_dollars', 'a coherent last price is preferred over the midpoint');
 
