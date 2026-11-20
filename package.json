@@ -2,8 +2,7 @@
   "name": "kalshidash1-dev-tools",
   "private": true,
   "version": "1.0.0",
-  "description": "Dev-only test tooling for KalshiDash1. The published site itself has no build step and no runtime dependencies.",
-  "type": "module",
+  "description": "Dev-only test tooling for KalshiDash1. The published site itself has no build step and no runtime dependencies. No \"type\" field on purpose: existing checkers in scripts/ are CommonJS (.js) while the engine and tests are ESM (.mjs), and adding type=module broke them.",
   "scripts": {
     "test:engine": "node tools/live_engine.mjs --selftest",
     "test:feed": "node scripts/check_alerts.mjs",
