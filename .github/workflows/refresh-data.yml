@@ -90,20 +90,30 @@ jobs:
           echo "::error::could not push after 3 attempts; another writer is committing to ${BRANCH} continuously"
           exit 1
 
-      # Close the loop explicitly: the next refresh is requested by this run rather than assumed.
-      # `workflow_dispatch` is the documented event that is not suppressed for GITHUB_TOKEN:
+      # OPTIONAL chain hint. Measured 2026-11-20: a dispatch made with the repository's own
+      # `GITHUB_TOKEN` returns 204 but does not create a run in another workflow, and a workflow
+      # file added on a branch other than the default is not registered at all. The reliable
+      # driver is `keepalive.yml`, which samples both feeds inline on a schedule. This step only
+      # helps if a fine-grained PAT with Actions:write is stored as SELF_DISPATCH_TOKEN; without
+      # it the step reports that fact instead of pretending the chain continued.
       # https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow
-      - name: Queue the next refresh (self-trigger chain)
+      - name: Queue the next run (only with SELF_DISPATCH_TOKEN)
         if: always()
         env:
-          GH_TOKEN: ${{ secrets.SELF_DISPATCH_TOKEN || secrets.GITHUB_TOKEN }}
+          SELF_DISPATCH_TOKEN: ${{ secrets.SELF_DISPATCH_TOKEN }}
         run: |
-          set -euo pipefail
-          echo 'Requesting the next refresh in this same chain.'
-          curl -sS -o /dev/null -w '%{http_code}\n' -X POST \
+          if [ -z "${SELF_DISPATCH_TOKEN}" ]; then
+            echo "::notice::No SELF_DISPATCH_TOKEN secret; the scheduled driver is keepalive.yml, which samples inline."
+            exit 0
+          fi
+          CODE=$(curl -sS -o /dev/null -w '%{http_code}' -X POST \
             -H 'Accept: application/vnd.github+json' \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Authorization: Bearer ${SELF_DISPATCH_TOKEN}" \
             -H 'X-GitHub-Api-Version: 2022-11-28' \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/refresh-data.yml/dispatches" \
-            -d "{\"ref\":\"${GITHUB_REF_NAME}\"}" \
-            || echo '::warning::could not queue the next refresh; keepalive.yml will retry it'
+            -d "{\"ref\":\"${GITHUB_REF_NAME}\"}" || true)
+          echo "dispatch HTTP ${CODE}"
+          case "${CODE}" in
+            204|200) echo "Queued the next run." ;;
+            *) echo "::warning::dispatch refused (HTTP ${CODE}); keepalive.yml remains the driver." ;;
+          esac
