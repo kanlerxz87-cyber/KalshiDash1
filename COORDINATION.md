@@ -221,10 +221,13 @@ No unique content was discarded; alternate implementations of shared pages are d
   suggestions, questions, flagged) and the root `index.html` / `README.md` link forward to `/docs/`.
 * Flagged/unverified items do not block the merge; they are published on the Flagged pages
   (`flagged.html`, `docs/flagged.html`) with source links.
-* PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/6 (opened by this session)
-* Merge result: merged into `main` by this session without waiting for approval, as instructed.
-* GitHub Pages: legacy source `main` @ `/`; deploy re-checked with
-  `gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds` after the merge.
+* PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/6 — **MERGED** 2026-11-20T11:21:57Z, merge commit `4e94619` on `main` (merged by this session without waiting for approval, as instructed; no approval was required).
+* Checks on the PR before merge: `Site build check` and `site-qa` both `pass` (runs `44726929658`, `44726929750`).
+* GitHub Pages after the merge, at `4e94619`: `pages build and deployment` → `success`; Pages API build status `built`
+  (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds`); `Site build check` → `success`. Live URL:
+  https://kanlerxz87-cyber.github.io/KalshiDash1/ — the docs suite is at `/docs/` (e.g. `/docs/index.html`).
+  Content could not be fetched from this sandbox (outbound network is restricted to allow-listed hosts), so the
+  deploy is confirmed from the Pages API and workflow conclusions rather than by loading the page here.
 
 ### Reconciliation record (session-arena/a10437bd-kalshidash1)
 
@@ -235,14 +238,14 @@ No unique content was discarded; alternate implementations of shared pages are d
   branch `arena/a10437bd-kalshidash1`.
 * On `git pull --rebase origin main`, the rebase hit "both added" conflicts on the root page
   filenames, because **parallel sessions had already built and merged a complete, verified,
-  deployed site to `main`** (PRs #1–#6, session `ef745c36` and `3f5650f9`).
+  deployed site to `main`** (PRs #1–#7, sessions `ef745c36` and `3f5650f9`).
 * Resolution (per the coordination rules — resolve conflicts without discarding another
   session's work, and do not merge a broken/mixed site): this branch was **reconciled to the
   already-deployed `main` integration** rather than overwriting it. Overwriting would have
   replaced the deployed, verified site with a redundant duplicate and risked a mixed/broken
   site (different asset paths and navigation).
-* Verification of the reconciled base (`origin/main` @ `4e94619`): 16 HTML pages, 353 internal
-  links, **0 broken**; all `*.json` valid. The deployed site is intact.
+* Verification of the reconciled base (`origin/main`): 16 HTML pages, 353 internal links,
+  **0 broken**; all `*.json` valid. The deployed site is intact.
 * The duplicate build from this session is **preserved** on the remote branch
   `origin/arena/a10437bd-kalshidash1` at commit `b4f4c59` (not deleted; reachable in history)
   for reference, but is **not** merged to avoid duplication.
