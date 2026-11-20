@@ -1,5 +1,12 @@
 # COORDINATION.md — shared task board
 
+## Current Arena session — `arena/c431fca8-kalshidash1` (2026-11-20 UTC)
+
+- Status: active; branched from `d24616a80151e8e51c6334f585d3e0e6d4cde919`.
+- Claim: **repository integration smoke-audit and documentation cleanup**. Initial checks found unresolved Git merge-conflict markers in `README.md`; the advertised `npm test` currently stops because declared dev dependency `jsdom` is not installed in this checkout. I will resolve the README conflict in favor of the more complete merged alert-engine description, run the declared suites after installing locked dependencies, and record exact outcomes/remaining limitations.
+- Scope: `COORDINATION.md`, `README.md` only. No current unfinished task rows were visible in the inherited board; this is a new, non-overlapping audit follow-up. No API claims or live values will be changed.
+- Status: **in progress**. Claim commit is recorded before changes to the claimed README scope.
+
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
 ---
