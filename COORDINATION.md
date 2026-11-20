@@ -40,7 +40,7 @@ Decision: this session did the full site on its own branch, because it may only 
 | T5 | Portfolio + trading status pages | done (blocked) | session-ef745c36 | `portfolio.html`, `trading.html`, `analysis.html` | auth doc, create-order quick start, order-direction doc | F-07, F-08, F-09 |
 | T6 | Questions, missing info, suggestions | done | session-ef745c36 | `questions.html`, `suggestions.html` | see pages | — |
 | T7 | Sources + Flagged for review pages | done | session-ef745c36 | `sources.html`, `flagged.html` | see pages | F-01 … F-13 |
-| T8 | Build, link check, Pages workflow, PR, merge, deploy check | in progress | session-ef745c36 | `scripts/*`, `.github/workflows/pages.yml`, `COORDINATION.md`, `README.md` | `node scripts/check-links.mjs` | F-14 (Pages source could not be changed by the token; site published from repo root) |
+| T8 | Build, link check, Pages workflow, PR, merge, deploy check | done (merged PR #4; Pages built) | session-ef745c36 | `scripts/*`, `.github/workflows/pages.yml`, `COORDINATION.md`, `README.md` | `node scripts/check-links.mjs` | F-14 (Pages source could not be changed by the token; site published from repo root) |
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review` (published on the Flagged page; does not block).
 
@@ -66,8 +66,11 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review` (published 
 - Contradiction found: a prior session's note says gas markets were "not located in demo events". The official series list returns AAA gas series (flag F-15).
 
 - PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/4 (branch `arena/ef745c36-kalshidash1` → `main`)
-- Merge result: see the final message of this session (merge is recorded on the PR).
-- GitHub Pages URL: https://kanlerxz87-cyber.github.io/KalshiDash1/
+- Merge result: merged with a merge commit (`gh pr merge 4 --merge`) at 2026-11-20T11:14:23Z; merge commit `63dd2d3d9b4fff9e30ca831a45c89806094785c0`. The first attempt failed with a merge conflict against the PRs #1–#3 already on `main`; it was resolved by integrating `main` (see above) and pushing, then merged.
+- GitHub Pages: source `main` `/` (legacy). Pages build for `63dd2d3` status `built`, no error (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest`, 2026-11-20T11:14:42Z). Live check: https://kanlerxz87-cyber.github.io/KalshiDash1/ serves the new home page (first fetch returned a cached copy of the older page; a re-fetch showed the new one).
+- Pages URL: https://kanlerxz87-cyber.github.io/KalshiDash1/
+- Checks not run: GitHub Actions workflow `pages.yml` was not registered for this repo (no runs; Actions settings not readable with the token). Equivalent checks were run locally (see above).
+- Open items for the owner (see Flagged page): F-01 browser CORS to the demo API untested; F-07 no demo key, so no portfolio or trades; F-15 contradiction in a prior note about gas markets; F-14 Pages source choice.
 - Pages: the token got HTTP 403 when changing Pages to the workflow build type or to `/docs` (repo admin needed). The existing legacy source (`main`, `/`) is used, so the site is at the repo root.
 
 
