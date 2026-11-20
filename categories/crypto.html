@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto — KalshiDash1</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">Kalshi<span class="em">Dash1</span></div>
+    <nav class="nav">
+      <a href="../index.html">Home</a>
+      <a href="gas.html">Gas Prices</a>
+      <a href="elections.html">Elections</a>
+      <a href="culture.html">Culture</a>
+      <a href="crypto.html" class="active">Crypto</a>
+      <a href="golf.html">Golf</a>
+      <a href="../portfolio.html">Portfolio</a>
+      <a href="../suggestions.html">Suggestions</a>
+      <a href="../qa.html">Q&amp;A</a>
+      <a href="../flagged.html">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <h1 class="page-title">Crypto</h1>
+  <p class="page-sub">Cryptocurrency price event contracts. Track highest dollar-amount live events until resolved (Yes / No).</p>
+
+  <div id="api-key-notice" class="card" style="padding:12px 16px;"></div>
+
+  <div class="section">
+    <div class="graph-wrap">
+      <div class="graph-controls">
+        <label for="graph-period">Graph length</label>
+        <select id="graph-period">
+          <option value="60">1 minute candles</option>
+          <option value="300" selected>5 minutes</option>
+          <option value="3600">1 hour</option>
+          <option value="86400">1 day</option>
+        </select>
+      </div>
+      <div id="graph-canvas"></div>
+    </div>
+    <p class="page-sub" style="margin-top:6px;">X axis = time. Y axis = current contract price (¢). Select seconds/minutes/hours via graph length. Live event data (crypto price charts) from <a href="https://docs.kalshi.com/api-reference/live-data/get-event-live-data.md" target="_blank" rel="noopener">GET /event-live-data</a>; candlesticks from <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener">GET /market-candlesticks</a>.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Live events — Crypto</h2>
+    <table class="wide">
+      <thead>
+        <tr>
+          <th style="width:14%;">Ticker</th>
+          <th>Event title</th>
+          <th style="width:12%;">Status</th>
+          <th style="width:11%;">Yes price</th>
+          <th style="width:11%;">No price</th>
+          <th style="width:14%;">Resolved</th>
+          <th style="width:14%;">Liquidity / contracts at price</th>
+          <th style="width:14%;">Source</th>
+        </tr>
+      </thead>
+      <tbody id="events-table-body">
+        <tr><td colspan="8" class="graph-placeholder">Loading live events&hellip;</td></tr>
+      </tbody>
+    </table>
+    <p class="page-sub" style="margin-top:6px;">Source: <a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener">GET /events</a> · Order book: <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener">GET /market-orderbook</a>.</p>
+  </div>
+
+  <div class="card">
+    <h3>Analysis &amp; findings — Crypto</h3>
+    <p style="font-size:0.9rem;color:#334155;">No live data available yet (see Flagged for Review). Once connected to the demo API, this table will show open crypto markets, their Yes/No prices, resolution outcome (Yes/No), and available contracts at each price level.</p>
+  </div>
+
+  <footer>
+    KalshiDash1 &middot; Crypto &middot; Not financial advice. Demo prices may not reflect real markets.
+  </footer>
+</div>
+
+<script src="../assets/js/app.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const marketTicker = null; // set from live data when available
+  (async () => {
+    await window.KalshiDash.loadMarkets();
+    window.KalshiDash.renderCategoryPage();
+    window.KalshiDash.renderApiKeyNotice();
+    if (marketTicker) {
+      window.KalshiDash.renderPriceGraph("#graph-canvas", marketTicker, 300);
+      window.KalshiDash.setupGraphControls();
+    } else {
+      document.getElementById("graph-canvas").innerHTML = `<div class="graph-placeholder">Select a market from the table above to view its price graph. Live market data unavailable (unverified).</div>`;
+    }
+  })();
+});
+</script>
+</body>
+</html>

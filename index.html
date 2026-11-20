@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KalshiDash1 — Kalshi Demo Dashboard</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">Kalshi<span class="em">Dash1</span></div>
+    <nav class="nav">
+      <a href="index.html" class="active">Home</a>
+      <a href="categories/gas.html">Gas Prices</a>
+      <a href="categories/elections.html">Elections</a>
+      <a href="categories/culture.html">Culture</a>
+      <a href="categories/crypto.html">Crypto</a>
+      <a href="categories/golf.html">Golf</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="qa.html">Q&amp;A</a>
+      <a href="flagged.html">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <h1 class="page-title">Executive Summary — KalshiDash1</h1>
+  <p class="page-sub">Live dashboard for Kalshi demo event contracts. Focus: gas prices, elections, culture, crypto, golf.</p>
+
+  <div class="card">
+    <h3>What this dashboard does</h3>
+    <ul style="margin-left:20px; color:#334155; font-size:0.95rem;">
+      <li>Tracks the <strong>highest dollar-amount live events</strong> on Kalshi until they resolve (resolved Yes / No).</li>
+      <li>Tracks <strong>portfolio performance</strong> using the Kalshi <strong>demo account</strong> (mock funds; demo credentials are <em>not</em> shared with production).</li>
+      <li>Analyzes trades, categorizes them by type, and surfaces trade strategies by trade type.</li>
+      <li>Renders <strong>live-interactive price graphs</strong>: X axis = time (seconds / minutes / hours), Y axis = current contract price.</li>
+      <li>Shows <strong>current liquidity</strong> and how many contracts are available at a given price.</li>
+      <li>Provides a <strong>suggestions</strong> section for reviewing improvement paths before implementing changes.</li>
+      <li>Provides a <strong>Q&amp;A</strong> section listing questions/information/answers that must be addressed before decisions.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Official Kalshi demo endpoints (verified)</h3>
+    <table class="wide" style="margin-top:8px;">
+      <thead><tr><th style="width:22%;">Surface</th><th>Recommended demo endpoint</th><th>Also supported</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>REST Trade API</td>
+          <td><code>https://external-api.demo.kalshi.co/trade-api/v2</code></td>
+          <td><code>https://demo-api.kalshi.co/trade-api/v2</code></td>
+        </tr>
+        <tr>
+          <td>WebSocket API</td>
+          <td><code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code></td>
+          <td><code>wss://demo-api.kalshi.co/trade-api/ws/v2</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="page-sub" style="margin-top:10px;">Sources: <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Kalshi Demo Environment docs</a> · <a href="https://demo.kalshi.co/" target="_blank" rel="noopener">Kalshi Demo site</a> · <a href="https://docs.kalshi.com/welcome" target="_blank" rel="noopener">Kalshi API docs</a></p>
+  </div>
+
+  <div class="alert alert-warn">
+    <span class="k">Important limitation (unverified):</span>
+    This agent sandbox cannot call kalshi.co directly (outbound internet is limited to GitHub/npm/PyPI hosts). No Kalshi demo API credentials were provided, so <strong>live market prices, orderbooks, portfolio balances, fills, and trade execution cannot be fetched or demonstrated here.</strong> All such values are left blank and flagged <span class="badge badge-warn">unverified</span>. To enable live data, configure your own demo API key in browser DevTools (<code>window.KALSHI_API_KEY = "your-demo-key"</code>) and refresh. <a href="flagged.html">View all flagged items &rarr;</a>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Categories</h3>
+      <p style="font-size:0.9rem;color:#334155;">Track live events by topic until resolution (Yes / No).</p>
+      <a href="categories/gas.html" class="btn btn-small" style="margin-right:8px;">Gas Prices</a>
+      <a href="categories/elections.html" class="btn btn-small" style="margin-right:8px;">Elections</a>
+      <a href="categories/culture.html" class="btn btn-small" style="margin-right:8px;">Culture</a>
+      <a href="categories/crypto.html" class="btn btn-small" style="margin-right:8px;">Crypto</a>
+      <a href="categories/golf.html" class="btn btn-small">Golf</a>
+    </div>
+
+    <div class="card">
+      <h3>Portfolio (demo)</h3>
+      <p style="font-size:0.9rem;color:#334155;">Balance, positions, P&amp;L, fills using Kalshi demo account.</p>
+      <a href="portfolio.html" class="btn btn-primary">Open Portfolio</a>
+    </div>
+
+    <div class="card">
+      <h3>Price graph</h3>
+      <p style="font-size:0.9rem;color:#334155;">Time (X) vs contract price (Y); selectable seconds/minutes/hours.</p>
+      <a href="categories/crypto.html" class="btn btn-small">View on Crypto</a>
+    </div>
+
+    <div class="card">
+      <h3>Suggestions &amp; Q&amp;A</h3>
+      <p style="font-size:0.9rem;color:#334155;">Improvement paths and pre-decision questions.</p>
+      <a href="suggestions.html" class="btn btn-small" style="margin-right:8px;">Suggestions</a>
+      <a href="qa.html" class="btn btn-small">Q&amp;A</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>How to read the tables</h3>
+    <ul style="margin-left:20px; color:#334155; font-size:0.9rem;">
+      <li><strong>Ticker</strong> — Kalshi market/event ticker.</li>
+      <li><strong>Yes / No price</strong> — current contract price in cents (¢).</li>
+      <li><strong>Resolved</strong> — YES / NO once the event settles; "Unresolved" while live.</li>
+      <li><strong>Liquidity</strong> — volume / contracts available at a given price (from the order book).</li>
+      <li><strong>Source link</strong> — every row links to an official Kalshi docs page or the demo site. Blank/unverified values are flagged and never inferred.</li>
+    </ul>
+  </div>
+
+  <footer>
+    KalshiDash1 &middot; Built for the Kalshi demo environment. Not financial advice. Demo market prices may not reflect real markets.
+  </footer>
+</div>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>
