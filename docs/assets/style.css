@@ -70,3 +70,11 @@ footer{border-top:1px solid var(--border);padding:22px 0;color:var(--muted);font
 .bar{height:8px;background:#0d1218;border-radius:99px;overflow:hidden;border:1px solid var(--border)}
 .bar>i{display:block;height:100%;background:var(--accent)}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* sub-navigation for category pages */
+.subnav{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 2px;padding:0;list-style:none}
+.subnav a{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--panel-2,#141b2b);border:1px solid var(--border,#243049);color:var(--text,#e8edf7);text-decoration:none;font-size:13px}
+.subnav a:hover{border-color:#3b82f6}
+.subnav a.active{background:#1d4ed8;border-color:#3b82f6}
+.switch{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted,#93a2bd)}
+.tablewrap{overflow:auto}

@@ -21,7 +21,7 @@
   var state = {
     seriesByCategory: null, allSeries: [], ranked: [], selected: null,
     samples: [], windowSec: 3600, liveTimer: null, bookTimer: null, ws: null,
-    lastRefresh: null, liveOk: false, settled: []
+    lastRefresh: null, liveOk: false, settled: [], catTimer: null
   };
   function setStatus(ok, msg) {
     var el = $("live-status"); if (!el) return;
@@ -441,6 +441,68 @@
     var b2 = $("bt-run"); if (b2) b2.addEventListener("click", backtest);
   }
   if (page === "suggestions") initSuggestions();
+  /* ---------- category pages ---------- */
+  function renderCategoryPage() {
+    var catId = document.body.getAttribute("data-category"); if (!catId) return;
+    var cat = K.CATEGORIES.filter(function (c) { return c.id === catId; })[0];
+    var heading = $("cat-title"); if (heading) heading.textContent = cat ? cat.label : catId;
+    var mBody = $("cat-markets"), eBody = $("cat-events"), sBody = $("cat-series"), nBody = $("cat-note");
+
+    function render(rows) {
+      var list = rows.filter(function (r) { return r.category === catId; });
+      var open = list.filter(function (r) { return !K.isResolved(r.market); });
+      var settled = list.filter(function (r) { return K.isResolved(r.market); });
+      if (mBody) mBody.innerHTML = open.length ? open.slice(0, 30).map(function (r, i) {
+        var m = r.market;
+        return "<tr data-ticker='" + esc(m.ticker) + "' style='cursor:pointer'><td class='num'>" + (i + 1) + "</td>" +
+          "<td><strong>" + esc(K.displayTitle(m)) + "</strong><br><code>" + esc(m.ticker) + "</code><br><span class='muted small'>event " + esc(m.event_ticker || "—") + " · series " + esc(r.seriesTicker) + "</span></td>" +
+          "<td class='num'>" + money(r.notional) + "</td><td class='num'>" + money(r.notional24h || 0) + "</td>" +
+          "<td class='num'>" + numFmt(r.volume) + "</td><td class='num'>" + cents(r.lastPrice) + "</td>" +
+          "<td class='num'>" + numFmt(r.openInterest) + "</td><td class='small'>" + esc(m.close_time || "—") + "</td>" +
+          "<td><a href='index.html'>chart →</a></td></tr>";
+      }).join("") : "<tr><td colspan='9' class='muted'>No open markets found in this category right now — nothing is invented. Try Refresh.</td></tr>";
+      if (eBody) eBody.innerHTML = settled.length ? settled.slice(0, 30).map(function (r) {
+        var m = r.market;
+        return "<tr><td><strong>" + esc(K.displayTitle(m)) + "</strong><br><code>" + esc(m.ticker) + "</code></td>" +
+          "<td>" + esc(m.status || "—") + "</td><td><strong>" + esc(K.resolutionLabel(m)) + "</strong></td>" +
+          "<td class='small'>" + esc(m.settlement_ts || "—") + "</td>" +
+          "<td class='num'>" + (m.settlement_value_dollars !== undefined ? "$" + esc(m.settlement_value_dollars) : "—") + "</td>" +
+          "<td class='num'>" + money(r.notional) + "</td></tr>";
+      }).join("") : "<tr><td colspan='6' class='muted'>No settled markets in this category inside the current live window. Settled markets leave the live endpoints after the historical cutoff — see Historical Data in Sources.</td></tr>";
+      var series = (state.seriesByCategory || {})[catId] || [];
+      if (sBody) sBody.innerHTML = series.length ? series.slice(0, 20).map(function (x) {
+        return "<tr><td><code>" + esc(x.ticker) + "</code></td><td>" + esc(x.title || "—") + "</td><td>" + esc(x.category || "—") + "</td>" +
+          "<td>" + esc((x.categories || []).join(", ") || "—") + "</td><td class='num'>" + numFmt(K.num(x.volume_fp, 0)) + "</td></tr>";
+      }).join("") : "<tr><td colspan='5' class='muted'>No series matched this category's keyword rules in this run.</td></tr>";
+      if (nBody) nBody.textContent = list.length + " tracked market(s) for " + (cat ? cat.label : catId) + ": " + open.length + " open, " + settled.length + " resolved.";
+    }
+
+    function reload() {
+      if (nBody) nBody.textContent = "Loading live data…";
+      loadCategories().then(function (rows) {
+        var set = {}; ((state.seriesByCategory || {})[catId] || []).forEach(function (x) { set[x.ticker] = true; });
+        return K.recentSettled(set, 30 * 86400, 3).then(function (settled) {
+          var extra = (settled || []).map(function (m) {
+            return { market: m, category: catId, categoryLabel: cat ? cat.label : catId, seriesTicker: m.series_ticker,
+              notional: K.estNotional(m), notional24h: K.estNotional24h(m), volume: K.volume(m), lastPrice: K.lastPrice(m), openInterest: K.openInterest(m) };
+          });
+          render(rows.concat(extra));
+        });
+      }).catch(function () {
+        if (nBody) nBody.textContent = "Live data unavailable in this browser session (see dashboard error explanation). No rows are fabricated.";
+      });
+    }
+    reload();
+    var b = $("cat-refresh"); if (b) b.addEventListener("click", reload);
+    var auto = $("cat-auto");
+    if (auto) auto.addEventListener("change", function () {
+      if (state.catTimer) { clearInterval(state.catTimer); state.catTimer = null; }
+      if (auto.checked) { state.catTimer = setInterval(reload, 30000); if (nBody) nBody.textContent += " · auto-refresh 30s on"; }
+    });
+    if (auto) { auto.checked = true; state.catTimer = setInterval(reload, 30000); }
+  }
+  if (page === "category") renderCategoryPage();
+
 
   /* demo connect form (portfolio + trade pages share ids pattern) */
   document.querySelectorAll(".demo-connect-form").forEach(function (form) {
