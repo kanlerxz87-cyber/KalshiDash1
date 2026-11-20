@@ -63,9 +63,19 @@ jobs:
       # A scheduled run checks out the default branch; a manual dispatch may target any branch.
       # Rebase onto whatever ref this run was started from, which is valid in both cases.
       - name: Rebase onto the latest tip of this branch
+        if: github.ref_name == github.event.repository.default_branch
         run: git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
 
+      - name: Validation run — snapshot captured, nothing to commit
+        if: github.ref_name != github.event.repository.default_branch
+        run: |
+          echo "Captured and validated the snapshot from '${{ github.ref_name }}'."
+          echo "Not the default branch, so nothing is committed here."
+
+      # Same rule as live-alerts (F-49): a manual dispatch from a session branch is a *validation*
+      # run. It captures and validates real data but does not push into another session's branch.
       - name: Commit refreshed data (only when something changed)
+        if: github.ref_name == github.event.repository.default_branch
         run: |
           set -euo pipefail
           git config user.name  'kalshidash-bot'

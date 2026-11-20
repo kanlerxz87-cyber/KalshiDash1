@@ -62,13 +62,16 @@ jobs:
         run: node scripts/check_alerts.mjs
 
       - name: Commit the new sample
-        # Runs whenever a sample was produced and validated, even if a later step fails, so a
-        # partial problem never loses real, verified market data.
-        if: steps.sample.outcome == 'success' && success() || steps.sample.outcome == 'success'
-        # F-49: this step failed twice with no readable log (the job log download is not always
-        # available). Every command is now traced, and a trap emits a ::error:: annotation with the
-        # failing command so the cause is readable through the API even when the log is not.
-        shell: bash
+        # F-49 (session-444e829d): the engine runs for two different reasons and they must not be
+        # treated the same.
+        #   * on a schedule (always the default branch) the sample is the record the site serves,
+        #     so it is committed and pushed;
+        #   * on a push or a manual dispatch from any other branch the run is a *validation* run:
+        #     it proves the engine works against the live API, but committing there would mean a
+        #     bot writing into another session's branch and racing their push. That is what made
+        #     this step fail (twice) with no readable log. Validation runs now stop after
+        #     "Validate the feed" and never touch git.
+        if: steps.sample.outcome == 'success' && github.ref_name == github.event.repository.default_branch
         run: |
           set -eo pipefail
           trap 'echo "::error::commit step failed at line $LINENO: $BASH_COMMAND" >&2' ERR
@@ -94,6 +97,13 @@ jobs:
             git pull --rebase --autostash origin "$BRANCH"
             git push origin "HEAD:$BRANCH"
           fi
+
+      - name: Validation run — sample checked, nothing to commit
+        if: steps.sample.outcome == 'success' && github.ref_name != github.event.repository.default_branch
+        run: |
+          echo "This run sampled the live demo API and validated the feed (see 'Validate the feed')."
+          echo "It was started from '${{ github.ref_name }}', not the default branch, so the bot"
+          echo "does not write to git here: a scheduled run on the default branch publishes the data."
 
       - name: Fail the run if the engine could not reach the API
         if: steps.sample.outcome != 'success'
