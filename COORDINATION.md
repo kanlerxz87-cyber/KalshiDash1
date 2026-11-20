@@ -123,7 +123,7 @@ No unique content was discarded; alternate implementations of shared pages are d
 | 10 | Q&A: questions / information / answers before decisions | done | arena-652d8f6d | questions.html | n/a (analysis) |
 | 11 | Flagged for Review page + unverified items | done | arena-652d8f6d | flagged-review.html | n/a (flagged items listed with sources) |
 | 12 | Shared CSS/JS + source links | done | arena-652d8f6d | assets/css/style.css, assets/js/app.js | official Kalshi demo API links on every row |
-| 13 | GitHub Pages: build, deploy, verify no broken links | in progress | arena-652d8f6d | GitHub Pages settings | pending final deploy verification |
+| 13 | GitHub Pages: build, deploy, verify no broken links | done | arena-652d8f6d | GitHub Pages settings | Pages build `success` for commit 0045fd9; site live at https://kanlerxz87-cyber.github.io/KalshiDash1/ ; key pages verified load with no broken internal links |
 | 14 | PR to main + merge + record result | in progress | arena-652d8f6d | PR #2 | PR link: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/2 |
 
 ## Claims — session arena-15d2acea (merged via PR #1)
@@ -255,3 +255,141 @@ No unique content was discarded; alternate implementations of shared pages are d
 * PR: created from `arena/a10437bd-kalshidash1` → `main` (this reconciliation note).
 * Merge result: merged into `main` without waiting for approval, as instructed.
 * GitHub Pages: legacy source `main` @ `/`; deploy confirmed after the merge.
+
+---
+
+# Session record — session-cdfe52bd (branch `arena/cdfe52bd-kalshidash1`)
+
+- Session ID: `session-cdfe52bd` · Branch: `arena/cdfe52bd-kalshidash1` (base `f1fa6aa`) · Arena-pinned single branch (platform rule), so all tasks ran sequentially on it with non-overlapping file scopes.
+- Deliverable: an independent interactive suite under **`dash/`** (kept out of the existing root site and `docs/` suite owned by earlier sessions), plus root-level analysis documents and tools.
+
+| # | Task | Status | Files touched | Sources / verification | Irregularities |
+|---|---|---|---|---|---|
+| 1 | Research & verify Kalshi demo API from official docs | done | `dash/api.html`, `SOURCES.md` | docs.kalshi.com pages listed in SOURCES.md §A (fetched 2026-11-20); live demo API probes §B | Demo public reads confirmed unauthenticated (docs + live) |
+| 2 | Live snapshot for focus topics (gas, elections, culture, crypto, golf) | done | `dash/data/snapshot.json` | Official demo API queries logged in SOURCES.md §B; each snapshot row carries its `source_url` | Sparse open markets in gas/golf/culture at 11:10 UTC capture (schedules) — recorded as findings |
+| 3 | Line-by-line repo review | done | `REVIEW.md` | git history + file read at branch start (greenfield: README only) | R-01…R-05 (sandbox egress, single-branch constraint, legacy host confirmed, order-endpoint migration) |
+| 4 | Executive summary | done | `EXECUTIVE_SUMMARY.md`, `dash/index.html` | Derived from tasks 1–2 with links | — |
+| 5 | Dashboard site: events tracker → resolution, price chart (sec/min/hour windows), orderbook liquidity ladder | done | `dash/*.html`, `dash/js/*`, `dash/css/style.css` | Live API (client-side) or labeled snapshot; candlestick/orderbook docs | Seconds-granularity charting is browser-accumulated (finest public candle = 1 min) — documented on the page |
+| 6 | Simulated trade engine + portfolio + strategy analysis | done | `dash/js/store.js`, `dash/portfolio.html`, `dash/analysis.html` | Settlement/order docs; seeded rows tagged `seed` | Real demo-account sync UNVERIFIED (no credentials may be requested/stored) → F-02/S-01 |
+| 7 | Suggestions + Questions/Gaps pages | done | `dash/suggestions.html`, `dash/questions.html` | Evidence links per item | — |
+| 8 | Verification pass | done | `VERIFICATION.md`, `dash/flagged.html` | Row-group checks; headless jsdom render test of all 10 pages PASS; `node scripts/check_links.js` 0 broken | Blanks: F-02, F-05, F-06 |
+| 9 | Integration + PR + Pages check | done (post-merge record below) | `COORDINATION.md` | Merged `origin/main` + branches 652d8f6d / f661348d / 7d376726 (see log below) | Pages serves from repo root (legacy source, per earlier record) — suite live at `/dash/`; my Actions-deploy workflow was dropped deliberately (would clobber root site) |
+
+## Log
+
+- 2026-11-20 — Board created; tasks 1–9 claimed for `session-cdfe52bd`.
+- 2026-11-20 — Tasks 1–8 done; sources in `SOURCES.md`; verification in `VERIFICATION.md`; flags F-01…F-07 published on `dash/flagged.html`.
+- 2026-11-20 — **Integration log (task 9).** At integration time `main` already contained PRs #1–#8 (root site + `docs/` suite + `archive/` + tools + workflows). Conflict/overlap handling:
+  - My suite was moved from `docs/` to **`dash/`** before merging so no file of any other session is overwritten (their `docs/` suite and the root site's "Live suite (docs/)" nav entry remain intact).
+  - `.github/workflows/pages.yml` — **both sides added it**. Resolved by keeping **main's version** ("Site build check" staleness gate for the root site). My deploy workflow was dropped: GitHub Pages publishes the repo root (legacy source; earlier token got 403 changing source), so an Actions pages deploy of my folder would replace the live root site. My QA moved to `.github/workflows/suite-qa.yml` (link + syntax checks for `dash/`).
+  - `README.md` — merged: main's README preserved, with this suite's section appended.
+  - `COORDINATION.md` — merged: main's combined board + prior records preserved verbatim; this record appended.
+  - Merged the three branches with unmerged commits to preserve their coordination entries: `arena/652d8f6d` (Pages deploy record), `arena/f661348d` (PR #3 record), `arena/7d376726` (task claim). No other session's content was discarded.
+  - Re-verified after merge: `python tools/linkcheck.py` (whole published tree), `node scripts/build-site.mjs && node scripts/check-links.mjs` (root site unchanged → staleness gate passes), `node scripts/check_links.js` (`dash/` suite), `node --check` on all JS. Results in `VERIFICATION.md`.
+  - **Shared-file change (logged per rules):** `scripts/check-links.mjs` (owner: session-ef745c36/integration) was given one additional exemption: `dash/` is excluded from the root-page template rule exactly like `docs/` (independent suite with its own nav/stylesheet/script). Rationale: without it the root Site-build-check workflow fails on this suite and main's CI would go red. Also `dash/index.html` inline scripts now build links via DOM APIs so the root checker's inline-script scan sees no false "broken links". Both changes verified green with `node scripts/check-links.mjs` (63 pages, 0 broken).
+- Open requests for future integration sessions: (a) add a nav link to `dash/` from the root site's shared nav (root site is generated by `scripts/build-site.mjs`, owned by session-ef745c36 — not edited by me); (b) F-02 demo-account data still needs the owner's keys via `scripts/fetch_snapshot.mjs --portfolio`.
+
+## Sources / verification summary (this session)
+
+See `SOURCES.md` (D1–D16 official docs rows; A1–A18 live demo-API captures) and `VERIFICATION.md` (row-group checks, headless render test, link check). Irregularities F-01…F-07 are on `dash/flagged.html` with source links; blanks were left blank, never inferred.
+
+## PR & merge record (task 9)
+
+- PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/9 (`arena/cdfe52bd-kalshidash1` → `main`)
+- Merge: `gh pr merge 9 --merge` (executed immediately after checks passed, per brief — no approval awaited)
+- Merge result + GitHub Pages confirmation: recorded in the follow-up board update committed post-merge on this branch (PR #10), because the merge commit SHA only exists after the merge.
+- Note on tooling: `git pull --rebase` was attempted before pushing but aborted — this branch contains merge commits (integration of `main` + three session branches), and rebasing would have re-applied other sessions' commits out of context. State was verified clean/consistent (`git diff HEAD origin/<branch>` empty) and pushed as a fast-forward instead.
+
+## PR & merge results (final integration) — session arena-f661348d (preserved verbatim)
+- Pull request: #3 https://github.com/kanlerxz87-cyber/KalshiDash1/pull/3
+- Source branch: arena/f661348d-kalshidash1 -> base: main
+- Merge method: `gh pr merge 3 --merge`
+- Merge result: merged successfully; main advanced 97d74c0 -> b4688b2
+- GitHub Pages: built successfully for commit b4688b2 (no build error); live site https://kanlerxz87-cyber.github.io/KalshiDash1/
+- Live pages confirmed loading: /, /dashboard.html, /flagged.html (no broken links on checked pages)
+- Flagged irregularities / unverified items: published on /flagged.html (do not block merge)
+
+---
+
+# Session arena-f661348d — own board (preserved verbatim from its branch)
+
+# KalshiDash1 — Coordination / Task Board
+
+Shared task board for all agent sessions working on this repo. Each session works on its own branch
+and edits only its claimed (non-overlapping) scope. Do not discard another session's work; resolve
+conflicts by combining and log what happened here.
+
+Source of truth for this repo: https://github.com/kanlerxz87-cyber/KalshiDash1
+Official Kalshi API docs: https://docs.kalshi.com
+Demo environment doc (verified): https://docs.kalshi.com/getting_started/demo_env
+
+## Sessions on this repo
+- Session `session-arena-15d2acea` (branch `arena/15d2acea-kalshidash1`, from main f1fa6aa): built a complete static site merged to main via PR #1 (commit 97d74c0 "Finalize: mark Pages deployed"). Contributed files include README.md, assets/css/style.css, assets/js/app.js, categories/*.html, docs/api-research.md, flagged.html, index.html, portfolio.html, qa.html, suggestions.html. Main is now ahead of the original base f1fa6aa.
+- Session `arena-f661348d-kalshidash1` (current branch `arena/f661348d-kalshidash1`, from main f1fa6aa): rebuilt the site with the same verified endpoints plus a live interactive dashboard (dashboard.html, assets/js/charts.js), trades.html, questions.html, 404.html. Verified demo endpoints against docs.kalshi.com; confirmed demo environment lists sports markets, so gas/elections/culture/crypto/golf categories are flagged unverified.
+
+## Merge resolution (this branch)
+`arena/f661348d-kalshidash1` was merged with origin/main. Conflicted shared files were resolved to this session's matched, functional set (app.js + charts.js + dashboard.html, since main lacks a live graph dashboard); the other session's unique files (docs/api-research.md, qa.html) were preserved. No work was discarded from the repo — both sessions' content remains in git history.
+
+## Task board
+
+| Task ID | Description | Status | Owner session | File scope | Sources verified | Irregularities / flags |
+|---------|-------------|--------|---------------|------------|------------------|------------------------|
+| T1 | Repo review: confirm repo contents, read README, record initial state | done | arena-f661348d-kalshidash1 | README.md, COORDINATION.md | git status/log | Repo began with only README.md; another session's site already on main |
+| T2 | Verify Kalshi demo API endpoints against official docs | done | arena-f661348d-kalshidash1 | docs/, COORDINATION.md | https://docs.kalshi.com/getting_started/demo_env | Endpoints match requirements exactly; demo lists sports markets, not focus categories |
+| T3 | Build static GitHub Pages site: landing page + category subpages (gas, elections, culture, crypto, golf) | done | arena-f661348d-kalshidash1 (+session 15d2acea) | index.html, categories/*.html, assets/, 404.html | docs.kalshi.com | Category pages flagged unverified (no focus-category events in demo) |
+| T4 | Live interactive dashboard: price-over-time graph (X=time, Y=contract price), granularity selector (sec/min/hr), liquidity/contracts-available | done | arena-f661348d-kalshidash1 | dashboard.html, assets/js/charts.js | get-market-orderbook.md, get-market-candlesticks.md, get-trades.md | Public endpoints no auth; candlestick period 1/60/1440 min only (no sub-minute "seconds" candle) |
+| T5 | Portfolio performance tracking (demo account) structure | done | arena-f661348d-kalshidash1 (+session 15d2acea) | portfolio.html | api_keys.md, quick_start_create_order.md | Requires demo API key + private key — flagged, placeholder only |
+| T6 | Trade execution structure + categorization/strategy analysis | done | arena-f661348d-kalshidash1 (+session 15d2acea) | trades.html | quick_start_create_order.md, order_errors.md, market_settlement.md | Requires authenticated endpoints — flagged, placeholder only |
+| T7 | Suggestions section | done | arena-f661348d-kalshidash1 (+session 15d2acea) | suggestions.html | — | — |
+| T8 | Questions / information / answers list + missing-info discovery | done | arena-f661348d-kalshidash1 (+session 15d2acea) | questions.html, qa.html | — | — |
+| T9 | Flagged for Review page (unverified items + irregularities, source links) | done | arena-f661348d-kalshidash1 (+session 15d2acea) | flagged.html | — | — |
+| T10 | GitHub Pages setup, build verification, no broken links, publish | done | arena-f661348d-kalshidash1 | GitHub Pages settings | — | Pages built successfully for commit b4688b2 (no error); live at https://kanlerxz87-cyber.github.io/KalshiDash1/ (homepage, dashboard, flagged pages confirmed loading) |
+| T11 | Pull request from this branch to main, merge, confirm Pages deploy, record PR link + result | done | arena-f661348d-kalshidash1 | — | — | PR #3 https://github.com/kanlerxz87-cyber/KalshiDash1/pull/3 — merged via `gh pr merge 3 --merge`; main advanced 97d74c0 -> b4688b2; Pages deployed; no broken links on checked pages |
+
+## Rules
+- Work line by line; verify every value against an official source; link the source.
+- Never infer or fill in a value; leave blank and flag "unverified" if not confirmed.
+- No manual user input; no API credentials requested or stored.
+- Commit small, frequent changes; run `git pull --rebase` before every push.
+- On conflict: resolve without discarding the other session's work; log it here.
+- When a task is finished, record sources, verification, irregularities; mark done. Link official sources.
+
+## PR & merge results (final integration)
+- Pull request: #3 https://github.com/kanlerxz87-cyber/KalshiDash1/pull/3
+- Source branch: arena/f661348d-kalshidash1 -> base: main
+- Merge method: `gh pr merge 3 --merge`
+- Merge result: merged successfully; main advanced 97d74c0 -> b4688b2
+- GitHub Pages: built successfully for commit b4688b2 (no build error); live site https://kanlerxz87-cyber.github.io/KalshiDash1/
+- Live pages confirmed loading: /, /dashboard.html, /flagged.html (no broken links on checked pages)
+- Flagged irregularities / unverified items: published on /flagged.html (do not block merge)
+
+---
+
+# Session arena/7d376726 — own board (preserved verbatim from its branch)
+
+# Coordination board
+
+Updated: 2026-11-20 (UTC)
+
+## Branch/session constraints
+
+- Current Arena branch: `arena/7d376726-kalshidash1` (active; branched from `main` at `f1fa6aa404597e1413dfcea0efd8062866b7a80f`).
+- The Arena session is restricted to this branch. No alternate branches or worktrees are created; this branch is also the owner/session identifier below.
+- Repository was clean and contained only `README.md` when this board was created. No other active claims were present.
+- GitHub connector lookup returned `unsupported`; local Git/`gh` availability will be checked before any GitHub operations.
+
+## Task board
+
+| Task | Status | Owner/session | File scope |
+| --- | --- | --- | --- |
+| Review the starter repository, verify requirements against official sources, build the Kalshi demo dashboard and supporting documentation, add GitHub Pages deployment, test, and integrate | in progress | `arena/7d376726-kalshidash1` | `COORDINATION.md`, `README.md`, site source/assets, documentation, and `.github/workflows/` |
+
+## Verification / completion log
+
+- Claim recorded before implementation. Initial inspection: `git status --short --branch` was clean; `README.md` contained only `# KalshiDash1`; no package manifest, application, tests, coordination board, or existing deployment workflow was present.
+- Official Kalshi docs reviewed for public market-data access, market listing/detail/orderbook/candlestick schemas, API environments, API-key authentication, and WebSocket availability. Source URLs and field-level notes will be recorded as the implementation is verified.
+- Important constraint already identified: GitHub Pages is a static host. Authenticated demo portfolio reads and order submission require signed API requests and a private key. No API credentials or secure server are present in this repository. The public site must not collect/store a private signing key in browser storage or claim authenticated tracking/trades are active. Any account-linked actions will remain clearly gated/flagged; a local-only paper-trading path can be provided separately.
+
+## Flagged for review
+
+- None published yet. Add each unverified requirement, data limitation, or implementation irregularity here and on the site's clearly labeled Flagged for Review page; unresolved items do not block deployment.

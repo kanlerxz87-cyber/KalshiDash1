@@ -73,3 +73,44 @@ and reads demo credentials from environment variables only.
 
 CI runs all of the above (plus `node scripts/check-links.mjs`-style syntax checks) in
 `.github/workflows/site-qa.yml`; the root site itself is rebuilt and checked by `.github/workflows/pages.yml`.
+
+---
+
+# KalshiDash1 — the `dash/` interactive suite (added by session-cdfe52bd, kept alongside the root site and `docs/` suite)
+
+A third, independent implementation under `dash/`, published at `/dash/` alongside the others. Nothing from
+any other session was overwritten: its pages, `js/`, `css/` and verified data snapshot live entirely inside `dash/`.
+It adds live→legacy→snapshot data fallback, a canvas price chart with seconds-to-days windows, a full orderbook
+liquidity ladder, a simulated trade/portfolio engine, and a suggestions review queue.
+
+## Pages under `dash/`
+
+| Path | Purpose |
+|------|---------|
+| `dash/index.html` | Executive summary + focus-topic glance + highest-dollar rows (live or verified snapshot) |
+| `dash/events.html` | Topic boards ranked by dollar volume, tracked to resolution (yes/no) + resolution log |
+| `dash/market.html` | Price chart (X = time: 5 min seconds-granularity / 1 h / 6 h / 24 h / 7 d; Y = contract price), orderbook ladder (contracts available at each price), rules + settlement sources, simulated trade ticket |
+| `dash/portfolio.html` | Simulated P&L, win rate, exposure, equity curve, category breakdown (real demo-account sync needs the owner's keys — see `dash/flagged.html` F-02) |
+| `dash/analysis.html` | Topic × strategy breakdown; strategy definitions mapped to verified exchange mechanics |
+| `dash/suggestions.html` | 8 evidence-backed proposals with approve/reject/implemented review workflow (browser-local) |
+| `dash/questions.html` | Questions & gaps: known/verified vs missing, with a discovery plan per unknown |
+| `dash/api.html` | Verified API reference: environments, auth, endpoint inventory, data model, rate limits, quirks |
+| `dash/sources.html` | Source register: every row → official docs page or exact API query |
+| `dash/flagged.html` | Flagged for review F-01…F-07 with evidence links and blank-value policy |
+
+## Tools and documents added alongside
+
+| Path | Purpose |
+|------|---------|
+| `dash/data/snapshot.json` | Verified point-in-time capture of the official demo API (2026-11-20) — the only market data committed in the repo; every row carries its `source_url`. Used only as fallback when the browser cannot reach the API, and clearly labeled. |
+| `EXECUTIVE_SUMMARY.md` | Executive summary of the brief, verified platform facts, findings, blank policy |
+| `SOURCES.md` | Source register (D1–D16 docs rows, A1–A18 live API captures) |
+| `VERIFICATION.md` | Line-by-line verification record incl. headless render test of all 10 pages |
+| `REVIEW.md` | Repo review + environment irregularities |
+| `scripts/check_links.js` | Link/asset/JSON checker for `dash/` |
+| `scripts/fetch_snapshot.mjs` | Refresh the snapshot from the official API; `--portfolio` exports your demo account (keys stay on your machine) |
+| `scripts/local-proxy.mjs` | CORS-proof local live mode (`/api/*` → demo API) |
+| `.github/workflows/suite-qa.yml` | CI: link + syntax checks for the `dash/` suite |
+
+Conventions of this suite: every table row links its official source; unconfirmed values stay blank and are
+listed on the Flagged page; portfolio/trade data is simulated and labeled as such; not financial advice.

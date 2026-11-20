@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KalshiDash1 — Kalshi Demo Dashboard</title>
+<meta name="description" content="Live dashboard for the Kalshi demo environment: highest-dollar events in gas prices, elections, culture, crypto and golf; price charts; liquidity; simulated portfolio and strategy analysis.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+  <h1>Kalshi Demo Dashboard</h1>
+  <p class="sub">Tracks the highest-dollar live events on the Kalshi <strong>demo</strong> exchange across five focus topics —
+  gas prices, elections, culture, crypto and golf — until each market resolves <strong>yes</strong> or <strong>no</strong>.
+  Every number links to the official endpoint or documentation page it came from. Portfolio and trade execution are
+  simulated in-browser (real demo-account sync needs the account holder's API keys — see <a href="questions.html">Questions &amp; Gaps</a>).</p>
+
+  <div class="grid cols-4" id="status-cards"></div>
+
+  <div class="notice" id="mode-notice">
+    <strong>Data source:</strong> probing the official demo API
+    (<a href="https://external-api.demo.kalshi.co/trade-api/v2" target="_blank" rel="noopener">external-api.demo.kalshi.co</a>)…
+    If your browser cannot reach it (CORS/network), the site falls back to a verified snapshot captured
+    2026-11-20 and says so here.
+  </div>
+
+  <h2>Executive summary</h2>
+  <div class="panel">
+    <p><strong>What this is.</strong> A static, dependency-free dashboard for Kalshi's official demo Trade API
+    (recommended REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code>, also-supported
+    <code>https://demo-api.kalshi.co/trade-api/v2</code>; WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code>).
+    Endpoint URLs in your brief match the official documentation exactly
+    (<a href="https://docs.kalshi.com/getting_started/api_environments" target="_blank" rel="noopener">API Environments and Endpoints</a>,
+    <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Test In The Demo Environment</a>).</p>
+
+    <p><strong>Key verified facts.</strong></p>
+    <ul>
+      <li>Public market data (series, events, markets, orderbook, candlesticks, trades) is reachable <em>without authentication</em>
+      (<a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Quick Start: Market Data</a>) — the dashboard uses only these.</li>
+      <li>Orders, balances and positions require API-key request signing (KALSHI-ACCESS-KEY / -SIGNATURE / -TIMESTAMP headers,
+      RSA-PSS or Ed25519) — <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">docs</a>.
+      Real order placement is <code>POST /portfolio/events/orders</code> (V2); the legacy <code>/portfolio/orders</code> writes return
+      <em>410 Gone</em> — <a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a>.</li>
+      <li>Markets resolve with <code>result</code> = <code>"yes"</code> or <code>"no"</code>; winning side receives $1 per contract
+      (<a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market schema</a>,
+      <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>).
+      The Events tracker follows each market from live → resolved.</li>
+      <li>Demo environment uses mock funds and separate credentials, and Kalshi warns demo prices
+      may not reflect real markets — <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo_env.md</a>.</li>
+    </ul>
+
+    <p><strong>Highest-dollar focus-topic activity at the verified snapshot (2026-11-20 11:10 UTC):</strong>
+    the elections market <code>KXELECTIONEMERGENCY-27JAN01</code> led the focus topics with
+    7,475.30 contracts traded and equal open interest (~$7,475 notional at $1/contract), followed by the demo hourly BTC
+    market <code>KXDEMOFUTHOURLY-26NOV20H12-UP</code> with 1,175.00 contracts. Gas, golf and culture had
+    <em>no open markets at that moment</em> (their series trade on daily/tournament schedules) — all rows and empty-result
+    probes are recorded with source links in <a href="sources.html">Sources</a>.</p>
+
+    <p><strong>What is deliberately blank / flagged.</strong> Real demo-account portfolio numbers (need credentials),
+    anything the API did not return, and the events-endpoint category-filter quirk (F-01). See
+    <a href="flagged.html">Flagged for Review</a> — nothing on this site was inferred or filled in.</p>
+  </div>
+
+  <h2>Focus topics at a glance</h2>
+  <div class="table-wrap">
+    <table id="glance-table">
+      <thead>
+        <tr>
+          <th>Topic</th>
+          <th class="num">Series tracked (snapshot)</th>
+          <th class="num">Live markets (snapshot)</th>
+          <th>Highest-dollar row captured</th>
+          <th>State at capture</th>
+          <th>Source</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <h2>Highest-dollar rows right now</h2>
+  <p class="sub">Ranked by 24h dollar volume (contracts × $1 notional), then total volume. Live when the API is reachable from your browser; otherwise the verified snapshot.</p>
+  <div class="table-wrap">
+    <table id="top-table">
+      <thead>
+        <tr>
+          <th>Market</th><th>Topic</th>
+          <th class="num">Last</th><th class="num">Bid / Ask</th>
+          <th class="num">24h vol ($)</th><th class="num">Total vol ($)</th><th class="num">Open int ($)</th>
+          <th>Status</th><th>Source</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <h2>How to use this site</h2>
+  <div class="grid cols-2">
+    <div class="panel">
+      <h3>Track &amp; trade (simulated)</h3>
+      <ol>
+        <li><a href="events.html">Live Events</a> — pick a topic tab, sort by dollar volume, follow each market to resolution (yes/no).</li>
+        <li><a href="market.html">Market Detail</a> — price chart (seconds/minutes/hours windows), full orderbook ladder (contracts available at each price), rules and settlement sources.</li>
+        <li><a href="portfolio.html">Portfolio</a> — place simulated trades against live prices; P&amp;L, win rate, exposure and equity curve.</li>
+        <li><a href="analysis.html">Trade Analysis</a> — categorize trades by topic and strategy; compare performance; strategy definitions.</li>
+      </ol>
+    </div>
+    <div class="panel">
+      <h3>Decide &amp; verify</h3>
+      <ol>
+        <li><a href="suggestions.html">Suggestions</a> — improvement proposals with impact/effort; review and approve/reject before implementing.</li>
+        <li><a href="questions.html">Questions &amp; Gaps</a> — what we know, what we don't, and how to find out — before any decision.</li>
+        <li><a href="api.html">API Reference</a> — the verified endpoint inventory and data model.</li>
+        <li><a href="sources.html">Sources</a> / <a href="flagged.html">Flagged for Review</a> — per-row provenance and irregularities.</li>
+      </ol>
+    </div>
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/kalshi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app-common.js"></script>
+<script>
+(function () {
+  'use strict';
+  App.renderHeader('index.html');
+  App.renderFooter();
+  var K = window.K;
+
+  function mkLink(url, text) {
+    var a = document.createElement('a');
+    a.href = url; a.textContent = text;
+    return a.outerHTML;
+  }
+
+  function marketCells(m) {
+    return '<td>' + mkLink(K.marketUrl(m.ticker), m.title || m.ticker) + '<br><code class="small">' + K.esc(m.ticker) + '</code></td>' +
+      '<td>' + App.topicLabel(m.topic) + '</td>' +
+      '<td class="num">' + K.usd4(m.last_price_dollars) + '</td>' +
+      '<td class="num">' + K.usd4(m.yes_bid_dollars) + ' / ' + K.usd4(m.yes_ask_dollars) + '</td>' +
+      '<td class="num">' + K.num(K.fp(m.volume_24h_fp)) + '</td>' +
+      '<td class="num">' + K.num(K.fp(m.volume_fp)) + '</td>' +
+      '<td class="num">' + K.num(K.fp(m.open_interest_fp)) + '</td>' +
+      '<td>' + App.statusBadge(m.status, m.result) + '</td>' +
+      '<td class="src">' + K.apiLink(m.source_url) + '</td>';
+  }
+
+  function renderTop(rows) {
+    var tb = document.querySelector('#top-table tbody');
+    tb.innerHTML = '';
+    rows.slice(0, 8).forEach(function (m) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = marketCells(m);
+      tb.appendChild(tr);
+    });
+    if (!rows.length) tb.innerHTML = '<tr><td colspan="9" class="muted">No market rows available.</td></tr>';
+  }
+
+  function renderGlance() {
+    Data.snapshot().then(function (snap) {
+      var tb = document.querySelector('#glance-table tbody');
+      tb.innerHTML = '';
+      K.cfg.topics.forEach(function (t) {
+        var topic = snap.topics[t.id] || {};
+        var series = topic.series || [], markets = topic.live_markets || [];
+        var best = markets.slice().sort(function (a, b) {
+          return (K.fp(b.volume_24h_fp) || 0) - (K.fp(a.volume_24h_fp) || 0) || (K.fp(b.volume_fp) || 0) - (K.fp(a.volume_fp) || 0);
+        })[0];
+        var bestCell = best
+          ? mkLink(K.marketUrl(best.ticker), best.title || best.ticker) + ' — vol ' + K.num(K.fp(best.volume_fp)) + ' contracts'
+          : '<span class="muted">no open markets at capture</span>';
+        var state = markets.length
+          ? '<span class="badge live">' + markets.length + ' live</span>'
+          : '<span class="badge warn">none open at 11:10 UTC</span>';
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td><strong>' + t.label + '</strong></td>' +
+          '<td class="num">' + series.length + '</td>' +
+          '<td class="num">' + markets.length + '</td>' +
+          '<td>' + bestCell + '</td>' +
+          '<td>' + state + '</td>' +
+          '<td class="src">' + K.apiLink(topic.series_query || snap.meta.api_root, 'series query') + '</td>';
+        tb.appendChild(tr);
+      });
+
+      var top = [];
+      Object.keys(snap.topics).forEach(function (tid) {
+        (snap.topics[tid].live_markets || []).forEach(function (m) {
+          top.push(Object.assign({}, m, { topic: tid, source_url: m.source_url }));
+        });
+      });
+      top.sort(function (a, b) {
+        return (K.fp(b.volume_24h_fp) || 0) - (K.fp(a.volume_24h_fp) || 0) || (K.fp(b.volume_fp) || 0) - (K.fp(a.volume_fp) || 0);
+      });
+      renderTop(top);
+    });
+  }
+
+  renderGlance();
+
+  // status cards + live upgrade
+  var cards = document.getElementById('status-cards');
+  Data.snapshotMeta().then(function (meta) {
+    cards.innerHTML =
+      '<div class="stat"><div class="label">Environment</div><div class="value">Demo</div><div class="note">mock funds · separate keys</div></div>' +
+      '<div class="stat"><div class="label">Snapshot captured</div><div class="value">' + meta.captured_at.replace('T', ' ').replace('Z', ' UTC') + '</div><div class="note">' + K.apiLink(meta.api_root, 'source endpoint') + '</div></div>' +
+      '<div class="stat"><div class="label">Focus topics</div><div class="value">5</div><div class="note">gas · elections · culture · crypto · golf</div></div>' +
+      '<div class="stat"><div class="label">Verification</div><div class="value">Row-linked</div><div class="note"><a href="sources.html">every row has a source</a></div></div>';
+  });
+
+  K.onModeChange(function (st) {
+    var n = document.getElementById('mode-notice');
+    if (!n) return;
+    if (st.mode === 'live' || st.mode === 'legacy') {
+      n.className = 'notice good';
+      n.innerHTML = '<strong>Live data:</strong> connected to the official demo API (' + K.esc(st.base) + '). ' +
+        'Tables below refresh from it; the 2026-11-20 snapshot remains available as verified reference.';
+      Data.allMarkets({ topN: 4 }).then(renderTop).catch(function () {});
+    } else if (st.mode === 'snapshot') {
+      n.className = 'notice warn';
+      n.innerHTML = '<strong>Snapshot mode:</strong> your browser could not reach the demo API directly (likely CORS or network policy). ' +
+        'Showing the verified snapshot captured 2026-11-20T11:10:39Z with per-row source links. ' +
+        'For live data: open the site locally with <code>node scripts/local-proxy.mjs</code> (see README), or run <code>scripts/fetch_snapshot.mjs</code> to refresh the snapshot.';
+    }
+  });
+})();
+</script>
+</body>
+</html>

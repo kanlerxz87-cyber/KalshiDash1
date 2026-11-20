@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trade Analysis — KalshiDash1</title>
+<meta name="description" content="Categorize simulated trades by topic and strategy, compare performance, and review strategy definitions and findings.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+  <h1>Trade Analysis</h1>
+  <p class="sub">Every simulated trade is tagged twice: by <strong>topic</strong> (gas prices, elections, culture, crypto, golf) and by
+  <strong>strategy type</strong>. This page aggregates both so strategy choices can be compared on results, not impressions.
+  Trades and P&amp;L are simulated (see <a href="portfolio.html">Portfolio</a>); the strategy definitions below are grounded in
+  verified API behavior and linked to sources.</p>
+
+  <h2>Results by topic × strategy</h2>
+  <div class="table-wrap">
+    <table id="cross-table">
+      <thead>
+        <tr><th>Topic</th><th>Strategy</th><th class="num">Trades</th><th class="num">Settled</th><th class="num">Wins</th><th class="num">Win rate</th><th class="num">Realized P&amp;L ($)</th><th class="num">Avg P&amp;L ($)</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <h2>Results by strategy type</h2>
+  <div class="grid cols-2" id="strategy-cards"></div>
+
+  <h2>Strategy definitions &amp; how they map to the exchange</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Strategy type</th><th>Definition</th><th>Exchange mechanic it relies on (verified)</th><th>Source</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Hold to resolution</strong></td>
+          <td>Buy YES or NO and hold until the market determines; collect $1 per winning contract.</td>
+          <td>Settlement pays the winning side $1/contract; <code>result</code> = "yes"/"no"; <code>settlement_value_dollars</code> credits YES holders.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a></td>
+        </tr>
+        <tr>
+          <td><strong>Momentum</strong></td>
+          <td>Enter in the direction of recent price change; exit on reversal or time stop.</td>
+          <td><code>previous_price_dollars</code> / <code>previous_yes_bid_dollars</code> / <code>previous_yes_ask_dollars</code> give 1-day-ago references; candlesticks give OHLC at 1m/60m/1440m.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Candlesticks</a> · <a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market</a></td>
+        </tr>
+        <tr>
+          <td><strong>Mean reversion</strong></td>
+          <td>Fade extreme prices (near $0 / $1) when the event is unresolved and liquidity is thin.</td>
+          <td>Binary prices are bounded $0–$1 on a per-market tick grid (<code>price_ranges</code>); orderbook depth shows how thin liquidity is at each level.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/fixed_point_migration" target="_blank" rel="noopener">Fixed-Point Representation</a> · <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">Orderbook</a></td>
+        </tr>
+        <tr>
+          <td><strong>Liquidity provision</strong></td>
+          <td>Rest bids/asks inside the spread to earn it; manage resulting inventory.</td>
+          <td>Best bid/ask and their sizes are on every market (<code>yes_bid_size_fp</code>, <code>yes_ask_size_fp</code>); full depth via orderbook; queue position via authenticated order endpoints.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">Orderbook Responses</a></td>
+        </tr>
+        <tr>
+          <td><strong>Event catalyst</strong></td>
+          <td>Position before a scheduled publication/certification that determines the market.</td>
+          <td><code>close_time</code>, <code>expected_expiration_time</code>, <code>occurrence_datetime</code> and per-series settlement sources (AAA, EIA, AP, official returns) define when determination happens.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Findings from the verified data</h2>
+  <div class="panel">
+    <ol>
+      <li><strong>Liquidity is concentrated in few markets.</strong> At the verified snapshot (2026-11-20 11:10 UTC) one elections market
+      (<code>KXELECTIONEMERGENCY-27JAN01</code>, 7,475.30 contracts) and one crypto market (<code>KXDEMOFUTHOURLY-26NOV20H12-UP</code>, 1,175.00)
+      dominated the focus topics; the rest were empty or thin. Thin markets make entry/exit cost dominate — check the
+      orderbook ladder before sizing any trade. <span class="small">(<a href="sources.html">row sources</a>)</span></li>
+      <li><strong>Topic schedules differ sharply.</strong> Crypto demo markets trade hourly; gas prices resolve daily/monthly against AAA/EIA
+      publications; golf around tournament rounds; elections events can run for months. A one-size polling and monitoring cadence
+      over-trades nothing and misses the schedules — the tracker therefore shows close times per row.</li>
+      <li><strong>Resolution economics are simple; price limits are not.</strong> Each winning contract pays exactly $1, but markets use
+      different tick grids (<code>price_ranges</code>: 1¢, 0.1¢, tapered structures). Limit orders must snap to the grid or the API
+      rejects them — verified in the fixed-point docs.</li>
+      <li><strong>Demo ≠ production.</strong> Kalshi warns demo market prices and behavior may not reflect real markets
+      (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo_env.md</a>). Any strategy proven here
+      needs re-validation on production data before real-money use.</li>
+    </ol>
+  </div>
+
+  <h2>Suggestions arising from this analysis</h2>
+  <p class="sub">Kept in the review queue so changes are chosen deliberately before implementation —
+  <a href="suggestions.html">open the suggestions board</a>.</p>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/kalshi.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app-common.js"></script>
+<script>
+(function () {
+  'use strict';
+  App.renderHeader('analysis.html');
+  App.renderFooter();
+  var K = window.K;
+  var trades = Store.getTrades();
+
+  // cross table
+  var groups = {};
+  trades.forEach(function (t) {
+    var key = t.topic + '||' + t.strategy;
+    groups[key] = groups[key] || [];
+    groups[key].push(t);
+  });
+  var tb = document.querySelector('#cross-table tbody');
+  Object.keys(groups).sort().forEach(function (key) {
+    var parts = key.split('||');
+    var s = Store.computeStats(groups[key]);
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + App.topicLabel(parts[0]) + '</td>' +
+      '<td>' + K.esc((Store.STRATEGIES.filter(function (x) { return x.id === parts[1]; })[0] || {}).label || parts[1]) + '</td>' +
+      '<td class="num">' + s.total + '</td><td class="num">' + s.settled + '</td><td class="num">' + s.wins + '</td>' +
+      '<td class="num">' + (s.winRate === null ? '—' : (s.winRate * 100).toFixed(1) + '%') + '</td>' +
+      '<td class="num">' + K.usd(s.realized) + '</td>' +
+      '<td class="num">' + (s.settled ? K.usd(s.realized / s.settled) : '—') + '</td>';
+    tb.appendChild(tr);
+  });
+  if (!Object.keys(groups).length) tb.innerHTML = '<tr><td colspan="8" class="muted">No trades recorded yet.</td></tr>';
+
+  // strategy cards
+  var cards = document.getElementById('strategy-cards');
+  Store.STRATEGIES.forEach(function (st) {
+    var sub = trades.filter(function (t) { return t.strategy === st.id; });
+    var s = Store.computeStats(sub);
+    var d = document.createElement('div');
+    d.className = 'card';
+    d.innerHTML = '<h3>' + st.label + '</h3>' +
+      '<div class="meta">' + (s.winRate === null ? 'no settled trades' :
+        (s.winRate * 100).toFixed(1) + '% win rate · ' + K.usd(s.realized) + ' realized · ' + s.total + ' trades') + '</div>' +
+      '<div class="body">' + st.desc + '</div>' +
+      (sub.length ? '' : '<div class="small muted mt">No trades tagged with this strategy yet — place one from Market Detail.</div>');
+    cards.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

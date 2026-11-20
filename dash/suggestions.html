@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suggestions — KalshiDash1</title>
+<meta name="description" content="Improvement suggestions with impact and effort, for review and approval before implementation.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+  <h1>Suggestions Board</h1>
+  <p class="sub">Every proposed improvement to the dashboard and its decision-making value. Nothing here is implemented until it is
+  reviewed and approved — use the buttons to move items through
+  <span class="badge neutral">proposed</span> → <span class="badge good">approved</span> /
+  <span class="badge no">rejected</span> / <span class="badge accent">implemented</span>.
+  Decisions are saved in your browser (localStorage). Each suggestion links the verified evidence behind it.</p>
+
+  <div class="btnrow">
+    <span class="small muted" id="s-summary"></span>
+  </div>
+
+  <div id="s-list"></div>
+
+  <h2>How suggestions are generated</h2>
+  <div class="panel">
+    <ol>
+      <li><strong>Evidence first:</strong> only claims that survived the line-by-line verification (see <a href="sources.html">Sources</a>) may justify a suggestion.</li>
+      <li><strong>Gap-driven:</strong> anything missing to make a better decision becomes a row on <a href="questions.html">Questions &amp; Gaps</a> first, then a suggestion.</li>
+      <li><strong>Review before build:</strong> impact vs effort is stated up front; the reviewer approves, rejects, or edits before any code changes.</li>
+      <li><strong>No silent changes:</strong> implemented items are re-verified and logged in the repo's VERIFICATION.md.</li>
+    </ol>
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/kalshi.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app-common.js"></script>
+<script src="js/suggestions.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+# QA for the interactive suite under dash/ (session-cdfe52bd).
+# Complements .github/workflows/pages.yml (root-site staleness gate) and site-qa.yml (whole-tree checks).
+name: suite-qa
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Link and asset check (dash/ suite)
+        run: node scripts/check_links.js
+      - name: JavaScript syntax check
+        run: |
+          set -e
+          for f in dash/js/*.js; do echo "node --check $f"; node --check "$f"; done
+          for f in scripts/*.js scripts/*.mjs; do echo "node --check $f"; node --check "$f"; done
+      - name: Snapshot JSON validity
+        run: node -e "JSON.parse(require('fs').readFileSync('dash/data/snapshot.json')); console.log('snapshot ok')"

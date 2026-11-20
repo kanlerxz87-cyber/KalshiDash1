@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Questions &amp; Gaps — KalshiDash1</title>
+<meta name="description" content="Questions, known information, verified answers, and missing information with discovery plans — before any decision.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+  <h1>Questions, Information &amp; Answers</h1>
+  <p class="sub">A decision is only as good as its inputs. This page lists every question the project depends on, what is
+  <strong>known and verified</strong> (with source links), what is <strong>missing</strong>, and <strong>how to discover it</strong>.
+  Rows whose answer cannot be confirmed from an official source are left blank and flagged — never inferred.
+  Use this list before making any call on strategy, scope, or implementation.</p>
+
+  <div class="notice">
+    <strong>Legend:</strong> <span class="badge good">Answered</span> verified from an official source ·
+    <span class="badge warn">Partial</span> partially known, gaps stated ·
+    <span class="badge bad">Open</span> cannot be answered without missing inputs (each has a discovery plan).
+  </div>
+
+  <h2>A. Data &amp; market structure</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:22%">Question</th><th style="width:30%">Known (verified)</th><th style="width:22%">Missing</th><th style="width:26%">How to discover it</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>What are the official demo API endpoints?</td>
+          <td><span class="badge good">Answered</span> REST <code>https://external-api.demo.kalshi.co/trade-api/v2</code> (also <code>https://demo-api.kalshi.co/trade-api/v2</code>); WS <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> (also <code>wss://demo-api.kalshi.co/trade-api/ws/v2</code>). <a href="https://docs.kalshi.com/getting_started/api_environments" target="_blank" rel="noopener">source</a></td>
+          <td>—</td><td>—</td>
+        </tr>
+        <tr>
+          <td>Can market data be read without an account?</td>
+          <td><span class="badge good">Answered</span> Yes — series, events, markets, orderbook and trades are documented public endpoints; verified live during this build. <a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">source</a></td>
+          <td>—</td><td>—</td>
+        </tr>
+        <tr>
+          <td>How does a market resolve?</td>
+          <td><span class="badge good">Answered</span> <code>result</code> ∈ {"yes","no","scalar",""}; winning side receives $1/contract; <code>settlement_value_dollars</code> shows the YES payout. <a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">schema</a> · <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">settlement</a></td>
+          <td>—</td><td>—</td>
+        </tr>
+        <tr>
+          <td>Can markets be ranked by dollar volume server-side?</td>
+          <td><span class="badge warn">Partial</span> No volume sort exists on Get Markets (ordering is creation/close/settlement time per docs). Series volume exists via <code>include_volume=true</code>. <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">source</a></td>
+          <td>A true "most active" listing endpoint (the website shows one) is not in the documented Trade API.</td>
+          <td>Rank client-side (implemented), or run a scheduled scanner job (suggestion S-03); check <code>docs.kalshi.com/llms.txt</code> again for new search/live-data endpoints.</td>
+        </tr>
+        <tr>
+          <td>How fast is market data?</td>
+          <td><span class="badge warn">Partial</span> REST responses are cached and can lag the exchange by several seconds; candlesticks lag trades slightly. <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">source</a></td>
+          <td>Exact cache TTL; sub-second freshness.</td>
+          <td>WebSocket is the documented route for current state (needs auth — row B2); measure lag against WS once keys exist.</td>
+        </tr>
+        <tr>
+          <td>What exactly does "dollar amount" mean for ranking?</td>
+          <td><span class="badge warn">Partial</span> Volume fields are contract counts (<code>volume_fp</code>); each binary contract has $1 notional (<code>notional_value_dollars</code>), so dollar volume = contracts × $1. Open interest similarly counts contracts.</td>
+          <td>Your intended metric (24h dollar volume vs total vs open interest vs orderbook depth).</td>
+          <td>The tracker shows all four per row and ranks by 24h dollar volume by default (sortable columns); confirm preference on the Suggestions board.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>B. Account, trading &amp; portfolio</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:22%">Question</th><th style="width:30%">Known (verified)</th><th style="width:22%">Missing</th><th style="width:26%">How to discover it</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>How are orders placed programmatically?</td>
+          <td><span class="badge good">Answered</span> <code>POST /portfolio/events/orders</code> (V2 shape: ticker, side bid/ask, count, price, time_in_force, self_trade_prevention_type). Legacy <code>/portfolio/orders</code> returns 410 Gone. <a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">source</a></td>
+          <td>—</td><td>—</td>
+        </tr>
+        <tr>
+          <td>How is a request authenticated?</td>
+          <td><span class="badge good">Answered</span> Headers <code>KALSHI-ACCESS-KEY</code>, <code>KALSHI-ACCESS-SIGNATURE</code>, <code>KALSHI-ACCESS-TIMESTAMP</code>; signature over timestamp+method+path (no query string), RSA-PSS or Ed25519. <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">source</a></td>
+          <td>—</td><td>—</td>
+        </tr>
+        <tr>
+          <td>What is in the demo account portfolio?</td>
+          <td><span class="badge bad">Open</span> —</td>
+          <td>Demo-account API key ID + private key (created by the account holder on demo.kalshi.co), or a signed export.</td>
+          <td>Run <code>scripts/fetch_snapshot.mjs</code> with demo keys locally to export balance/positions/fills JSON into <code>docs/data/</code> (option in S-01). Keys stay on your machine — never in this repo or site.</td>
+        </tr>
+        <tr>
+          <td>What are the real demo-account returns and win rates?</td>
+          <td><span class="badge bad">Open</span> —</td>
+          <td>Fills and settlement history for the demo account.</td>
+          <td>Same as B3: <code>GET /portfolio/fills</code>, <code>GET /portfolio/settlements</code>, <code>GET /portfolio/positions</code> with the holder's keys. Current site shows SIMULATED results only.</td>
+        </tr>
+        <tr>
+          <td>What fees apply to trades?</td>
+          <td><span class="badge warn">Partial</span> Series declare <code>fee_type</code> (quadratic, flat, …) and <code>fee_multiplier</code>; the fee schedule PDF is referenced from the series docs. <a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">source</a></td>
+          <td>Exact fee formula constants (in the fee schedule PDF), rounding rules per balance.</td>
+          <td>Fetch <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">kalshi.com/docs/kalshi-fee-schedule.pdf</a> and implement per-series fees (suggestion S-05); verify against <a href="https://docs.kalshi.com/getting_started/fee_rounding" target="_blank" rel="noopener">Fee Rounding docs</a>.</td>
+        </tr>
+        <tr>
+          <td>Are demo prices representative?</td>
+          <td><span class="badge good">Answered</span> No guarantee — Kalshi states demo market prices and behavior may not reflect real markets. <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">source</a></td>
+          <td>—</td><td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>C. Strategy &amp; decision-making</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:22%">Question</th><th style="width:30%">Known (verified)</th><th style="width:22%">Missing</th><th style="width:26%">How to discover it</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Which topic/strategy performs best?</td>
+          <td><span class="badge bad">Open</span> —</td>
+          <td>Real trade history (B4) and enough settled sample size.</td>
+          <td>Track simulated trades against live prices now (implemented); replace with real fills later; require a minimum settled count before concluding (statistics note on Analysis).</td>
+        </tr>
+        <tr>
+          <td>How liquid are the focus-topic markets?</td>
+          <td><span class="badge warn">Partial</span> Snapshot shows extreme concentration (one elections + one crypto market dominated; gas/golf/culture empty at capture). Orderbook depth is readable per market. <a href="sources.html">row sources</a></td>
+          <td>Full liquidity profile across all open markets at all times.</td>
+          <td>Scheduled scanner (S-03) recording depth and volume over time; liquidity score (S-07).</td>
+        </tr>
+        <tr>
+          <td>When exactly do gas/golf/culture markets open?</td>
+          <td><span class="badge warn">Partial</span> Series frequencies are documented per series (daily/monthly/annual/custom: e.g. KXGAS-MONTH monthly, KXAAAGAS* daily, golf "custom" around events). <a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&limit=50" target="_blank" rel="noopener">source</a></td>
+          <td>Precise listing schedules for each series.</td>
+          <td>Poll <code>GET /events?series_ticker=…&status=open</code> daily and log first-open times; the tracker refreshes automatically.</td>
+        </tr>
+        <tr>
+          <td>Can strategies be validated on historical data?</td>
+          <td><span class="badge warn">Partial</span> Candlesticks (1m/60m/1440m, ≤5,000 periods/request) and <code>GET /historical/*</code> endpoints exist. <a href="https://docs.kalshi.com/getting_started/historical_data" target="_blank" rel="noopener">source</a></td>
+          <td>Depth-of-book history (not offered in the public API surface reviewed).</td>
+          <td>Backtest price-based strategies on candlesticks; treat liquidity strategies as untestable historically until live simulation data accumulates.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>D. Operations &amp; platform</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:22%">Question</th><th style="width:30%">Known (verified)</th><th style="width:22%">Missing</th><th style="width:26%">How to discover it</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Will browsers reach the demo API from this site?</td>
+          <td><span class="badge warn">Partial</span> The API is reachable over HTTPS and documented with browser <code>fetch</code> examples; this sandbox's own egress is restricted, and the site degrades to snapshot mode automatically if the browser is blocked.</td>
+          <td>CORS policy of the demo hosts (headers not observable from this sandbox).</td>
+          <td>Open the live site and watch the data badge; if it shows SNAPSHOT, use <code>scripts/local-proxy.mjs</code> locally or the GitHub-Actions scanner (S-03).</td>
+        </tr>
+        <tr>
+          <td>What are the rate limits on unauthenticated reads?</td>
+          <td><span class="badge warn">Partial</span> Docs state unauthenticated requests have "separate limits" and to back off on 429; authenticated tiers use token buckets (most requests 10 tokens). <a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">source</a></td>
+          <td>Exact unauthenticated budget.</td>
+          <td>Watch for 429s during live polling; the dashboard polls conservatively (2 min lists / 10 s market) and can slow further.</td>
+        </tr>
+        <tr>
+          <td>Is WebSocket streaming possible without keys?</td>
+          <td><span class="badge good">Answered</span> No — WS sessions are authenticated even for public channels (channel-level auth is just skipped for public ones). <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">source</a></td>
+          <td>—</td><td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/kalshi.js"></script>
+<script src="js/app-common.js"></script>
+<script>
+  App.renderHeader('questions.html');
+  App.renderFooter();
+</script>
+</body>
+</html>

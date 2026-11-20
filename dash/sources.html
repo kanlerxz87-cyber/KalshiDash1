@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sources &amp; Verification — KalshiDash1</title>
+<meta name="description" content="Every source used by this project, what it verifies, and how it was checked.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+  <h1>Sources &amp; Verification Log</h1>
+  <p class="sub">Every claim on this site traces to a row in this register. Live-data rows link their exact API query;
+  documented facts link the official docs page. Verification was performed 2026-11-20 by re-fetching each source.
+  Items that could not be confirmed are listed on <a href="flagged.html">Flagged for Review</a> and left blank wherever they appear.</p>
+
+  <h2>Official documentation (docs.kalshi.com)</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Claim it verifies</th><th>Page</th><th>Checked</th></tr></thead>
+      <tbody>
+        <tr><td>Demo/production REST + WS base URLs (matches the project brief exactly)</td><td><a href="https://docs.kalshi.com/getting_started/api_environments" target="_blank" rel="noopener">API Environments and Endpoints</a></td><td>2026-11-20</td></tr>
+        <tr><td>Demo environment: mock funds, separate keys, price-representativeness warning</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Test In The Demo Environment</a></td><td>2026-11-20</td></tr>
+        <tr><td>Public market data needs no authentication</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Quick Start: Market Data</a></td><td>2026-11-20 (incl. live call)</td></tr>
+        <tr><td>Auth headers + signature construction</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">Quick Start: Authenticated Requests</a></td><td>2026-11-20</td></tr>
+        <tr><td>Orderbook shape: yes/no bid arrays, no asks, ascending order, empty→200</td><td><a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">Orderbook Responses</a> · <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">Get Market Orderbook</a></td><td>2026-11-20 (incl. live call)</td></tr>
+        <tr><td>Get Markets filters + ordering rules + caching caveat</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a></td><td>2026-11-20 (incl. live call)</td></tr>
+        <tr><td>Get Events parameters (no category filter; with_nested_markets)</td><td><a href="https://docs.kalshi.com/api-reference/events/get-events" target="_blank" rel="noopener">Get Events</a></td><td>2026-11-20 (incl. live call)</td></tr>
+        <tr><td>Market schema: status enum, result enum (yes/no/scalar/""), price/size fields</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market</a></td><td>2026-11-20 (incl. live call)</td></tr>
+        <tr><td>Series list filters (category exact-match, tags, include_volume), fee fields</td><td><a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a></td><td>2026-11-20 (incl. live calls)</td></tr>
+        <tr><td>Candlestick periods 1/60/1440 min, ≤5,000 periods, OHLC schema</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Get Market Candlesticks</a></td><td>2026-11-20 (incl. live call)</td></tr>
+        <tr><td>Settlement: $1/contract to winning side; timing; settlement fees</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a></td><td>2026-11-20</td></tr>
+        <tr><td>Fixed-point price/count representations, tick grids</td><td><a href="https://docs.kalshi.com/getting_started/fixed_point_migration" target="_blank" rel="noopener">Fixed-Point Representation</a></td><td>2026-11-20</td></tr>
+        <tr><td>Rate limits: token buckets, unauth separate limits, 429 behavior</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate Limits and Tiers</a></td><td>2026-11-20</td></tr>
+        <tr><td>Create Order (V2) path <code>POST /portfolio/events/orders</code>; legacy writes 410 Gone</td><td><a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a></td><td>2026-11-20</td></tr>
+        <tr><td>WebSocket channels (public vs private) and session auth</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">Quick Start: WebSockets</a> · <a href="https://docs.kalshi.com/changelog" target="_blank" rel="noopener">API Changelog</a></td><td>2026-11-20</td></tr>
+        <tr><td>Endpoint inventory (portfolio, orders, order groups, RFQ, block trades, historical)</td><td><a href="https://docs.kalshi.com/llms.txt" target="_blank" rel="noopener">Official docs index (llms.txt)</a></td><td>2026-11-20</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Live demo-API captures (external-api.demo.kalshi.co, 2026-11-20)</h2>
+  <p class="sub">Each entry is the exact request the build session issued. The frozen results are bundled as
+  <code>docs/data/snapshot.json</code> and shown throughout the site with per-row links.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Capture</th><th>Request</th><th>What it produced</th></tr></thead>
+      <tbody>
+        <tr><td>Market object shape probe</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?limit=2" target="_blank" rel="noopener">GET /markets?limit=2</a></td><td>Verified field names/values against the docs schema</td></tr>
+        <tr><td>Gas series + volumes</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50" target="_blank" rel="noopener">GET /series?category=Economics&amp;tags=Oil and energy&amp;include_volume=true</a></td><td>Gas/energy series rows (SPRMIN 1,269.00; AAAGASD 234.00; KXAAAGASDSD 128.00; KXAAAGASED 89.00; …)</td></tr>
+        <tr><td>Elections series + volumes</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50" target="_blank" rel="noopener">GET /series?category=Elections&amp;include_volume=true</a></td><td>KXELECTIONEMERGENCY 7,517.00; KXVOTEPERCENTWHATLEYNC 7.00; KXFLEARLYVOTE 5.00; …</td></tr>
+        <tr><td>Culture series</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&limit=50" target="_blank" rel="noopener">GET /series?category=Culture</a></td><td>2 X-ban series (KXXBANNEDMURRAYHILLGUY1, KXXBANNEDGROK); volumes not requested → left blank</td></tr>
+        <tr><td>Crypto series</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=50" target="_blank" rel="noopener">GET /series?category=Crypto</a></td><td>KXBTCHIT85K, ETHMAXY, KXRIPPLE, KXBNBD, KXXRPATH, … (CF Benchmarks settlement sources)</td></tr>
+        <tr><td>Golf series + volumes</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50" target="_blank" rel="noopener">GET /series?category=Sports&amp;tags=Golf&amp;include_volume=true</a></td><td>KXPGAR1T5 219.00; TGL/PGA series at 0.00</td></tr>
+        <tr><td>Elections live markets</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXELECTIONEMERGENCY&status=open&limit=10" target="_blank" rel="noopener">GET /markets?series_ticker=KXELECTIONEMERGENCY&amp;status=open</a></td><td>KXELECTIONEMERGENCY-27JAN01 (7,475.30 vol / 7,475.30 OI) — top focus-topic row</td></tr>
+        <tr><td>Crypto live market</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXDEMOFUTHOURLY&status=open&limit=5" target="_blank" rel="noopener">GET /markets?series_ticker=KXDEMOFUTHOURLY&amp;status=open</a></td><td>KXDEMOFUTHOURLY-26NOV20H12-UP (1,175.00 vol / 735.00 24h)</td></tr>
+        <tr><td>Gas/golf/culture open-market probes (empty)</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXGAS-MONTH&status=open&limit=10" target="_blank" rel="noopener">KXGAS-MONTH</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGAR1T5&status=open&limit=10" target="_blank" rel="noopener">KXPGAR1T5</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXXBANNEDGROK&status=open&limit=10" target="_blank" rel="noopener">KXXBANNEDGROK</a></td><td>Empty results at 2026-11-20T11:10Z — recorded as findings, not errors</td></tr>
+        <tr><td>Settled gas event (resolution rows)</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASDSD&status=settled&with_nested_markets=true&limit=2" target="_blank" rel="noopener">GET /events?series_ticker=KXAAAGASDSD&amp;status=settled&amp;with_nested_markets=true</a></td><td>KXAAAGASDSD-26NOV14 strike ladder, all result "no", AAA settlement</td></tr>
+        <tr><td>Settled markets sample</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?status=settled&limit=25" target="_blank" rel="noopener">GET /markets?status=settled&amp;limit=25</a></td><td>result "yes"/"no" values; settlement_value_dollars semantics ($1 yes / $0 no)</td></tr>
+        <tr><td>Orderbook ladder</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP/orderbook?depth=10" target="_blank" rel="noopener">GET /markets/{ticker}/orderbook?depth=10</a></td><td>Snapshot orderbook_sample (YES bid $0.0100 × 10.00)</td></tr>
+        <tr><td>Candlesticks</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY/markets/KXDEMOFUTHOURLY-26NOV20H12-UP/candlesticks?start_ts=1795169439&end_ts=1795173039&period_interval=1" target="_blank" rel="noopener">GET /series/{s}/markets/{t}/candlesticks</a></td><td>10 one-minute candles (OHLC + volume + OI) in snapshot</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Independent confirmation (non-official, informational only)</h2>
+  <p class="sub">Third-party pages were read during research but are <em>not</em> used as verification sources for any value on this site;
+  they are listed for reviewer context only.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Page</th><th>Agrees with official docs on</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://predictreport.io/blog/kalshi-api-guide" target="_blank" rel="noopener">predictreport.io — Kalshi API Guide</a></td><td>Base URLs, public-read behavior, auth headers</td></tr>
+        <tr><td><a href="https://www.botforkalshi.com/blog/kalshi-api-tutorial" target="_blank" rel="noopener">botforkalshi.com — API tutorial</a></td><td>WS auth + orderbook_delta sequence handling</td></tr>
+        <tr><td><a href="https://blog.predictefy.com/kalshi-api-key" target="_blank" rel="noopener">predictefy.com — API key guide</a></td><td>Demo key separation, signing flow</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/kalshi.js"></script>
+<script src="js/app-common.js"></script>
+<script>
+  App.renderHeader('sources.html');
+  App.renderFooter();
+</script>
+</body>
+</html>
