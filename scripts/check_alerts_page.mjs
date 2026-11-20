@@ -130,9 +130,15 @@ const dom = new JSDOM(html, {
 const { window } = dom;
 
 // Minimal, honest environment: fetch handles the feed file and the mocked API.
+let feedRequests = 0;
 window.fetch = async (url, opts) => {
   const u = String(url);
   if (u.includes('data/live/feed.json')) {
+    feedRequests += 1;
+    // The page is served from /alerts/, so the feed must be reached as ../data/live/… —
+    // ../../data would resolve outside the repository on GitHub Pages. Assert it here so a
+    // broken relative path fails the test rather than silently showing an empty site.
+    check(u.startsWith('../data/live/feed.json'), 'feed path is relative to the page: got ' + u);
     return { ok: true, status: 200, json: async () => JSON.parse(JSON.stringify(feed)), text: async () => JSON.stringify(feed) };
   }
   if (u.startsWith(BASE)) {
@@ -205,6 +211,7 @@ check(text('#markets-table').includes('Live market for KXAAAGASTX'), 'browser po
 
 // stats + mode banner
 check(text('#stats').includes('High ROI'), 'stat cards rendered');
+check(feedRequests > 0, 'the engine feed was actually requested');
 check(text('#mode-badge').includes('live') || text('#mode-badge').includes('engine'), 'mode badge reports a real data mode');
 
 // the "highest dollar" ranking is ordered

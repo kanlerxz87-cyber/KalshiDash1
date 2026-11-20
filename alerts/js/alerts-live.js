@@ -119,7 +119,7 @@
 
   function loadFeed() {
     // Cache-bust so a freshly deployed feed is not hidden by a CDN copy.
-    return fetch('../../data/live/feed.json?t=' + Date.now(), { cache: 'no-store' })
+    return fetch('../data/live/feed.json?t=' + Date.now(), { cache: 'no-store' })
       .then(function (r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();

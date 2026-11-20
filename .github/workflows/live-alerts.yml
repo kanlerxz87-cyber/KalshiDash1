@@ -9,9 +9,10 @@ name: live-alerts
 # docs/ALERTS.md.
 
 on:
+  # IMPORTANT: GitHub only fires `schedule` for the repository's DEFAULT branch. Once this is
+  # merged to main the 10-minute cadence starts automatically; on a feature branch only the
+  # manual dispatch and push triggers below can run it.
   schedule:
-    # Every 10 minutes. GitHub may delay scheduled jobs under load; the engine timestamps
-    # every sample, so a late run is visible rather than silently wrong.
     - cron: '*/10 * * * *'
   workflow_dispatch:
   push:
