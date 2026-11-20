@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live dashboard · Kalshi Demo Dashboard</title>
+<meta name="description" content="Live price chart (seconds, minutes, hours, days) and order-book liquidity for a Kalshi demo market.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="dashboard">
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="active">Live dashboard</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div></nav>
+<main class="content">
+
+<h1>Live market dashboard</h1>
+<p class="lead">Price over time for one market. X axis = time, Y axis = last traded YES price (dollars). Liquidity = resting orders by price from the order book.</p>
+<div class="controls">
+  <label>Market <select id="market-select"><option value="">Choose from a category page…</option></select></label>
+  <label>Granularity <select id="gran">
+    <option value="sec">Seconds (live, recorded here)</option>
+    <option value="min" selected>Minutes (1-min candles)</option>
+    <option value="hour">Hours (1-hour candles)</option>
+    <option value="day">Days (1-day candles)</option>
+  </select></label>
+  <label>Range <select id="range"></select></label>
+  <button id="refresh" class="btn">Refresh now</button>
+</div>
+<p class="muted" id="m-status">Loading…</p>
+
+<div class="cards" id="m-cards">
+  <div class="card"><div class="k">Last price (YES)</div><div class="v" id="c-last">—</div></div>
+  <div class="card"><div class="k">Best YES bid</div><div class="v" id="c-bid">—</div></div>
+  <div class="card"><div class="k">Best YES ask</div><div class="v" id="c-ask">—</div></div>
+  <div class="card"><div class="k">Open interest (contracts)</div><div class="v" id="c-oi">—</div></div>
+  <div class="card"><div class="k">Status</div><div class="v" id="c-status">—</div></div>
+</div>
+
+<div class="chart-wrap"><svg id="chart" viewBox="0 0 900 360" role="img" aria-label="Price chart"></svg></div>
+<p class="muted small" id="chart-note"></p>
+
+<div class="two-col">
+  <div>
+    <h2>Liquidity: resting YES bids</h2>
+    <p class="muted small">Buy orders for YES. Contracts = quantity resting at that price (highest first).</p>
+    <div id="bids-table"></div>
+  </div>
+  <div>
+    <h2>Liquidity: implied YES asks</h2>
+    <p class="muted small">Derived: a NO bid at P is a YES ask at 1 − P (per the order book reference). Lowest first.</p>
+    <div id="asks-table"></div>
+  </div>
+</div>
+
+<h2>Market rules &amp; sources</h2>
+<div id="m-rules" class="rules"></div>
+<p class="muted small">Sources: <a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a> · <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Orderbook">Get Market Orderbook ↗</a> · <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Candlesticks">Get Market Candlesticks ↗</a>. Seconds granularity is recorded in this browser only (no API history at seconds resolution). See <a class="flag" href="flagged.html#F-02">F-02</a>.</p>
+
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
+</main>
+</div>
+<script src="assets/app.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sources · Kalshi Demo Dashboard</title>
+<meta name="description" content="Every official source used, the date checked, and what each one supports.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body >
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="active">Sources</a><a href="flagged.html" class="">Flagged for review</a></div></nav>
+<main class="content">
+
+<h1>Sources</h1>
+<p class="muted">Each source was fetched on 2026-11-20 with the fetch tool. Live API links return data that changes; the value shown on the site is whatever the API returned when you loaded it.</p>
+<div class="table-wrap"><table  class="compact"><thead><tr><th>ID</th><th>Official source (link)</th><th>Supports</th><th>Checked</th></tr></thead><tbody>
+<tr><td>SRC-01</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener" title="Kalshi docs: Demo environment">Demo environment ↗</a></td><td>Demo REST and WebSocket roots; demo prices caveat</td><td>2026-11-20</td></tr>
+<tr><td>SRC-02</td><td><a href="https://docs.kalshi.com/llms.txt" target="_blank" rel="noopener" title="Kalshi docs: documentation index">documentation index ↗</a></td><td>Index of Kalshi docs pages used</td><td>2026-11-20</td></tr>
+<tr><td>SRC-03</td><td><a href="https://docs.kalshi.com/getting_started/api_environments" target="_blank" rel="noopener" title="Kalshi docs: API environments (linked from demo env page)">API environments (linked from demo env page) ↗</a></td><td>Environment list (linked; not fetched in full)</td><td>2026-11-20</td></tr>
+<tr><td>SRC-04</td><td><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a></td><td>Events list parameters (status, series_ticker, with_nested_markets, cursor)</td><td>2026-11-20</td></tr>
+<tr><td>SRC-05</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a></td><td>Market fields: status, result, bids/asks, volume, open interest</td><td>2026-11-20</td></tr>
+<tr><td>SRC-06</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Orderbook">Get Market Orderbook ↗</a></td><td>Orderbook structure, YES/NO bids, implied asks</td><td>2026-11-20</td></tr>
+<tr><td>SRC-07</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Candlesticks">Get Market Candlesticks ↗</a></td><td>Candlestick periods, 5,000 limit, OHLC price fields</td><td>2026-11-20</td></tr>
+<tr><td>SRC-08</td><td><a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a></td><td>Series list filters (category, tags, include_volume)</td><td>2026-11-20</td></tr>
+<tr><td>SRC-09</td><td><a href="https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Tags for Series Categories">Get Tags for Series Categories ↗</a></td><td>Category → tags mapping</td><td>2026-11-20</td></tr>
+<tr><td>SRC-10</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener" title="Kalshi docs: Market Settlement">Market Settlement ↗</a></td><td>$1 payout per winning contract</td><td>2026-11-20</td></tr>
+<tr><td>SRC-11</td><td><a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a></td><td>Signed-request headers; key creation</td><td>2026-11-20</td></tr>
+<tr><td>SRC-12</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start WebSockets">Quick Start WebSockets ↗</a></td><td>WebSocket authentication for all channels</td><td>2026-11-20</td></tr>
+<tr><td>SRC-13</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits.md" target="_blank" rel="noopener" title="Kalshi docs: Rate Limits and Tiers">Rate Limits and Tiers ↗</a></td><td>Rate-limit structure; unauthenticated limits not numerically given</td><td>2026-11-20</td></tr>
+<tr><td>SRC-14</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start Create your first order">Quick Start Create your first order ↗</a></td><td>Quick-start order example (legacy fields; see F-08)</td><td>2026-11-20</td></tr>
+<tr><td>SRC-15</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/exchange/status" target="_blank" rel="noopener" title="Kalshi demo API: exchange status (live)">exchange status (live) ↗</a></td><td>Live exchange status response</td><td>2026-11-20</td></tr>
+<tr><td>SRC-16</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories" target="_blank" rel="noopener" title="Kalshi demo API: tags by category (live)">tags by category (live) ↗</a></td><td>Live category/tag map</td><td>2026-11-20</td></tr>
+<tr><td>SRC-17</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?tags=Golf&category=Sports&include_volume=true" target="_blank" rel="noopener" title="Kalshi demo API: Golf series (live)">Golf series (live) ↗</a></td><td>Live Golf series list</td><td>2026-11-20</td></tr>
+<tr><td>SRC-18</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?tags=Oil%20%26%20Gas&include_volume=true" target="_blank" rel="noopener" title="Kalshi demo API: Oil &amp; Gas series (live)">Oil &amp; Gas series (live) ↗</a></td><td>Live Oil &amp; Gas series list (includes AAA gas series)</td><td>2026-11-20</td></tr>
+<tr><td>SRC-19</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true" target="_blank" rel="noopener" title="Kalshi demo API: open US gas price events (live)">open US gas price events (live) ↗</a></td><td>Live open US gas price events</td><td>2026-11-20</td></tr>
+<tr><td>SRC-20</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=settled&with_nested_markets=true" target="_blank" rel="noopener" title="Kalshi demo API: settled US gas price events (live)">settled US gas price events (live) ↗</a></td><td>Live settled US gas price events with result yes/no</td><td>2026-11-20</td></tr>
+<tr><td>SRC-21</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.00/orderbook?depth=5" target="_blank" rel="noopener" title="Kalshi demo API: orderbook for KXAAAGASM-26NOV30-3.00 (live, no credentials)">orderbook for KXAAAGASM-26NOV30-3.00 (live, no c ↗</a></td><td>Live orderbook call with no credentials (empty book at this moment)</td><td>2026-11-20</td></tr>
+<tr><td>SRC-22</td><td><a href="https://gasprices.aaa.com/" target="_blank" rel="noopener" title="AAA (settlement source named in the API series record for gas markets; not independently fetched)">AAA (settlement source named in the API series r ↗</a></td><td>Named settlement source for gas series (linked, not independently checked)</td><td>not fetched</td></tr>
+<tr><td>SRC-23</td><td><a href="https://docs.kalshi.com/getting_started/order_direction.md" target="_blank" rel="noopener" title="Kalshi docs: Order direction (outcome_side and book_side)">Order direction (outcome_side and book_side) ↗</a></td><td>Legacy action/side fields and removal date ("not before May 28, 2026")</td><td>2026-11-20</td></tr>
+<tr><td>SRC-24</td><td><a href="https://docs.kalshi.com/getting_started/historical_data.md" target="_blank" rel="noopener" title="Kalshi docs: Historical Data">Historical Data ↗</a></td><td>Live vs historical cutoff; which market/trade records leave live endpoints</td><td>2026-11-20</td></tr>
+</tbody></table></div>
+
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
+</main>
+</div>
+<script src="assets/app.js" type="module"></script>
+</body>
+</html>

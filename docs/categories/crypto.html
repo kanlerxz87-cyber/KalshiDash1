@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crypto · Kalshi Demo Dashboard</title>
+<meta name="description" content="Crypto markets on the Kalshi demo: open markets ranked by open-interest dollars, and recently resolved YES/NO outcomes.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-page="topic" data-topic="crypto">
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="../index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="../index.html" class="">Home</a><a href="../executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="../categories/gas.html" class="">Gas prices</a><a href="../categories/elections.html" class="">Elections</a><a href="../categories/culture.html" class="">Culture</a><a href="../categories/crypto.html" class="active">Crypto</a><a href="../categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="../dashboard.html" class="">Live dashboard</a><a href="../portfolio.html" class="">Portfolio</a><a href="../trading.html" class="">Trading</a><a href="../analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="../questions.html" class="">Questions & answers</a><a href="../suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="../sources.html" class="">Sources</a><a href="../flagged.html" class="">Flagged for review</a></div></nav>
+<main class="content">
+
+<h1>Crypto</h1>
+<p class="lead">Series in Kalshi's <code>Crypto</code> category (BTC, ETH, SOL and others, many settled by CF Benchmarks).</p>
+<div class="cards" id="topic-cards">
+  <div class="card"><div class="k">Series in scope</div><div class="v" id="t-series">…</div><div class="s">Top 8 by series volume (contracts)</div></div>
+  <div class="card"><div class="k">Open markets (loaded)</div><div class="v" id="t-open">…</div><div class="s">From up to 2 pages of open events per series</div></div>
+  <div class="card"><div class="k">Open interest, $ (derived)</div><div class="v" id="t-oi">…</div><div class="s">Σ open interest × $1 notional per contract</div></div>
+  <div class="card"><div class="k">Resolved, last 14 days</div><div class="v" id="t-res">…</div><div class="s">Markets with result yes / no</div></div>
+</div>
+<p class="muted" id="t-status">Loading live data from the Kalshi demo API…</p>
+
+<h2>Open markets: ranked by open-interest $ (derived)</h2>
+<p class="muted">Ranking field is derived (see <a class="flag" href="../flagged.html#F-03">F-03</a>). Click a ticker to open the live chart and order book. Prices are dollars per $1 contract.</p>
+<input class="filter" id="open-filter" placeholder="Filter rows (title, ticker, series)…" aria-label="Filter open markets">
+<div id="open-table"></div>
+
+<h2>Recently resolved (YES / NO)</h2>
+<p class="muted">Settled events closed in the last 14 days, from the API's <code>status=settled</code> list. A market's result is its <code>result</code> field.</p>
+<div id="settled-table"></div>
+
+<h2>Series in scope</h2>
+<div id="series-table"></div>
+
+<h2>Sources for this page</h2>
+<ul><li><a href="https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Tags for Series Categories">Get Tags for Series Categories ↗</a></li><li><a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a></li><li><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a></li></ul>
+<p class="muted">Unverified or missing values appear as “—”. Open <a href="../flagged.html">Flagged for review</a> for caveats.</p>
+
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="../flagged.html">Flagged for review</a>.</footer>
+</main>
+</div>
+<script src="../assets/app.js" type="module"></script>
+</body>
+</html>
