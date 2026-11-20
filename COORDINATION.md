@@ -6,20 +6,31 @@ Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main
 
 - Session ID: `session-d5b935f4`
 - Branch: `arena/d5b935f4-kalshidash1` (base `8f80f34`, `main`) — Arena manages this one branch; no other branches/worktrees are created by this session.
-- Position: **final integration session** for the remaining brief gaps. All prior session tasks (below) are `done` and merged (PRs #1–#4, #10). Per the board rules, shared outputs (generator, index/nav, table data) may now be changed by this integration session; nothing built by earlier sessions is deleted or discarded.
-- Claimed 2026-11-20, tasks A1–A7 (see board below). Prior session records are preserved verbatim after this section.
 
-### Task board — session-d5b935f4 (gaps against the original brief)
+### Overlap check (read from `origin` 2026-11-20 ~13:35 UTC, AFTER my first claim push) — read first
 
-| ID | Task | Status | Owner | Files touched | Sources | Irregularities |
+My first claim on this branch (A1–A7, commit `6b1474d`) was written from the board state at base `8f80f34` and **overlapped active claims discovered on `origin` afterwards**. The A1–A7 claim is **withdrawn** and replaced by the narrow D-scope below. Nothing from A1–A7 was implemented before the withdrawal (no code files were touched). The overlapping work stays with its owners:
+
+| Overlapping work I had claimed | Actual claimant(s) observed | State at 13:35 UTC |
+|---|---|---|
+| ≥$0.10 swing alert engine + two scrolling chat feeds (incl. high-ROI filter) + scheduled capture | `session-cb49437b` (`tools/live_engine.mjs`, `alerts/**`, `data/live/**`, `live-alerts.yml`) | active — engine sample committed 13:33 UTC |
+| Automated simulated trade engine + alert feeds in the `dash/` suite | `session-815b546d` (`dash/js/autotrade.js`, `dash/js/alerts.js`, …) | claim commit 13:18 UTC, **no implementation commits yet** (7f90cf50 K3 holds a takeover watch for ~14:20 UTC; I will not race it) |
+| Swing-catalyst links on charts, strategy synthesis lab | `session-7f90cf50` (`catalyst.html`, `strategylab.html`, `assets/catalyst.*`, `assets/strategylab.*`) | active — claim 13:30 UTC |
+| Canonical site pages (market/resolution/portfolio), consolidation of site trees, `data/snapshot.json` + `refresh-data.yml`, sources/flagged, **final integration PR/merge (I10)** | `session-7d6d2fcb` (final integration session) | active — data refresh committed 13:22 UTC |
+| Live re-verification L1–L3, repo hygiene + audit page R1–R3 | `session-e6c3b3b6`, `session-bf16f2dd` | done, merged (PR #11, PR #12) |
+
+**Irregularity logged (not mine to resolve):** both `session-cb49437b` ("integration edits … this is the final integration session") and `session-7d6d2fcb` ("FINAL INTEGRATION — read this first", I10) describe themselves as the final integration session. One of them should stand down; flagged here and on my session record for the user.
+
+### Task board — session-d5b935f4 (non-overlapping gaps only)
+
+| ID | Task | Status | Owner | Files touched (only these) | Sources | Irregularities |
 |---|---|---|---|---|---|---|
-| A1 | Live data + engine pipeline: collector for the 5 focus topics (gas, elections, culture, crypto, golf), ≥$0.10 swing alert engine, high-ROI model picks, automated simulated-trade engine (5 strategies), resolution ledger; scheduled GitHub Actions refresh with committed `data/` snapshots | in progress | session-d5b935f4 | `scripts/livefeed.mjs`, `.github/workflows/livefeed.yml`, `data/` | demo Trade API endpoints (verified live this session) + docs.kalshi.com refs on Sources page | Prior convention "no market data committed" revised: small bounded `data/` snapshots are required so alerts/trades/resolutions persist across page loads (logged here; nothing large is committed) |
-| A2 | Live alerting UI: two scrolling chat feeds (All events / Model picks – high ROI), real-time ≥$0.10 swing alerts with links | unclaimed→next | session-d5b935f4 | `alerts.html` (via generator), `assets/feed.js` | A1 endpoints | — |
-| A3 | Dashboard upgrades: price chart jump markers (≥$0.10) with event/website links, liquidity depth summary | unclaimed→next | session-d5b935f4 | `dashboard.html` (via generator), `assets/app.js`, `assets/charts.js` | market, orderbook, candlesticks, trades endpoints | Causality of linked sources to price jumps is never asserted (coincidence only) |
-| A4 | Portfolio + trading + analysis: automated simulated portfolio/performance, trade log with strategy × topic categorisation, live demo-account path (keys via GitHub Secrets only, never in repo) | unclaimed→next | session-d5b935f4 | `portfolio.html`, `trading.html`, `analysis.html` (via generator), `assets/feed.js` | market_settlement, api_keys, create-order docs | Live-account execution needs demo API keys (owner action; simulated trading is active meanwhile) — flagged |
-| A5 | Event lifecycle tracking until resolution (yes/no) with resolution ledger page | unclaimed→next | session-d5b935f4 | `tracked-events.html` (via generator) | events/markets endpoints (`result`, `status`) | — |
-| A6 | Docs + verification: executive summary refresh, sources/flagged/questions/suggestions updates, README, line-by-line verification with per-row source links | unclaimed→next | session-d5b935f4 | `README.md`, `EXECUTIVE_SUMMARY.md`, generator pages | docs.kalshi.com + live API | F-01 to be resolved by header check in Actions (CORS) |
-| A7 | Final integration: QA (link check, JS syntax, staleness), PR → main, merge, GitHub Pages deploy confirmation, record here | unclaimed→next | session-d5b935f4 | `COORDINATION.md`, `.github/workflows/pages.yml` | `gh` + Pages API | — |
+| D1 | Verified API-contract record for the demo Trade API, published for all engine builders: exact schemas verified live this session (Get Trades path `/markets/trades` + fields, candlestick periods 1/60/1440 min per official OpenAPI, create-order contract + millisecond signing, fixed-point `*_fp` string fields, `settlement_sources[].url` as swing-catalyst links, orderbook pair shape) | done | session-d5b935f4 | `verification/2026-11-20-d5b935f4.md` (new, session-stamped file in the existing `verification/` folder pattern) | docs.kalshi.com `llms.txt`, `get-trades.md`, `quick_start_create_order.md`, `get-market-candlesticks.md` (via llms.txt), live demo API GETs listed in the file | `verification/**` was created by `e6c3b3b6`; only a new session-stamped file is added, no existing file edited (noted in their folder convention) |
+| D2 | **Real demo-account portfolio tracking + trade execution toolchain** — the brief's "Track the portfolio performance using the kalshi demo account" / "Execute trades": signed `GET /portfolio/{balance,positions,fills,settlements}` + `POST /portfolio/events/orders` exactly per the official quick start; dry-run by default; activates when the owner adds `KALSHI_KEY_ID` / `KALSHI_PRIVATE_KEY` GitHub Secrets (no manual input required now; never stores keys) | in progress | session-d5b935f4 | `tools/demo_trader.mjs` (new), `docs/DEMO_ACCOUNT.md` (new), `.github/workflows/demo-account.yml` (new), `demo-account.html` (new, standalone page not in shared nav), `assets/demo-account.js` (new) | `quick_start_create_order.md`, `api_keys.md`, `quick_start_authenticated_requests.md`, `get-trades.md` (all read this session) | Distinct from `815b546d`'s *simulated* auto-trade engine (`dash/**`) and from `7d6d2fcb`'s portfolio *pages*; no file owned by another session is edited |
+| D3 | QA of D1/D2 deliverables (link check, node syntax, workflow lint), this session's PR `arena/d5b935f4-kalshidash1` → `main`, merge without waiting, Pages deploy check, record here | in progress | session-d5b935f4 | `COORDINATION.md` (this section only) | `gh`, Pages API | Leaves the **final** integration PR (whole-site) to I10 (`7d6d2fcb`) per the board |
+| D4 | Handoff notes for the final integration session: nav-integration request for `demo-account.html`, plus observations (fixed-point `*_fp` strings in live payloads, correct trades endpoint path, integration-role ambiguity) | in progress | session-d5b935f4 | `COORDINATION.md` (this section only) | — | — |
+
+Shared-file policy: no file owned by another session is edited. New pages follow the root page template so `scripts/check-links.mjs` passes unchanged (pattern used by `bf16f2dd` and `7f90cf50`).
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review` (published on the Flagged page; does not block).
 
