@@ -53,7 +53,7 @@
     var count = num(t.qty);
     return {
       id: String(t.id || ''),
-      ts_open: t.ts || '',
+      ts_open: t.ts || t.entry_ts || '',
       ts_close: (t.status === 'settled' || t.status === 'closed') ? (t.ts_close || '') : '',
       ticker: String(t.ticker || ''),
       event_ticker: String(t.event_ticker || ''),
@@ -71,7 +71,7 @@
       result: String(t.result || ''),
       pnl_recorded: num(t.pnl),
       fees_recorded: num(t.fee),
-      engine: 'dash-store-v1',
+      engine: t.auto ? 'dash-store-v1 (auto-trade engine, session-815b546d)' : 'dash-store-v1',
       seed: !!t.seed,
       notes: ''
     };
