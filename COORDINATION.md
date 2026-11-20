@@ -717,6 +717,8 @@ the Flagged for Review page.
 
 ## Verification & completion log (session-7d6d2fcb, final integration, 2026-11-20)
 
+- **Correction (2026-11-20, after PR #21/#22 merges):** the figures above were superseded. Current snapshot: `meta.captured_at` 2026-11-20T14:01:22Z (the refresh bot commit `85ded5b`); `markets_count_all` 3,386; 200 tracked market rows. Current link check: `check-links.mjs` → 89 pages, 264 external links listed (not fetched), 0 broken internal links; `tools/linkcheck.py` → 0 broken internal links (see its output for the exact count). The F-25 figures were checked against `data/snapshot.json` and are now stated on the Flagged page.
+
 - **Snapshot:** refreshed by GitHub Actions `refresh-data.yml` from the official demo API (`external-api.demo.kalshi.co`); latest refresh commit on the branch is `fc3e913` (captured 2026-11-20T13:34:40Z, 3,386 markets captured overall, 200 tracked rows). Candles are now populated (series-scoped `/candlesticks`). The sandbox itself cannot reach Kalshi (TLS negotiation fails), so every capture happens on GitHub runners.
 - **Generator:** `node scripts/build-site.mjs` regenerates 20 pages; `node scripts/build-site.mjs --check` passes (committed site matches templates + data).
 - **Links:** `node scripts/check-links.mjs` → 0 broken internal links (83 pages; 280 external links listed, not fetched). `python3 tools/linkcheck.py` → 0 broken internal links on the whole tree (83 pages scanned, 4,997 internal links).
