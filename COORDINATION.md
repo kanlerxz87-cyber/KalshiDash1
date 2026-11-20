@@ -72,6 +72,59 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review` (published 
 
 Claim pushed immediately per the board convention.
 
+
+### session-cb49437b — completion record (2026-11-20)
+
+**Branch:** `arena/cb49437b-kalshidash1` · **Scope claimed:** `alerts/`, `tools/live_engine.mjs`,
+`data/live/`, `.github/workflows/live-alerts.yml`, `.github/workflows/alerts-qa.yml`,
+`scripts/check_alerts.mjs`, `scripts/check_alerts_page.mjs`, `docs/ALERTS.md`.
+
+| ID | Task | Status | Files |
+|---|---|---|---|
+| T-A1 | Live alert engine (≥ $0.10 swings, candles, resolutions) | done | `tools/live_engine.mjs`, `data/live/` |
+| T-A2 | Two scrolling chat feeds (all events + high-ROI filter) | done | `alerts/` |
+| T-A3 | Scheduled CI capture so the feed is live without a browser | done | `.github/workflows/live-alerts.yml` |
+| T-A4 | Verification, integration, PR/merge/deploy | in progress | this file, `docs/ALERTS.md` |
+
+**Verification performed**
+
+- `node tools/live_engine.mjs --selftest` — 30 offline assertions (threshold boundary at exactly
+  $0.10 in both directions, no-baseline suppression, price-never-invented rule, candle swings,
+  resolution merge, ladder derivation, taxonomy guard). PASS.
+- `node scripts/check_alerts.mjs` — feed validator. PASS on real data; and deliberately corrupted
+  input produced 8 expected failures (sub-threshold alert, false high-ROI flag, duplicate id,
+  non-official source host, out-of-range price, invalid result, missing `/trade-api/v2` prefix).
+- `node scripts/check_alerts_page.mjs` — jsdom render/behaviour test: both feeds, high-ROI filter,
+  no invented price for an empty book, live-poll merge, feed path. PASS.
+- `node scripts/check-links.mjs` + `python3 tools/linkcheck.py` — 64 pages, 0 broken internal links.
+- GitHub Actions `live-alerts` executed 4 times against the live demo API (`external-api.demo
+  .kalshi.co`): 1 expected failure (see below), 3 successes. Real markets were captured for gas,
+  elections, crypto and golf.
+- CI: `alerts-qa`, `site-qa`, `suite-qa` all green on this branch.
+
+**Irregularities found (published on `flagged.html`, IDs F-A1…F-A8)**
+
+- **F-A1** Upstream API inconsistency: `/search/tags_by_categories` has no `Culture` key while
+  `GET /series?category=Culture` serves Culture series. Verified by fetching both. Found by the
+  engine's own taxonomy guard on its first live run, not by inspection.
+- **F-A3** No traded-dollar field exists; the "highest dollar" ranking is `volume_fp × price`,
+  labelled an estimate.
+- **F-A4** The high-ROI feed is a documented heuristic, not a back-tested model.
+- **F-A5** "Gas prices" excludes crude oil that shares the `Oil & Gas` tag — a stated judgement.
+- **F-A6** Zero alerts so far because the demo exchange is quiet; nothing was seeded.
+- **F-A7** No streaming: the WebSocket handshake needs a signed key.
+- **F-A8** Demo-account portfolio sync still needs the owner's key.
+- **F-A2** Browser CORS to the API is untested from the sandbox; the page detects and reports it.
+
+**Defects found by running it, not by reading it** (all fixed): topic starvation (one topic took
+every request slot); a 5 MB state file; wrong run counters; a 404 feed path under the Pages project
+subpath; and a price rule that would have averaged an empty book into a $0.50 price.
+
+**Merge ordering note:** the alert work does not depend on any other session's files. The final
+integration session should merge this branch and confirm: the scheduled `live-alerts` workflow runs
+on `main` (GitHub fires cron only on the default branch), `/alerts/` serves, and `data/live/feed.json`
+loads from the project subpath.
+
 ## Verification performed (session-ef745c36, 2026-11-20)
 
 - Read each official page with the fetch tool and recorded the URL in `scripts/build-site.mjs` (`S` object) and on the Sources page.
