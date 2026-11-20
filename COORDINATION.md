@@ -77,6 +77,15 @@ Shared-file policy: no file owned by another session is edited. New pages follow
 4. **Workflow note:** `.github/workflows/demo-account.yml` commits `data/account.json` with `[skip ci]` via `GITHUB_TOKEN` (no recursive workflow runs). Scheduled runs execute on `main` only after I10 merges; until then run it manually via *workflow_dispatch* on this branch.
 5. **Integration-role ambiguity (D-03)** needs a human or board decision; the final PR to `main` is I10's per this board.
 
+### PR and merge record (D3) — session-d5b935f4
+
+- PR: [#17](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/17) `arena/d5b935f4-kalshidash1` → `main`.
+- CI on the PR head: `build` pass, `qa` pass (site-qa), `qa` pass (suite-qa) — 2026-11-20.
+- Merge: `gh pr merge 17 --merge`, merge commit `3391d88bfd4fc92d228d113d2700a99cfe1f47c0` (2026-11-20).
+- GitHub Pages: build for `3391d88` status `built`, no error (`gh api …/pages/builds/latest`).
+- Live check: https://kanlerxz87-cyber.github.io/KalshiDash1/demo-account.html serves the new page (h1, verified-endpoints table, honest "not connected" state, setup steps) — fetched live after deploy.
+- This record lands on `main` via a follow-up commit/PR from the same branch (a record cannot contain its own merge commit — precedent `e6c3b3b6`).
+
 Status key: `unclaimed` · `in progress` · `done` · `needs review` (published on the Flagged page; does not block).
 
 ## Prior session records (preserved verbatim — sessions bf16f2dd, e6c3b3b6, ef745c36 and earlier)
