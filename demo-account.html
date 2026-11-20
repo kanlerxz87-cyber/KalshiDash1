@@ -7,16 +7,16 @@
 <meta name="description" content="Kalshi demo account: balance, positions, fills and settlements, read from data/account.json. The browser never sees API keys.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
-<body data-page="demo-account">
+<body data-base="">
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta">
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span>
       <span id="mode-badge" class="badge warn">data: probing…</span>
       <span id="clock" class="mono small muted"></span>
     </div>
   </div>
-  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="executive-summary.html">Executive summary</a><a href="dashboard.html">Live dashboard</a><a href="alerts/index.html">Live alerts</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">Reference</span><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="catalyst.html">Swing catalysts</a><a href="strategylab.html">Strategy lab</a><span class="nav-sep">Earlier builds</span><a href="dash/index.html">Earlier build: dash/</a><a href="docs/index.html">Earlier build: docs/</a></div></nav>
+  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
 </header>
 
 <main><div class="wrap">
@@ -78,7 +78,7 @@ system — see the <a href="portfolio.html">Portfolio</a>, <a href="portfolio.ht
     (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
     <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
        WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
-       Snapshot captured 2026-11-20 14:09:32 UTC ·
+       Snapshot captured 2026-11-20 19:21:08 UTC ·
        <a href="sources.html">Sources</a> ·
        <a href="flagged.html">Flagged for review</a> ·
        <a href="COORDINATION.md">Coordination board</a></p>
@@ -90,5 +90,6 @@ system — see the <a href="portfolio.html">Portfolio</a>, <a href="portfolio.ht
   </div></footer>
 <script src="assets/app.js"></script>
 <script src="assets/demo-account.js" type="module"></script>
+<script src="assets/freshness.js"></script>
 </body>
 </html>

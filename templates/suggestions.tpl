@@ -7,11 +7,11 @@
 <meta name="description" content="Concrete proposals for making the Kalshi demo dashboard more live and interactive, each with the reason it matters and the official source it relies on.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
-<body data-page="suggestions">
+<body data-base="{{BASE}}">
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta">
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span>
       <span id="mode-badge" class="badge warn">data: probing…</span>
       <span id="clock" class="mono small muted"></span>
     </div>
@@ -120,5 +120,6 @@
 
 <footer class="site">{{FOOTER}}</footer>
 <script src="assets/app.js"></script>
+<script src="{{BASE}}assets/freshness.js"></script>
 </body>
 </html>

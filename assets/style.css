@@ -288,3 +288,30 @@ nav.site .nav-sep {
   border-left: 1px solid var(--line-2); margin-left: 8px;
 }
 nav.site a + a { margin-left: 0; }
+
+/* ------------------------------------------------------------------ freshness */
+/* The engine-age badge is intentionally separate from the API-mode badge: "this browser just
+ * reached the API" and "the alert engine sampled recently" are different claims. Colours follow
+ * the same vocabulary as the rest of the site (green = fresh, amber = degraded, red = stale). */
+.badge.stale { color: #2a0000; background: var(--down); border-color: var(--down); font-weight: 600; }
+#feed-freshness { font-variant-numeric: tabular-nums; cursor: help; }
+
+/* -------------------------------------------------------- grouped navigation */
+/* Five labelled groups instead of one 20-link row: Start · Topics · Trading · Model · Review.
+ * The groups wrap on narrow screens so no entry is hidden behind a horizontal scroll. */
+nav.site .nav-inner { flex-wrap: wrap; overflow-x: visible; row-gap: 0; }
+nav.site .nav-group {
+  border-left: 1px solid var(--line-2);
+  margin-left: 10px;
+  padding-left: 10px;
+  padding-right: 2px;
+  align-self: center;
+}
+nav.site .nav-group:first-child { border-left: 0; margin-left: 0; }
+nav.site .nav-links { display: flex; flex-wrap: wrap; }
+@media (max-width: 720px) {
+  nav.site .nav-group { flex-basis: 100%; border-left: 0; margin: 6px 0 0; padding: 0; }
+  nav.site .nav-links { flex-basis: 100%; }
+  nav.site a { padding: 8px 10px; font-size: 13px; }
+  #feed-freshness { order: -1; }
+}

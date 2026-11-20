@@ -54,3 +54,17 @@ jobs:
 
       - name: Python tool syntax
         run: python -m py_compile tools/*.py
+
+      # A stale conflict can be auto-merged as text and published (it happened to README.md
+      # twice in this repo). Fail the build if a marker survives into a published file.
+      - name: No unresolved merge markers in published files
+        run: |
+          set -e
+          if grep -rn '^<<<<<<< \|^>>>>>>> ' \
+               --include='*.html' --include='*.tpl' --include='*.md' \
+               --include='*.css' --include='*.js' --include='*.mjs' --include='*.yml' \
+               --exclude-dir=node_modules --exclude-dir=.git . ; then
+            echo "::error::unresolved merge markers found in the tree above"
+            exit 1
+          fi
+          echo "No unresolved merge markers."

@@ -7,16 +7,16 @@
 <meta name="description" content="Every unverified value, limitation and irregularity found while building the Kalshi demo dashboard, with the official source to check it against.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
-<body data-page="flagged">
+<body data-base="">
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta">
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span>
       <span id="mode-badge" class="badge warn">data: probing…</span>
       <span id="clock" class="mono small muted"></span>
     </div>
   </div>
-  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="executive-summary.html">Executive summary</a><a href="dashboard.html">Live dashboard</a><a href="alerts/index.html">Live alerts</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">Reference</span><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="catalyst.html">Swing catalysts</a><a href="strategylab.html">Strategy lab</a><span class="nav-sep">Earlier builds</span><a href="dash/index.html">Earlier build: dash/</a><a href="docs/index.html">Earlier build: docs/</a></div></nav>
+  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
 </header>
 
 <main><div class="wrap">
@@ -83,6 +83,9 @@
         <tr><td><span id="F-51"></span>F-51</td><td>Limitation</td><td>The alert console under <code>alerts/</code> cannot confirm browser-to-API access (CORS) from a build sandbox. It detects a blocked request, falls back to the engine feed and says so in its banner. The engine itself runs in GitHub Actions, where this does not apply. Related: the WebSocket ticker channel would be real-time but its handshake is authenticated, so a static site cannot stream.</td><td>alerts/ console</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Quick Start: Market Data</a> · <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">Quick Start: WebSockets</a></td><td><span class="badge warn">Needs review</span></td></tr>
         <tr><td><span id="F-52"></span>F-52</td><td>Correction to F-04</td><td>F-04 states "Culture is mapped to Kalshi's Entertainment category. Kalshi has no category named Culture." That is contradicted by the live API: <code>GET /series?category=Culture</code> returns series whose <code>category</code> and <code>categories</code> are <code>Culture</code> (verified 2026-11-20). Kalshi does have a Culture category; what it lacks is a <em>tag</em> list for it (see F-50). F-04 is left in place as the earlier published record and is superseded by this row.</td><td>Culture topic rules</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true&limit=3" target="_blank" rel="noopener">GET /series?category=Culture (live)</a></td><td><span class="badge warn">Correction</span></td></tr>
         <tr><td><span id="F-53"></span>F-53</td><td>Method</td><td>The alert engine scores a swing with a fixed published heuristic — weights 0.20 headroom / 0.20 move size / 0.35 liquidity / 0.25 spread, threshold 0.62, samples older than an hour halved — and it is <em>not</em> back-tested. It also does not predict outcomes. Each alert prints its own term values so the ranking can be audited.</td><td>High-ROI alert feed</td><td><a href="docs/ALERTS.md">docs/ALERTS.md §3.4</a> · <a href="alerts/index.html">the console (method section)</a></td><td><span class="badge good">Rule published</span></td></tr>
+        <tr><td><span id="F-54"></span>F-54</td><td>Irregularity (environment)</td><td><strong>No scheduled workflow had ever fired on this repository</strong> when it was audited at 19:15 UTC on 2026-11-20: <code>GET /repos/{owner}/{repo}/actions/runs?event=schedule</code> returned no runs at all, for any workflow, even though three of them declare a cron. The repository is public, 8 hours old, not a fork, not archived or disabled, with an active default branch — so none of the disqualifiers GitHub documents apply, and the cause cannot be determined from the repository side. The consequence was visible on this site: the header said LIVE over an alert feed whose newest sample was ~5 hours old. <strong>Mitigation, not a fix:</strong> <code>keepalive.yml</code> now samples the API inline on its own cron instead of trusting another workflow's schedule, and every page prints the <em>measured</em> age of the newest sample (the badge at the top right) so a stall can never again look like liveness. The underlying scheduler behaviour is left flagged.</td><td>Live alert engine · every page header</td><td><a href="https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule" target="_blank" rel="noopener">GitHub: schedule event</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/actions/workflows/keepalive.yml" target="_blank" rel="noopener">keepalive.yml</a> · <a href="https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/actions/runs?event=schedule" target="_blank" rel="noopener">the empty schedule-run list (live)</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-55"></span>F-55</td><td>Limitation</td><td><code>keepalive.yml</code> cannot be executed before it is merged. Measured: a workflow file first added on a non-default branch does not appear in <code>GET /actions/workflows</code> and produces no runs, so its first real execution is on <code>main</code> after the merge. The merge record states the outcome of that first run; it is not assumed to have worked.</td><td>.github/workflows/keepalive.yml</td><td><a href="https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule" target="_blank" rel="noopener">GitHub docs (scheduled workflows run on the default branch)</a></td><td><span class="badge neutral">Documented</span></td></tr>
+        <tr><td><span id="F-56"></span>F-56</td><td>Data caveat</td><td>The demo exchange reports very large volumes — for example 465,856,531 contracts traded on a single 2028 presidential-nomination market. The figures are reproduced exactly as the API returns them; they are <strong>not</strong> claimed to be realistic, and Kalshi states that demo prices and behaviour "may not be reflective of those in real markets". Read every dollar figure on this site as mock-fund demo data.</td><td>All market tables</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Test In The Demo Environment</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&status=open&limit=5" target="_blank" rel="noopener">the live GET /markets response</a></td><td><span class="badge neutral">Documented</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -92,7 +95,7 @@
     <p>Every row above points at an official Kalshi document or an official demo endpoint. The full registry with what each
     source confirms and how it was verified is on the <a href="sources.html">Sources</a> page, and the raw captured payloads are
     committed in <code>data/snapshot.json</code> so the numbers can be traced back to the response they came from.</p>
-    <p class="small muted">Verified 2026-11-20 14:09:32 UTC. Report any row you disagree with — each one names the exact check to run.</p>
+    <p class="small muted">Verified 2026-11-20 19:21:08 UTC. Report any row you disagree with — each one names the exact check to run.</p>
   </div>
 </div></main>
 
@@ -103,7 +106,7 @@
     (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
     <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
        WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
-       Snapshot captured 2026-11-20 14:09:32 UTC ·
+       Snapshot captured 2026-11-20 19:21:08 UTC ·
        <a href="sources.html">Sources</a> ·
        <a href="flagged.html">Flagged for review</a> ·
        <a href="COORDINATION.md">Coordination board</a></p>
@@ -114,5 +117,6 @@
     <a href="dash/index.html">dash/</a> · <a href="docs/index.html">docs/</a>.</p>
   </div></footer>
 <script src="assets/app.js"></script>
+<script src="assets/freshness.js"></script>
 </body>
 </html>

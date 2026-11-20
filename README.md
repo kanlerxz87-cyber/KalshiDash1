@@ -197,6 +197,155 @@ Supporting files: `docs/assets/` (own API client and page logic).
 
 ---
 
+# KalshiDash1 — the `dash/` interactive suite (added by session-cdfe52bd, kept alongside the root site and `docs/` suite)
+
+A third, independent implementation under `dash/`, published at `/dash/` alongside the others. Nothing from
+any other session was overwritten: its pages, `js/`, `css/` and verified data snapshot live entirely inside `dash/`.
+It adds live→legacy→snapshot data fallback, a canvas price chart with seconds-to-days windows, a full orderbook
+liquidity ladder, two live scrolling alert chats with a ≥ $0.10 swing detector (batched quote polls + trade-by-trade
+prices from the public `/markets/trades` endpoint, merged from two independent implementations), automated simulated-trade
+engines (momentum-10c/fade-jump on the Alerts page; five strategies on the Automated Trading page), a simulated
+trade/portfolio engine, and a suggestions review queue.
+
+## Pages under `dash/`
+
+| Path | Purpose |
+|------|---------|
+| `dash/index.html` | Executive summary + focus-topic glance + highest-dollar rows + live-alerting intro (live or verified snapshot) |
+| `dash/events.html` | Topic boards ranked by dollar volume, tracked to resolution (yes/no) + resolution log |
+| `dash/alerts.html` | **Live alerting (merged engine, sessions arena-f89b55f7 + arena/815b546d):** two scrolling chats — every ≥ $0.10 swing vs. the high-ROI model filter (score ≥ 70) — plus the ROI model ranking, jump-cause research links, a compact liquidity ladder, a chart with seconds→days windows and jump markers, resolutions logged from the API `result` field, snapshot trades replay, and automated simulated strategies (`momentum-10c`, `fade-jump`) that write into Portfolio/Analysis. Each 15 s cycle: 1 batched `GET /markets?tickers=…` + trade-walk of the top 4 markets (`GET /markets/trades`); see `dash/flagged.html` F-08–F-12. |
+| `dash/market.html` | Price chart (X = time: 5 min seconds-granularity / 1 h / 6 h / 24 h / 7 d; Y = contract price), orderbook ladder (contracts available at each price), rules + settlement sources, simulated trade ticket |
+| `dash/autotrade.html` | Automated simulated-trade engine: five strategies run automatically against live prices; decisions, controls and stats logged |
+| `dash/portfolio.html` | Simulated P&L, win rate, exposure, equity curve, category breakdown (real demo-account sync needs the owner's keys — see `dash/flagged.html` F-02) |
+| `dash/analysis.html` | Topic × strategy breakdown; strategy definitions mapped to verified exchange mechanics |
+| `dash/executive-summary.html` | Dedicated executive summary page: environment, verified facts, focus-topic activity, capabilities, key findings |
+| `dash/suggestions.html` | 12 evidence-backed proposals with approve/reject/implemented review workflow (browser-local) |
+| `dash/questions.html` | Questions & gaps: known/verified vs missing, with a discovery plan per unknown |
+| `dash/api.html` | Verified API reference: environments, auth, endpoint inventory, data model, rate limits, quirks |
+| `dash/sources.html` | Source register: every row → official docs page or exact API query |
+| `dash/flagged.html` | Flagged for review F-01…F-12 with evidence links and blank-value policy |
+
+## Tools and documents added alongside
+
+| Path | Purpose |
+|------|---------|
+| `dash/data/snapshot.json` | Verified point-in-time capture of the official demo API (2026-11-20) — the only market data committed in the repo; every row carries its `source_url`. Used only as fallback when the browser cannot reach the API, and clearly labeled. |
+| `scripts/refresh_snapshot.py` | Rebuilds the `dash/` snapshot from the latest verified captures (merges rows in place; keeps prior rows and blanks for unconfirmed values) |
+| `EXECUTIVE_SUMMARY.md` | Executive summary of the brief, verified platform facts, findings, blank policy |
+| `SOURCES.md` | Source register (D1–D16 docs rows, A1–A18 live API captures) |
+| `VERIFICATION.md` | Line-by-line verification record incl. headless render test of all 10 pages |
+| `REVIEW.md` | Repo review + environment irregularities |
+| `scripts/check_links.js` | Link/asset/JSON checker for `dash/` |
+| `scripts/fetch_snapshot.mjs` | Refresh the snapshot from the official API; `--portfolio` exports your demo account (keys stay on your machine) |
+| `scripts/local-proxy.mjs` | CORS-proof local live mode (`/api/*` → demo API) |
+| `.github/workflows/suite-qa.yml` | CI: link + syntax checks for the `dash/` suite |
+
+Conventions of this suite: every table row links its official source; unconfirmed values stay blank and are
+listed on the Flagged page; portfolio/trade data is simulated and labeled as such; not financial advice.
+
+---
+
+# Live alerts — two scrolling feeds (added by session-cb49437b)
+
+`alerts/index.html` is a live alerting console for the Kalshi demo exchange. It watches the five
+focus topics (gas prices, elections, culture, crypto, golf) and posts a message to a scrolling feed
+whenever a contract moves **$0.10 or more in either direction**. A second feed repeats only the
+alerts a documented heuristic scores as high expected ROI. Both feeds link the exact API row behind
+each alert, plus the contract terms and settlement sources.
+
+```bash
+node tools/live_engine.mjs --selftest     # offline logic test, no network
+node tools/live_engine.mjs                # one live sample, writes data/live/
+node scripts/check_alerts.mjs             # validate the published feed
+node scripts/check_alerts_page.mjs        # render + behaviour test of the page (jsdom)
+```
+
+* **Why a scheduled job:** GitHub Pages is static, so nothing on the site can sample the exchange
+  while nobody is looking. `.github/workflows/live-alerts.yml` runs the engine every 10 minutes and
+  commits `data/live/feed.json`; the page reads that and additionally polls the public API while it
+  is open.
+* **What it will not do:** place orders or read a portfolio. Those endpoints need a signed request
+  with the account holder's key; the site holds no credentials and never asks for them.
+* Method, sources and every irregularity: [`docs/ALERTS.md`](docs/ALERTS.md). Flagged items with
+  links: [`flagged.html`](flagged.html).
+
+---
+
+# Live-loop integrity: how "live" is made checkable (added by session-f7490df7)
+
+This section documents a measured defect and the guarantee that replaces it. Nothing here is a
+claim about Kalshi; it is about this repository's own plumbing.
+
+## The defect that was measured
+
+On 2026-11-20 at 19:15 UTC, this repository's "live" alert feed was **five hours old** and the
+site still said LIVE. The evidence, all re-checkable:
+
+| What was checked | How | Result |
+|---|---|---|
+| Does any `schedule` trigger ever fire here? | `GET /repos/kanlerxz87-cyber/KalshiDash1/actions/runs?event=schedule` | **empty** — no scheduled run, ever, for any of the three workflows that declare a cron |
+| How old was the published sample? | `data/live/feed.json` → `meta.generated_at` | `2026-11-20T14:18:54Z` (≈5 h at audit time) |
+| Was the refresh job healthy? | Actions run `44752211268` on `main` | **failing**, step "Commit refreshed data" |
+| Root cause of the failure | `git log --author=kalshidash-bot origin/main` | **no commits** — the refresh bot had never once won its push race against the engine bot |
+
+GitHub documents two causes for a silent `schedule` stall: runs "can be delayed during periods of
+high loads … some queued jobs may be dropped", and scheduled workflows are disabled in public
+repositories after 60 days without activity
+([events that trigger workflows § schedule](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)).
+Neither can be ruled out from inside the repository, so the fix does not depend on the cron.
+
+## The three-part fix
+
+1. **`keepalive.yml` samples inline.** It calls `tools/live_engine.mjs` and
+   `scripts/fetch-snapshot.mjs` itself, on a 15-minute cron, and commits with a rebase-and-retry
+   loop. It does not *dispatch* other workflows — that was tried and measured not to work: a
+   dispatch made with the repository's own `GITHUB_TOKEN` returns 2xx but starts nothing, and a
+   workflow file first added on a branch is not registered until it exists on the default branch.
+   ([dispatch semantics](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow#triggering-a-workflow-from-a-workflow))
+2. **`tools/freshness_check.mjs` is the gate.** It fails the run when the *published* feed is
+   older than 45 minutes, when an alert lacks a `source_url`, when a recorded swing is below the
+   published `$0.10` threshold, or when a resolution is anything other than the exchange's own
+   `yes` / `no`.
+3. **`assets/freshness.js` puts the measurement in front of the reader.** Every page header now
+   shows the real age of the newest engine sample, green under 20 minutes, amber to 45, and
+   **`STALE`** beyond that — with a tooltip that says the feeds are historical. If the feed
+   cannot be read at all it says `engine unreadable`; it never falls back to the word "live".
+
+The badge is a checked property, not a promise: `node scripts/check_freshness_badge.mjs` loads the
+real pages in jsdom with controlled timestamps and asserts all four states plus "no third-party
+request" (53 assertions, run in CI).
+
+## Navigation
+
+The primary nav is now five labelled groups — **Start · Topics · Trading · Model · Review** —
+instead of one 20-link row. Topic links carry `?topic=<id>` so the dashboard and the alert console
+can open already filtered. No URL was removed: the legacy `dash/` and `docs/` suites are still
+reachable under **Review**, and every page they served still resolves.
+
+## Reproduce every check locally
+
+```bash
+node scripts/build-site.mjs --check        # site matches templates + data
+node scripts/check-links.mjs              # 0 broken internal links
+python3 tools/linkcheck.py                # same, independent implementation
+node tools/live_engine.mjs --selftest     # alert-engine logic (offline)
+node scripts/check_alerts.mjs             # feed structure, provenance, thresholds
+node tools/freshness_check.mjs            # staleness gate
+node scripts/check_freshness_badge.mjs    # header badge honesty (needs `npm install`)
+```
+
+## Sources used for this section
+
+* Demo environment, and the caveat that demo prices "may not be reflective of those in real
+  markets" — <https://docs.kalshi.com/getting_started/demo_env>
+* Unauthenticated public market data used by the sampler —
+  <https://docs.kalshi.com/getting_started/quick_start_market_data>
+* Settlement pays `$1` per winning contract; `result` is `yes` | `no` | `scalar` —
+  <https://docs.kalshi.com/getting_started/market_settlement>
+* GitHub `schedule` semantics, delay/drop behaviour —
+  <https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule>
+* GitHub dispatch-from-workflow semantics —
+  <https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow>
 Official references: [Demo environment](https://docs.kalshi.com/getting_started/demo_env) ·
 [API index](https://docs.kalshi.com/llms.txt) · [Market data](https://docs.kalshi.com/getting_started/quick_start_market_data) ·
 [Market settlement](https://docs.kalshi.com/getting_started/market_settlement) ·

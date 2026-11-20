@@ -7,16 +7,16 @@
 <meta name="description" content="Executive summary of the Kalshi demo dashboard: what was built, what the verified data shows, what the limitations are and what a trader can do with it.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
-<body data-page="executive">
+<body data-base="">
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta">
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span>
       <span id="mode-badge" class="badge warn">data: probing…</span>
       <span id="clock" class="mono small muted"></span>
     </div>
   </div>
-  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="executive-summary.html">Executive summary</a><a href="dashboard.html">Live dashboard</a><a href="alerts/index.html">Live alerts</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">Reference</span><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="catalyst.html">Swing catalysts</a><a href="strategylab.html">Strategy lab</a><span class="nav-sep">Earlier builds</span><a href="dash/index.html">Earlier build: dash/</a><a href="docs/index.html">Earlier build: docs/</a></div></nav>
+  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
 </header>
 
 <main><div class="wrap">
@@ -24,7 +24,7 @@
     <div class="grow">
       <h1>Executive summary</h1>
       <p class="sub">What was built, what the verified data shows, what it cannot show, and how a trader uses it.
-      Snapshot 2026-11-20 14:09:32 UTC. Every claim below links to its official source.</p>
+      Snapshot 2026-11-20 19:21:08 UTC. Every claim below links to its official source.</p>
     </div>
     <div class="btnrow"><a class="btn primary" href="dashboard.html">Open the live dashboard</a></div>
   </div>
@@ -52,7 +52,7 @@
 
   <h2>2 · What the verified data shows</h2>
   <div class="panel">
-    <p>At the captured snapshot the demo exchange returned <strong>3386</strong> open markets across the five topics
+    <p>At the captured snapshot the demo exchange returned <strong>3385</strong> open markets across the five topics
     from <strong>122</strong> matching series, using <strong>185</strong> documented endpoint calls.
     Every one of those rows is stored with the exact URL it came from, so the numbers can be checked by re-running the query.</p>
     <div class="table-wrap">
@@ -62,7 +62,7 @@
       <td><strong><a href="categories/gas.html">Gas Prices</a></strong></td>
       <td class="num">30</td>
       <td class="num">143</td>
-      <td class="num">39,447</td>
+      <td class="num">33,211</td>
       <td><a href="market.html?ticker=KXAAAGASW-26NOV23-3.6400">Will average **gas prices** be above $3.6400?</a></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
     </tr>
@@ -70,8 +70,8 @@
       <td><strong><a href="categories/elections.html">Elections</a></strong></td>
       <td class="num">30</td>
       <td class="num">318</td>
-      <td class="num">3,892,407</td>
-      <td><a href="market.html?ticker=KXPRESNOMD-28-AYAN">Will Andrew Yang be the nominee for the Presidency for the Democratic party?</a></td>
+      <td class="num">3,628,690</td>
+      <td><a href="market.html?ticker=KXPRESNOMR-28-MPEN">Will Mike Pence be the nominee for the Presidency for the Republican party?</a></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
     </tr>
 <tr>
@@ -86,15 +86,15 @@
       <td><strong><a href="categories/crypto.html">Crypto</a></strong></td>
       <td class="num">30</td>
       <td class="num">1,756</td>
-      <td class="num">589,178</td>
-      <td><a href="market.html?ticker=KXBTCY-27JAN0100-T149999.99">BTC price  on Jan 1, 2027?</a></td>
+      <td class="num">607,587</td>
+      <td><a href="market.html?ticker=KXBTCY-27JAN0100-B117500">BTC price  on Jan 1, 2027?</a></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
     </tr>
 <tr>
       <td><strong><a href="categories/golf.html">Golf</a></strong></td>
       <td class="num">30</td>
-      <td class="num">1,169</td>
-      <td class="num">10,061,073</td>
+      <td class="num">1,168</td>
+      <td class="num">6,601,034</td>
       <td><a href="market.html?ticker=KXPGATOUR-THRC26-TMOO">The RSM Classic: Taylor Moore wins</a></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
     </tr></tbody>
@@ -171,7 +171,7 @@
     (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
     <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
        WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
-       Snapshot captured 2026-11-20 14:09:32 UTC ·
+       Snapshot captured 2026-11-20 19:21:08 UTC ·
        <a href="sources.html">Sources</a> ·
        <a href="flagged.html">Flagged for review</a> ·
        <a href="COORDINATION.md">Coordination board</a></p>
@@ -182,5 +182,6 @@
     <a href="dash/index.html">dash/</a> · <a href="docs/index.html">docs/</a>.</p>
   </div></footer>
 <script src="assets/app.js"></script>
+<script src="assets/freshness.js"></script>
 </body>
 </html>

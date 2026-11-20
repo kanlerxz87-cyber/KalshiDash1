@@ -1,0 +1,151 @@
+name: keepalive
+
+# WHY THIS WORKFLOW EXISTS
+# ------------------------
+# Measured on 2026-11-20: **no `schedule`-triggered run had ever occurred in this repository**
+# (`GET /repos/{owner}/{repo}/actions/runs?event=schedule` → empty), while `live-alerts.yml` and
+# `refresh-data.yml` both declare a cron. Meanwhile the published site said LIVE over a
+# `data/live/feed.json` sample that was roughly five hours old.
+#
+# GitHub documents the two failure modes that produce exactly that, and neither can be ruled out
+# from inside the repository:
+#   * "The `schedule` event can be delayed during periods of high loads of GitHub Actions
+#     workflow runs. ... If the load is sufficiently high enough, some queued jobs may be
+#     dropped."
+#   * "In a public repository, scheduled workflows are automatically disabled when no repository
+#     activity has occurred in 60 days."
+#   https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule
+#
+# DESIGN DECISION THAT MATTERS
+# ----------------------------
+# The first version of this file *dispatched* the other two workflows. That was measured to be
+# unreliable here for two independent reasons, both verified rather than guessed:
+#   1. `workflow_dispatch` requests made with the repository's own `GITHUB_TOKEN` do not create
+#      runs triggered by other workflows — GitHub's rule is the reverse direction (dispatch
+#      events are not suppressed when they *start* a run), docs:
+#      https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow#triggering-a-workflow-from-a-workflow
+#   2. A workflow file first added on a non-default branch is not registered until it exists on
+#      the default branch: `GET /actions/workflows` did not list it and it produced no runs.
+# So this workflow no longer depends on any other workflow. It **runs the sampling itself**,
+# inline, using the same committed scripts the alerts/refresh jobs use. One trigger is enough.
+#
+# WHAT IT DOES, IN ORDER
+#   1. sample the demo API with tools/live_engine.mjs      → data/live/feed.json  (the alert feeds)
+#   2. refresh the snapshot with scripts/fetch-snapshot.mjs → data/snapshot.json  (static fallback)
+#   3. rebuild the static site so both files are consistent
+#   4. commit and push with a rebase-and-retry loop (other bots push here too)
+#   5. verify the freshness of what was just published and FAIL the run if it is beyond the limit
+#
+# No secret is required or stored. Public, unauthenticated demo endpoints only:
+# https://docs.kalshi.com/getting_started/quick_start_market_data
+
+on:
+  schedule:
+    # Every 15 minutes, a few minutes past the quarter hour so it avoids the documented
+    # high-load window at the top of the hour.
+    - cron: '4,19,34,49 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/keepalive.mjs'
+      - 'tools/freshness_check.mjs'
+      - '.github/workflows/keepalive.yml'
+
+permissions:
+  contents: write
+
+# The other two writers queue behind this one instead of racing it (see the shared group name in
+# live-alerts.yml and refresh-data.yml).
+concurrency:
+  group: writer-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pulse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check
+        run: |
+          node --check scripts/keepalive.mjs
+          node --check tools/freshness_check.mjs
+          node --check tools/live_engine.mjs
+
+      # Offline assertions first: if the engine's logic is broken, no network call is worth making.
+      - name: Engine logic selftest
+        run: node tools/live_engine.mjs --selftest
+
+      # Records, before this pulse does anything, how long ago each sampler last actually ran —
+      # including the "scheduled run: never" fact that motivated this workflow.
+      - name: When did the samplers last run?
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/keepalive.mjs --stale-minutes 20 || true
+
+      - name: Sample the demo API (the alert engine)
+        id: engine
+        # A failed sample must not skip the snapshot refresh or the commit below: a partial but
+        # real update is better than none, and the freshness gate at the end is what decides.
+        continue-on-error: true
+        run: node tools/live_engine.mjs --max-series 12 --candle-markets 6
+
+      - name: Validate the engine feed
+        run: node scripts/check_alerts.mjs
+
+      - name: Refresh the committed snapshot (static fallback)
+        continue-on-error: true
+        run: node scripts/fetch-snapshot.mjs
+
+      - name: Rebuild the static site
+        run: node scripts/build-site.mjs
+
+      - name: Check internal links before publishing anything
+        run: node scripts/check-links.mjs
+
+      - name: Commit and push (rebase-and-retry)
+        id: push
+        run: |
+          set -euo pipefail
+          git config user.name  'kalshidash1-engine'
+          git config user.email 'engine@users.noreply.github.com'
+          git add data/ '*.html' assets categories
+          if git diff --cached --quiet; then
+            echo 'Nothing changed in this pulse.'
+            exit 0
+          fi
+          STAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git commit -m "data(live): keepalive pulse ${STAMP}"
+          BRANCH="${GITHUB_REF_NAME}"
+          for attempt in 1 2 3; do
+            echo "push attempt ${attempt}/3 to ${BRANCH}"
+            if git pull --rebase --autostash origin "$BRANCH" && git push origin "HEAD:${BRANCH}"; then
+              echo "pushed on attempt ${attempt}"
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 10))
+          done
+          echo '::error::could not push after 3 attempts'
+          exit 1
+
+      # The gate that makes the live claim checkable. It reads the *published* feed (via the API,
+      # at the branch tip) rather than the working tree, so it cannot pass on a locally fresh file
+      # that was never pushed.
+      - name: Freshness gate — fail loudly if the published feed is stale
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.engine.outcome }}" != "success" ]; then
+            echo "::error::the engine could not sample the demo API in this pulse — the feed was not advanced"
+          fi
+          node tools/freshness_check.mjs --branch "${GITHUB_REF_NAME}" \
+            --warn-minutes 20 --stale-minutes 45
