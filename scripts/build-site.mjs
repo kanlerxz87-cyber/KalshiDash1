@@ -49,6 +49,11 @@ const TOPICS = [
 ];
 const topicLabel = (id) => (TOPICS.find((t) => t.id === id) || { label: id || '—' }).label;
 
+/* Series per topic actually tracked/shown on the topic pages. The Get Series List
+   endpoint documents no `limit`, so the query returns every matching series and the
+   site keeps the top N locally, ranked by volume_fp (see flagged.html F-25). */
+const SERIES_KEPT_PER_TOPIC = 30;
+
 /* --------------------------------------------------------------- navigation */
 /* Five groups, in the order a trader actually uses the dashboard:
  *   Start   -> what is on fire right now (alerts, dashboard, executive summary)
@@ -382,6 +387,7 @@ function replacements(text, base = '') {
     '{{MARKET_COUNT}}': String(snap.markets_count_all || (snap.markets || []).length),
     '{{TOPIC_COUNT}}': String(TOPICS.length),
     '{{SERIES_COUNT}}': String(TOPICS.reduce((s, t) => s + (((snap.topics[t.id] || {}).series) || []).length, 0)),
+    '{{SERIES_KEPT_PER_TOPIC}}': String(SERIES_KEPT_PER_TOPIC),
     '{{ENDPOINT_COUNT}}': String(((snap.meta || {}).endpoints_used || []).length)
   };
   TOPICS.forEach((t) => {

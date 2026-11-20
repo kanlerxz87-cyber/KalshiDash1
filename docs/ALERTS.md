@@ -229,7 +229,7 @@ Full list with links: [Flagged for review](../flagged.html#F-50). Alert-specific
 | F-03 (existing) | No traded-dollar field exists; ranking is `volume_fp × price`, labelled as an estimate |
 | F-53 | The high-ROI model is a documented heuristic, not a back-tested model |
 | F-05 (existing) | "Gas prices" excludes crude oil that shares the `Oil & Gas` tag — a judgement call, stated openly |
-| F-53 | Zero alerts so far because the demo is quiet; nothing is seeded |
+| F-57 | Zero alerts so far because the demo is quiet; nothing is seeded |
 | F-51 | No streaming: schedule + polling only, because the WS handshake needs a key |
 | F-24 (existing) | Demo-account portfolio sync still needs the owner's key |
 

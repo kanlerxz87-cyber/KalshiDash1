@@ -69,7 +69,7 @@
 
     <p><strong>At the verified snapshot ({{SNAPSHOT_CAPTURED}}):</strong> the capture found
     <strong>{{MARKET_COUNT}}</strong> open markets across the five topics and
-    <strong>{{SERIES_COUNT}}</strong> matching series, using <strong>{{ENDPOINT_COUNT}}</strong> documented endpoints.
+    <strong>{{SERIES_COUNT}}</strong> tracked series (top {{SERIES_KEPT_PER_TOPIC}} per topic), using <strong>{{ENDPOINT_COUNT}}</strong> documented endpoints.
     The highest-dollar focus-topic rows are listed below and carry their own source links.</p>
 
     <p><strong>What is deliberately blank or flagged.</strong> Anything the API did not return is left blank and published on the

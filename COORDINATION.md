@@ -1,5 +1,56 @@
 # COORDINATION.md — shared task board
 
+## Session on this branch — session-e480a835 (verification + defect-fix pass, 2026-11-20)
+
+- Session ID: `session-e480a835`
+- Branch: `arena/e480a835-kalshidash1` (base `d24616a`; branch reset onto the latest `main` after parallel
+  sessions landed their own fixes, then unique contributions re-applied — see below).
+- Role: post-integration **line-by-line verification and defect-fix** pass. The brief requires "review the repo
+  line by line, verify everything, flag irregularities, no hallucinations".
+
+### Defects found
+
+| ID | Defect | Where | Outcome |
+|---|---|---|---|
+| V-01 | Unresolved git merge-conflict markers (`<<<<<<< HEAD`, `=======`, `>>>>>>> origin/main`) committed to `main`. | `README.md` (dash/alerts.html row) | **Independently fixed on `main` by session d1de3583** (identical resolution). My branch converged to `main`'s version — no duplicate fix. |
+| V-02 | Duplicate HTML ids on the Flagged page: the alert session appended five rows (F-27…F-31) that duplicated IDs already used by the first integration batch (F-01…F-33), producing invalid HTML and breaking `#F-28` anchor links. | `templates/flagged.tpl` | **Independently reconciled on `main` by session dd012e26** (flag list now F-01…F-56, no duplicates). My branch converged to `main`'s authoritative reconciliation. |
+| V-03 | Imprecise wording: hero text said "122 matching series" but 122 is the number *tracked* (top 30/topic + culture's 2); the total *matching* series is 3,298 (`series_count_kept`). | `templates/index.tpl`, `templates/executive-summary.tpl`, `scripts/build-site.mjs` | **Unique to this session — retained.** Changed to "122 tracked series (top 30 per topic)" and wired a new `{{SERIES_KEPT_PER_TOPIC}}` placeholder. `main` did not have this fix. |
+
+### Unique contributions retained after convergence
+
+- **V-03 series-wording precision** (templates + build script) — not present on `main`.
+- **Zero-alerts flagged row (F-57)** in `templates/flagged.tpl` — `main`'s flag list had no row for the
+  "zero real alerts so far" observation; added as F-57 (the next free ID) with its source links.
+- `docs/ALERTS.md`: the zero-alerts irregularity-table row now points at F-57 (main's version referenced
+  F-53, the heuristic row).
+- `EXECUTIVE_SUMMARY.md`: F-A1…F-A8 → published-ID mapping note (F-A1→F-50 · F-A2→F-51 · F-A3→F-03 ·
+  F-A4→F-53 · F-A5→F-05 · F-A6→F-57 · F-A7→F-51 · F-A8→F-24).
+- This board record.
+
+### Verification performed (session-e480a835, 2026-11-20)
+
+- `node scripts/build-site.mjs` → 22 pages generated, no unresolved `{{ }}` placeholders.
+- `node scripts/check-links.mjs` → 0 broken internal links.
+- `python3 tools/linkcheck.py` → 0 broken internal links.
+- `node scripts/check_links.js` (dash/) → 0 broken.
+- `node tools/live_engine.mjs --selftest` → all assertions passed.
+- `node scripts/check_alerts.mjs`, `node tools/alerts-qa.mjs`, `node tools/qa_alert_test.mjs`,
+  `node tools/qa_logic_test.mjs` → all pass.
+- Duplicate-id scan across every published HTML file (root, `dash/`, `alerts/`) → none.
+
+### Sources (official, re-confirmed)
+
+- Demo environment & endpoint table: https://docs.kalshi.com/getting_started/demo_env
+- Get Series List (series_count / no documented `limit`): https://docs.kalshi.com/api-reference/market/get-series-list
+- The committed snapshot `data/snapshot.json` (`topics.*.series_count_kept`, `meta.endpoints_used`) is the source for the 3,298 / 185 figures.
+
+### PR & merge record
+
+- PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/35 (`arena/e480a835-kalshidash1` → `main`).
+- Method: `gh pr merge 35 --merge`. Record appended after the merge (a record cannot contain its own merge commit).
+
+---
+
 ## Current Arena session — `arena/dd012e26-kalshidash1` (2026-11-20 UTC) — FINAL INTEGRATION
 
 - Session ID: `dd012e26`. Branch: `arena/dd012e26-kalshidash1` (base `d24616a`, `main`; branch fast-forwarded to `c57e52e` = `main` after PRs #25/#26 landed).
