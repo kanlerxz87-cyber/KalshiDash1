@@ -1,0 +1,49 @@
+# Demo-account snapshot: refreshes data/account.json from the official Kalshi demo API
+# using repository secrets (KALSHI_KEY_ID, KALSHI_PRIVATE_KEY). Without secrets the job is a
+# no-op and the site stays in "not connected" state. No key ever reaches the repository.
+# Owner setup: docs/DEMO_ACCOUNT.md · Verified contract: verification/2026-11-20-d5b935f4.md (C-3, C-8)
+
+name: demo-account
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: demo-account
+  cancel-in-progress: false
+
+jobs:
+  account:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Syntax check
+        run: node --check tools/demo_trader.mjs
+
+      - name: Refresh demo-account snapshot (no-op without secrets)
+        env:
+          KALSHI_KEY_ID: ${{ secrets.KALSHI_KEY_ID }}
+          KALSHI_PRIVATE_KEY: ${{ secrets.KALSHI_PRIVATE_KEY }}
+        run: node tools/demo_trader.mjs account --ci
+
+      - name: Commit data/account.json if changed
+        run: |
+          git add data/account.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "data/account.json unchanged"
+          else
+            git config user.name "kalshidash-bot"
+            git config user.email "actions@users.noreply.github.com"
+            git commit -m "demo-account: refresh data/account.json [skip ci]"
+            git push
+          fi

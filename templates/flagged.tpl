@@ -29,194 +29,45 @@
     </div>
   </div>
 
-  <h2>Open in this session</h2>
+  <h2>All flagged items</h2>
+  <p class="small muted">The line-by-line verification record of the repository facts is on the <a href="audit/index.html">verified-facts audit page</a>. F-01 to F-20 are the published record from earlier sessions, kept as written (refreshed by PR #11). F-21 and later were added during final integration.</p>
   <div class="table-wrap">
     <table>
       <thead><tr><th>ID</th><th>Type</th><th>Item</th><th>Affects</th><th>Source to check</th><th>Status</th></tr></thead>
       <tbody>
-        <tr><td><strong>F-01</strong></td><td>Unverified</td>
-          <td>Browser access (CORS) to the demo API could not be tested. The build sandbox can reach only GitHub, npm and PyPI,
-          so the live feed was exercised through the fetch tool and through GitHub Actions instead of from a browser.
-          The site probes the API on load and falls back to the committed snapshot, stating which mode it is in.</td>
-          <td>Every live table, both chat panes</td>
-          <td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Quick Start: Market Data</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-02</strong></td><td>Limitation</td>
-          <td>REST candlesticks have a one-minute minimum period (1, 60 or 1440 minutes). Sub-minute resolution only exists while the
-          page is open, because the browser samples the price itself. The WebSocket feed, which would give true tick data, requires
-          API-key authentication during the handshake.</td>
-          <td>Charts, swing detection</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Get Market Candlesticks</a> ·
-          <a href="https://docs.kalshi.com/websockets/websocket-connection" target="_blank" rel="noopener">WebSocket Connection</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-03</strong></td><td>Interpretation</td>
-          <td>The Kalshi API has no "dollar volume" field. The dollar columns here are
-          <code>contracts × notional_value_dollars</code>, where <code>notional_value_dollars</code> is the settlement value of one
-          contract as published by the API. Where the API did not return that field the dollar cell is left blank rather than
-          assumed. Ranking is therefore a derived figure, not an official one.</td>
-          <td>All ranking and dollar columns</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market</a> ·
-          <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-04</strong></td><td>Interpretation</td>
-          <td>"Highest dollar amount live events" is read as "highest 24-hour dollar volume, then highest total volume".
-          Kalshi publishes no volume ranking, so the ordering is a stated interpretation.</td>
-          <td>Dashboard, topic pages, markets</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-05</strong></td><td>Interpretation</td>
-          <td>No news feed exists in the Kalshi API, so a price move cannot be attributed to a cause. Each chat message links the
-          event's <strong>official settlement source</strong> — AAA for the gas series, the named election authority for election
-          series, the named news organisations for the culture series — as a <em>candidate</em> source, plus the Kalshi market page
-          and the exact API row. These links are not a verified cause of the move.</td>
-          <td>Both chat panes</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a> ·
-          <a href="https://gasprices.aaa.com/" target="_blank" rel="noopener">AAA</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-06</strong></td><td>Derived value</td>
-          <td>The ROI score is a weighted heuristic written by this project, not an official Kalshi figure. Every weight and every
-          formula is published on <a href="strategies.html">Strategies</a> so it can be recomputed or rejected.</td>
-          <td>High-ROI chat pane, strategy rules</td>
-          <td><a href="strategies.html">Strategies</a> (own document) · <a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-07</strong></td><td>Blocker</td>
-          <td>No demo API key is committed anywhere in this repository, so no real order was ever placed and the demo-account page
-          could not be exercised against a live account. The signing code follows the official guide line for line, but that code path
-          is unverified against the exchange. The site deliberately offers no order-placement button.</td>
-          <td>Demo account page, portfolio</td>
-          <td><a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">Quick Start: Authenticated Requests</a> ·
-          <a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-08</strong></td><td>Limitation</td>
-          <td>Topic pages list the top 30 series by volume. The Get Series List endpoint documents no <code>limit</code> parameter,
-          so a category query returns everything — the Elections query returned 2,709 series at capture time.</td>
-          <td>Topic pages</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a></td>
-          <td><span class="badge no">resolved in this session — rule stated on each topic page</span></td></tr>
-        <tr><td><strong>F-09</strong></td><td>Unverified</td>
-          <td>Some markets have an empty touch at capture time, so their order-book ladder is blank and the liquidity columns show
-          "—". Nothing is filled in to hide the gap.</td>
-          <td>Liquidity tables, ROI depth component</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">Get Market Orderbook</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-10</strong></td><td>Unverified</td>
-          <td>The fee schedule was not read in this session. The simulator applies no trading fee; Kalshi states settlement fees
-          are zero for simple yes/no determinations. Series records carry a <code>fee_type</code> that this site does not model.</td>
-          <td>Portfolio P&amp;L, analysis</td>
-          <td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a> ·
-          <a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-11</strong></td><td>Limitation</td>
-          <td>The simulator fills at the visible touch and cannot model queue position, partial fills or latency, so its results are
-          an upper bound on what a real order would achieve. The strategies were published without a backtest against history.</td>
-          <td>Portfolio, analysis</td>
-          <td><a href="strategies.html">Strategies</a> (own document)</td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-12</strong></td><td>Limitation</td>
-          <td>Markets that settled before the exchange's historical cutoff are only available through
-          <code>GET /historical/markets</code>, so the resolved-event tables show the recent window only.</td>
-          <td>Resolved-event tables</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-13</strong></td><td>Scope</td>
-          <td>The brief names five topics, so the dashboard covers only gas prices, elections, culture, crypto and golf. The demo
-          exchange also lists AI, Business, Commodities, Entertainment, Financials, Health, Mentions, Politics, Science and
-          Technology, Social and World categories, which are deliberately out of scope.</td>
-          <td>Whole site</td>
-          <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories" target="_blank" rel="noopener">GET /search/tags_by_categories</a></td>
-          <td><span class="badge neutral">documented</span></td></tr>
-        <tr><td><strong>F-14</strong></td><td>Caveat</td>
-          <td>Demo prices and market behaviour may not reflect real markets, and demo funds are mock funds. Kalshi's own warning.</td>
-          <td>All price data</td>
-          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Test In The Demo Environment</a></td>
-          <td><span class="badge neutral">documented</span></td></tr>
-        <tr><td><strong>F-15</strong></td><td>Interpretation</td>
-          <td>"Culture" is a real series category in the demo exchange — the official tag taxonomy has no Culture tag list, but
-          <code>GET /series?category=Culture</code> returns series such as "Will Grok be banned this year". A prior session on this
-          repository asserted that Kalshi has no category named Culture; that assertion is contradicted by the live API record and
-          the earlier page is preserved under <code>archive/</code>.</td>
-          <td>Culture topic page</td>
-          <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&amp;include_volume=true" target="_blank" rel="noopener">GET /series?category=Culture</a> ·
-          <a href="https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories" target="_blank" rel="noopener">GET /search/tags_by_categories</a></td>
-          <td><span class="badge no">resolved in this session — contradiction documented</span></td></tr>
-        <tr><td><strong>F-16</strong></td><td>Interpretation</td>
-          <td>The gas topic keeps only the AAA gasoline series (ticker prefix <code>KXAAAGAS</code>, or a title containing
-          "gas price"). The broader "Oil and energy" tag also returns crude-oil and coal series, which are not gas prices and are
-          excluded by the stated rule.</td>
-          <td>Gas topic page</td>
-          <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">GET /series?category=Economics&amp;tags=Oil and energy</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-17</strong></td><td>Repo irregularity</td>
-          <td>Before this session the repository shipped <strong>three overlapping site trees</strong> — a generated site at the root,
-          a full interactive suite under <code>dash/</code> and a second suite under <code>docs/</code> — each with its own
-          overlapping pages, stylesheet and navigation. They were consolidated into one canonical site at the repository root; the
-          earlier trees are preserved unchanged under <code>archive/</code> and are not re-verified line by line.</td>
-          <td>Repository structure</td>
-          <td><a href="COORDINATION.md">COORDINATION.md</a> · git history of this repository</td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-18</strong></td><td>Process</td>
-          <td>GitHub Pages is configured as a legacy source serving the repository root of <code>main</code>; the automation token
-          returned HTTP 403 when asked to change the build type or the source folder, so that choice needs a repository admin.</td>
-          <td>Publishing</td>
-          <td>GitHub Pages settings (repository admin)</td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-19</strong></td><td>Unverified</td>
-          <td>The <code>tickers</code> batch filter documents no maximum number of tickers. The site batches 40 tickers per request
-          as a precaution; a larger batch may be rejected by the exchange.</td>
-          <td>Live alert feed</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-20</strong></td><td>Process</td>
-          <td>The committed snapshot is refreshed by a GitHub Actions job that calls the demo API from a GitHub runner. It runs on a
-          schedule and on demand; it can only see what the public endpoints return, so it inherits the same limits as the browser feed.</td>
-          <td>data/snapshot.json</td>
-          <td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/.github/workflows/refresh-data.yml" target="_blank" rel="noopener">.github/workflows/refresh-data.yml</a></td>
-          <td><span class="badge neutral">documented</span></td></tr>
-        <tr><td><strong>F-21</strong></td><td>Limitation</td>
-          <td>The Kalshi API exposes no news or event feed. The site cannot identify what caused a sharp contract move, so it
-          does not guess a cause. The only links it shows next to a move are the series' published settlement sources and
-          contract URLs, when the API returns them, and those are not a cause.</td>
-          <td>Live alert chats (both)</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a> (<code>settlement_sources</code>, <code>contract_url</code>)</td>
-          <td><span class="badge warn">needs review</span></td></tr>
-        <tr><td><strong>F-22</strong></td><td>Repo irregularity</td>
-          <td>Three repository-level issues were found and fixed during integration. (a) <code>tools/linkcheck.py</code> scanned
-          <code>templates/*.html</code> as published pages, so templates were renamed to <code>*.tpl</code>. (b) <code>dash/</code> and
-          <code>docs/</code> were moved under <code>archive/</code> and then restored in place, because <code>suite-qa.yml</code> and
-          <code>site-qa.yml</code> still reference them. (c) The site's series queries sent <code>limit=100</code>, which the Get Series
-          List schema does not document; the parameter was removed.</td>
-          <td>Whole tree</td>
-          <td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/tools/linkcheck.py" target="_blank" rel="noopener">tools/linkcheck.py</a>, <a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a></td>
-          <td><span class="badge neutral">fixed</span></td></tr>
-        <tr><td><strong>F-23</strong></td><td>Limitation</td>
-          <td>Browser QA was run in jsdom (a DOM simulator without real rendering), with mocked and snapshot data. It found and
-          fixed runtime defects, but it is not a visual check in a real browser, and the live WebSocket path is not exercised
-          (WebSocket subscriptions need an authenticated connection, and no key is committed).</td>
-          <td>Whole site</td>
-          <td><a href="https://docs.kalshi.com/websockets/websocket-connection" target="_blank" rel="noopener">WebSocket connection</a></td>
-          <td><span class="badge warn">needs review</span></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <h2>Carried forward from earlier sessions</h2>
-  <div class="table-wrap">
-    <table class="compact">
-      <thead><tr><th>ID</th><th>Item</th><th>Outcome in this session</th></tr></thead>
-      <tbody>
-        <tr><td>F-09 (prior)</td><td>Positions and fills endpoints were not fetched, so their paths were not verified.</td>
-          <td><span class="badge good">resolved</span> — <code>GET /portfolio/positions</code>, <code>/portfolio/fills</code> and
-          <code>/portfolio/settlements</code> are now called by the demo-account page, following
-          <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">the official signing guide</a>.</td></tr>
-        <tr><td>F-11 (prior)</td><td>The repository contained only a README at the base commit; no tests, CI, licence or .gitignore.</td>
-          <td><span class="badge good">resolved</span> — three CI workflows, a .gitignore and QA scripts now exist.</td></tr>
-        <tr><td>F-12 (prior)</td><td>Other session branches claimed the same tasks, and one marked work done that was never pushed.</td>
-          <td><span class="badge neutral">recorded</span> — the full history of claims and merges is in
-          <a href="COORDINATION.md">COORDINATION.md</a>.</td></tr>
-        <tr><td>F-16 (prior)</td><td>Overlapping site pages built by different sessions; prior versions kept under archive/.</td>
-          <td><span class="badge neutral">recorded</span> — see F-17 above. The earlier root-site files are kept verbatim in <code>archive/legacy-root/</code>; the older <code>archive/</code> trees are unchanged.</td></tr>
-        <tr><td>F-14 (prior)</td><td>GitHub Pages settings could not be changed by the automation token.</td>
-          <td><span class="badge neutral">still open</span> — see F-18.</td></tr>
+        <tr><td><span id="F-01"></span>F-01</td><td>Unverified</td><td>Browser access (CORS) to the demo API could not be tested from the build sandbox. The live tables depend on it.</td><td>All category pages, dashboard</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener" title="Kalshi docs: Demo environment">Demo environment ↗</a> · <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Orderbook">Get Market Orderbook ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-02"></span>F-02</td><td>Limitation</td><td>REST candles are 1 minute minimum. Seconds granularity is recorded only while the page is open, not from the API. WebSocket requires credentials.</td><td>Dashboard</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Candlesticks">Get Market Candlesticks ↗</a> · <a href="https://docs.kalshi.com/getting_started/quick_start_websockets.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start WebSockets">Quick Start WebSockets ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-03"></span>F-03</td><td>Derived value</td><td>No dollar-volume field exists in the API. Ranking uses open interest × notional_value_dollars (contracts × $1). This is a derived figure, not an official one.</td><td>Category pages</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a> · <a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener" title="Kalshi docs: Market Settlement">Market Settlement ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-04"></span>F-04</td><td>Interpretation (refined 2026-11-20)</td><td>"Culture" is mapped to Kalshi's Entertainment category. The official tag map has no Culture key, but the live series filter <code>category=Culture</code> returns two series (KXXBANNEDGROK, KXXBANNEDMURRAYHILLGUY1), so the earlier statement that Kalshi has no Culture category is contradicted. Which category is canonical is a reviewer decision.</td><td>Culture page</td><td><a href="https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Tags for Series Categories">Get Tags for Series Categories ↗</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true&limit=50" target="_blank" rel="noopener" title="Kalshi demo API: series in category Culture (live, 2026-11-20)">series in category Culture (live, 2026-11-20) ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-05"></span>F-05</td><td>Interpretation</td><td>"Gas prices" uses only AAA gas series (KXAAAGAS*). Oil & Gas tag includes WTI and natural gas series, which are excluded.</td><td>Gas page</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?tags=Oil%20%26%20Gas&include_volume=true" target="_blank" rel="noopener" title="Kalshi demo API: Oil &amp; Gas series (live)">Oil &amp; Gas series (live) ↗</a> · <a href="https://gasprices.aaa.com/" target="_blank" rel="noopener" title="AAA (settlement source named in the API series record for gas markets; not independently fetched)">AAA (settlement source named in the API series r ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-06"></span>F-06</td><td>Caveat</td><td>Demo prices may not reflect real markets (Kalshi's own warning).</td><td>All price data</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener" title="Kalshi docs: Demo environment">Demo environment ↗</a></td><td><span class="badge ">Documented</span></td></tr>
+        <tr><td><span id="F-07"></span>F-07</td><td>Blocker</td><td>Portfolio, trades and P&amp;L not available: no demo API key provided; none requested or stored.</td><td>Portfolio, Trading, Analysis</td><td><a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a></td><td><span class="badge warn">Blocked</span></td></tr>
+        <tr><td><span id="F-08"></span>F-08</td><td>Irregularity</td><td>The quick-start order example uses <code>POST /portfolio/events/orders</code> with <code>side: "bid"</code>. The order-direction page says legacy action/side fields "will not be removed before May 28, 2026"; today is 2026-11-20, so the example may be out of date. Not tested (no key).</td><td>Trading page</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start Create your first order">Quick Start Create your first order ↗</a> · <a href="https://docs.kalshi.com/getting_started/order_direction.md" target="_blank" rel="noopener" title="Kalshi docs: Order direction (outcome_side and book_side)">Order direction (outcome_side and book_side) ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-09"></span>F-09</td><td>Unverified</td><td>Positions and fills endpoints were not fetched in this session, so their paths are not listed as verified.</td><td>Portfolio</td><td><a href="https://docs.kalshi.com/llms.txt" target="_blank" rel="noopener" title="Kalshi docs: documentation index">documentation index ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-10"></span>F-10</td><td>Unverified</td><td>Fee schedule not read. Series records carry a fee_type; the schedule PDF is not verified here.</td><td>Analysis, suggestions</td><td><a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-11"></span>F-11</td><td>Repo irregularity</td><td>Repository at base commit f1fa6aa contains only README.md ("# KalshiDash1"). No tests, CI, licence or .gitignore existed before this work.</td><td>Repo</td><td>git history of this repository</td><td><span class="badge ">Noted</span></td></tr>
+        <tr><td><span id="F-12"></span>F-12</td><td>Coordination</td><td>Other session branches exist (arena/3f5650f9-kalshidash1 and arena/f661348d-kalshidash1) with claims on the same tasks. Branch 3f5650f9 marks docs as done, but those docs are not on that branch. See COORDINATION.md.</td><td>Process</td><td>COORDINATION.md on this branch</td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-13"></span>F-13</td><td>Unverified</td><td>Some market field values are cached briefly by the API (Get Market reference), so live figures can lag.</td><td>Dashboard</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a></td><td><span class="badge ">Documented</span></td></tr>
+        <tr><td><span id="F-14"></span>F-14</td><td>Process</td><td>GitHub Pages settings could not be changed by the automation token (HTTP 403 for build type and for the /docs folder). The site is therefore published from the repository root on main (legacy source). Repository owner may prefer a different source.</td><td>Publishing</td><td>GitHub Pages settings (repo admin)</td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-15"></span>F-15</td><td>Irregularity (prior session)</td><td>Another session's page stated that gas-price markets were "not located in demo events". The official series list does return AAA gas series (for example KXAAAGASM, US gas price; KXAAAGASMINTX, Texas lowest gas price). That statement is contradicted by the API record. The prior pages are preserved in archive/.</td><td>Gas page; archived prior pages</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?tags=Oil%20%26%20Gas&include_volume=true" target="_blank" rel="noopener" title="Kalshi demo API: Oil &amp; Gas series (live)">Oil &amp; Gas series (live) ↗</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true" target="_blank" rel="noopener" title="Kalshi demo API: open US gas price events (live)">open US gas price events (live) ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-16"></span>F-16</td><td>Superseded pages</td><td>Two sessions built overlapping site pages (merged on main through PRs #1-#3). The current site replaces the overlapping root pages. Their prior versions are kept under archive/ with internal links rewritten, not re-verified line by line. Start at archive/index.html.</td><td>archive/ folder; git history</td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-17"></span>F-17</td><td>Irregularity</td><td>The gas filter asks for tag <code>Oil &amp; Gas</code> and keeps only tickers starting with <code>KXAAAGAS</code>. It therefore misses AAA-settled gas series without that tag, for example <code>AAAGASMAX</code> (US highest gas price yearly; tag Oil and energy only). Live check 2026-11-20. Proposed fix: query category Economics with tag Oil and energy and keep the AAA gas prefixes, after confirming how the series list is paged.</td><td>Gas page (live code in assets/app.js)</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&limit=50" target="_blank" rel="noopener" title="Kalshi demo API: Economics series, first 50 (live, 2026-11-20)">Economics series, first 50 (live, 2026-11-20) ↗</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories" target="_blank" rel="noopener" title="Kalshi demo API: tags by category (live)">tags by category (live) ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-18"></span>F-18</td><td>Scope</td><td>Diesel series (<code>KXDIESELD</code>, <code>KXDIESELW</code>, <code>KXDIESELMONAK</code>) are AAA-settled but are not gasoline prices, so the gas page excludes them. Open <code>KXDIESELD</code> markets showed zero volume and zero last price on 2026-11-20. Decide whether diesel belongs under gas prices.</td><td>Gas page scope</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50" target="_blank" rel="noopener" title="Kalshi demo API: Economics + Oil and energy series (live, 2026-11-20)">Economics + Oil and energy series (live, 2026-11 ↗</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXDIESELD&status=open&limit=5" target="_blank" rel="noopener" title="Kalshi demo API: open KXDIESELD markets (live, 2026-11-20)">open KXDIESELD markets (live, 2026-11-20) ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-19"></span>F-19</td><td>Observation</td><td>A <code>status=open</code> request returned markets whose <code>status</code> field reads <code>active</code> (KXDIESELD-26NOV21, 2026-11-20). This matches the response enum in F-03. No change is needed unless a page compares the response field to <code>open</code>.</td><td>All market tables</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXDIESELD&status=open&limit=5" target="_blank" rel="noopener" title="Kalshi demo API: open KXDIESELD markets (live, 2026-11-20)">open KXDIESELD markets (live, 2026-11-20) ↗</a></td><td><span class="badge ">Documented</span></td></tr>
+        <tr><td><span id="F-20"></span>F-20</td><td>Irregularity (dash/ suite)</td><td>The <code>dash/</code> gas matcher (title <code>/\bgas\b|gasoline|fuel price|SPR\b/i</code>, ticker <code>/GAS|SPR/i</code>) also matches the Strategic Petroleum Reserve series (KXSPRMIN, live 2026-11-20) and the natural-gas production series KXPAGAS (listed in <code>dash/data/snapshot.json</code>). It is not a gasoline-price filter. Not changed in this session; fix in <code>dash/js/config.js</code>.</td><td>dash/ suite gas topic</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50" target="_blank" rel="noopener" title="Kalshi demo API: Economics + Oil and energy series (live, 2026-11-20)">Economics + Oil and energy series (live, 2026-11 ↗</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/verification/2026-11-20-e6c3b3b6.md" target="_blank" rel="noopener" title="Repo: live re-verification record V1-V9 (session e6c3b3b6)">live re-verification record V1-V9 (session e6c3b ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-21"></span>F-21</td><td>Interpretation</td><td>"Highest dollar amount live events" is read as "highest 24-hour dollar volume, then highest total volume". Kalshi publishes no volume ranking, so the ordering is a stated interpretation.</td><td>Dashboard, topic pages, markets</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-22"></span>F-22</td><td>Limitation</td><td>The Kalshi API has no news or event feed, so a sharp contract move cannot be attributed to a cause. The site does not guess one. The only links shown beside a move are the series' published settlement sources and contract URLs, when the API returns them. Those are sources for the rules, not explanations of the move.</td><td>Live alert chats (both)</td><td><a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a> (<code>settlement_sources</code>, <code>contract_url</code>)</td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-23"></span>F-23</td><td>Derived value</td><td>The ROI score is a weighted heuristic written by this project, not an official Kalshi figure. Every weight and formula is published on the Strategies page so it can be recomputed or rejected.</td><td>High-ROI chat pane, strategy rules</td><td><a href="strategies.html" target="_blank" rel="noopener">Strategies (own document)</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-24"></span>F-24</td><td>Blocker</td><td>No demo API key is committed anywhere in this repository, so no real demo order has been placed. The repository includes a demo-account page fed from <code>data/account.json</code> (refreshed by a workflow that reads repository secrets) and a trade tool (<code>tools/demo_trader.mjs</code>) that defaults to dry-run. The signing path is unverified against the exchange. The browser never receives a key.</td><td>Demo account, portfolio, trading</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">Authenticated Requests</a> · <a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-25"></span>F-25</td><td>Limitation</td><td>Topic pages list the top 30 series by volume. The Get Series List endpoint documents no <code>limit</code> parameter, so a category query returns every matching series; the Elections query returned 2,709 series at capture time.</td><td>Topic pages</td><td><a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a></td><td><span class="badge good">Rule stated on each topic page</span></td></tr>
+        <tr><td><span id="F-26"></span>F-26</td><td>Unverified</td><td>Some markets have an empty touch at capture time, so their order-book ladder is blank and the liquidity columns show "—". Nothing is filled in to hide the gap.</td><td>Liquidity tables, ROI depth component</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">Get Market Orderbook</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-27"></span>F-27</td><td>Limitation</td><td>The simulator fills at the visible touch and cannot model queue position, partial fills or latency, so its results are an upper bound on what a real order would achieve. The strategies were published without a backtest against history.</td><td>Portfolio, analysis</td><td><a href="strategies.html" target="_blank" rel="noopener">Strategies (own document)</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-28"></span>F-28</td><td>Limitation</td><td>Resolved-event tables show at most two settled events per series, taken from the live <code>status=settled</code> filter at capture time. Older history is not included. Kalshi maps the settled filter to the <em>finalized</em> lifecycle state.</td><td>Resolved-event tables</td><td><a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market lifecycle</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-29"></span>F-29</td><td>Scope</td><td>The brief names five topics, so the site covers only gas prices, elections, culture, crypto and golf. Other categories in the demo taxonomy are deliberately out of scope.</td><td>Whole site</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories" target="_blank" rel="noopener">Tag taxonomy (live)</a></td><td><span class="badge neutral">Documented</span></td></tr>
+        <tr><td><span id="F-30"></span>F-30</td><td>Repo irregularity</td><td>Repository issues found and fixed during integration: (a) <code>tools/linkcheck.py</code> scanned <code>templates/*.html</code> as published pages, so templates are now <code>*.tpl</code>; (b) <code>dash/</code> and <code>docs/</code> were moved under <code>archive/</code> and then restored in place, because <code>suite-qa.yml</code> and <code>site-qa.yml</code> still reference them; (c) the earlier root-site files are kept verbatim in <code>archive/legacy-root/</code>; (d) a pages-staleness step was invalid YAML and was rewritten; (e) the series queries sent <code>limit=100</code>, which the Get Series List schema does not document, so the parameter was removed.</td><td>Whole repository</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/tools/linkcheck.py" target="_blank" rel="noopener">tools/linkcheck.py</a> · <a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a></td><td><span class="badge good">Fixed in this session</span></td></tr>
+        <tr><td><span id="F-31"></span>F-31</td><td>Unverified</td><td>The <code>tickers</code> batch filter documents no maximum number of tickers. The site batches 40 tickers per request as a precaution; a larger batch may be rejected by the exchange.</td><td>Live alert feed</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a></td><td><span class="badge warn">Needs review</span></td></tr>
+        <tr><td><span id="F-32"></span>F-32</td><td>Process</td><td>The committed snapshot is refreshed by a GitHub Actions job that calls the demo API from a GitHub runner, on a schedule and on demand. It can only see what the public endpoints return, so it inherits the same limits as the browser feed.</td><td>data/snapshot.json</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/.github/workflows/refresh-data.yml" target="_blank" rel="noopener">.github/workflows/refresh-data.yml</a></td><td><span class="badge neutral">Documented</span></td></tr>
+        <tr><td><span id="F-33"></span>F-33</td><td>Limitation</td><td>Browser QA was run in jsdom (a DOM simulator without real rendering), with snapshot and mocked live data. It found and fixed runtime defects, but it is not a visual check in a real browser, and the live WebSocket path is not exercised: WebSocket subscriptions need an authenticated connection, and no key is committed.</td><td>Whole site</td><td><a href="https://docs.kalshi.com/websockets/websocket-connection" target="_blank" rel="noopener">WebSocket connection</a></td><td><span class="badge warn">Needs review</span></td></tr>
       </tbody>
     </table>
   </div>

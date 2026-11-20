@@ -43,8 +43,8 @@ const pages = walk(ROOT);
 for (const file of pages) {
   const html = readFileSync(file, "utf8");
   const rel = file.slice(ROOT.length + 1);
-  // dash/, docs/ and archive/ are independent suites / preserved trees: link-checked only.
-  const independent = rel.startsWith("archive/") || rel.startsWith("dash/") || rel.startsWith("docs/");
+  // dash/, docs/, audit/ and archive/ are independent pages / suites / preserved trees: link-checked only.
+  const independent = rel.startsWith("archive/") || rel.startsWith("dash/") || rel.startsWith("docs/") || rel.startsWith("audit/");
 
   if (!independent) {
     if (!/<title>[^<]+<\/title>/.test(html)) errors.push(`${rel}: missing <title>`);
@@ -55,7 +55,10 @@ for (const file of pages) {
     if (/\{\{[A-Z_]+/.test(html)) errors.push(`${rel}: unresolved template placeholder`);
   }
 
-  for (const m of html.matchAll(/\b(href|src)="([^"]*)"/g)) {
+  // JavaScript fragments inside inline <script> blocks contain href/src string
+  // concatenations that are not real links — strip script/style blocks first.
+  const scanText = html.replace(/<script\b[\s\S]*?<\/script>|<style\b[\s\S]*?<\/style>/gi, " ");
+  for (const m of scanText.matchAll(/\b(href|src)="([^"]*)"/g)) {
     const raw = m[2];
     if (raw === "" || raw.startsWith("mailto:") || raw.startsWith("data:") || raw.startsWith("#")) continue;
     if (raw.includes("${")) continue;

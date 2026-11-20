@@ -108,7 +108,7 @@
         <li>the Kalshi market page for that contract;</li>
         <li>the <strong>official settlement source</strong> the exchange itself names for the event — for example
         <a href="https://gasprices.aaa.com/" target="_blank" rel="noopener">AAA</a> for the gas series, the Texas Secretary of State
-        for election series, or the named news organisations for the culture series;</li>
+        for election series, as named in each series record (the Texas Secretary of State is the example the registry cites);</li>
         <li>the exact API endpoint the row was read from.</li>
       </ul>
       <p class="small muted">The Kalshi API publishes no news feed, so a link is a <em>candidate</em> source for the move, not a

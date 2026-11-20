@@ -206,6 +206,20 @@
       "url": "https://external-api.demo.kalshi.co/trade-api/v2/events",
       "confirms": "Resolved events with their market-level result (yes / no), settlement timestamp and settlement sources.",
       "verification": "Called live on 2026-11-20; stored in data/snapshot.json under topics.*.settled_events."
+    },
+    {
+      "id": "series_economics",
+      "title": "GET /series?category=Economics (first 50, no tag filter)",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&limit=50",
+      "confirms": "Economics series list used to find AAA-settled gas and diesel series outside the Oil and energy tag (flag F-17, F-18).",
+      "verification": "Called live on 2026-11-20 by session e6c3b3b6; the response is recorded in verification/2026-11-20-e6c3b3b6.md."
+    },
+    {
+      "id": "markets_diesel_open",
+      "title": "GET /markets?series_ticker=KXDIESELD&status=open",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXDIESELD&status=open&limit=5",
+      "confirms": "Open diesel markets: status field value active, zero volume and zero last price at capture (flag F-18, F-19).",
+      "verification": "Called live on 2026-11-20 by session e6c3b3b6; see verification/2026-11-20-e6c3b3b6.md."
     }
   ],
   "external": [
@@ -222,6 +236,20 @@
       "url": "https://demo.kalshi.co/",
       "confirms": "Where a trader can look the same contracts up by hand and where demo API keys are created.",
       "verification": "Linked from demo_env on 2026-11-20."
+    },
+    {
+      "id": "verification_e6c3b3b6",
+      "title": "Repo record: live re-verification V1-V9 (PR #11)",
+      "url": "https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/verification/2026-11-20-e6c3b3b6.md",
+      "confirms": "Exact URLs, responses and checks behind flags F-04, F-15, F-17 to F-20 (written by another session; reproduced here as a link).",
+      "verification": "File merged to main by PR #11."
+    },
+    {
+      "id": "verification_d5b935f4",
+      "title": "Repo record: demo-account API contracts C-1..C-8 (PR #17)",
+      "url": "https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/verification/2026-11-20-d5b935f4.md",
+      "confirms": "Verified demo Trade API contracts for the demo-account page and the trades endpoint path (GET /markets/trades?ticker=).",
+      "verification": "File merged to main by PR #17."
     }
   ]
 }

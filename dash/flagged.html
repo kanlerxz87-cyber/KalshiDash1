@@ -76,6 +76,30 @@
           <td>—</td>
           <td>No action needed for the site; noted for transparency about how verification was performed.</td>
         </tr>
+        <tr>
+          <td><strong>F-08</strong></td>
+          <td>Alert detection depends on REST polling — fast swings may be missed</td>
+          <td>The demo API has no server-side swing alerting. Alerts compare trade-by-trade prices (GET /markets/trades) at 10-second poll cadence. Swings shorter than the poll interval, or occurring between polls, may be missed or detected with a delayed magnitude. REST responses are cached and can lag the exchange by several seconds.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-trades" target="_blank" rel="noopener">Get Trades docs</a> · <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets (caching caveat)</a></td>
+          <td>— (alerts still only fire on verified ≥ $0.10 price differences actually observed).</td>
+          <td>Confirm whether a sub-10s poll or a server-side scanner (S-03) is acceptable for stricter latency.</td>
+        </tr>
+        <tr>
+          <td><strong>F-09</strong></td>
+          <td>The "high-ROI" chat filter is a transparent heuristic, not an official Kalshi model</td>
+          <td>The selective chat filters by a deterministic score computed from verified market fields: 40% liquidity (24h volume, normalized), 30% open interest (normalized), 30% opportunity (|0.5 − last price| × 2). No Kalshi model or ROI data exists in the public API, so the filter is the site's own documented heuristic.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market schema</a> · <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a></td>
+          <td>The score and its inputs are shown on every alert; it is labeled "model" only as the brief's terminology, with the formula published on the Alerts page.</td>
+          <td>Review the 40/30/30 weighting and the ROI proxy ((1−price) for YES, price for NO, scaled by liquidity); adjust weights if desired.</td>
+        </tr>
+        <tr>
+          <td><strong>F-10</strong></td>
+          <td>Automated simulated trading concentrates on the hourly demo BTC markets</td>
+          <td>The most active focus-topic markets are the demo hourly BTC series (KXDEMOFUTHOURLY-*) — they settle hourly and carry most of the observed volume. Automated strategies therefore exercise simulated positions mostly on these markets; gas/golf/culture/elections markets are thin or absent at capture.</td>
+          <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXDEMOFUTHOURLY&status=open&limit=10" target="_blank" rel="noopener">live market query</a> · <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo_env (mock prices)</a></td>
+          <td>No inference about real-market behavior is made; all P&amp;L from these simulated trades is labeled simulated.</td>
+          <td>Confirm the strategy set should keep trading the thinner topics or restrict to the most liquid markets.</td>
+        </tr>
       </tbody>
     </table>
   </div>

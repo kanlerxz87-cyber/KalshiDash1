@@ -671,97 +671,6 @@
     return st;
   }
 
-  /* ======================================================== signed requests */
-  /* Byo-key demo-account access. The private key lives in memory only: it is
-   * never written to localStorage and never sent anywhere except the Kalshi
-   * API host that the user chose. Signing scheme verified against
-   * docs.kalshi.com/getting_started/quick_start_authenticated_requests.md:
-   *   message = timestamp(ms) + METHOD + path   (path without query string)
-   *   RSA-PSS/SHA-256 (salt length = digest length) or Ed25519, base64 output. */
-  var credentials = { keyId: null, privateKey: null, keyObject: null };
-
-  function pemToDer(pem) {
-    var body = pem.replace(/-----BEGIN [^-]+-----/g, '').replace(/-----END [^-]+-----/g, '').replace(/\s+/g, '');
-    var bin = atob(body);
-    var out = new Uint8Array(bin.length);
-    for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-    return out;
-  }
-
-  /* Wrap a PKCS#1 RSAPrivateKey inside a PKCS#8 wrapper so WebCrypto can import it. */
-  function pkcs1ToPkcs8(der) {
-    var algId = [0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05, 0x00];
-    function len(n) {
-      if (n < 0x80) return [n];
-      var bytes = [];
-      var v = n;
-      while (v > 0) { bytes.unshift(v & 0xff); v >>= 8; }
-      return [0x80 | bytes.length].concat(bytes);
-    }
-    var body = [0x02, 0x01, 0x00].concat(algId, [0x04].concat(len(der.length), Array.prototype.slice.call(der)));
-    var seq = [0x30].concat(len(body.length), body);
-    return new Uint8Array(seq);
-  }
-
-  function importPrivateKey(pem) {
-    var isPkcs1 = /-----BEGIN RSA PRIVATE KEY-----/.test(pem);
-    var der = pemToDer(pem);
-    if (isPkcs1) der = pkcs1ToPkcs8(der);
-    return crypto.subtle.importKey('pkcs8', der, { name: 'Ed25519' }, false, ['sign'])
-      .catch(function () {
-        return crypto.subtle.importKey('pkcs8', der, { name: 'RSASSA-PSS', hash: 'SHA-256' }, false, ['sign']);
-      });
-  }
-
-  function b64(buf) {
-    var bytes = new Uint8Array(buf), s = '';
-    for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
-    return btoa(s);
-  }
-
-  async function signRequest(method, pathname, body) {
-    if (!credentials.keyObject) throw new Error('No API key loaded.');
-    var ts = String(Date.now());
-    var msg = ts + method.toUpperCase() + pathname;
-    var data = new TextEncoder().encode(msg);
-    var sig;
-    if (credentials.keyObject.algorithm.name === 'RSASSA-PSS') {
-      sig = await crypto.subtle.sign({ name: 'RSASSA-PSS', saltLength: 32 }, credentials.keyObject, data);
-    } else {
-      sig = await crypto.subtle.sign({ name: 'Ed25519' }, credentials.keyObject, data);
-    }
-    return {
-      'KALSHI-ACCESS-KEY': credentials.keyId,
-      'KALSHI-ACCESS-TIMESTAMP': ts,
-      'KALSHI-ACCESS-SIGNATURE': b64(sig),
-      'Content-Type': 'application/json'
-    };
-  }
-
-  async function authGet(pathname) {
-    var url = state.base + pathname;
-    var signPath = new URL(url).pathname;
-    var headers = await signRequest('GET', signPath);
-    var res = await fetch(url, { headers: headers });
-    var text = await res.text();
-    var json = null;
-    try { json = JSON.parse(text); } catch (e) { /* non-JSON error body */ }
-    if (!res.ok) throw new Error((json && json.message) ? json.message : ('HTTP ' + res.status + ' ' + text.slice(0, 200)));
-    return json;
-  }
-
-  async function authPost(pathname, payload) {
-    var url = state.base + pathname;
-    var signPath = new URL(url).pathname;
-    var headers = await signRequest('POST', signPath);
-    var res = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(payload) });
-    var text = await res.text();
-    var json = null;
-    try { json = JSON.parse(text); } catch (e) { /* non-JSON error body */ }
-    if (!res.ok) throw new Error((json && (json.message || json.code)) ? (json.message + ' ' + (json.details || '')) : ('HTTP ' + res.status + ' ' + text.slice(0, 200)));
-    return json;
-  }
-
   /* ============================================================== rendering */
   function marketRowHtml(m, opts) {
     opts = opts || {};
@@ -1409,66 +1318,6 @@
     });
   };
 
-  /* ------------------------------------------------------- demo account page */
-  pages.demo = function () {
-    var out = $('#demo-out');
-    var keyIdIn = $('#demo-key-id');
-    var pemIn = $('#demo-private-key');
-
-    function show(msg, cls) {
-      if (out) out.innerHTML = '<div class="notice ' + (cls || '') + '">' + msg + '</div>';
-    }
-
-    var loadBtn = $('#demo-load');
-    if (loadBtn) {
-      loadBtn.addEventListener('click', function () {
-        var keyId = (keyIdIn.value || '').trim();
-        var pem = (pemIn.value || '').trim();
-        if (!keyId || !pem) { show('Enter both the API key ID and the private key PEM.', 'warn'); return; }
-        show('Importing the key in this browser…');
-        importPrivateKey(pem).then(function (keyObject) {
-          credentials.keyId = keyId;
-          credentials.keyObject = keyObject;
-          pemIn.value = '';
-          show('Key imported (held in memory only — it is not stored and never leaves this browser). Fetching the demo account…', 'good');
-          return Promise.all([
-            authGet('/portfolio/balance'),
-            authGet('/portfolio/positions').catch(function () { return { market_positions: [] }; }),
-            authGet('/portfolio/fills?limit=50').catch(function () { return { fills: [] }; }),
-            authGet('/portfolio/settlements?limit=50').catch(function () { return { settlements: [] }; })
-          ]);
-        }).then(function (r) {
-          var bal = r[0], pos = r[1], fills = r[2], setts = r[3];
-          var html = '<h3>Demo account</h3><dl class="kv">' +
-            '<dt>Balance (cents)</dt><dd>' + num(bal.balance) + ' → ' + usd((bal.balance || 0) / 100) + '</dd>' +
-            '<dt>Open positions</dt><dd>' + ((pos.market_positions || []).length) + '</dd>' +
-            '<dt>Fills returned</dt><dd>' + ((fills.fills || []).length) + '</dd>' +
-            '<dt>Settlements returned</dt><dd>' + ((setts.settlements || []).length) + '</dd></dl>';
-          if ((pos.market_positions || []).length) {
-            html += '<div class="table-wrap" style="margin-top:10px"><table class="compact"><thead><tr><th>Market</th><th class="num">Position</th><th class="num">Cost basis</th><th class="num">Realized P&amp;L</th><th class="num">Total traded</th></tr></thead><tbody>' +
-              pos.market_positions.map(function (p) {
-                return '<tr><td>' + esc(p.ticker) + '</td><td class="num">' + num(p.position) + '</td><td class="num">' + cents(p.cost_basis_total) + '</td>' +
-                  '<td class="num">' + cents(p.realized_pnl) + '</td><td class="num">' + num(p.total_traded) + '</td></tr>';
-              }).join('') + '</tbody></table></div>';
-          }
-          html += '<p class="small muted" style="margin-top:10px">Source: <code>GET /portfolio/balance</code>, <code>/portfolio/positions</code>, <code>/portfolio/fills</code>, <code>/portfolio/settlements</code> on the demo host. ' +
-            'Official docs: <a href="' + CFG.docs.auth + '" target="_blank" rel="noopener">authenticated requests</a>.</p>';
-          if (out) out.innerHTML = html;
-        }).catch(function (e) {
-          show('Could not read the demo account: ' + esc(e.message) + '<br><span class="small">Check the key id, the private key and the key scopes. Docs: <a href="' + CFG.docs.auth + '" target="_blank" rel="noopener">authenticated requests</a>.</span>', 'bad');
-        });
-      });
-    }
-
-    var clearBtn = $('#demo-clear');
-    if (clearBtn) clearBtn.addEventListener('click', function () {
-      credentials = { keyId: null, privateKey: null, keyObject: null };
-      if (keyIdIn) keyIdIn.value = '';
-      if (pemIn) pemIn.value = '';
-      show('Credentials cleared from memory.', 'good');
-    });
-  };
-
   /* ----------------------------------------------------------- analysis page */
   pages.analysis = function () {
     var body = $('#analysis-body');
@@ -1569,7 +1418,7 @@
     /* expose for debugging and for the QA logic test */
     window.KD = {
       CFG: CFG, STRATEGIES: STRATEGIES, state: state, fmt: { usd: usd, cents: cents, num: num, pct: pct, esc: esc },
-      api: { get: apiGet, authGet: authGet, authPost: authPost, importPrivateKey: importPrivateKey, signRequest: signRequest, pkcs1ToPkcs8: pkcs1ToPkcs8 },
+      api: { get: apiGet },   /* no signed/browser-side key handling: keys never reach the browser (see demo-account) */
       roi: roiOf, portfolioStats: portfolioStats, settings: settings, saveSettings: saveSettings,
       getTrades: getTrades, setTrades: setTrades, getAlerts: getAlerts, setAlerts: setAlerts,
       refPrice: refPrice, detectSwing: detectSwing, emit: emit
