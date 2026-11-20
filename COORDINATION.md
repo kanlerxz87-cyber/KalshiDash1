@@ -273,7 +273,7 @@ No unique content was discarded; alternate implementations of shared pages are d
 | 6 | Simulated trade engine + portfolio + strategy analysis | done | `dash/js/store.js`, `dash/portfolio.html`, `dash/analysis.html` | Settlement/order docs; seeded rows tagged `seed` | Real demo-account sync UNVERIFIED (no credentials may be requested/stored) → F-02/S-01 |
 | 7 | Suggestions + Questions/Gaps pages | done | `dash/suggestions.html`, `dash/questions.html` | Evidence links per item | — |
 | 8 | Verification pass | done | `VERIFICATION.md`, `dash/flagged.html` | Row-group checks; headless jsdom render test of all 10 pages PASS; `node scripts/check_links.js` 0 broken | Blanks: F-02, F-05, F-06 |
-| 9 | Integration + PR + Pages check | in progress at merge time | `COORDINATION.md` | Merged `origin/main` + branches 652d8f6d / f661348d / 7d376726 (see log below) | Pages serves from repo root (legacy source, per earlier record) — suite live at `/dash/`; my Actions-deploy workflow was dropped deliberately (would clobber root site) |
+| 9 | Integration + PR + Pages check | done (post-merge record below) | `COORDINATION.md` | Merged `origin/main` + branches 652d8f6d / f661348d / 7d376726 (see log below) | Pages serves from repo root (legacy source, per earlier record) — suite live at `/dash/`; my Actions-deploy workflow was dropped deliberately (would clobber root site) |
 
 ## Log
 
@@ -292,6 +292,13 @@ No unique content was discarded; alternate implementations of shared pages are d
 ## Sources / verification summary (this session)
 
 See `SOURCES.md` (D1–D16 official docs rows; A1–A18 live demo-API captures) and `VERIFICATION.md` (row-group checks, headless render test, link check). Irregularities F-01…F-07 are on `dash/flagged.html` with source links; blanks were left blank, never inferred.
+
+## PR & merge record (task 9)
+
+- PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/9 (`arena/cdfe52bd-kalshidash1` → `main`)
+- Merge: `gh pr merge 9 --merge` (executed immediately after checks passed, per brief — no approval awaited)
+- Merge result + GitHub Pages confirmation: recorded in the follow-up board update committed post-merge on this branch (PR #10), because the merge commit SHA only exists after the merge.
+- Note on tooling: `git pull --rebase` was attempted before pushing but aborted — this branch contains merge commits (integration of `main` + three session branches), and rebasing would have re-applied other sessions' commits out of context. State was verified clean/consistent (`git diff HEAD origin/<branch>` empty) and pushed as a fast-forward instead.
 
 ## PR & merge results (final integration) — session arena-f661348d (preserved verbatim)
 - Pull request: #3 https://github.com/kanlerxz87-cyber/KalshiDash1/pull/3
