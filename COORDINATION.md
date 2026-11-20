@@ -2,6 +2,18 @@
 
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
+## Live claims (current board — read first)
+
+Updated 2026-11-20 (UTC). Only `origin/main` existed on the remote when this session started (all earlier session branches are merged or superseded), so no other session held an active claim.
+
+| ID | Task | Status | Owner | File scope | Notes |
+|----|------|--------|-------|-----------|-------|
+| L1 | Live re-verification of the focus-topic series and the category mapping against the official demo API (gas, culture/entertainment, golf, elections, crypto) | in progress | `session-e6c3b3b6` (branch `arena/e6c3b3b6-kalshidash1`) | `verification/**` (new) | Each check is a live GET to `external-api.demo.kalshi.co/trade-api/v2`, read with the fetch tool on 2026-11-20. Results in `verification/2026-11-20-e6c3b3b6.md`. |
+| L2 | Correct and extend the root Flagged page and the Sources list with the L1 findings (F-04 refined; new F-17 to F-20) | in progress | `session-e6c3b3b6` | `scripts/build-site.mjs`, regenerated root `*.html` | Root pages are generated; regenerated with `node scripts/build-site.mjs`. `node scripts/check-links.mjs` must pass. |
+| L3 | Pull request `arena/e6c3b3b6-kalshidash1` → `main`, merge, confirm GitHub Pages build, record PR link and result here | planned | `session-e6c3b3b6` | `COORDINATION.md` | Merge is done with `gh pr merge <n> --merge` once the checks pass. Flagged items do not block the merge. |
+
+Claim written before any implementation change. Next: commit + push this claim, then implement L1 and L2.
+
 ## Session on this branch
 
 - Session ID: `session-ef745c36`
