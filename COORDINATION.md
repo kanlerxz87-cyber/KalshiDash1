@@ -20,12 +20,12 @@
 
 | ID | Task | Status | Owner | Files touched (only these) |
 |---|---|---|---|---|
-| R1 | **Repair the failing `Refresh demo data snapshot` job** (the old push used detached `HEAD`; feature-branch workflow write-back attempts also failed despite explicit branch targeting and retries). | **in progress — write-back restricted to `main`; validate by running the refreshed workflows on `main` after merge** | session-dd012e26 | `.github/workflows/refresh-data.yml`, `.github/workflows/live-alerts.yml` |
+| R1 | **Repair the failing `Refresh demo data snapshot` job** (the old push used detached `HEAD`; branch write-back failed even after explicit target/retry handling). | **needs review — feature branches now validate without write-back, but post-merge `main` runs 44802297690 / 44802297778 still failed in commit/write-back; exact Actions log text could not be retrieved in this sandbox** | session-dd012e26 | `.github/workflows/refresh-data.yml`, `.github/workflows/live-alerts.yml` |
 | R2 | **Fix duplicate flag IDs on the Flagged for Review page.** `F-27`…`F-31` each appear twice (the alert-engine set from session-cb49437b was appended after the integration set, out of numeric order). The alert-engine set is renumbered `F-49`…`F-53` (the later-arriving upstream settlement audit already owns F-34…F-38), and every in-repo reference to the alert-engine IDs is updated. | **done** | session-dd012e26 | `templates/flagged.tpl`, `flagged.html` (generated), `docs/ALERTS.md`, `alerts/index.html`, `alerts/js/alerts-page.js` |
 | R3 | **Complete the navigation consolidation** left half-finished by session-7d6d2fcb: `dash/index.html`, `dash/api.html`, `dash/executive-summary.html`, `dash/market.html` were unreachable from the landing page. One canonical nav now reaches every published page, the live alert console is a first-class nav entry, and the two earlier suites are labelled as supplementary rather than left as orphans. | **done** | session-dd012e26 | `scripts/build-site.mjs`, `templates/*.tpl` (nav/footer text only), regenerated root pages |
 | R4 | **Record the new irregularities found in the line-by-line review** (duplicate flag IDs; the failing refresh job; the scheduled-workflow gap; the `package.json`/`package-lock.json` dependency mismatch) on the site's Flagged for Review page with sources, per the brief. | **done** | session-dd012e26 | `templates/flagged.tpl`, `flagged.html` (generated) |
 | R5 | **Re-verify the combined tree line by line** against official sources and record it. | **done** — integration changes, tested outputs, and the previously fetched official docs/API comparison are recorded; older archived rows are not claimed as newly re-fetched | session-dd012e26 | `verification/2026-11-20-dd012e26.md` (new), `VERIFICATION.md`, `COORDINATION.md` |
-| R6 | **PR to `main`, merge, confirm the Pages deploy**, record the result. | **in progress** | session-dd012e26 | `COORDINATION.md` (this section only) |
+| R6 | **PR to `main`, merge, confirm the Pages deploy**, record the result. | **done — PR #32 and PR #37 merged; Pages API reports `built` for #37 merge commit** | session-dd012e26 | `COORDINATION.md` (this section only) |
 
 ### Verification performed (session-dd012e26, 2026-11-20 UTC)
 
@@ -41,7 +41,7 @@ See `verification/2026-11-20-dd012e26.md` for the exact scope, methods and evide
 ### Irregularities found in this session's review (published on `flagged.html`)
 
 - **F-49–F-53** — alert-engine entries had reused F-27–F-31 IDs; rows are now unique and references were updated. The intervening F-34–F-38 IDs were added on `main` by the concurrently merged settlement-source audit and were preserved. The alert-engine meanings are: F-49 data coherence, F-50 Culture tag taxonomy inconsistency, F-51 browser CORS limitation, F-52 Culture topic category correction, F-53 heuristic ROI model.
-- **F-44–F-48** — this integration's new findings: refresh push failure (retry-loop repair pending Actions confirmation), no recorded scheduled runs, stale lockfile metadata, duplicate IDs fixed, and formerly unreachable supplementary pages now linked.
+- **F-44–F-48** — this integration's new findings: refresh push failure remains unresolved after the post-merge `main` runs failed in the write-back steps; no recorded scheduled runs; stale lockfile metadata; duplicate IDs fixed; and formerly unreachable supplementary pages now linked.
 - **F-39** — refresh-data push step failed in run `44752211268`: it constructed a push target from detached `HEAD` and did not rebase against concurrent updates. Workflow repaired; future run is needed to confirm the live fix.
 - **F-40** — repository Actions API reported zero schedule-triggered runs despite declared cron schedules.
 - **F-41** — stale `package-lock.json` package records/root name do not match `package.json`; `npm ci` still passes. Left unchanged, flagged.
@@ -50,7 +50,11 @@ See `verification/2026-11-20-dd012e26.md` for the exact scope, methods and evide
 
 ### PR & merge record (R6)
 
-- *To be completed when the PR is opened and merged. No PR, merge or deploy result is claimed yet.*
+- Main integration PR #32: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/32 — merged with merge commit `2b9050c28feffb318a51905dd26cf75a8116395a` at 2026-11-20T19:27:27Z. `Site build check`, `site-qa`, `alerts-qa`, `suite-qa`, and the feature-branch refresh validation all passed before merge.
+- Post-deploy correction PR #37: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/37 — corrected F-52's link to F-50 after the deployed page was inspected; merged with commit `82f5f0ba4e7c729707f15666b7bf3802ba2db1e7` at 2026-11-20T19:29:09Z. All four PR checks passed.
+- GitHub Pages: `pages-build-deployment` run 44802145793 succeeded for PR #32; after PR #37, the Pages API reported `built`, `error: null`, at merge commit `82f5f0ba4e7c729707f15666b7bf3802ba2db1e7` (2026-11-20T19:29:39Z). The public landing page and Flagged for Review page were fetched. The final deployed F-52 row now points to F-50.
+- Follow-up workflow result: on `main`, `Refresh demo data snapshot` run 44802297690 and `live-alerts` run 44802297778 failed at their commit/write-back step, although capture, regeneration, links, API sample and feed validation passed. Raw GitHub Actions logs could not be downloaded from this sandbox, so exact command errors are unverified. This remains F-44 and is **not claimed as fixed**; feature-branch workflow runs now skip write-back intentionally. Site build/tests/deploy themselves passed.
+
 
 ---
 
