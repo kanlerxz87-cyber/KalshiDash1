@@ -172,6 +172,29 @@
           <td>data/snapshot.json</td>
           <td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/.github/workflows/refresh-data.yml" target="_blank" rel="noopener">.github/workflows/refresh-data.yml</a></td>
           <td><span class="badge neutral">documented</span></td></tr>
+        <tr><td><strong>F-21</strong></td><td>Limitation</td>
+          <td>The Kalshi API exposes no news or event feed. The site cannot identify what caused a sharp contract move, so it
+          does not guess a cause. The only links it shows next to a move are the series' published settlement sources and
+          contract URLs, when the API returns them, and those are not a cause.</td>
+          <td>Live alert chats (both)</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a> (<code>settlement_sources</code>, <code>contract_url</code>)</td>
+          <td><span class="badge warn">needs review</span></td></tr>
+        <tr><td><strong>F-22</strong></td><td>Repo irregularity</td>
+          <td>Three repository-level issues were found and fixed during integration. (a) <code>tools/linkcheck.py</code> scanned
+          <code>templates/*.html</code> as published pages, so templates were renamed to <code>*.tpl</code>. (b) <code>dash/</code> and
+          <code>docs/</code> were moved under <code>archive/</code> and then restored in place, because <code>suite-qa.yml</code> and
+          <code>site-qa.yml</code> still reference them. (c) The site's series queries sent <code>limit=100</code>, which the Get Series
+          List schema does not document; the parameter was removed.</td>
+          <td>Whole tree</td>
+          <td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/tools/linkcheck.py" target="_blank" rel="noopener">tools/linkcheck.py</a>, <a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a></td>
+          <td><span class="badge neutral">fixed</span></td></tr>
+        <tr><td><strong>F-23</strong></td><td>Limitation</td>
+          <td>Browser QA was run in jsdom (a DOM simulator without real rendering), with mocked and snapshot data. It found and
+          fixed runtime defects, but it is not a visual check in a real browser, and the live WebSocket path is not exercised
+          (WebSocket subscriptions need an authenticated connection, and no key is committed).</td>
+          <td>Whole site</td>
+          <td><a href="https://docs.kalshi.com/websockets/websocket-connection" target="_blank" rel="noopener">WebSocket connection</a></td>
+          <td><span class="badge warn">needs review</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -191,7 +214,7 @@
           <td><span class="badge neutral">recorded</span> — the full history of claims and merges is in
           <a href="COORDINATION.md">COORDINATION.md</a>.</td></tr>
         <tr><td>F-16 (prior)</td><td>Overlapping site pages built by different sessions; prior versions kept under archive/.</td>
-          <td><span class="badge neutral">recorded</span> — see F-17 above; the archive is unchanged and still linked from the repository root.</td></tr>
+          <td><span class="badge neutral">recorded</span> — see F-17 above. The earlier root-site files are kept verbatim in <code>archive/legacy-root/</code>; the older <code>archive/</code> trees are unchanged.</td></tr>
         <tr><td>F-14 (prior)</td><td>GitHub Pages settings could not be changed by the automation token.</td>
           <td><span class="badge neutral">still open</span> — see F-18.</td></tr>
       </tbody>

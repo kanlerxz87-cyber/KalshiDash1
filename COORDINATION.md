@@ -72,21 +72,32 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review` (published 
 
 | ID | Task | Status | Owner | Files touched | Sources | Irregularities |
 |---|---|---|---|---|---|---|
-| I1 | Repo review, line by line (all files, all branches, all prior records) | in progress | session-7d6d2fcb | whole repo (read) | `git log`, `gh api`, repo tree | see REVIEW.md |
-| I2 | Consolidate the three overlapping site trees into one canonical site at the repo root; preserve the others under `archive/` | in progress | session-7d6d2fcb | site generator, root pages, `archive/` | — | F-20 (prior sessions shipped 3 parallel site trees) |
-| I3 | Live alert engine: two scrolling chats (all events + high-ROI model filter), swing threshold ≥ $0.10 | unclaimed | session-7d6d2fcb | `assets/app.js`, `dashboard.html` | get-market, orderbook | F-21 (no news feed in the Kalshi API) |
-| I4 | Market page: price chart (seconds → days), orderbook ladder (contracts available at each price) | unclaimed | session-7d6d2fcb | `market.html`, `assets/chart.js` | candlesticks, orderbook | — |
-| I5 | Resolution tracking (live → determined → finalized; result yes/no) | unclaimed | session-7d6d2fcb | `markets.html`, `categories/*.html` | get-events, market settlement | — |
-| I6 | Simulated trades + strategy engine + portfolio P&L + trade categorisation | unclaimed | session-7d6d2fcb | `portfolio.html`, `analysis.html`, `strategies.html` | market settlement, create-order (V2) | F-07 (no demo key → simulated only) |
-| I7 | Live data refresh: GitHub Actions job that re-captures the snapshot from the official demo API | unclaimed | session-7d6d2fcb | `scripts/fetch-snapshot.mjs`, `.github/workflows/refresh-data.yml` | demo API | — |
-| I8 | Sources page with a source link on every table row; Flagged for Review page | unclaimed | session-7d6d2fcb | `sources.html`, `flagged.html`, `data/sources.json` | docs.kalshi.com | — |
-| I9 | Line-by-line re-verification of combined data; link check; build check | unclaimed | session-7d6d2fcb | `scripts/check-links.mjs`, `VERIFICATION.md` | — | — |
-| I10 | PR to `main`, merge, confirm Pages deploy, record PR + merge result | unclaimed | session-7d6d2fcb | `COORDINATION.md`, `README.md` | `gh pr`, `gh api .../pages/builds/latest` | — |
+| I1 | Repo review, line by line (all files, all branches, all prior records) | done | session-7d6d2fcb | whole repo (read) | `git log`, `gh api`, repo tree; official pages listed on the Sources page | F-20, F-21, and the flagged list on the Flagged for Review page |
+| I2 | Consolidate the overlapping site trees into one canonical site at the repo root; preserve the others under `archive/` | done | session-7d6d2fcb | `scripts/build-site.mjs`, `templates/*.tpl`, root pages, `archive/legacy-root/`, `archive/` | — | F-20 (prior sessions shipped 3 parallel site trees). `dash/` and `docs/` were moved to `archive/` and then restored in place because existing QA workflows (`suite-qa.yml`, `site-qa.yml`) and other sessions reference them; they remain independent suites. |
+| I3 | Live alert engine: two scrolling chats (all events + high-ROI model filter), swing threshold ≥ $0.10 | done | session-7d6d2fcb | `assets/app.js`, `templates/dashboard.tpl` | get-market, orderbook | F-21 (no news feed in the Kalshi API; news links only where a source is published) |
+| I4 | Market page: price chart (30 s → 24 h windows), orderbook ladder (contracts available at each price) | done | session-7d6d2fcb | `templates/market.tpl`, `assets/chart.js`, `assets/app.js` | candlesticks, orderbook | — |
+| I5 | Resolution tracking (live → determined → finalized; result yes/no) | done | session-7d6d2fcb | `templates/markets.tpl`, `categories/*.html`, `scripts/build-site.mjs` | get-events (settled), market settlement | — |
+| I6 | Simulated trades + strategy engine + portfolio P&L + trade categorisation | done (simulated only) | session-7d6d2fcb | `templates/portfolio.tpl`, `templates/analysis.tpl`, `templates/strategies.tpl`, `templates/demo-account.tpl` | market settlement, create-order (V2) | F-07 (no demo key in the repo → no real demo order placed; the site has no order button) |
+| I7 | Live data refresh: GitHub Actions job that re-captures the snapshot from the official demo API | done | session-7d6d2fcb | `scripts/fetch-snapshot.mjs`, `.github/workflows/refresh-data.yml` | demo API | — |
+| I8 | Sources page with a source link on every table row; Flagged for Review page | done | session-7d6d2fcb | `templates/sources.tpl`, `templates/flagged.tpl`, `data/sources.json` | docs.kalshi.com | — |
+| I9 | Line-by-line re-verification of combined data; link check; build check | done | session-7d6d2fcb | `scripts/check-links.mjs`, `scripts/build-site.mjs`, `templates/*.tpl` | — | F-22 (the whole-tree checker scanned `templates/*.html`; templates renamed to `.tpl`) |
+| I10 | PR to `main`, merge, confirm Pages deploy, record PR + merge result | in progress | session-7d6d2fcb | `COORDINATION.md` | `gh pr`, `gh api .../pages/builds/latest` | — |
 
 Rules honoured by this session: only files in the scope above are edited; no other session's file is
 modified; every claim is committed and pushed immediately; `git pull --rebase` is run before every push;
 no value is inferred — anything not confirmable from an official source is left blank and published on
 the Flagged for Review page.
+
+## Verification & completion log (session-7d6d2fcb, final integration, 2026-11-20)
+
+- **Snapshot:** refreshed by GitHub Actions `refresh-data.yml` from the official demo API (`external-api.demo.kalshi.co`); latest refresh commit on the branch is `fc3e913` (captured 2026-11-20T13:34:40Z, 3,386 markets captured overall, 200 tracked rows). Candles are now populated (series-scoped `/candlesticks`). The sandbox itself cannot reach Kalshi (TLS negotiation fails), so every capture happens on GitHub runners.
+- **Generator:** `node scripts/build-site.mjs` regenerates 20 pages; `node scripts/build-site.mjs --check` passes (committed site matches templates + data).
+- **Links:** `node scripts/check-links.mjs` → 0 broken internal links (83 pages; 280 external links listed, not fetched). `python3 tools/linkcheck.py` → 0 broken internal links on the whole tree (83 pages scanned, 4,997 internal links).
+- **Syntax:** `node --check` on `assets/app.js`, `assets/chart.js`, `scripts/*.mjs`; `node tools/qa_logic_test.mjs` → all checks passed.
+- **Runtime QA (jsdom, not a real browser):** every generated page loaded with the real `assets/app.js` + `assets/chart.js` in snapshot mode (no errors) and in a mocked-live mode where the demo host answers from the snapshot (index, dashboard, markets, both category kinds, market detail, analysis, strategies, portfolio, culture — no errors). Defects found and fixed: double page initialisation, a TypeError in the clock, `#x tbody` selectors that never matched, a missing nav-active hook, a typo in a stat label, no-canvas fallback, and an undocumented `limit` on series queries.
+- **Not verified:** a real-browser (Chromium) visual pass and the live Kalshi WebSocket path (WebSocket subscriptions require authentication; no key is committed).
+- **Sources:** every official URL used is in `data/sources.json` and on the Sources page.
+- **Irregularities:** all published on the Flagged for Review page (`flagged.html`, generated from `templates/flagged.tpl`).
 
 ## Verification performed (session-ef745c36, 2026-11-20)
 
