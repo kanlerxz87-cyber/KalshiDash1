@@ -76,4 +76,9 @@ jobs:
         run: |
           echo "The engine did not complete. Log tail:"
           tail -40 /tmp/engine.log
+          # Surface the cause as annotations, because the raw job log is not always
+          # downloadable; annotations are always readable through the API.
+          tail -12 /tmp/engine.log | while IFS= read -r line; do
+            echo "::error::engine: $line"
+          done
           exit 1
