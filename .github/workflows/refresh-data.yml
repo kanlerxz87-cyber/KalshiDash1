@@ -34,6 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -61,6 +63,8 @@ jobs:
         # commit is rebased onto the remote branch first.
         run: |
           set -euo pipefail
+          echo "Preparing snapshot push: event=$GITHUB_EVENT_NAME ref=$GITHUB_REF target=$TARGET_BRANCH"
+          git status --short
           git config user.name  'kalshidash-bot'
           git config user.email 'kalshidash-bot@users.noreply.github.com'
           git add data/snapshot.json
@@ -73,8 +77,8 @@ jobs:
             # between our rebase and push. Failed pushes are retried only after a
             # fresh rebase; other errors fail after the bounded retry count.
             for attempt in 1 2 3 4 5; do
-              git fetch origin "$TARGET_BRANCH"
-              git rebase "origin/$TARGET_BRANCH"
+              git fetch origin "refs/heads/$TARGET_BRANCH:refs/remotes/origin/$TARGET_BRANCH"
+              git rebase "refs/remotes/origin/$TARGET_BRANCH"
               if git push origin "HEAD:$TARGET_BRANCH"; then
                 echo "Pushed the refreshed snapshot to origin/$TARGET_BRANCH on attempt $attempt."
                 exit 0
