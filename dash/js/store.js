@@ -22,7 +22,10 @@
     { id: 'momentum', label: 'Momentum', desc: 'Enter in the direction of recent price movement; exit on reversal or time stop.' },
     { id: 'mean-reversion', label: 'Mean reversion', desc: 'Fade extreme prices near 0 or 1 when liquidity is thin and the event is not resolved.' },
     { id: 'liquidity-provision', label: 'Liquidity provision', desc: 'Rest bids/asks inside the spread to earn the spread; inventory risk is the cost.' },
-    { id: 'event-catalyst', label: 'Event catalyst', desc: 'Position ahead of a scheduled data release or event (e.g. AAA gas price publish, election certification).' }
+    { id: 'event-catalyst', label: 'Event catalyst', desc: 'Position ahead of a scheduled data release or event (e.g. AAA gas price publish, election certification).' },
+    /* added additively by session arena-f89b55f7 — automated strategies driven by the ≥$0.10 swing engine on alerts.html */
+    { id: 'momentum-10c', label: 'Momentum ≥ $0.10 (auto)', desc: 'Automated (alerts.html): when a market the model likes (score ≥ 70) jumps ≥ $0.10 with an executable quote, enter on that side at the quote; exit at ±$0.10 or a 15-minute time stop. Simulated only.' },
+    { id: 'fade-jump', label: 'Fade ≥ $0.10 jump (auto)', desc: 'Automated (alerts.html): when a ≥ $0.10 jump hits a market the model does NOT like, take the opposite side at the current quote; exit at ±$0.10 or a 15-minute time stop. Simulated only.' }
   ];
 
   function seedTrades() {

@@ -64,8 +64,9 @@
   <h2>Live alerting</h2>
   <p class="sub">The <a href="alerts.html">Live Alerts</a> page runs two scrolling chats that post whenever a watched
   contract price swings <strong>≥ $0.10 in either direction</strong>: an all-events feed and a selective high-ROI
-  model filter. Alerts are generated from verified trade-by-trade prices (<a href="https://docs.kalshi.com/api-reference/market/get-trades" target="_blank" rel="noopener">Get Trades</a>)
-  at 10-second cadence; each entry links its API source and the settlement-source websites that may have caused the jump.</p>
+  model filter. Each 15-second cycle makes one batched quote request (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets <code>tickers</code></a>)
+  and walks the most recent trade-by-trade prices of the highest-dollar tracked markets (<a href="https://docs.kalshi.com/api-reference/market/get-trades" target="_blank" rel="noopener">Get Trades</a>),
+  so alert rows carry exact trade timestamps; each entry links its API source and the settlement-source websites that may have caused the jump.</p>
 
   <h2>Focus topics at a glance</h2>
   <div class="table-wrap">
@@ -108,7 +109,7 @@
         <li><a href="events.html">Live Events</a> — pick a topic tab, sort by dollar volume, follow each market to resolution (yes/no).</li>
         <li><a href="alerts.html">Live Alerts</a> — two scrolling chats: every ≥ $0.10 price swing in either direction, plus a selective high-ROI model filter, each with source and catalyst links.</li>
         <li><a href="market.html">Market Detail</a> — price chart (seconds/minutes/hours windows), full orderbook ladder (contracts available at each price), rules and settlement sources.</li>
-        <li><a href="autotrade.html">Automated Trading</a> — run simulated trades automatically across five strategies against live prices; decisions and stats are logged.</li>
+        <li><a href="autotrade.html">Automated Trading</a> — run simulated trades automatically across five strategies against live prices; decisions and stats are logged. The Live Alerts page additionally auto-trades its momentum-10c / fade-jump strategies.</li>
         <li><a href="portfolio.html">Portfolio</a> — all simulated trades (manual + automated); P&amp;L, win rate, exposure and equity curve.</li>
         <li><a href="analysis.html">Trade Analysis</a> — categorize trades by topic and strategy; compare performance; strategy definitions.</li>
       </ol>

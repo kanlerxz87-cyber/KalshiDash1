@@ -43,5 +43,14 @@ jobs:
       - name: API-client logic tests (mocked, documented response shapes)
         run: node tools/qa_logic_test.mjs
 
+      # session arena-f89b55f7: alert-engine + Live Alerts page tests
+      - name: Alert-engine logic tests (swing detection, ROI model, strategies)
+        run: node tools/alerts-qa.mjs
+
+      - name: Live Alerts page render test (jsdom, mocked API transport)
+        run: |
+          npm install --no-save --silent jsdom@24.1.3
+          node tools/alerts-render-test.mjs
+
       - name: Python tool syntax
         run: python -m py_compile tools/*.py
