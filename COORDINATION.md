@@ -297,7 +297,9 @@ See `SOURCES.md` (D1–D16 official docs rows; A1–A18 live demo-API captures) 
 
 - PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/9 (`arena/cdfe52bd-kalshidash1` → `main`)
 - Merge: `gh pr merge 9 --merge` (executed immediately after checks passed, per brief — no approval awaited)
-- Merge result + GitHub Pages confirmation: recorded in the follow-up board update committed post-merge on this branch (PR #10), because the merge commit SHA only exists after the merge.
+- **Merge result:** merged successfully; merge commit `78b50de6fbeb0a6ef570350170e6bf3deb3f70bf` on `main` (2026-11-20T11:49Z). CI on the PR: all 3 workflows green (`build` = Site build check; `qa` = site-qa; `qa` = suite-qa).
+- **GitHub Pages:** build status `built`, no error, for the merge commit (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest`, 2026-11-20T11:49:56Z). Live checks: root site https://kanlerxz87-cyber.github.io/KalshiDash1/ serves; the suite is live at **https://kanlerxz87-cyber.github.io/KalshiDash1/dash/index.html** (rendered dashboard + tables verified via live fetch; `dash/flagged.html` verified live with all F-01…F-07 rows).
+- This post-merge record lands on `main` via the follow-up PR (#10), since the merge commit SHA only exists after the merge.
 - Note on tooling: `git pull --rebase` was attempted before pushing but aborted — this branch contains merge commits (integration of `main` + three session branches), and rebasing would have re-applied other sessions' commits out of context. State was verified clean/consistent (`git diff HEAD origin/<branch>` empty) and pushed as a fast-forward instead.
 
 ## PR & merge results (final integration) — session arena-f661348d (preserved verbatim)
