@@ -34,7 +34,76 @@ Shared-file policy: no file owned by another session is edited. New pages follow
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review` (published on the Flagged page; does not block).
 
-## Session on this branch (previous — session-ef745c36, preserved)
+## Prior session records (preserved verbatim — sessions bf16f2dd, e6c3b3b6, ef745c36 and earlier)
+
+## Claims — session bf16f2dd (branch `arena/bf16f2dd-kalshidash1`, base `8f80f34`)
+
+Branch note: Arena fixes this session's branch name as `arena/bf16f2dd-kalshidash1`; the `session-<id>/<task>` naming in the brief is not used here. Work stays on this branch only.
+
+Overlap check (read from `origin` on 2026-11-20 before claiming): already claimed by others and therefore NOT claimed here — repo review I1 and consolidation I2 (`7d6d2fcb`), alert engine (`cb49437b`, `815b546d`), market/resolution/portfolio pages I4–I6 (`7d6d2fcb`), live re-verification and flagged refresh L1–L3 (`e6c3b3b6`), final PR/merge (`7d6d2fcb` I10).
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| R1 | Repo hygiene: `tools/__pycache__/*.pyc` are tracked in git; untrack them and add `__pycache__/` and `*.pyc` to `.gitignore` | done | session-bf16f2dd | `.gitignore`, `tools/__pycache__/*.pyc` (untrack only) |
+| R2 | Verified-facts page `audit/index.html` (not linked from the shared nav): each official fact checked against docs.kalshi.com or the live demo API, with the captured value, plus irregularities found in the repo | done | session-bf16f2dd | `audit/index.html` (new) |
+| R3 | Record this session's sources, verification, irregularities and PR/merge result in this section | done (PR/merge result below) | session-bf16f2dd | `COORDINATION.md` (this section only) |
+
+Not in scope for this session: data tables, shared index/navigation, the dashboard, alerts, portfolio and trading. Those belong to the claimed sessions above or require demo API credentials this session does not have.
+
+
+### Record — session bf16f2dd (2026-11-20)
+
+- **Sources read (official):** [Demo environment](https://docs.kalshi.com/getting_started/demo_env) · [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets) · [Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) · [WebSocket connection](https://docs.kalshi.com/websockets/websocket-connection) · [Rate limits and tiers](https://docs.kalshi.com/getting_started/rate_limits). Live demo API (fetched 2026-11-20): [exchange/status](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status) · [settled KXAAAGASM events](https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=settled&with_nested_markets=true) · [search/tags_by_categories](https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories).
+- **Verification:** 16 facts checked line by line; 10 verified, 2 partial, 4 unverified or not in the API (V1–V16 in `audit/index.html`). Every row has a source link. Unconfirmed values were left blank or flagged, not filled in.
+- **Checks run:** `python3 tools/linkcheck.py` (no broken internal links), `node scripts/check-links.mjs` (no broken internal links), `node scripts/build-site.mjs` (no diff in generated files), HTML tag balance check on `audit/index.html`.
+- **Irregularities (R-01…R-10, on the page):** tracked `.pyc` files and missing ignore rules (fixed on this branch); README says no market data is committed while `dash/data/snapshot.json` is committed (open, dash owner); three overlapping site trees (`7d6d2fcb` I2); three link checkers; pages.yml staleness gate covers only root paths; notional-value wording not confirmed (V9); stale top section of this board; F-14/F-16 ordering; CORS not browser-tested (F-01).
+- **Blocked, not done:** portfolio, trades and live WebSocket alerts need a demo API key (WebSocket auth verified, V11). The sandbox cannot reach Kalshi hosts with `curl`; live values were read with the fetch tool.
+- **Not changed (shared outputs):** site index, navigation, data tables and the root Flagged page. Those stay with the final integration session. `audit/index.html` is reachable by URL and is not in the nav.
+- **PR and merge (session bf16f2dd):** [PR #12](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/12) `arena/bf16f2dd-kalshidash1` → `main`, merged with `gh pr merge 12 --merge` at 2026-11-20T13:24:09Z, merge commit `ca3fbd80192625b5dbbe7e8d7d0567ad36b80410`. CI on the PR head: build, qa, qa all pass. Pages: build `ca3fbd8` status `built`, no error (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest`). Live check: https://kanlerxz87-cyber.github.io/KalshiDash1/audit/index.html renders the Flagged for Review page. Note: PR #13 (`e6c3b3b6`) merged on top at `3db2a2e`, and Pages built that too, with no error.
+- **Conflict log:** PR #12 conflicted with `main` in `COORDINATION.md` only (both sessions appended sections). Resolved by keeping both sections verbatim. No other session's file was edited.
+
+## Live claims (current board — read first)
+
+Updated 2026-11-20 (UTC). Only `origin/main` existed on the remote when this session started (all earlier session branches are merged or superseded), so no other session held an active claim.
+
+| ID | Task | Status | Owner | File scope | Notes |
+|----|------|--------|-------|-----------|-------|
+| L1 | Live re-verification of the focus-topic series and the category mapping against the official demo API (gas, culture/entertainment, golf, elections, crypto) | done (gas, culture, category map, diesel; golf, elections, crypto not re-fetched, see record) | `session-e6c3b3b6` (branch `arena/e6c3b3b6-kalshidash1`) | `verification/**` (new) | Each check is a live GET to `external-api.demo.kalshi.co/trade-api/v2`, read with the fetch tool on 2026-11-20. Results in `verification/2026-11-20-e6c3b3b6.md`. |
+| L2 | Correct and extend the root Flagged page and the Sources list with the L1 findings (F-04 refined; new F-17 to F-20; SRC-25 to SRC-30) | done | `session-e6c3b3b6` | `scripts/build-site.mjs`, regenerated root `*.html` | Root pages are generated; regenerated with `node scripts/build-site.mjs`. `node scripts/check-links.mjs` must pass. |
+| L3 | Pull request `arena/e6c3b3b6-kalshidash1` → `main`, merge, confirm GitHub Pages build, record PR link and result here | done (PR #11 merged, merge commit `0650abd`) | `session-e6c3b3b6` | `COORDINATION.md` | Merge is done with `gh pr merge <n> --merge` once the checks pass. Flagged items do not block the merge. |
+
+Claim written before any implementation change (commit `7b46a2f`).
+
+### Session e6c3b3b6 — results (2026-11-20, UTC)
+
+**Sources (official, read this session):** demo environment https://docs.kalshi.com/getting_started/demo_env ; Get Series List https://docs.kalshi.com/api-reference/market/get-series-list.md ; Get Markets https://docs.kalshi.com/api-reference/market/get-markets ; tags for series categories https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories.md ; live demo API GETs listed as V1–V9 in `verification/2026-11-20-e6c3b3b6.md`.
+
+**Verification performed:** nine live GETs to `external-api.demo.kalshi.co/trade-api/v2` (exchange status, category→tag map, `category=Culture`, `category=Entertainment`, `Economics` + `Oil and energy`, `Economics` first 50, three open-market queries). Each row of the verification table lists its exact URL. The build sandbox cannot reach `kalshi.co`, so these were read with the fetch tool. Nothing was inferred.
+
+**Findings (flagged, not blocking):**
+- F-04 refined: the official tag map has no `Culture` key, but `series?category=Culture` returns two series with `category: "Culture"`. The earlier statement "Kalshi has no category named Culture" is contradicted by the live series data.
+- F-15 confirmed again: AAA gas series exist in the demo (for example `KXAAAGASDOK`, `KXAAAGASMINTX`).
+- F-17 (new): the gas filter (tag `Oil & Gas` + prefix `KXAAAGAS`) misses AAA-settled `AAAGASMAX` (tag `Oil and energy` only).
+- F-18 (new): diesel series are AAA-settled but are not gasoline. Open `KXDIESELD` markets had zero volume and zero last price.
+- F-19 (new, observation): `status=open` returned markets whose `status` field reads `active`. Consistent with the F-03 enum.
+- F-20 (new): the `dash/` suite's gas matcher also matches `KXSPRMIN` (Strategic Petroleum Reserve) and natural-gas production (`KXPAGAS`). It is not changed in this session; the fix belongs in `dash/js/config.js`.
+
+**Not re-verified this session:** golf, elections and crypto series lists. The earlier snapshot (`dash/data/snapshot.json`, 2026-11-20T11:10Z) is still the only record for them.
+
+**Checks run before commit:** `node scripts/build-site.mjs` (regenerates without diff, so the Pages staleness gate passes), `node scripts/check-links.mjs` (63 pages, no broken internal links), `python3 tools/linkcheck.py` (no broken internal links), `node tools/qa_logic_test.mjs` (all checks passed), `node --check assets/app.js`.
+
+**Handoff / conflict log:** none. No other session branch exists on `origin` (only `main` at `8f80f34` before this session). No merge conflicts.
+
+### Session e6c3b3b6 — PR and merge record (L3)
+
+- PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/11 (`arena/e6c3b3b6-kalshidash1` → `main`).
+- CI on the PR before merge: `build` pass, `qa` pass (site-qa), `qa` pass (suite-qa). Merge state `CLEAN`.
+- Merge: `gh pr merge 11 --merge`, merged 2026-11-20T13:22:04Z, merge commit `0650abd2d4fc1063750d2e71c74c5f39d05ecadb`.
+- GitHub Pages: build for `0650abd` status `built`, no error (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest`, created 2026-11-20T13:22:05Z, updated 13:22:25Z). Live check: https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html shows F-04 (refined) and F-17 to F-20.
+- Follow-up (cosmetic): the new flagged rows were placed out of ID order. They are sorted in a follow-up PR from the same branch, with this record. The follow-up PR's merge result is reported in its own PR, because a record cannot contain its own merge commit.
+- Flagged items do not block the merge. They are published on the live Flagged page (F-04, F-05, F-15, F-17 to F-20) with source links for manual review.
+
+## Session on this branch
 
 - Session ID: `session-ef745c36`
 - Branch: `arena/ef745c36-kalshidash1` (base `f1fa6aa`, `main`)
