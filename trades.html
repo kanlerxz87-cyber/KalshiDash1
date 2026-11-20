@@ -61,7 +61,7 @@
   "price": "0.0100",
   "time_in_force": "good_till_canceled",
   "self_trade_prevention_type": "taker_at_cross",
-  "client_order_id": "<uuid4>"
+  "client_order_id": "&lt;uuid4&gt;"
 }</pre>
     <p class="small"><code>client_order_id</code> (up to 64 chars: letters, digits, <code>_ - : + = /</code>) enables idempotent retries; resubmitting with the same ID while the order is open returns <code>409 order_already_exists</code>.</p>
   </div>

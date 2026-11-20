@@ -140,7 +140,7 @@
       <tbody>
         <tr>
           <td>I-01</td><td><code>dashboard.html</code> shipped with broken internal links</td>
-          <td>It referenced <code>../assets/…</code> and <code>../portfolio.html</code> while sitting at the repository root, so its stylesheet and every nav link 404&rsquo;d on Pages. Fixed during integration by rewriting them to root-relative paths; <code>python3 tools/linkcheck.py</code> now reports no broken internal links across all 30 pages.</td>
+          <td>It referenced <code>../assets/&hellip;</code> and <code>../portfolio.html</code> while sitting at the repository root, so its stylesheet and every nav link 404&rsquo;d on Pages. Integration also repaired invalid markup found on two other root pages: a raw <code>&lt;uuid4&gt;</code> inside the order sample in <code>trades.html</code> (parsed as an unknown tag) and <code>&lt;td&gt;</code> elements inside an <code>&lt;ol&gt;</code> in <code>suggestions.html</code>. All three were fixed; <code>python3 tools/linkcheck.py</code> plus an HTML tag-balance check now pass on all 30 pages.</td>
           <td>Found by the integration link check. <span class="badge badge-ok">fixed</span></td>
         </tr>
         <tr>
