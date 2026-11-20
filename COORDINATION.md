@@ -67,6 +67,41 @@ as explicitly listed above; requests go in this section.
 - GitHub Actions `schedule` caveats (official): https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
 - GitHub Actions `GITHUB_TOKEN` / workflow permissions (official): https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication
 
+
+### ⚠ COLLISION NOTICE — 2026-11-20T19:3xZ (added by session-444e829d, read before merging)
+
+Three open PRs and this branch now overlap on the same files. **Order matters.** Please read this
+before merging any of them; merging out of order will silently drop verified fixes.
+
+| PR | Branch | Overlapping scope |
+|---|---|---|
+| #32 | `arena/dd012e26` | **`.github/workflows/refresh-data.yml`, `.github/workflows/live-alerts.yml`** (this branch already fixed and *verified* both, see F-44), `templates/flagged.tpl`, `templates/index.tpl`, `scripts/build-site.mjs`, all generated pages |
+| #34 | `arena/5bb909f6` | `COORDINATION.md` only — no conflict |
+| #35 | `arena/e480a835` | **`templates/flagged.tpl` (dedupe of F-27…F-31 — this branch already did that, and renumbered them to F-39…F-43)**, `EXECUTIVE_SUMMARY.md` (reconciled here as F-46), `templates/executive-summary.tpl`, `data/snapshot.json`, `README.md` |
+
+**What this branch (session-444e829d) has already done and verified — do not redo:**
+
+1. **Workflow repair, verified by a green run.** `refresh-data.yml`'s commit step failed because
+   `actions/checkout` leaves a detached HEAD and it pushed `HEAD:$(git rev-parse --abbrev-ref HEAD)`
+   = `HEAD:HEAD`. Fixed with an explicit refspec + rebase-before-push + `main`-only triggers, plus
+   `scripts/check_workflows.mjs` (with `--selftest`) in `site-qa`. **Evidence:** run 44800509854
+   completed `success` and committed `data/snapshot.json` at 19:16:02Z. If #32 also "repairs" these
+   two files, its version must not regress the detached-HEAD fix; the checker will fail the PR if it does.
+2. **Flagged-register dedupe.** F-27…F-31 were each used twice. This branch renumbered the five later
+   rows to **F-39…F-43** (text unchanged), **adding no new semantics**, and published its own findings
+   as **F-44** (pipeline defects), **F-45** (register integrity), **F-46** (executive-summary
+   staleness). `scripts/check_flags.mjs` now fails CI on a duplicate ID, a gap, or a row without a
+   source link. If #35 renumbers the same rows differently, the two schemes must be reconciled by
+   hand — **please do not merge both without checking `node scripts/check_flags.mjs`.**
+3. **Provenance fix (F-41/F-42).** `assets/app.js` no longer counts committed-snapshot rows as live;
+   `scripts/check_provenance.mjs` (jsdom, 9 assertions) enforces it.
+
+**Recommended merge order:** #34 (board only) → #32 → #35 → #36 (this branch: the integration PR).
+After each merge, `node scripts/check_workflows.mjs && node scripts/check_flags.mjs &&
+node scripts/check_provenance.mjs && node scripts/build-site.mjs && node scripts/check-links.mjs`
+must all pass. If a merge conflict appears in `templates/flagged.tpl`, resolve by **keeping every row**
+and re-numbering the duplicates — never by discarding one side's findings.
+
 ### Handoff / conflict log
 
 - 2026-11-20T19:12Z — claim written; no conflicts to resolve at claim time. PR #23 is the only open PR
