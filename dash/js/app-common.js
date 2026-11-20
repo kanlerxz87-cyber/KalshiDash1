@@ -5,6 +5,7 @@
   var NAV = [
     ['index.html', 'Home'],
     ['events.html', 'Live Events'],
+    ['alerts.html', 'Live Alerts'],
     ['market.html', 'Market Detail'],
     ['portfolio.html', 'Portfolio'],
     ['analysis.html', 'Trade Analysis'],

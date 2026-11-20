@@ -48,3 +48,48 @@
 ## 5. Post-merge integration verification
 
 Recorded in `COORDINATION.md` (task 9): link check re-run on `main` after merge, GitHub Pages deploy confirmed via the Pages API/Actions run, PR link + merge SHA appended.
+
+---
+
+# Session arena-f89b55f7 — Live Alerts verification record (2026-11-20, appended additively)
+
+Scope: new `dash/alerts.html` + `dash/js/model.js` + `dash/js/alerts.js` (session files), additive
+edits to `dash/js/app-common.js` (nav), `dash/js/store.js` (2 strategy definitions), `dash/index.html`,
+`dash/flagged.html` (F-08–F-10), `dash/sources.html` (S-A1–S-A4), `README.md`, this file, and
+`.github/workflows/site-qa.yml` (two new CI steps). Nothing from earlier sessions was overwritten or removed.
+
+## 1. New official-source checks (row-linked on dash/sources.html, S-A1–S-A4)
+
+| Claim | Source | How verified |
+|---|---|---|
+| `GET /markets?tickers=…` batch: "every matching market is returned in one response" when tickers is the only filter | https://docs.kalshi.com/api-reference/market/get-markets | Docs page fetched and read (param + paging/ordering/caching sections) |
+| Batch endpoint works unauthenticated on the demo host and returns full quote fields | https://external-api.demo.kalshi.co/trade-api/v2/markets?tickers=KXELECTIONEMERGENCY-27JAN01 (+ 2-ticker probe) | Platform fetch returned the live market JSON (yes_ask $0.0700 ↔ no_bid $0.9300, price_ranges step $0.0100, linear_cent) |
+| REST response caching lag (alert timestamps can lag fills) | https://docs.kalshi.com/api-reference/market/get-markets (caching note) | Docs text quoted on the alerts page and flagged as F-08 |
+| Rate limits: unauthenticated requests have separate limits; back off on 429 | https://docs.kalshi.com/getting_started/rate_limits | Docs page fetched; engine uses 1 batched request / 15 s + exponential backoff |
+
+## 2. Test results (all run in this session)
+
+| Check | Command | Result |
+|---|---|---|
+| Alert-engine logic (swing detect ±$0.10, stale-baseline guard, dedup, ROI model weights, pickTracked caps, planEntry/planExit incl. NO side = 1 − YES, time stop) | `node tools/alerts-qa.mjs` | 37/37 PASS |
+| Live Alerts page render + behavior (jsdom, real page scripts, mocked transport shaped like verified payloads; drives 3 poll cycles: baseline → +$0.11 swing → take-profit exit) | `node tools/alerts-render-test.mjs` (jsdom 24.1.3, dev-only, not committed) | 21/21 PASS |
+| Syntax | `node --check dash/js/model.js dash/js/alerts.js dash/js/store.js dash/js/app-common.js` | PASS |
+| dash suite link/asset check (now 11 pages incl. alerts.html) | `node scripts/check_links.js` | 47 links, 0 broken |
+| Repo-wide link check | `python3 tools/linkcheck.py` | 64 pages, 995 internal links, 0 broken |
+| docs-suite logic test (unchanged, regression) | `node tools/qa_logic_test.mjs` | all PASS |
+| Root-site check (unchanged, regression) | `node scripts/check-links.mjs` | 64 pages, 0 broken internal links |
+| Local serve of every touched page | python3 http.server + curl | /dash/alerts.html, /dash/index.html, all js → 200 |
+
+## 3. Behavior guarantees asserted by the tests
+
+- No invented values: unparseable/missing prices never alert, never trade (guarded in code + tests).
+- No look-ahead: a SIM entry pays the executable ask observed after the jump (test fixture ties ask to the post-jump price; entry = $0.55, not the pre-jump $0.44).
+- NO-side accounting uses the verified 1 − YES relation (fixture + live probe).
+- Dedup prevents alert spam; stale baselines (>15 min) re-baseline silently.
+- Alert feeds and SIM trades persist in localStorage (browser-local by design; F-09), never committed as market data.
+
+## 4. Blank values added by this session
+
+None. All new values are either computed from live API fields (labeled), documented constants
+(threshold $0.10 from the brief; model weights — ours, documented on the page), or left blank
+(e.g., settlement-source lines say "not captured" when the API returned none — F-10 policy).

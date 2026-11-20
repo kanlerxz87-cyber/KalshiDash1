@@ -76,6 +76,30 @@
           <td>—</td>
           <td>No action needed for the site; noted for transparency about how verification was performed.</td>
         </tr>
+        <tr>
+          <td><strong>F-08</strong> <span class="badge warn">new — session arena-f89b55f7</span></td>
+          <td>Alert engine is REST-polling only; WebSocket streaming is not used, and REST responses are cached</td>
+          <td>The brief asks for a "live" alerting system. The official WebSocket requires an authenticated session even for public channels (this site never handles credentials — F-02), so alerts run on a 15&nbsp;s batched REST poll of <code>GET /markets?tickers=…</code>. The Get Markets docs also state responses are cached "for a short time, so prices, sizes and status can lag the exchange by several seconds" — alert timestamps can therefore lag fills by the cache lag + one poll interval.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets (caching note)</a> · <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">WebSocket quick start (session auth)</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?tickers=KXELECTIONEMERGENCY-27JAN01" target="_blank" rel="noopener">live tickers probe</a></td>
+          <td>No sub-second alert latency is claimed anywhere on the site; the engine status line states the true poll interval.</td>
+          <td>If you provide demo API keys (see F-02), a WebSocket client can replace the poller for sub-second alerts.</td>
+        </tr>
+        <tr>
+          <td><strong>F-09</strong> <span class="badge warn">new — session arena-f89b55f7</span></td>
+          <td>Alerting and automated simulated trading run only while <code>dash/alerts.html</code> is open in your browser</td>
+          <td>The engine is browser-local by design (a static GitHub Pages site has no server process). Feeds, price history and SIM trades persist in <code>localStorage</code>. No server-side watcher exists, so nothing alerts while the page is closed. Automated trades are SIMULATED paper trades — real demo-account order execution needs credentials (F-02) and is intentionally not implemented.</td>
+          <td><code>dash/js/alerts.js</code> · <code>dash/js/model.js</code> (both in-repo)</td>
+          <td>—</td>
+          <td>If 24/7 alerting is wanted, the S-03 scheduled-scanner proposal could be extended to post alert digests.</td>
+        </tr>
+        <tr>
+          <td><strong>F-10</strong> <span class="badge warn">new — session arena-f89b55f7</span></td>
+          <td>Jump-cause links: two kinds, clearly labeled</td>
+          <td>Each jump's "cause research" panel shows (1) the market's official settlement-source links — these come from the API's <code>settlement_sources</code> fields and are official; (2) a Google News search link built from the market title — this is an <strong>auto-generated research pointer, not a verified source, and no causal claim is made</strong>; (3) the market rules page; (4) the exact API query that produced the row.</td>
+          <td><code>dash/js/alerts.js</code> (<code>renderCause</code>) · <a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List (settlement_sources field)</a></td>
+          <td>The dashboard never states what caused a jump — it only links research starting points.</td>
+          <td>Review whether auto-generated news-search links are wanted at all; they can be removed from <code>renderCause</code> in one line.</td>
+        </tr>
       </tbody>
     </table>
   </div>

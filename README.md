@@ -63,6 +63,8 @@ its own API client, page logic, methodology, verification table and Flagged page
 ```bash
 python3 tools/linkcheck.py        # repo-wide internal link check (covers root, docs/ and archive/)
 node tools/qa_logic_test.mjs      # 28 logic checks on docs/assets/kalshi.js against documented response shapes
+node tools/alerts-qa.mjs          # 37 logic checks on dash/js/model.js (swing detection, ROI model, strategies)
+node tools/alerts-render-test.mjs # jsdom render+behavior test of dash/alerts.html (npm i --no-save jsdom@24.1.3 first)
 python3 tools/kalshi_client.py snapshot --with-settled --with-candles   # durable JSON snapshot (needs network)
 python3 tools/kalshi_client.py markets --category crypto --limit 25
 ```
@@ -89,6 +91,7 @@ liquidity ladder, a simulated trade/portfolio engine, and a suggestions review q
 |------|---------|
 | `dash/index.html` | Executive summary + focus-topic glance + highest-dollar rows (live or verified snapshot) |
 | `dash/events.html` | Topic boards ranked by dollar volume, tracked to resolution (yes/no) + resolution log |
+| `dash/alerts.html` | **Live alerting (session arena-f89b55f7):** two scrolling chats — every ≥ $0.10 swing vs. the high-ROI model filter (score ≥ 70) — plus the ROI model ranking, jump-cause research links, a compact liquidity ladder, a chart with seconds→days windows and jump markers, and automated simulated strategies (`momentum-10c`, `fade-jump`) that write into Portfolio/Analysis. REST-polled (`GET /markets?tickers=…`, 1 batched request / 15 s + backoff); see `dash/flagged.html` F-08–F-10. |
 | `dash/market.html` | Price chart (X = time: 5 min seconds-granularity / 1 h / 6 h / 24 h / 7 d; Y = contract price), orderbook ladder (contracts available at each price), rules + settlement sources, simulated trade ticket |
 | `dash/portfolio.html` | Simulated P&L, win rate, exposure, equity curve, category breakdown (real demo-account sync needs the owner's keys — see `dash/flagged.html` F-02) |
 | `dash/analysis.html` | Topic × strategy breakdown; strategy definitions mapped to verified exchange mechanics |
