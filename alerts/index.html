@@ -79,7 +79,9 @@
         (<a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a>)
         and checks every category and tag it uses against the live tag taxonomy
         (<a id="lnk-taxonomy" href="https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories" target="_blank" rel="noopener">/search/tags_by_categories</a>).
-        If a category or tag disappears, the run fails loudly instead of quietly showing an empty table.</li>
+        A tag missing from a category that publishes tags fails the run loudly instead of quietly showing an
+        empty table. A category the taxonomy does not key at all (the demo has one — see
+        <a href="../flagged.html#F-A1">F-A1</a>) is recorded as a note and re-checked through discovery.</li>
       <li><strong>Sampling.</strong> Open markets are read with
         <code>GET /markets?series_ticker=…&amp;status=open</code>
         (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>).
@@ -185,6 +187,74 @@
     returned in ascending price order.
   </p>
   <div id="ladder"></div>
+
+
+  <h2>Suggestions to make this more live and interactive</h2>
+  <p class="small muted" style="margin-top:0">Each item states what it would change, what it costs, and the official
+    source that decides whether it is possible. Nothing here is implemented yet unless it says so.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Suggestion</th><th>Effect</th><th>What it needs</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>S-01</td>
+          <td><strong>Move from polling to the WebSocket ticker channel</strong></td>
+          <td>Removes the 10-minute delay entirely; every quote change arrives as an event, so a $0.10 swing is seen the moment it happens.</td>
+          <td>A server-side relay holding a demo API key, because the handshake is signed. Cannot be done from a static page.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">Quick Start: WebSockets</a></td>
+        </tr>
+        <tr>
+          <td>S-02</td>
+          <td><strong>Tighten the schedule to 1 minute</strong> once a relay exists</td>
+          <td>Better resolution in the feed and chart without any new credential.</td>
+          <td>GitHub's scheduled runs are best-effort and can be delayed; a self-hosted runner or the relay is more reliable. Unauthenticated limits argue against hammering the REST API.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate Limits</a></td>
+        </tr>
+        <tr>
+          <td>S-03</td>
+          <td><strong>Orderbook depth chart next to the price chart</strong></td>
+          <td>Shows how far a $100 order would move the price before you place it — the sharpest way to judge whether an alert is tradable.</td>
+          <td>Already collected per run; only needs a cumulative-depth view. Low effort.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">Orderbook Responses</a></td>
+        </tr>
+        <tr>
+          <td>S-04</td>
+          <td><strong>One-click "paper-trade this alert"</strong> that writes into the existing simulator</td>
+          <td>Turns the feed into a decision tool: act on a swing, then see the result in the portfolio.</td>
+          <td>Wiring to the existing simulated portfolio (local storage). No credentials, so it stays honest.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a> (payout rule)</td>
+        </tr>
+        <tr>
+          <td>S-05</td>
+          <td><strong>Candle-based chart for every window</strong></td>
+          <td>Fills gaps where the sampler was not running, so the chart is continuous instead of dotted.</td>
+          <td>Already used for alert detection; needs to be stored per window (1 min / 60 min / 1 day intervals).</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Get Market Candlesticks</a></td>
+        </tr>
+        <tr>
+          <td>S-06</td>
+          <td><strong>Score calibration</strong> instead of a fixed heuristic</td>
+          <td>Replaces the hand-set weights with weights fitted to realised outcomes, so "high ROI" means something measurable.</td>
+          <td>Real alert history plus settlement results. Not possible yet: there are too few real alerts, and fitting a model to a handful of points would be fabrication.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a> (results)</td>
+        </tr>
+        <tr>
+          <td>S-07</td>
+          <td><strong>News context per alert</strong></td>
+          <td>Puts a headline beside a jump so you can see what likely caused it.</td>
+          <td>The API already returns each series' <code>settlement_sources</code> (the outlets Kalshi itself names for that contract); linking them per alert is possible today. Anything beyond that would be an unreviewed external guess.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-series" target="_blank" rel="noopener">Get Series</a></td>
+        </tr>
+        <tr>
+          <td>S-08</td>
+          <td><strong>Alert on volume spikes, not only price</strong></td>
+          <td>A sudden jump in <code>volume_24h_fp</code> often precedes a price move.</td>
+          <td>Needs a threshold for volume as well; the field is already sampled every run.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <h2>Data sources and limits</h2>
   <div class="panel small">
