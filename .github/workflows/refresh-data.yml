@@ -1,0 +1,65 @@
+name: Refresh demo data snapshot
+
+# Re-captures data/snapshot.json from the official Kalshi DEMO Trade API (public,
+# unauthenticated endpoints) and regenerates the static site so the committed
+# fallback data and the published pages never drift apart.
+#
+# The visitor's browser always prefers live data; this job only refreshes the
+# committed fallback used when the browser cannot reach the demo API.
+#
+# Docs: https://docs.kalshi.com/getting_started/demo_env
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 */2 * * *'
+  push:
+    branches:
+      - main
+      - 'arena/**'
+    paths:
+      - 'scripts/fetch-snapshot.mjs'
+      - 'scripts/build-site.mjs'
+      - '.github/workflows/refresh-data.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-data-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Capture snapshot from the official demo API
+        run: node scripts/fetch-snapshot.mjs
+
+      - name: Regenerate the static site
+        run: |
+          if [ -f scripts/build-site.mjs ]; then node scripts/build-site.mjs; fi
+
+      - name: Check internal links
+        run: |
+          if [ -f scripts/check-links.mjs ]; then node scripts/check-links.mjs; fi
+
+      - name: Commit refreshed data (only when something changed)
+        run: |
+          set -e
+          git config user.name  'kalshidash-bot'
+          git config user.email 'kalshidash-bot@users.noreply.github.com'
+          git add data/snapshot.json
+          if [ -f scripts/build-site.mjs ]; then git add -- '*.html' assets categories; fi
+          if git diff --cached --quiet; then
+            echo 'No data change — nothing to commit.'
+          else
+            git commit -m 'chore(data): refresh demo snapshot from the official Kalshi demo API'
+            git push origin "HEAD:$(git rev-parse --abbrev-ref HEAD)"
+          fi
