@@ -51,8 +51,16 @@ jobs:
           if [ -f scripts/check-links.mjs ]; then node scripts/check-links.mjs; fi
 
       - name: Commit refreshed data (only when something changed)
+        # Fixed 2026-11-20 (session-dd012e26). This step used to fail on `main`:
+        #   1. `git rev-parse --abbrev-ref HEAD` returns the literal string "HEAD" on
+        #      the detached checkout that actions/checkout leaves behind, so the push
+        #      target was the invalid refspec "HEAD:HEAD";
+        #   2. the push had no rebase, so it lost the race against the concurrent
+        #      `live-alerts` job, which pushes data/live/ to the same branch.
+        # Both are fixed below: the target branch comes from the event, and the
+        # commit is rebased onto the remote branch first.
         run: |
-          set -e
+          set -euo pipefail
           git config user.name  'kalshidash-bot'
           git config user.email 'kalshidash-bot@users.noreply.github.com'
           git add data/snapshot.json
@@ -61,5 +69,8 @@ jobs:
             echo 'No data change — nothing to commit.'
           else
             git commit -m 'chore(data): refresh demo snapshot from the official Kalshi demo API'
-            git push origin "HEAD:$(git rev-parse --abbrev-ref HEAD)"
-          fi
+            git pull --rebase --autostash origin "$TARGET_BRANCH"
+            git push origin "HEAD:$TARGET_BRANCH"
+            echo "Pushed the refreshed snapshot to origin/$TARGET_BRANCH."
+        env:
+          TARGET_BRANCH: ${{ github.ref_name }}
