@@ -94,7 +94,7 @@
         (model.highROI ? '<span class="badge accent">model ' + Number(model.score).toFixed(2) + '</span>' : '') +
         '<span class="when" title="' + A.esc(a.ts || '') + '">' + timeAgo(a.ts) + '</span>' +
       '</div>' +
-      '<div class="what"><a href="../dashboard.html?market=' + encodeURIComponent(a.ticker) + '">' +
+      '<div class="what"><a href="../dashboard.html?ticker=' + encodeURIComponent(a.ticker) + '">' +
         A.esc(a.title || a.ticker) + '</a> <code class="small muted">' + A.esc(a.ticker) + '</code></div>' +
       '<div class="figs">' +
         '<span>' + A.usd(a.from, 2) + ' → <b>' + A.usd(a.to, 2) + '</b></span>' +
@@ -252,7 +252,7 @@
     }
     tb.innerHTML = rows.map(function (m) {
       return '<tr>' +
-        '<td><a href="../dashboard.html?market=' + encodeURIComponent(m.ticker) + '">' + A.esc(m.title || m.ticker) + '</a>' +
+        '<td><a href="../dashboard.html?ticker=' + encodeURIComponent(m.ticker) + '">' + A.esc(m.title || m.ticker) + '</a>' +
           '<br><code class="small muted">' + A.esc(m.ticker) + '</code></td>' +
         '<td class="num">' + A.usd(m.price, 2) + '</td>' +
         '<td class="num">' + A.usd(A.num(m.yes_bid_dollars), 2) + ' (' + (m.yes_bid_size_fp === undefined || m.yes_bid_size_fp === null ? '—' : A.esc(m.yes_bid_size_fp)) + ')</td>' +
