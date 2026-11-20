@@ -337,6 +337,15 @@
     return f[ticker] || state.live.history[ticker] || [];
   }
 
+  /* How many series matched for a topic in the last engine run (from the compact summary). */
+  function topicSeriesCount(topicId) {
+    var t = (state.feed && state.feed.meta && state.feed.topic_rules) || [];
+    var sum = 0;
+    var summary = (state.feed && state.feed.topics) || {};
+    if (summary[topicId] && typeof summary[topicId].count === 'number') return summary[topicId].count;
+    return null;
+  }
+
   function orderbooks() {
     return (state.feed && state.feed.orderbooks) || {};
   }
@@ -346,7 +355,7 @@
     state: state,
     loadFeed: loadFeed, pollLive: pollLive,
     allAlerts: allAlerts, highRoiAlerts: highRoiAlerts, resolutions: resolutions,
-    markets: markets, history: history, orderbooks: orderbooks,
+    markets: markets, history: history, orderbooks: orderbooks, topicSeriesCount: topicSeriesCount,
     modelScore: modelScore, trackedPrice: trackedPrice,
     num: num, round: round, usd: usd, esc: esc, topicLabel: topicLabel
   };

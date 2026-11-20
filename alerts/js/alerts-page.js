@@ -8,6 +8,7 @@
     topicFilter: 'all',
     chartWindow: 3600,          // seconds
     chartTicker: '',
+    boardTopic: 'all',
     seenIds: {},                // ids already rendered, so "new" highlighting is honest
     autoScroll: true
   };
@@ -190,20 +191,69 @@
 
   /* ---------------- markets table ---------------- */
 
+  /* Per-topic board. Rows come from the engine's by_topic block when it exists (the engine is
+   * the only source that samples every topic), with browser-polled rows merged on top. */
+  function topicRows(topicId) {
+    var feed = (A.state.feed && A.state.feed.by_topic) || {};
+    var rows = ((feed[topicId] || {}).rows || []).slice();
+    var seen = {};
+    rows.forEach(function (m) { seen[m.ticker] = true; });
+    Object.keys(A.state.live.markets).forEach(function (k) {
+      var m = A.state.live.markets[k];
+      if (m.topic !== topicId || seen[k]) return;
+      rows.push(m);
+    });
+    var liveOnly = {};
+    A.markets().forEach(function (m) { if (m.topic === topicId) liveOnly[m.ticker] = m; });
+    rows = rows.map(function (m) { return liveOnly[m.ticker] || m; });
+    rows.sort(function (a, b) { return (b.est_traded_dollars || 0) - (a.est_traded_dollars || 0); });
+    return rows;
+  }
+
+  function renderTopicTabs() {
+    var wrap = document.getElementById('topic-tabs');
+    var ids = ['all'].concat(A.TOPICS.map(function (t) { return t.id; }));
+    wrap.innerHTML = '';
+    ids.forEach(function (id) {
+      var b = document.createElement('button');
+      b.className = 'btn small' + (id === ui.boardTopic ? ' primary' : '');
+      b.textContent = id === 'all' ? 'All topics' : A.topicLabel(id);
+      b.addEventListener('click', function () {
+        ui.boardTopic = id;
+        renderTopicTabs();
+        renderMarkets('markets-table');
+      });
+      wrap.appendChild(b);
+    });
+  }
+
   function renderMarkets(id) {
     var tb = document.querySelector('#' + id + ' tbody');
-    var rows = A.markets().filter(function (m) { return m.status === 'active' || m.status === 'initialized' || !m.status; });
-    rows.sort(function (a, b) { return (b.est_traded_dollars || 0) - (a.est_traded_dollars || 0); });
-    rows = rows.slice(0, 40);
+    var rows;
+    var noteEl = document.getElementById('topic-note');
+    if (ui.boardTopic === 'all') {
+      rows = A.markets().filter(function (m) { return m.status === 'active' || m.status === 'initialized' || !m.status; });
+      rows.sort(function (a, b) { return (b.est_traded_dollars || 0) - (a.est_traded_dollars || 0); });
+      rows = rows.slice(0, 40);
+      if (noteEl) noteEl.textContent = 'Showing the combined board. Pick a topic above to see it on its own.';
+    } else {
+      rows = topicRows(ui.boardTopic).slice(0, 30);
+      if (noteEl) {
+        var seriesCount = ((A.state.feed && A.state.feed.meta && A.state.feed.meta.topic_rules) || [])
+          .filter(function (t) { return t.id === ui.boardTopic; }).length ? A.topicSeriesCount(ui.boardTopic) : null;
+        noteEl.textContent = A.topicLabel(ui.boardTopic) +
+          (seriesCount !== null ? ' — ' + seriesCount + ' series matched in the last engine run.' : '') +
+          (rows.length === 0 ? ' No open contract with a readable price was found for this topic. That is reported as-is rather than padded with examples.' : '');
+      }
+    }
     if (!rows.length) {
-      tb.innerHTML = '<tr><td colspan="11" class="empty">No live markets could be read. Nothing is filled in on its behalf.</td></tr>';
+      tb.innerHTML = '<tr><td colspan="10" class="empty">No live market with a readable price for this selection. Nothing is filled in on its behalf.</td></tr>';
       return;
     }
     tb.innerHTML = rows.map(function (m) {
       return '<tr>' +
         '<td><a href="../dashboard.html?market=' + encodeURIComponent(m.ticker) + '">' + A.esc(m.title || m.ticker) + '</a>' +
           '<br><code class="small muted">' + A.esc(m.ticker) + '</code></td>' +
-        '<td>' + A.esc(A.topicLabel(m.topic)) + '</td>' +
         '<td class="num">' + A.usd(m.price, 2) + '</td>' +
         '<td class="num">' + A.usd(A.num(m.yes_bid_dollars), 2) + ' (' + (m.yes_bid_size_fp === undefined || m.yes_bid_size_fp === null ? '—' : A.esc(m.yes_bid_size_fp)) + ')</td>' +
         '<td class="num">' + A.usd(A.num(m.yes_ask_dollars), 2) + ' (' + (m.yes_ask_size_fp === undefined || m.yes_ask_size_fp === null ? '—' : A.esc(m.yes_ask_size_fp)) + ')</td>' +
@@ -439,6 +489,7 @@
   /* ---------------- bootstrap ---------------- */
 
   function renderAll() {
+    renderTopicTabs();
     fillChartPicker();
     renderChats(true);
     renderStats();

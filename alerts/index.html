@@ -141,24 +141,27 @@
     </div>
   </div>
 
-  <h2>Highest-dollar live events</h2>
+  <h2>Highest-dollar live events, kept separate by topic</h2>
   <p class="small muted" style="margin-top:0">
     Ranked by <strong>estimated traded dollars</strong> = contracts traded × tracked price. Kalshi does not publish
     traded dollars per market in this response, so this column is <em>our estimate</em> from two published fields
     (<a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market</a>);
-    it is never presented as exchange data.
+    it is never presented as exchange data. Each topic keeps its own board so a single high-volume category cannot
+    crowd the others out.
   </p>
+  <div class="controls" id="topic-tabs"></div>
   <div class="table-wrap">
     <table id="markets-table">
       <thead><tr>
-        <th>Event / contract</th><th>Topic</th><th class="num">Price</th>
+        <th>Event / contract</th><th class="num">Price</th>
         <th class="num">Bid (size)</th><th class="num">Ask (size)</th>
         <th class="num">24h vol</th><th class="num">Total vol</th><th class="num">Est. $ traded</th>
         <th>Closes</th><th>Status</th><th>Source</th>
       </tr></thead>
-      <tbody><tr><td colspan="11" class="empty">Loading…</td></tr></tbody>
+      <tbody><tr><td colspan="10" class="empty">Loading…</td></tr></tbody>
     </table>
   </div>
+  <p class="small muted" id="topic-note"></p>
 
   <h2>Resolved events — how each one settled</h2>
   <p class="small muted" style="margin-top:0">Contracts stay tracked until they resolve. The

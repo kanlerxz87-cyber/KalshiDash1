@@ -69,6 +69,8 @@ const feed = {
   history: {
     'KXHIGH-1': [[now - 1800, 0.30], [now - 900, 0.34], [now - 300, 0.45], [now - 60, 0.46]]
   },
+  by_topic: {},
+  topics: { crypto: { count: 3, top: [] } },
   orderbooks: {
     'KXHIGH-1': {
       ticker: 'KXHIGH-1',

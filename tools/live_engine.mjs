@@ -672,12 +672,21 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
   }
 
   // ---- resolutions (result is "yes" | "no" | "scalar"; S7/S8)
+  //
+  // Only markets this engine actually tracks are kept, because that is what the brief asks
+  // to follow ("track live events until the events have resolved"). A settled series can
+  // return thousands of historical strikes; storing all of them would bury the tracked ones
+  // and bloat the file. Everything else is counted, not dropped silently.
+  const tracked = new Set(Object.keys(next.markets || {}));
+  let untracked = 0;
   for (const r of resolutions) {
     if (!r || !r.ticker) continue;
     if (r.result !== 'yes' && r.result !== 'no' && r.result !== 'scalar') continue;
+    if (!tracked.has(r.ticker)) { untracked += 1; continue; }
     if (next.resolutions.some((x) => x.ticker === r.ticker)) continue;
     next.resolutions.push(r);
   }
+  next.run.untracked_settled_seen = (next.run.untracked_settled_seen || 0) + untracked;
   next.resolutions.sort((a, b) => String(b.settlement_ts || '').localeCompare(String(a.settlement_ts || '')));
   next.resolutions = next.resolutions.slice(0, MAX_RESOLUTIONS);
 
@@ -710,7 +719,22 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
     for (const ticker of marketTickers) if (!keepMarkets.has(ticker)) delete next.markets[ticker];
   }
 
-  next.topics = topicsFound || {};
+  // Only a compact discovery summary is kept: the raw series rows carry long prohibition
+  // texts and settlement lists that made state.json several megabytes for no benefit. The
+  // full rows are still returned by the API and linked from the site.
+  const summary = {};
+  for (const [tid, rows] of Object.entries(topicsFound || {})) {
+    summary[tid] = {
+      count: (rows || []).length,
+      top: (rows || []).slice(0, 8).map((r) => ({
+        series_ticker: r.series_ticker,
+        title: r.title,
+        volume_fp: r.volume_fp,
+        source_url: r.source_url,
+      })),
+    };
+  }
+  next.topics = summary;
   next.meta.generated_at = new Date(nowSeconds * 1000).toISOString();
   return next;
 }
@@ -998,7 +1022,7 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
   next.meta.taxonomy_notes = taxonomyNotes;
   // A topic that returned no series is reported, never silently shown as an empty board.
   next.meta.topics_without_series = TOPICS
-    .filter((t) => ((next.topics || {})[t.id] || []).length === 0)
+    .filter((t) => !((next.topics || {})[t.id] || {}).count)
     .map((t) => t.id);
   next.meta.orderbooks = orderbooks;
 
@@ -1020,6 +1044,8 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
           alerts: next.alerts.slice(0, 200),
           resolutions: next.resolutions.slice(0, 100),
           markets: topMarkets(next, 60),
+          by_topic: boardByTopic(next, 24),
+          topics: next.topics || {},
           history: slimHistory(next, 12),
           orderbooks: next.meta.orderbooks || {},
         },
@@ -1032,6 +1058,21 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
     log('  --dry-run: nothing written');
   }
   return next;
+}
+
+/** Per-topic board, so topics stay separate and each one ranks its own top contracts. */
+export function boardByTopic(state, perTopic = 24) {
+  const out = {};
+  for (const t of TOPICS) {
+    out[t.id] = {
+      label: t.label,
+      rows: Object.values(state.markets || {})
+        .filter((m) => m && m.topic === t.id)
+        .sort((a, b) => (b.est_traded_dollars || 0) - (a.est_traded_dollars || 0))
+        .slice(0, perTopic),
+    };
+  }
+  return out;
 }
 
 /** Highest estimated traded dollars first — the brief's "highest dollar amount" ranking. */
