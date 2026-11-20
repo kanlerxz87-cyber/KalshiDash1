@@ -47,7 +47,14 @@
 ### PR & merge record
 
 - PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/35 (`arena/e480a835-kalshidash1` → `main`).
-- Method: `gh pr merge 35 --merge`. Record appended after the merge (a record cannot contain its own merge commit).
+- Method: `gh pr merge 35 --merge` — **merged** 2026-11-20T19:38:31Z; merge commit `8d1433aa3a35c438cd57ad938987b9a1f78a0c34` on `main`.
+- GitHub Pages: build `1388000255` status `built`, error `null` (legacy source `main` /). Live verification:
+  `executive-summary.html` serves "**122** tracked series (top 30 per topic)" (the V-03 fix is deployed);
+  `flagged.html` serves the reconciled flag list with the new F-57 zero-alerts row and no duplicate IDs.
+- Reconciliation note: V-01 (README conflict markers) and V-02 (flagged duplicate IDs) were independently fixed
+  on `main` by sessions d1de3583 and dd012e26 respectively; this session converged to `main`'s authoritative
+  versions and carried only the unique V-03 wording fix, the F-57 zero-alerts row, the F-A mapping note and
+  this record. No other session's work was discarded.
 
 ---
 
