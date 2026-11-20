@@ -1,0 +1,20 @@
+{
+  "name": "kalshidash1-dev-tools",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Dev-only test tooling for KalshiDash1. The published site itself has no build step and no runtime dependencies.",
+  "type": "module",
+  "scripts": {
+    "test:engine": "node tools/live_engine.mjs --selftest",
+    "test:feed": "node scripts/check_alerts.mjs",
+    "test:page": "node scripts/check_alerts_page.mjs",
+    "test:links": "node scripts/check-links.mjs && python3 tools/linkcheck.py",
+    "test": "npm run test:engine && npm run test:feed && npm run test:page && npm run test:links"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

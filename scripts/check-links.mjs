@@ -40,7 +40,10 @@ for (const file of pages) {
   // therefore checked for links but not against the root-page template. Added by the integration session.
   // dash/ is likewise an independent suite (session-cdfe52bd; own template, nav, css/js under dash/) —
   // same exemption, same rationale. Added by its integration session; logged in COORDINATION.md.
-  if (!rel.startsWith("archive/") && !rel.startsWith("docs/") && !rel.startsWith("dash/")) {
+  // alerts/ is an independent console (session-cb49437b; own nav, alerts/css/alerts.css and
+  // alerts/js/*.js) and the engine output lives in data/ (JSON, not HTML). Both are exempt from
+  // the root-page template for the same reason as docs/ and dash/.
+  if (!rel.startsWith("archive/") && !rel.startsWith("docs/") && !rel.startsWith("dash/") && !rel.startsWith("alerts/")) {
     if (!/<title>[^<]+<\/title>/.test(html)) errors.push(`${rel}: missing <title>`);
     if (!/<h1[ >]/.test(html)) errors.push(`${rel}: missing <h1>`);
     if (!html.includes('class="sidebar"')) errors.push(`${rel}: missing navigation`);

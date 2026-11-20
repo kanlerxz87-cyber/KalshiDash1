@@ -325,7 +325,14 @@
     var h = 260;
     canvas.width = w * dpr;
     canvas.height = h * dpr;
-    var ctx = canvas.getContext('2d');
+    var ctx = null;
+    try { ctx = canvas.getContext ? canvas.getContext('2d') : null; } catch (e) { ctx = null; }
+    if (!ctx) {
+      // No canvas support: the tables and feeds still work, so say why the chart is blank
+      // instead of throwing and taking the rest of the page down with it.
+      document.getElementById('chart-note').textContent = 'this browser did not provide a 2D canvas — chart unavailable';
+      return;
+    }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
 

@@ -1,0 +1,48 @@
+name: alerts-qa
+
+# Tests for the live alert engine and the two-chat console (session-cb49437b).
+# Complements pages.yml (root-site staleness), site-qa.yml (whole-tree links) and
+# suite-qa.yml (dash/). Runs on every push and PR, so a broken alert page or a feed that
+# violates the threshold/source rules can never reach main.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  alerts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dev-only test tooling
+        run: npm install --no-audit --no-fund
+
+      - name: Engine logic selftest (offline, no network)
+        run: node tools/live_engine.mjs --selftest
+
+      - name: Validate the committed engine feed (if the engine has produced one)
+        run: node scripts/check_alerts.mjs
+
+      - name: Render the alert page in jsdom and assert its behaviour
+        run: node scripts/check_alerts_page.mjs
+
+      - name: JavaScript syntax
+        run: |
+          set -e
+          for f in alerts/js/*.js tools/live_engine.mjs scripts/check_alerts.mjs scripts/check_alerts_page.mjs; do
+            echo "node --check $f"
+            node --check "$f"
+          done
+
+      - name: Link check (whole tree + root template)
+        run: |
+          node scripts/check-links.mjs
+          python3 tools/linkcheck.py
