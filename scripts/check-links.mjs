@@ -38,7 +38,9 @@ for (const file of pages) {
   // Generated pages must carry the shared template. Archived prior-session pages are checked for links only.
   // docs/ is an independent suite (its own template, nav and stylesheet under docs/assets/) and is
   // therefore checked for links but not against the root-page template. Added by the integration session.
-  if (!rel.startsWith("archive/") && !rel.startsWith("docs/")) {
+  // dash/ is likewise an independent suite (session-cdfe52bd; own template, nav, css/js under dash/) —
+  // same exemption, same rationale. Added by its integration session; logged in COORDINATION.md.
+  if (!rel.startsWith("archive/") && !rel.startsWith("docs/") && !rel.startsWith("dash/")) {
     if (!/<title>[^<]+<\/title>/.test(html)) errors.push(`${rel}: missing <title>`);
     if (!/<h1[ >]/.test(html)) errors.push(`${rel}: missing <h1>`);
     if (!html.includes('class="sidebar"')) errors.push(`${rel}: missing navigation`);

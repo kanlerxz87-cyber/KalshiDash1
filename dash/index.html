@@ -128,8 +128,14 @@
   App.renderFooter();
   var K = window.K;
 
+  function mkLink(url, text) {
+    var a = document.createElement('a');
+    a.href = url; a.textContent = text;
+    return a.outerHTML;
+  }
+
   function marketCells(m) {
-    return '<td><a href="' + K.marketUrl(m.ticker) + '">' + K.esc(m.title || m.ticker) + '</a><br><code class="small">' + K.esc(m.ticker) + '</code></td>' +
+    return '<td>' + mkLink(K.marketUrl(m.ticker), m.title || m.ticker) + '<br><code class="small">' + K.esc(m.ticker) + '</code></td>' +
       '<td>' + App.topicLabel(m.topic) + '</td>' +
       '<td class="num">' + K.usd4(m.last_price_dollars) + '</td>' +
       '<td class="num">' + K.usd4(m.yes_bid_dollars) + ' / ' + K.usd4(m.yes_ask_dollars) + '</td>' +
@@ -162,7 +168,7 @@
           return (K.fp(b.volume_24h_fp) || 0) - (K.fp(a.volume_24h_fp) || 0) || (K.fp(b.volume_fp) || 0) - (K.fp(a.volume_fp) || 0);
         })[0];
         var bestCell = best
-          ? '<a href="' + K.marketUrl(best.ticker) + '">' + K.esc(best.title || best.ticker) + '</a> — vol ' + K.num(K.fp(best.volume_fp)) + ' contracts'
+          ? mkLink(K.marketUrl(best.ticker), best.title || best.ticker) + ' — vol ' + K.num(K.fp(best.volume_fp)) + ' contracts'
           : '<span class="muted">no open markets at capture</span>';
         var state = markets.length
           ? '<span class="badge live">' + markets.length + ' live</span>'
