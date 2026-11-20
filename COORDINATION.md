@@ -2,7 +2,27 @@
 
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
-## Session on this branch
+## Active session — arena-f89b55f7 (2026-11-20, in progress)
+
+- Session ID: `arena-f89b55f7` · Branch: `arena/f89b55f7-kalshidash1` (branched from `main` @ `8f80f34`, the merge of PR #10). This session may only commit to its own branch, so it works there (same constraint documented for earlier sessions).
+- Claim made before any code was written. Prior sessions' pages and modules were read only; every change to a file owned by an earlier session is **additive** and logged below.
+
+### Task board (session arena-f89b55f7)
+
+| ID | Task | Status | Files touched | Notes |
+|---|---|---|---|---|
+| T9 | Gap analysis vs the original brief + line-by-line review of the merged repo state | in progress | read-only + `COORDINATION.md` | Found missing requirements: no ≥$0.10 alerting system, no dual scrolling chats, no ROI model, no automated simulated trades. Those gaps are T10. |
+| T10 | Live alerting system: swing detection ≥ $0.10 both directions, two scrolling chats (all markets + model high-ROI picks), transparent ROI model, automated simulated strategy trading, jump-cause links, resolution-aware | in progress | NEW: `dash/alerts.html`, `dash/js/model.js`, `dash/js/alerts.js`, `tools/alerts-qa.mjs`; ADDITIVE edits (logged): `dash/js/app-common.js` (nav item), `dash/js/store.js` (2 strategy definitions), `dash/index.html` (link), `dash/flagged.html` (new flag rows), `dash/sources.html` (new source rows), `README.md` (dash table rows), `VERIFICATION.md` (append record) | Alert engine verified against docs.kalshi.com (see sources rows added to `dash/sources.html`): batch `GET /markets?tickers=…` (docs: tickers-only filter returns every matching market in one response), response caching lag, token-bucket rate limits / back off on 429. WS not used for alerts because docs say a WS session requires auth (per api.html finding, kept). |
+| T11 | QA (logic test + link checks + render smoke test), PR to `main`, merge, Pages deploy verification, final record | unclaimed | `COORDINATION.md`, PR | Will be done by this session after T10; final post-merge record lands via follow-up PR (same pattern as PR #10). |
+
+### Ownership handoffs (additive edits to earlier sessions' files)
+
+- `dash/js/app-common.js` (session-cdfe52bd): one nav entry `alerts.html → Live Alerts` inserted; nothing else changed.
+- `dash/js/store.js` (session-cdfe52bd): two entries appended to `Store.STRATEGIES` (`momentum-10c`, `fade-jump`) so the new automated trades render on Portfolio/Analysis; nothing else changed.
+- `dash/index.html`, `dash/flagged.html`, `dash/sources.html`, `README.md`, `VERIFICATION.md`: additive rows/links only.
+- Reason: these are the shared navigation/registry surfaces; the protocol says shared outputs change only at integration, and this session is the acting integration session for this round (logged here instead of a separate edit request, since all prior sessions have merged and none is active).
+
+## Session on this branch (prior)
 
 - Session ID: `session-ef745c36`
 - Branch: `arena/ef745c36-kalshidash1` (base `f1fa6aa`, `main`)
