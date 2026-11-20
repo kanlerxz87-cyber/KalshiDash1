@@ -164,43 +164,92 @@ export function round(x, dp = 4) {
 }
 
 /**
- * The price this engine tracks, with the field it came from.
+ * The price this engine tracks, with the field it came from — or null.
  *
- * Order of preference:
- *   1. last_price_dollars, when it is a real binary price AND coherent with the current book;
- *   2. the midpoint of yes_bid_dollars and yes_ask_dollars when both sides are a real book;
- *   3. null — skipped and counted, never invented.
+ * A binary book gives two independent ways to read the same quotes (S6, documented):
  *
- * WHY THE COHERENCE CHECK EXISTS (measured, not theoretical)
- * ---------------------------------------------------------
- * The live demo returned `last_price_dollars: "0.8030"` for KXPRESPERSON-28-GABB while that
- * same market's order book was yes 0.002 / yes 0.003 (no bid 0.997 / no ask 0.998) and
- * `previous_price_dollars` was 0.0030. Read live on 2026-11-20. Trusting the last price there
- * produced a fake "$0.80 crash" alert — exactly the hallucination this project forbids.
+ *   direct  : yes bid = yes_bid_dollars,  yes ask = yes_ask_dollars
+ *   implied : yes bid = 1 − no_ask_dollars, yes ask = 1 − no_bid_dollars
  *
- * So when the market is NOT settled and a tradable book exists, a last price further than
- * `MAX_LAST_PRICE_BOOK_GAP` from the book is treated as stale and the book midpoint is used
- * instead, with `price_field` saying so. No value is ever manufactured: the midpoint is two
- * published quotes, and if the book is unusable the price is null.
+ * On a healthy market both describe the same book. The live demo does not always do that
+ * (measured 2026-11-20, KXPRESPERSON-28-GABB): one read returned
+ * last_price_dollars 0.8030 with yes 0.0020 / yes_ask 0.8030, while no_bid 0.9970 /
+ * no_ask 0.9980 imply a yes book of 0.002 / 0.003 and previous_price_dollars was 0.0030.
+ * Taking any of those numbers at face value produced fake "$0.80" alerts.
+ *
+ * So the rule is:
+ *   1. build both readings; a reading is usable only if 0 < bid <= ask < 1;
+ *   2. if both are usable and agree within MAX_BOOK_DISAGREEMENT, the book is healthy:
+ *      use last_price_dollars when it sits within MAX_LAST_PRICE_BOOK_GAP of the midpoint,
+ *      otherwise the midpoint (the last trade may be stale);
+ *   3. if they disagree, the read is internally contradictory. Use the reading that agrees
+ *      with previous_price_dollars; if that cannot decide it, use the implied (NO-side)
+ *      reading. Either way the row records which reading was used and why;
+ *   4. if neither reading is usable, return null: the market is skipped and counted.
+ *
+ * Nothing is manufactured: every branch returns a published quote, a published previous
+ * price, or null.
  */
 export const MAX_LAST_PRICE_BOOK_GAP = 0.25;
+export const MAX_BOOK_DISAGREEMENT = 0.05;
+
+function usablePair(bid, ask) {
+  return bid !== null && ask !== null && bid > 0 && ask > 0 && bid < 1 && ask < 1 && ask >= bid;
+}
 
 export function trackedPrice(m) {
   const last = num(m.last_price_dollars);
-  const bid = num(m.yes_bid_dollars);
-  const ask = num(m.yes_ask_dollars);
+  const prev = num(m.previous_price_dollars);
+  const yb = num(m.yes_bid_dollars);
+  const ya = num(m.yes_ask_dollars);
+  const nb = num(m.no_bid_dollars);
+  const na = num(m.no_ask_dollars);
   const settled = !!(m.result && m.result !== '');
-  // Both sides must be a real, tradable book: a bid above zero and an ask below one.
-  const bookOk = bid !== null && ask !== null && bid > 0 && ask > 0 && ask < 1 && ask >= bid;
-  const mid = bookOk ? round((bid + ask) / 2) : null;
 
-  if (last !== null && last > 0 && last < 1) {
-    if (!settled && bookOk && Math.abs(last - mid) > MAX_LAST_PRICE_BOOK_GAP) {
-      return { price: mid, field: 'mid(yes_bid_dollars,yes_ask_dollars) — last_price_dollars rejected as incoherent with the book' };
+  const directOk = usablePair(yb, ya);
+  const impliedOk = usablePair(na === null ? null : round(1 - na, 4), nb === null ? null : round(1 - nb, 4));
+
+  const direct = directOk ? { mid: round((yb + ya) / 2), how: 'yes quotes' } : null;
+  const implied = impliedOk
+    ? { mid: round(((1 - na) + (1 - nb)) / 2), how: 'no quotes (1 − no price)' }
+    : null;
+
+  let book = null;
+  if (direct && implied) {
+    if (Math.abs(direct.mid - implied.mid) <= MAX_BOOK_DISAGREEMENT) {
+      book = { mid: round((direct.mid + implied.mid) / 2), how: 'yes and no quotes agree', healthy: true };
+    } else {
+      // Contradictory read: prefer whichever reading agrees with the published previous price.
+      if (prev !== null && Math.abs(direct.mid - prev) < Math.abs(implied.mid - prev)) {
+        book = { mid: direct.mid, how: `yes quotes (no quotes disagreed by $${Math.abs(direct.mid - implied.mid).toFixed(2)}; chose the reading matching previous_price_dollars)`, healthy: false };
+      } else {
+        book = { mid: implied.mid, how: `no quotes (yes quotes disagreed by $${Math.abs(direct.mid - implied.mid).toFixed(2)}; chose the reading matching previous_price_dollars or the NO side)`, healthy: false };
+      }
     }
-    return { price: last, field: 'last_price_dollars' };
+  } else if (direct) {
+    book = { mid: direct.mid, how: direct.how, healthy: null };
+  } else if (implied) {
+    book = { mid: implied.mid, how: implied.how, healthy: null };
   }
-  if (bookOk) return { price: mid, field: 'mid(yes_bid_dollars,yes_ask_dollars)' };
+
+  if (book && last !== null && last > 0 && last < 1) {
+    if (settled || Math.abs(last - book.mid) <= MAX_LAST_PRICE_BOOK_GAP) {
+      return { price: last, field: 'last_price_dollars' };
+    }
+    return {
+      price: book.mid,
+      field: `book midpoint from ${book.how} — last_price_dollars ${last} rejected as incoherent`,
+      book_inconsistent: book.healthy === false,
+    };
+  }
+  if (book) {
+    return { price: book.mid, field: `book midpoint from ${book.how}`, book_inconsistent: book.healthy === false };
+  }
+  // No usable book at all: the last traded price is still published information about this
+  // contract, so it is used (labelled), rather than dropping a market that has traded.
+  if (last !== null && last > 0 && last < 1) {
+    return { price: last, field: 'last_price_dollars (no usable book to cross-check against)' };
+  }
   return { price: null, field: null };
 }
 
@@ -1282,10 +1331,22 @@ export function selftest() {
   ok(trackedPrice({ last_price_dollars: '0.3400' }).price === 0.34, 'trackedPrice prefers last traded price');
   ok(trackedPrice({ last_price_dollars: '0.0000', yes_bid_dollars: '0.2000', yes_ask_dollars: '0.3000' }).price === 0.25, 'trackedPrice falls back to bid/ask mid when last price is 0');
   ok(trackedPrice({ last_price_dollars: '0.0000', yes_bid_dollars: '0.0000', yes_ask_dollars: '1.0000' }).price === null, 'trackedPrice returns null rather than inventing a price');
-  // The measured demo defect: last price 0.8030 against a 0.002/0.003 book.
-  const inconsistent = trackedPrice({ last_price_dollars: '0.8030', yes_bid_dollars: '0.0020', yes_ask_dollars: '0.0030', result: '' });
-  ok(inconsistent.price === 0.0025, 'a last price far from a live book is rejected in favour of the book midpoint');
-  ok(/rejected/.test(inconsistent.field), 'the row records why the last price was not used');
+  // The measured demo defect: yes_ask was corrupted to 0.8030, contradicting no_bid 0.9970.
+  const inconsistent = trackedPrice({
+    last_price_dollars: '0.8030', previous_price_dollars: '0.0030',
+    yes_bid_dollars: '0.0020', yes_ask_dollars: '0.8030',
+    no_bid_dollars: '0.9970', no_ask_dollars: '0.9980', result: '',
+  });
+  ok(inconsistent.price === 0.0025, 'a contradictory book resolves to the NO-side reading, not to the corrupt ask (got ' + inconsistent.price + ')');
+  ok(inconsistent.book_inconsistent === true, 'the row is marked as coming from a contradictory book');
+  // and with the real single-market read, where yes_ask is sane but last_price is stale
+  const staleLast = trackedPrice({
+    last_price_dollars: '0.8030', previous_price_dollars: '0.0030',
+    yes_bid_dollars: '0.0020', yes_ask_dollars: '0.0030',
+    no_bid_dollars: '0.9970', no_ask_dollars: '0.9980', result: '',
+  });
+  ok(staleLast.price === 0.0025, 'a stale last price on a healthy book is replaced by the midpoint');
+  ok(/rejected/.test(staleLast.field), 'the row records why the last price was not used');
   const settledFar = trackedPrice({ last_price_dollars: '0.9500', yes_bid_dollars: '0.0100', yes_ask_dollars: '0.0200', result: 'yes' });
   ok(settledFar.price === 0.95, 'a settled market keeps its own last price (no book coherence rule)');
   const coherent = trackedPrice({ last_price_dollars: '0.4400', yes_bid_dollars: '0.4300', yes_ask_dollars: '0.4500' });
