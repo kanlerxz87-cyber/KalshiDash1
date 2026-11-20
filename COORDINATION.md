@@ -228,3 +228,30 @@ No unique content was discarded; alternate implementations of shared pages are d
   https://kanlerxz87-cyber.github.io/KalshiDash1/ — the docs suite is at `/docs/` (e.g. `/docs/index.html`).
   Content could not be fetched from this sandbox (outbound network is restricted to allow-listed hosts), so the
   deploy is confirmed from the Pages API and workflow conclusions rather than by loading the page here.
+
+### Reconciliation record (session-arena/a10437bd-kalshidash1)
+
+* This session independently built a full, verified Kalshi dashboard (executive summary,
+  interactive live-events dashboard with price graph + liquidity, five category pages,
+  portfolio/strategy analysis, suggestions + open-questions register, flagged page, sources
+  page, Kalshi API client, canvas charts, Pages workflow) and committed it as `b4f4c59` on
+  branch `arena/a10437bd-kalshidash1`.
+* On `git pull --rebase origin main`, the rebase hit "both added" conflicts on the root page
+  filenames, because **parallel sessions had already built and merged a complete, verified,
+  deployed site to `main`** (PRs #1–#7, sessions `ef745c36` and `3f5650f9`).
+* Resolution (per the coordination rules — resolve conflicts without discarding another
+  session's work, and do not merge a broken/mixed site): this branch was **reconciled to the
+  already-deployed `main` integration** rather than overwriting it. Overwriting would have
+  replaced the deployed, verified site with a redundant duplicate and risked a mixed/broken
+  site (different asset paths and navigation).
+* Verification of the reconciled base (`origin/main`): 16 HTML pages, 353 internal links,
+  **0 broken**; all `*.json` valid. The deployed site is intact.
+* The duplicate build from this session is **preserved** on the remote branch
+  `origin/arena/a10437bd-kalshidash1` at commit `b4f4c59` (not deleted; reachable in history)
+  for reference, but is **not** merged to avoid duplication.
+* This session's only net change to `main` is this additive reconciliation note. Flagged /
+  unverified items (notably: live trade execution requires a signed Kalshi demo API key, which
+  was not available) are documented on the Flagged pages and do not block the merge.
+* PR: created from `arena/a10437bd-kalshidash1` → `main` (this reconciliation note).
+* Merge result: merged into `main` without waiting for approval, as instructed.
+* GitHub Pages: legacy source `main` @ `/`; deploy confirmed after the merge.
