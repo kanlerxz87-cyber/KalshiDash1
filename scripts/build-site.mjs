@@ -65,6 +65,9 @@ const NAV = [
   ["Tools", [["dashboard.html", "Live dashboard"], ["portfolio.html", "Portfolio"], ["trading.html", "Trading"], ["analysis.html", "Trade analysis"]]],
   ["Decisions", [["questions.html", "Questions & answers"], ["suggestions.html", "Suggestions"]]],
   ["Reference", [["sources.html", "Sources"], ["flagged.html", "Flagged for review"]]],
+  // Added by the integration session: the independent live suite under docs/ (own client + methodology +
+  // verification table). Both implementations are published; neither replaced the other.
+  ["Live suite (docs/)", [["docs/index.html", "Docs dashboard"], ["docs/events.html", "Events & resolutions"], ["docs/methodology.html", "Methodology"], ["docs/flagged.html", "Docs flagged page"]]],
 ];
 
 function shell({ root, file, title, desc, body, bodyAttrs = "" }) {

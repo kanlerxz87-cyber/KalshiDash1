@@ -36,7 +36,9 @@ for (const file of pages) {
   const html = readFileSync(file, "utf8");
   const rel = file.slice(DOCS.length + 1);
   // Generated pages must carry the shared template. Archived prior-session pages are checked for links only.
-  if (!rel.startsWith("archive/")) {
+  // docs/ is an independent suite (its own template, nav and stylesheet under docs/assets/) and is
+  // therefore checked for links but not against the root-page template. Added by the integration session.
+  if (!rel.startsWith("archive/") && !rel.startsWith("docs/")) {
     if (!/<title>[^<]+<\/title>/.test(html)) errors.push(`${rel}: missing <title>`);
     if (!/<h1[ >]/.test(html)) errors.push(`${rel}: missing <h1>`);
     if (!html.includes('class="sidebar"')) errors.push(`${rel}: missing navigation`);

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Questions — KalshiDash1</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="questions">
+<header class="top"><div class="wrap top-inner">
+  <div class="brand">Kalshi<span>Dash1</span> <span class="badge">DEMO — mock funds</span></div>
+  <nav class="main"><a href="index.html">Dashboard</a><a href="executive-summary.html">Executive Summary</a><a href="events.html">Events &amp; Resolutions</a><a href="portfolio.html">Portfolio</a><a href="trade.html">Trade</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="methodology.html">Methodology</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for Review</a></nav>
+</div></header>
+<main class="wrap">
+  <h1>Questions, information needed, and answers</h1>
+  <p class="muted">What must be settled before a decision here can be considered “reasonable”. Each item lists: what we already know (with source), what is missing, the suggested way to discover it, and the current best answer where one exists. Anything we could not confirm is on <a href="flagged.html">Flagged for Review</a> rather than answered here.</p>
+
+  <h2>Q-01 · Which demo account do we trade with?</h2>
+  <div class="card"><ul>
+    <li><strong>Known.</strong> Demo accounts use mock funds; credentials are not shared with production; the recommended demo REST root is <code>https://external-api.demo.kalshi.co/trade-api/v2</code> (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo env docs</a>). Authenticated calls need an API Key ID + private key created at demo.kalshi.co → Account &amp; security → API Keys (<a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">Auth quick start</a>).</li>
+    <li><strong>Missing.</strong> No demo API key was supplied with this task, and none can be created without completing the demo signup flow — which requires a human and an email address.</li>
+    <li><strong>How to discover it.</strong> Create a demo account at <code>https://demo.kalshi.co/</code>, generate an API key, then paste it into the browser-only form on the <a href="portfolio.html">Portfolio</a> page. Nothing is committed to the repo.</li>
+    <li><strong>Answer for now.</strong> The site works without it (simulator + public data). Real demo order placement is available the moment a key is connected.</li>
+  </ul></div>
+
+  <h2>Q-02 · What exactly counts as an event's “dollar amount”?</h2>
+  <div class="card"><ul>
+    <li><strong>Known.</strong> Market objects expose <code>volume_fp</code>, <code>volume_24h_fp</code>, <code>open_interest_fp</code> (contract counts) and price fields in dollars; <code>notional_value_dollars</code> means “the total value of a single contract at settlement”, not traded dollars (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>). No event-level dollar total is documented.</li>
+    <li><strong>Missing.</strong> A published definition of “highest dollar amount” for ranking purposes (yours, not Kalshi's).</li>
+    <li><strong>How to discover it.</strong> Cross-check our estimate against <code>GET /markets/trades</code> sums for a few markets (count × price) and see whether the ordering changes; see <a href="suggestions.html">SUG-03</a>.</li>
+    <li><strong>Answer for now.</strong> Ranking = <code>volume_fp × last price</code>, labeled “estimated”, with raw volume and open interest shown so you can re-rank yourself.</li>
+  </ul></div>
+
+  <h2>Q-03 · Which series belong to the five categories?</h2>
+  <div class="card"><ul>
+    <li><strong>Known.</strong> <code>GET /series</code> returns <code>category</code> (primary) and <code>categories[]</code> (discovery list), and the <code>category</code> query filter matches exactly and case-sensitively (<a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a>). The set of valid category names is not enumerated in the docs.</li>
+    <li><strong>Missing.</strong> The authoritative category name list, and whether Kalshi has categories that map cleanly to “gas prices”, “culture”, and “golf”.</li>
+    <li><strong>How to discover it.</strong> Fetch <code>GET /series</code> once and collect distinct values of <code>categories[]</code>; the dashboard prints its matched series per category for audit on <a href="index.html">the dashboard</a> and each category page.</li>
+    <li><strong>Answer for now.</strong> Keyword discovery over live series, published per page so a reviewer can see exactly what was included and excluded.</li>
+  </ul></div>
+
+  <h2>Q-04 · Does the demo environment have live markets at all times?</h2>
+  <div class="card"><ul>
+    <li><strong>Known.</strong> The demo environment is for testing with mock funds and “the price and behavior of markets in the demo environment may not be reflective of those in real markets” (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo env docs</a>). Exchange status is exposed at <code>GET /exchange/status</code> (<a href="https://docs.kalshi.com/api-reference/exchange/get-exchange-status" target="_blank" rel="noopener">Get Exchange Status</a>).</li>
+    <li><strong>Missing.</strong> A guaranteed minimum number of open markets in each of our five categories in demo — this varies and could be zero on some days.</li>
+    <li><strong>How to discover it.</strong> Check the dashboard at several times of day; the category pages show per-category counts and the exchange-status endpoint.</li>
+    <li><strong>Answer for now.</strong> Design assumes “possibly empty”: every table degrades to an explicit empty state instead of substituting data.</li>
+  </ul></div>
+
+  <h2>Q-05 · Can a static GitHub Pages site call the API directly (CORS)?</h2>
+  <div class="card"><ul>
+    <li><strong>Known.</strong> Public market-data endpoints need no authentication (<a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Market Data quick start</a>). Whether the demo API sends permissive <code>Access-Control-Allow-Origin</code> headers is <em>not</em> documented anywhere we could verify.</li>
+    <li><strong>Missing.</strong> A live browser test from the deployed origin.</li>
+    <li><strong>How to discover it.</strong> Open the deployed site; if it reports “OFFLINE / API UNREACHABLE”, the console shows whether it is CORS or network. Fallback is a same-origin proxy (<a href="suggestions.html">SUG-02</a>).</li>
+    <li><strong>Answer for now.</strong> <span class="badge warn">UNVERIFIED</span> — see <a href="flagged.html">Flagged F-01</a>. The site never fabricates data if the call fails.</li>
+  </ul></div>
+
+  <h2>Q-06 · How do we keep price history without a backend?</h2>
+  <div class="card"><ul>
+    <li><strong>Known.</strong> Official candlesticks exist at 1 / 60 / 1440-minute granularity, max 365 days back for 1-minute bars, and history beyond the cutoff moves to <code>GET /historical/markets/{ticker}/candlesticks</code> (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Candlesticks</a>, <a href="https://docs.kalshi.com/getting_started/historical_data" target="_blank" rel="noopener">Historical Data</a>).</li>
+    <li><strong>Missing.</strong> Your retention requirement: do you need tick-level history, or are 1-minute bars enough?</li>
+    <li><strong>How to discover it.</strong> Decide against the two options in <a href="suggestions.html">SUG-01 / SUG-09</a>; the difference only matters if you plan to evaluate sub-minute strategies.</li>
+    <li><strong>Answer for now.</strong> 1-minute and up come from Kalshi; sub-minute comes from in-page samples, labeled as ours.</li>
+  </ul></div>
+
+  <h2>Q-07 · Which strategy definitions should the site support?</h2>
+  <div class="card"><ul>
+    <li><strong>Known.</strong> The four templates on <a href="strategies.html">Strategies</a> (favorite, longshot, momentum, mean reversion) are defined in code with explicit thresholds and run against real candlesticks; backtests ignore fees.</li>
+    <li><strong>Missing.</strong> Your decision rules — e.g. do you want liquidity-based entries (spread, book depth), time-to-expiry filters, or event-driven entries (news, settlement date)?</li>
+    <li><strong>How to discover it.</strong> Run the templates over a week of snapshot data (SUG-01) and look at which category/price-bucket produced errors; then pick rules to test.</li>
+    <li><strong>Answer for now.</strong> None of the templates is validated as profitable; they exist to make the mechanics reviewable, not to recommend trades.</li>
+  </ul></div>
+
+  <h2>Q-08 · How should a “trade” be categorized?</h2>
+  <div class="card"><ul>
+    <li><strong>Known.</strong> Fills/Orders carry <code>outcome_side</code> (yes/no) and <code>book_side</code> (bid/ask); <code>bid ≡ yes</code> and <code>ask ≡ no</code>, and <code>action</code>/<code>side</code> are deprecated with removal “not before May 28, 2026” (<a href="https://docs.kalshi.com/getting_started/order_direction" target="_blank" rel="noopener">Order direction</a>). V2 quoting is always from the YES leg: “<em>bid means buy YES, ask means sell YES</em>” (<a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order V2</a>).</li>
+    <li><strong>Missing.</strong> Whether you want buckets by entry price only (current) or by intent (momentum vs hedge vs expiry play), which is a labeling decision only you can make.</li>
+    <li><strong>How to discover it.</strong> Trade a handful in the simulator, look at the auto-generated buckets on <a href="portfolio.html">Portfolio</a>, and tell us which axis matters.</li>
+    <li><strong>Answer for now.</strong> Category × side × price bucket, with mode (simulator/demo) and timestamp.</li>
+  </ul></div>
+
+  <h2>Q-09 · How long must we track an event to catch resolution?</h2>
+  <div class="card"><ul>
+    <li><strong>Known.</strong> Markets move from live endpoints to historical on a rolling cutoff published by <code>GET /historical/cutoff</code> (<code>market_settled_ts</code>) — <a href="https://docs.kalshi.com/getting_started/historical_data" target="_blank" rel="noopener">Historical Data</a>. Settlement timing after determination is governed by <code>settlement_timer_seconds</code> on the market (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>).</li>
+    <li><strong>Missing.</strong> The actual demo cutoff value — it changes over time and can only be read live.</li>
+    <li><strong>How to discover it.</strong> Call <code>GET /historical/cutoff</code> from the browser and record it in the snapshot (SUG-01). Until then the events page polls live endpoints for the top rows.</li>
+    <li><strong>Answer for now.</strong> Tracked while visible in the live endpoints; anything that ages out must be fetched from <code>GET /historical/markets</code> — not implemented in the browser build, and stated as such.</li>
+  </ul></div>
+
+  <h2>Q-10 · What are the rate limits we must design around?</h2>
+  <div class="card"><ul>
+    <li><strong>Known.</strong> Requests cost tokens against a per-second budget; most requests cost 10 tokens; Basic/Advanced tiers can call <code>GET /portfolio/balance</code> once per second; 429 carries <code>too_many_requests</code> with no penalty and no <code>Retry-After</code>, so exponential backoff is the documented remedy (<a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate Limits</a>).</li>
+    <li><strong>Missing.</strong> Your demo account's actual tier — readable from <code>X-RateLimit-*</code> headers, which a browser cannot expose to script unless the API sets <code>Access-Control-Expose-Headers</code>.</li>
+    <li><strong>How to discover it.</strong> Read <code>GET /account/endpoint_costs</code> for non-default costs (documented on the same page) once authenticated; otherwise stay conservative.</li>
+    <li><strong>Answer for now.</strong> The page polls at 5 s for one selected market and refreshes rankings on demand, which stays far below Basic-tier budgets; it stops and shows an error on 429 instead of hammering.</li>
+  </ul></div>
+
+  <div class="notice info"><strong>Reading this page:</strong> “Answer for now” rows are engineering decisions, not claims about Kalshi. Anything factual on this site carries a link to the official page we read it from — see <a href="sources.html">Sources &amp; verification</a>.</div>
+</main>
+<footer><div class="wrap">KalshiDash1 · Demo data only · Not financial advice · <a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for Review</a></div></footer>
+<script src="assets/kalshi.js"></script><script src="assets/chart.js"></script><script src="assets/app.js"></script>
+</body>
+</html>
