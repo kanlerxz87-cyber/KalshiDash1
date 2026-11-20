@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suggestions — KalshiDash1</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">Kalshi<span class="em">Dash1</span></div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="categories/gas.html">Gas Prices</a>
+      <a href="categories/elections.html">Elections</a>
+      <a href="categories/culture.html">Culture</a>
+      <a href="categories/crypto.html">Crypto</a>
+      <a href="categories/golf.html">Golf</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="suggestions.html" class="active">Suggestions</a>
+      <a href="qa.html">Q&amp;A</a>
+      <a href="flagged.html">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <h1 class="page-title">Suggestions</h1>
+  <p class="page-sub">Improvement paths to improve decision making. Review each suggestion and choose the best path before implementing any changes.</p>
+
+  <div class="card">
+    <h3>Review-before-implement workflow</h3>
+    <ol style="margin-left:20px; color:#334155; font-size:0.95rem;">
+      <li>A suggestion is proposed (status: <strong>Proposed</strong>).</li>
+      <li>It is listed here with an owner, impact estimate, and required verification.</li>
+      <li>A reviewer marks it <strong>Under Review</strong>, checks it against official sources, and either approves or rejects.</li>
+      <li>Approved items are implemented; rejected items are closed with a reason.</li>
+      <li>No change is implemented without a recorded review decision.</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Suggestion register</h2>
+    <table class="wide">
+      <thead>
+        <tr>
+          <th style="width:6%;">#</th>
+          <th style="width:26%;">Suggestion</th>
+          <th style="width:30%;">Expected decision-making benefit</th>
+          <th style="width:14%;">Status</th>
+          <th style="width:12%;">Owner</th>
+          <th style="width:12%;">Verification</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Connect live Kalshi demo WebSocket (wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2) for real-time price movement on the graph.</td>
+          <td>Live price updates without manual refresh; see X=time vs Y=price movement as it happens.</td>
+          <td><span class="badge badge-neutral">Proposed</span></td>
+          <td>—</td>
+          <td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets.md" target="_blank" rel="noopener">WebSocket quick start</a></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Add a demo API-key input (client-side only, never stored) so users can enable live portfolio / orderbook data.</td>
+          <td>Real balances, positions, fills; enables actual trade-performance analysis.</td>
+          <td><span class="badge badge-neutral">Proposed</span></td>
+          <td>—</td>
+          <td><a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener">API Keys docs</a></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Add a backend proxy (or GitHub Pages-compatible CORS approach) so the browser can call the demo REST API without CORS blocks.</td>
+          <td>Reliable live market/orderbook/candlestick data from the dashboard.</td>
+          <td><span class="badge badge-neutral">Proposed</span></td>
+          <td>—</td>
+          <td>CORS policy of external-api.demo.kalshi.co (unverified)</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Categorize trades by type (directional, scalping, swing, hedge/spread) and compute win rate and P&amp;L per type.</td>
+          <td>Strategy refinement based on trade type performance.</td>
+          <td><span class="badge badge-neutral">Proposed</span></td>
+          <td>—</td>
+          <td>Requires live fills data (unverified)</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Add liquidity depth view: number of contracts available at each price level (yes/no bid stacks).</td>
+          <td>See how many contracts are tradable at a given price before deciding.</td>
+          <td><span class="badge badge-neutral">Proposed</span></td>
+          <td>—</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener">Order book docs</a></td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Export trade history and analysis to CSV for offline review.</td>
+          <td>Supports deeper analysis and record-keeping.</td>
+          <td><span class="badge badge-neutral">Proposed</span></td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Decision gate</h3>
+    <p style="font-size:0.9rem;color:#334155;">No suggestion above is implemented yet. Review each, verify against the linked official source, and choose the best path before any implementation.</p>
+  </div>
+
+  <footer>
+    KalshiDash1 &middot; Suggestions &middot; Not financial advice.
+  </footer>
+</div>
+
+</body>
+</html>

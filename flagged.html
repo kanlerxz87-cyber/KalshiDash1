@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flagged for Review — KalshiDash1</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">Kalshi<span class="em">Dash1</span></div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="categories/gas.html">Gas Prices</a>
+      <a href="categories/elections.html">Elections</a>
+      <a href="categories/culture.html">Culture</a>
+      <a href="categories/crypto.html">Crypto</a>
+      <a href="categories/golf.html">Golf</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="qa.html">Q&amp;A</a>
+      <a href="flagged.html" class="active">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <h1 class="page-title">Flagged for Review</h1>
+  <p class="page-sub">Irregularities and unverified items. These do not block the site launch and are published here for your review after the site is live.</p>
+
+  <div class="alert alert-info">
+    <span class="k">Verification standard:</span>
+    Every table row that shows a value links to an official source. If a value cannot be confirmed from an official source, it is left blank and flagged <span class="badge badge-warn">unverified</span>. Nothing is inferred or filled in.
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Unverified items (from official docs only)</h2>
+    <table class="wide">
+      <thead>
+        <tr>
+          <th style="width:6%;">#</th>
+          <th style="width:34%;">Item</th>
+          <th style="width:34%;">Official source</th>
+          <th style="width:14%;">Status</th>
+          <th style="width:12%;">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Demo Trade API base URL</td>
+          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Kalshi Demo Environment docs</a></td>
+          <td><span class="badge badge-ok">Verified</span></td>
+          <td>https://external-api.demo.kalshi.co/trade-api/v2</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Demo WebSocket URL</td>
+          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Kalshi Demo Environment docs</a></td>
+          <td><span class="badge badge-ok">Verified</span></td>
+          <td>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Demo site URL</td>
+          <td><a href="https://demo.kalshi.co/" target="_blank" rel="noopener">demo.kalshi.co</a></td>
+          <td><span class="badge badge-ok">Verified</span></td>
+          <td>Mock funds; credentials not shared with production.</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Demo API credentials</td>
+          <td>Not provided to this session</td>
+          <td><span class="badge badge-warn">Missing</span></td>
+          <td>Cannot fetch live portfolio/prices/trades without them.</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Live market prices / orderbooks / candlesticks</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener">Order book docs</a></td>
+          <td><span class="badge badge-warn">Unverified</span></td>
+          <td>Sandbox network cannot reach kalshi.co; left blank in tables.</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>CORS from GitHub Pages to kalshi.co</td>
+          <td>Not tested</td>
+          <td><span class="badge badge-warn">Unverified</span></td>
+          <td>Live fetch from the browser may be blocked; may need a proxy.</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Category tickers for gas / elections / culture / crypto / golf</td>
+          <td><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener">GET /events</a></td>
+          <td><span class="badge badge-warn">Unverified</span></td>
+          <td>No live event list fetched; tables are empty pending live data.</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>GitHub Pages deployment</td>
+          <td>GitHub Pages (repo settings)</td>
+          <td><span class="badge badge-neutral">Pending</span></td>
+          <td>Enable Pages on the main branch after merge.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Repo irregularities flagged</h2>
+    <ul style="margin-left:20px; color:#334155; font-size:0.95rem;">
+      <li>Repository started essentially empty (only <code>README.md</code> with "KalshiDash1"). No existing code, data, or configuration to review.</li>
+      <li>No existing tests, CI config, or GitHub Pages setup present.</li>
+      <li>No Kalshi API keys or secrets were provided (correctly — none should be committed).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Review path</h3>
+    <p style="font-size:0.9rem;color:#334155;">Review each flagged item, verify against the official source link, and request changes after the site is live. Nothing here blocks the GitHub Pages launch.</p>
+  </div>
+
+  <footer>
+    KalshiDash1 &middot; Flagged for Review &middot; Not financial advice.
+  </footer>
+</div>
+
+</body>
+</html>

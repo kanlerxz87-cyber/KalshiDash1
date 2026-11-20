@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golf — KalshiDash1</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">Kalshi<span class="em">Dash1</span></div>
+    <nav class="nav">
+      <a href="../index.html">Home</a>
+      <a href="gas.html">Gas Prices</a>
+      <a href="elections.html">Elections</a>
+      <a href="culture.html">Culture</a>
+      <a href="crypto.html">Crypto</a>
+      <a href="golf.html" class="active">Golf</a>
+      <a href="../portfolio.html">Portfolio</a>
+      <a href="../suggestions.html">Suggestions</a>
+      <a href="../qa.html">Q&amp;A</a>
+      <a href="../flagged.html">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <h1 class="page-title">Golf</h1>
+  <p class="page-sub">Golf tournament outcome event contracts. Track highest dollar-amount live events until resolved (Yes / No).</p>
+
+  <div id="api-key-notice" class="card" style="padding:12px 16px;"></div>
+
+  <div class="section">
+    <h2 class="section-title">Live events — Golf</h2>
+    <table class="wide">
+      <thead>
+        <tr>
+          <th style="width:14%;">Ticker</td>
+          <th>Event title</th>
+          <th style="width:12%;">Status</th>
+          <th style="width:11%;">Yes price</th>
+          <th style="width:11%;">No price</th>
+          <th style="width:14%;">Resolved</th>
+          <th style="width:14%;">Liquidity / contracts at price</th>
+          <th style="width:14%;">Source</th>
+        </tr>
+      </thead>
+      <tbody id="events-table-body">
+        <tr><td colspan="8" class="graph-placeholder">Loading live events&hellip;</td></tr>
+      </tbody>
+    </table>
+    <p class="page-sub" style="margin-top:6px;">Source: <a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener">GET /events</a> · Market detail: <a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener">GET /market/{ticker}</a> · Order book: <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener">GET /market-orderbook</a>.</p>
+  </div>
+
+  <div class="card">
+    <h3>Analysis &amp; findings — Golf</h3>
+    <p style="font-size:0.9rem;color:#334155;">No live data available yet (see Flagged for Review). Once connected to the demo API, this table will show open golf markets, their Yes/No prices, resolution outcome (Yes/No), and available contracts at each price level.</p>
+  </div>
+
+  <footer>
+    KalshiDash1 &middot; Golf &middot; Not financial advice. Demo prices may not reflect real markets.
+  </footer>
+</div>
+
+<script src="../assets/js/app.js"></script>
+<script>
+(async () => {
+  await window.KalshiDash.loadMarkets();
+  window.KalshiDash.renderCategoryPage();
+  window.KalshiDash.renderApiKeyNotice();
+})();
+</script>
+</body>
+</html>
