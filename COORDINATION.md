@@ -123,7 +123,7 @@ No unique content was discarded; alternate implementations of shared pages are d
 | 10 | Q&A: questions / information / answers before decisions | done | arena-652d8f6d | questions.html | n/a (analysis) |
 | 11 | Flagged for Review page + unverified items | done | arena-652d8f6d | flagged-review.html | n/a (flagged items listed with sources) |
 | 12 | Shared CSS/JS + source links | done | arena-652d8f6d | assets/css/style.css, assets/js/app.js | official Kalshi demo API links on every row |
-| 13 | GitHub Pages: build, deploy, verify no broken links | in progress | arena-652d8f6d | GitHub Pages settings | pending final deploy verification |
+| 13 | GitHub Pages: build, deploy, verify no broken links | done | arena-652d8f6d | GitHub Pages settings | Pages build `success` for commit 0045fd9; site live at https://kanlerxz87-cyber.github.io/KalshiDash1/ ; key pages verified load with no broken internal links |
 | 14 | PR to main + merge + record result | in progress | arena-652d8f6d | PR #2 | PR link: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/2 |
 
 ## Claims — session arena-15d2acea (merged via PR #1)
