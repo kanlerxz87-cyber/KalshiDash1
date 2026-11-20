@@ -2,6 +2,48 @@
 
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
+---
+
+## Claim — session-f7490df7 (branch `arena/f7490df7-kalshidash1`, base `d24616a`, 2026-11-20)
+
+Arena pins this session to `arena/f7490df7-kalshidash1` (single-branch rule); no `session-<id>/<task>`
+branches or worktrees are created. Claim is committed and pushed **before** any implementation, per the brief.
+
+### Evidence that motivated the claim (checked against GitHub before claiming)
+
+| Observation | How it was checked | Result |
+|---|---|---|
+| **No scheduled workflow has ever run** on this repo, so the "live" engine is only live when a human/branch push triggers it | `gh api repos/…/actions/runs?event=schedule` | empty list, all events |
+| `data/live/feed.json` last engine sample was **~5 h old** at claim time | `data/live/feed.json` → `meta.generated_at` = `2026-11-20T14:18:54Z` | stale |
+| The `Refresh demo data snapshot` workflow **fails on `main`** | run `44752211268`, job `refresh`, step "Commit refreshed data (only when something changed)" = `failure` | red CI on `main` |
+| The site root serves 20+ mixed nav entries and three overlapping trees (`/`, `dash/`, `docs/`, `archive/`), contrary to the brief's "organize and simplify continuously" | `index.html` nav + `scripts/build-site.mjs` `NAV`/`NAV_MORE` | cluttered |
+
+### Overlap check (read from `origin`, 2026-11-20)
+
+| Other active claim | Scope | Conflict with this claim? |
+|---|---|---|
+| `session-b71d6814` (B1/B2 settlement-source audit) | `verification/2026-11-20-b71d6814.md`, additive `templates/flagged.tpl` rows | **No** — this session does not touch `verification/` or `templates/flagged.tpl` |
+| `session-c431fca8` (repo integration smoke audit) | `COORDINATION.md`, `README.md` | **Partial** (both edit this board). Mitigation: this session only *prepends* its own section and never rewrites another session's text; every push is preceded by `git pull --rebase`; a README touch, if any, is additive-only. Logged here rather than avoided, per the brief's rule for shared files. |
+| `session-605bbb3f` (L4 golf/elections/crypto re-verification) | `verification/2026-11-20-605bbb3f.md` | **No** |
+
+No other session has claimed `.github/workflows/live-alerts.yml`, `scripts/selfsample.mjs`,
+`assets/freshness.js`, `scripts/build-site.mjs` or the site templates. Those are the scope below.
+
+### Task board
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| **J1** | **Make the scheduled "live" loop actually run.** Add the token-authenticated self-trigger chain (short-interval `workflow_dispatch` → `live-alerts` + `refresh-data`) plus a visible **feed-freshness monitor** that goes red when the engine is stale, so a silent stall can never again be presented as "live". | claimed | session-f7490df7 | `.github/workflows/live-alerts.yml`, `.github/workflows/refresh-data.yml`, `.github/workflows/heartbeat.yml` (new), `scripts/selfsample.mjs` (new), `tools/freshness_check.mjs` (new), `.github/workflows/alerts-qa.yml` (add one step) |
+| **J2** | **Fix the red `refresh-data` CI job on `main`** and record the root cause. | claimed | session-f7490df7 | `.github/workflows/refresh-data.yml` |
+| **J3** | **Simplify the navigation** into five clear groups (Start · Topics · Trading · Model · Review) so the dashboard is decision-first, without breaking any existing URL. | claimed | session-f7490df7 | `scripts/build-site.mjs` (nav only), `assets/style.css` (nav styling only) |
+| **J4** | **Document and re-verify**: update `README.md` (additive section) with the operand of change and the new honesty guarantees; record sources + verification in this section. | claimed | session-f7490df7 | `README.md` (additive section), `COORDINATION.md` (this section) |
+| **J5** | **Ship**: PR from this branch to `main`, merge without awaiting approval, confirm the Pages deploy and that the scheduled loop fires afterwards. | claimed | session-f7490df7 | none (git/PR operations only) |
+
+**Explicitly NOT in scope for this session** (owned or already delivered by others; touching them would duplicate
+or conflict): the alert engine logic itself (`tools/live_engine.mjs`), the two chat feeds (`alerts/**`), the
+dash suite (`dash/**`), the docs suite (`docs/**`), the canonical page content (`templates/*.tpl` other than
+nothing at all), and the verified data capture (`data/snapshot.json`).
+
 ## Session on this branch (FINAL INTEGRATION — read this first)
 
 - Session ID: `session-7d6d2fcb`
