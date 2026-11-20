@@ -176,6 +176,14 @@ function check(src, label, failures) {
     }
   }
 
+  /* ---- W6: never push to a hard-coded branch name. A `workflow_dispatch` can be started from any
+   * branch; pushing `HEAD:main` from a session branch puts unreviewed commits on the default branch
+   * and bypasses every review gate. This happened once while fixing F-39 — the fix was to push to
+   * ${GITHUB_REF_NAME} — so it is checked mechanically instead of trusted to review. */
+  for (const m of src.matchAll(/git\s+push\s+[^\n]*?(HEAD:main\b|HEAD:\$\{GITHUB_DEFAULT_BRANCH\})/g)) {
+    failures.push(`${label}: pushes to the default branch by name (${m[1]}); push to \${GITHUB_REF_NAME} instead (W6).`);
+  }
+
   /* ---- W5 (house rule): a workflow that commits generated data must validate it first. */
   if (pushes && /data\/live\/|data\/snapshot\.json/.test(src)) {
     if (!/check_alerts\.mjs|check-links\.mjs|fetch-snapshot\.mjs/.test(src)) {
@@ -201,9 +209,10 @@ if (process.argv.includes('--selftest')) {
     'session-branch push trigger': 'name: x\non:\n  push:\n    branches: [main, \'arena/**\']\njobs:\n  a:\n    steps:\n      - run: echo hi\n',
     'sub-5-minute cron': 'name: x\non:\n  schedule:\n    - cron: \'*/2 * * * *\'\njobs:\n  a:\n    steps:\n      - run: echo hi\n',
     'bare git push': 'name: x\non:\n  workflow_dispatch:\npermissions:\n  contents: write\njobs:\n  a:\n    steps:\n      - run: |\n          git config user.name a\n          git config user.email a@b\n          git diff --cached --quiet || git commit -m x\n          git push\n',
-    'swallowed rebase': 'name: x\non:\n  workflow_dispatch:\npermissions:\n  contents: write\njobs:\n  a:\n    steps:\n      - run: |\n          git config user.name a\n          git config user.email a@b\n          git diff --cached --quiet || git commit -m x\n          git pull --rebase origin main || true\n          git push origin HEAD:main\n'
+    'swallowed rebase': 'name: x\non:\n  workflow_dispatch:\npermissions:\n  contents: write\njobs:\n  a:\n    steps:\n      - run: |\n          git config user.name a\n          git config user.email a@b\n          git diff --cached --quiet || git commit -m x\n          git pull --rebase origin main || true\n          git push origin HEAD:main\n',
+    'hard-coded main push': 'name: x\non:\n  workflow_dispatch:\npermissions:\n  contents: write\njobs:\n  a:\n    steps:\n      - run: |\n          git config user.name a\n          git config user.email a@b\n          git diff --cached --quiet || git commit -m x\n          git push origin HEAD:main\n'
   };
-  const good = 'name: ok\non:\n  workflow_dispatch:\n  schedule:\n    - cron: \'*/10 * * * *\'\n  push:\n    branches: [main]\npermissions:\n  contents: write\njobs:\n  a:\n    steps:\n      - run: node scripts/check_alerts.mjs\n      - run: |\n          git config user.name a\n          git config user.email a@b\n          git add data/live/\n          git diff --cached --quiet && exit 0\n          git commit -m x\n          git push origin HEAD:main\n';
+  const good = 'name: ok\non:\n  workflow_dispatch:\n  schedule:\n    - cron: \'*/10 * * * *\'\n  push:\n    branches: [main]\npermissions:\n  contents: write\njobs:\n  a:\n    steps:\n      - run: node scripts/check_alerts.mjs\n      - run: |\n          git config user.name a\n          git config user.email a@b\n          git add data/live/\n          git diff --cached --quiet && exit 0\n          git commit -m x\n          git push origin \"HEAD:${GITHUB_REF_NAME}\"\n';
   let ok = 0, badCount = 0;
   for (const [name, src] of Object.entries(bad)) {
     const f = [];

@@ -75,10 +75,16 @@ jobs:
           else
             STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
             git commit -m "data(live): engine sample ${STAMP}"
-            # A failed rebase must stop the run: previously it was swallowed with `|| true`
-            # and the push then raced the session's own commits (F-40). A scheduled run is
-            # always on the default branch, so ${GITHUB_DEFAULT_BRANCH} is the right target.
-            BRANCH="${GITHUB_DEFAULT_BRANCH:-main}"
+            # Push back to the ref this run was started from — never to a hard-coded branch.
+            # F-39 taught that lesson the hard way: a `workflow_dispatch` can be started from a
+            # session branch, and pushing "HEAD:main" from there would put unreviewed work on the
+            # default branch. A failed rebase must stop the run (previously swallowed with
+            # `|| true`, which then pushed over a stale base). Both are guarded below.
+            BRANCH="${GITHUB_REF_NAME:?ref name is required}"
+            if [ "$GITHUB_EVENT_NAME" = "schedule" ] && [ "$BRANCH" != "$GITHUB_DEFAULT_BRANCH" ]; then
+              echo "refusing to push a scheduled run from non-default branch $BRANCH" >&2
+              exit 1
+            fi
             git pull --rebase --autostash origin "$BRANCH"
             git push origin "HEAD:$BRANCH"
           fi
