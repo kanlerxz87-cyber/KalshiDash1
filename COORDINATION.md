@@ -28,8 +28,8 @@ Demo environment doc (verified): https://docs.kalshi.com/getting_started/demo_en
 | T7 | Suggestions section | done | arena-f661348d-kalshidash1 (+session 15d2acea) | suggestions.html | — | — |
 | T8 | Questions / information / answers list + missing-info discovery | done | arena-f661348d-kalshidash1 (+session 15d2acea) | questions.html, qa.html | — | — |
 | T9 | Flagged for Review page (unverified items + irregularities, source links) | done | arena-f661348d-kalshidash1 (+session 15d2acea) | flagged.html | — | — |
-| T10 | GitHub Pages setup, build verification, no broken links, publish | in progress | arena-f661348d-kalshidash1 | GitHub Pages settings | — | Main (session 15d2acea) already marked Pages deployed |
-| T11 | Pull request from this branch to main, merge, confirm Pages deploy, record PR link + result | planned | arena-f661348d-kalshidash1 | — | — | — |
+| T10 | GitHub Pages setup, build verification, no broken links, publish | done | arena-f661348d-kalshidash1 | GitHub Pages settings | — | Pages built successfully for commit b4688b2 (no error); live at https://kanlerxz87-cyber.github.io/KalshiDash1/ (homepage, dashboard, flagged pages confirmed loading) |
+| T11 | Pull request from this branch to main, merge, confirm Pages deploy, record PR link + result | done | arena-f661348d-kalshidash1 | — | — | PR #3 https://github.com/kanlerxz87-cyber/KalshiDash1/pull/3 — merged via `gh pr merge 3 --merge`; main advanced 97d74c0 -> b4688b2; Pages deployed; no broken links on checked pages |
 
 ## Rules
 - Work line by line; verify every value against an official source; link the source.
@@ -38,3 +38,12 @@ Demo environment doc (verified): https://docs.kalshi.com/getting_started/demo_en
 - Commit small, frequent changes; run `git pull --rebase` before every push.
 - On conflict: resolve without discarding the other session's work; log it here.
 - When a task is finished, record sources, verification, irregularities; mark done. Link official sources.
+
+## PR & merge results (final integration)
+- Pull request: #3 https://github.com/kanlerxz87-cyber/KalshiDash1/pull/3
+- Source branch: arena/f661348d-kalshidash1 -> base: main
+- Merge method: `gh pr merge 3 --merge`
+- Merge result: merged successfully; main advanced 97d74c0 -> b4688b2
+- GitHub Pages: built successfully for commit b4688b2 (no build error); live site https://kanlerxz87-cyber.github.io/KalshiDash1/
+- Live pages confirmed loading: /, /dashboard.html, /flagged.html (no broken links on checked pages)
+- Flagged irregularities / unverified items: published on /flagged.html (do not block merge)
