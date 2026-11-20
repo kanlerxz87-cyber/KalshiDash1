@@ -112,6 +112,7 @@ function makeFetch(url) {
   if (ob) return json({ orderbook_fp: BOOK });
   const cs = /\/v2\/series\/([^/]+)\/markets\/([^/]+)\/candlesticks$/.exec(p);
   if (cs) return json({ candlesticks: [] });
+  if (p.endsWith("/v2/markets/trades")) return json({ trades: [], cursor: "" });
   const mk = /\/v2\/markets\/([^/]+)$/.exec(p);
   if (mk) {
     for (const s of Object.keys(MARKETS)) {
@@ -174,7 +175,7 @@ check("watch set built from 5 focus topics", page.state.tracked.length === 5, pa
 check("highest-dollar market tracked first (crypto 24h $2400)", page.state.tracked[0] && page.state.tracked[0].ticker === "KXDEMOFUTHOURLY-26NOV20H13-UP", page.state.tracked.map(m => m.ticker + ":" + m.volume_24h_fp));
 check("poll list built", page.state.pollList.length === 5, page.state.pollList);
 
-check("first poll is a baseline (no alerts yet)", page.state.alerts.length === 0, page.state.alerts);
+check("first poll is a baseline (no alerts yet)", page.state.feed.length === 0, page.state.feed);
 check("model table rendered 5 rows", window.document.querySelectorAll("#model-table tbody tr").length === 5, window.document.querySelectorAll("#model-table tbody tr").length);
 check("detail auto-selected (ladder rendered: 4 price levels)",
   window.document.querySelectorAll("#ladder tbody tr").length === 4,
@@ -187,9 +188,9 @@ PRICE["KXDEMOFUTHOURLY-26NOV20H13-UP"] = "0.5500";
 page.poll();
 await sleep(300);
 
-check("swing alert created (Δ +0.12→0.11 rounding: from 0.44 to 0.55)", page.state.alerts.length === 1 &&
-  Math.abs(page.state.alerts[0].delta - 0.11) < 1e-9 && page.state.alerts[0].dir === "up", page.state.alerts);
-check("alert carries per-row source URL (batched tickers query)", /tickers=/.test(page.state.alerts[0].source_url || ""));
+check("swing alert created (Δ +0.11: from 0.44 to 0.55)", page.state.feed.length === 1 &&
+  Math.abs(page.state.feed[0].delta - 0.11) < 1e-9 && page.state.feed[0].side === "up", page.state.feed);
+check("alert carries per-row source URL (batched tickers query)", /tickers=/.test(page.state.feed[0].source || ""));
 check("chat 1 (all markets) has the alert row", window.document.querySelectorAll("#chat-all .chat-row").length >= 1);
 check("chat 2 (model picks) has liked-alert + SIM entry", window.document.querySelectorAll("#chat-model .chat-row").length >= 2,
   window.document.querySelectorAll("#chat-model .chat-row").length);
@@ -203,7 +204,7 @@ check("momentum-10c SIM entry recorded at the executable post-jump ask ($0.55, q
   Math.abs(parseFloat(autoTrades[0].price) - 0.55) < 1e-9 && autoTrades[0].qty === 9, autoTrades[0]);
 check("dedup: an immediate identical re-poll adds no duplicate alert", (() => {
   page.poll();
-  return page.state.alerts.length === 1;
+  return page.state.feed.length === 1;
 })());
 await sleep(150);
 
@@ -220,8 +221,8 @@ check("SIM exit row appended to chat 2", /SIM ■/.test(window.document.getEleme
 check("exit_reason recorded", settled && /take-profit/.test(settled.exit_reason || ""), settled && settled.exit_reason);
 
 /* persistence: feeds survive a "reload" of the store */
-const storedAlerts = JSON.parse(window.localStorage.getItem("kalshidash:v1:alertfeed") || "[]");
-check("alerts persisted to localStorage", storedAlerts.length >= 1, storedAlerts.length);
+const storedAlerts = JSON.parse(window.localStorage.getItem("kalshidash:alerts:v1:feed") || "[]");
+check("alerts persisted to localStorage (feed namespace)", storedAlerts.length >= 1, storedAlerts.length);
 
 check("no script errors after all polls", errors.length === 0, errors);
 

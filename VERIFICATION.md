@@ -53,9 +53,9 @@ Recorded in `COORDINATION.md` (task 9): link check re-run on `main` after merge,
 
 # Session arena-f89b55f7 — Live Alerts verification record (2026-11-20, appended additively)
 
-Scope: new `dash/alerts.html` + `dash/js/model.js` + `dash/js/alerts.js` (session files), additive
+Scope: new `dash/alerts.html` + the merged `dash/js/alerts.js` engine (session files; merged with arena/815b546d's parallel implementation at integration), additive
 edits to `dash/js/app-common.js` (nav), `dash/js/store.js` (2 strategy definitions), `dash/index.html`,
-`dash/flagged.html` (F-08–F-10), `dash/sources.html` (S-A1–S-A4), `README.md`, this file, and
+`dash/flagged.html` (F-11–F-12 after renumbering; F-08–F-10 are arena/815b546d's rows), `dash/sources.html` (S-A1–S-A4), `README.md`, this file, and
 `.github/workflows/site-qa.yml` (two new CI steps). Nothing from earlier sessions was overwritten or removed.
 
 ## 1. New official-source checks (row-linked on dash/sources.html, S-A1–S-A4)
@@ -71,9 +71,9 @@ edits to `dash/js/app-common.js` (nav), `dash/js/store.js` (2 strategy definitio
 
 | Check | Command | Result |
 |---|---|---|
-| Alert-engine logic (swing detect ±$0.10, stale-baseline guard, dedup, ROI model weights, pickTracked caps, planEntry/planExit incl. NO side = 1 − YES, time stop) | `node tools/alerts-qa.mjs` | 37/37 PASS |
+| Alert-engine logic (swing detect ±$0.10, stale-baseline guard, dedup, ROI model weights, pickTracked caps, planEntry/planExit incl. NO side = 1 − YES, time stop) | `node tools/alerts-qa.mjs` | 37/37 PASS (re-run after the merge — see the reconciliation record in COORDINATION.md) |
 | Live Alerts page render + behavior (jsdom, real page scripts, mocked transport shaped like verified payloads; drives 3 poll cycles: baseline → +$0.11 swing → take-profit exit) | `node tools/alerts-render-test.mjs` (jsdom 24.1.3, dev-only, not committed) | 21/21 PASS |
-| Syntax | `node --check dash/js/model.js dash/js/alerts.js dash/js/store.js dash/js/app-common.js` | PASS |
+| Syntax | `node --check dash/js/alerts.js dash/js/store.js dash/js/app-common.js dash/js/autotrade.js` | PASS |
 | dash suite link/asset check (now 11 pages incl. alerts.html) | `node scripts/check_links.js` | 47 links, 0 broken |
 | Repo-wide link check | `python3 tools/linkcheck.py` | 64 pages, 995 internal links, 0 broken |
 | docs-suite logic test (unchanged, regression) | `node tools/qa_logic_test.mjs` | all PASS |
@@ -86,10 +86,10 @@ edits to `dash/js/app-common.js` (nav), `dash/js/store.js` (2 strategy definitio
 - No look-ahead: a SIM entry pays the executable ask observed after the jump (test fixture ties ask to the post-jump price; entry = $0.55, not the pre-jump $0.44).
 - NO-side accounting uses the verified 1 − YES relation (fixture + live probe).
 - Dedup prevents alert spam; stale baselines (>15 min) re-baseline silently.
-- Alert feeds and SIM trades persist in localStorage (browser-local by design; F-09), never committed as market data.
+- Alert feeds and SIM trades persist in localStorage (browser-local by design; F-11), never committed as market data.
 
 ## 4. Blank values added by this session
 
 None. All new values are either computed from live API fields (labeled), documented constants
 (threshold $0.10 from the brief; model weights — ours, documented on the page), or left blank
-(e.g., settlement-source lines say "not captured" when the API returned none — F-10 policy).
+(e.g., settlement-source lines say "not captured" when the API returned none — F-12 policy).

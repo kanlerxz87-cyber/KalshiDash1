@@ -37,6 +37,12 @@ const S = {
   gasSettledApi: { url: `${API}/events?series_ticker=KXAAAGASM&status=settled&with_nested_markets=true`, label: "Kalshi demo API: settled US gas price events (live)" },
   gasOrderbookApi: { url: `${API}/markets/KXAAAGASM-26NOV30-3.00/orderbook?depth=5`, label: "Kalshi demo API: orderbook for KXAAAGASM-26NOV30-3.00 (live, no credentials)" },
   gasEventsApi: { url: `${API}/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true`, label: "Kalshi demo API: open US gas price events (live)" },
+  getMarkets: { url: `${DOCS}/api-reference/market/get-markets`, label: "Kalshi API ref: Get Markets" },
+  seriesCultureApi: { url: `${API}/series?category=Culture&include_volume=true&limit=50`, label: "Kalshi demo API: series in category Culture (live, 2026-11-20)" },
+  seriesEconomicsApi: { url: `${API}/series?category=Economics&limit=50`, label: "Kalshi demo API: Economics series, first 50 (live, 2026-11-20)" },
+  seriesOilEnergyApi: { url: `${API}/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50`, label: "Kalshi demo API: Economics + Oil and energy series (live, 2026-11-20)" },
+  dieselMarketsApi: { url: `${API}/markets?series_ticker=KXDIESELD&status=open&limit=5`, label: "Kalshi demo API: open KXDIESELD markets (live, 2026-11-20)" },
+  verifyLog: { url: "https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/verification/2026-11-20-e6c3b3b6.md", label: "Repo: live re-verification record V1-V9 (session e6c3b3b6)" },
   aaa: { url: "https://gasprices.aaa.com/", label: "AAA (settlement source named in the API series record for gas markets; not independently fetched)" },
 };
 
@@ -183,7 +189,7 @@ ${table(["Fact", "Evidence", "Source"], [
 const TOPIC_INFO = {
   gas: { title: "Gas prices", blurb: "Markets on US gas prices settled by AAA. Series are found through the \"Oil &amp; Gas\" tag and filtered to tickers starting with <code>KXAAAGAS</code>. WTI oil and natural gas series are excluded (see " + "flag F-05).", flag: "F-05" },
   elections: { title: "Elections", blurb: "Series in Kalshi's <code>Elections</code> category (US and international races, primaries, nominations and related combos).", flag: null },
-  culture: { title: "Culture", blurb: "Kalshi's <code>Entertainment</code> category (music, awards, TV, movies, games). Kalshi has no category named \"culture\"; this mapping is our interpretation (see flag F-04).", flag: "F-04" },
+  culture: { title: "Culture", blurb: "Kalshi's <code>Entertainment</code> category (music, awards, TV, movies, games). The official tag map has no category named \"Culture\", yet the series filter <code>category=Culture</code> returns two live series; this mapping is our interpretation (see flag F-04).", flag: "F-04" },
   crypto: { title: "Crypto", blurb: "Series in Kalshi's <code>Crypto</code> category (BTC, ETH, SOL and others, many settled by CF Benchmarks).", flag: null },
   golf: { title: "Golf", blurb: "Series in Kalshi's <code>Sports</code> category that carry the <code>Golf</code> tag (for example Masters, Ryder Cup and PGA Tour markets).", flag: null },
 };
@@ -413,6 +419,12 @@ ${table(["ID", "Official source (link)", "Supports", "Checked"], [
   ["SRC-22", src("aaa"), "Named settlement source for gas series (linked, not independently checked)", "not fetched"],
   ["SRC-23", src("orderDir"), "Legacy action/side fields and removal date (\"not before May 28, 2026\")", CHECKED],
   ["SRC-24", src("histData"), "Live vs historical cutoff; which market/trade records leave live endpoints", CHECKED],
+  ["SRC-25", src("tagsApi"), "Category to tag map (live, 2026-11-20): no key named Culture; Entertainment, Commodities (Oil &amp; Gas), Economics (Oil and energy), Sports (Golf) present", CHECKED],
+  ["SRC-26", src("seriesCultureApi"), "Series with category Culture (live): two series. Conflicts with SRC-25 (see F-04)", CHECKED],
+  ["SRC-27", src("seriesEconomicsApi"), "AAA-settled gas series without the Oil &amp; Gas tag (AAAGASMAX). See F-17", CHECKED],
+  ["SRC-28", src("seriesOilEnergyApi"), "Economics + Oil and energy series, including AAA gas and diesel series and KXSPRMIN. See F-17, F-18, F-20", CHECKED],
+  ["SRC-29", src("dieselMarketsApi"), "Open KXDIESELD markets: status active, zero volume and zero last price. See F-18, F-19", CHECKED],
+  ["SRC-30", src("verifyLog"), "Session e6c3b3b6 record of live checks V1 to V9 with exact URLs", CHECKED],
 ], { cls: "compact" })}
 `);
 
@@ -423,7 +435,7 @@ ${table(["ID", "Type", "Item", "Affects", "Sources to check", "Status"], [
   ["F-01", "Unverified", "Browser access (CORS) to the demo API could not be tested from the build sandbox. The live tables depend on it.", "All category pages, dashboard", src("demoEnv") + " · " + src("orderbook"), badge("Needs review", "warn")],
   ["F-02", "Limitation", "REST candles are 1 minute minimum. Seconds granularity is recorded only while the page is open, not from the API. WebSocket requires credentials.", "Dashboard", src("candles") + " · " + src("ws"), badge("Needs review", "warn")],
   ["F-03", "Derived value", "No dollar-volume field exists in the API. Ranking uses open interest × notional_value_dollars (contracts × $1). This is a derived figure, not an official one.", "Category pages", src("market") + " · " + src("settlement"), badge("Needs review", "warn")],
-  ["F-04", "Interpretation", "\"Culture\" is mapped to Kalshi's Entertainment category. Kalshi has no category named Culture.", "Culture page", src("tags"), badge("Needs review", "warn")],
+  ["F-04", "Interpretation (refined 2026-11-20)", "\"Culture\" is mapped to Kalshi's Entertainment category. The official tag map has no Culture key, but the live series filter <code>category=Culture</code> returns two series (KXXBANNEDGROK, KXXBANNEDMURRAYHILLGUY1), so the earlier statement that Kalshi has no Culture category is contradicted. Which category is canonical is a reviewer decision.", "Culture page", src("tags") + " · " + src("seriesCultureApi"), badge("Needs review", "warn")],
   ["F-05", "Interpretation", "\"Gas prices\" uses only AAA gas series (KXAAAGAS*). Oil & Gas tag includes WTI and natural gas series, which are excluded.", "Gas page", src("gasSeriesApi") + " · " + src("aaa"), badge("Needs review", "warn")],
   ["F-06", "Caveat", "Demo prices may not reflect real markets (Kalshi's own warning).", "All price data", src("demoEnv"), badge("Documented", "")],
   ["F-07", "Blocker", "Portfolio, trades and P&amp;L not available: no demo API key provided; none requested or stored.", "Portfolio, Trading, Analysis", src("apiKeys"), badge("Blocked", "warn")],
@@ -433,9 +445,13 @@ ${table(["ID", "Type", "Item", "Affects", "Sources to check", "Status"], [
   ["F-11", "Repo irregularity", "Repository at base commit f1fa6aa contains only README.md (\"# KalshiDash1\"). No tests, CI, licence or .gitignore existed before this work.", "Repo", "git history of this repository", badge("Noted", "")],
   ["F-12", "Coordination", "Other session branches exist (arena/3f5650f9-kalshidash1 and arena/f661348d-kalshidash1) with claims on the same tasks. Branch 3f5650f9 marks docs as done, but those docs are not on that branch. See COORDINATION.md.", "Process", "COORDINATION.md on this branch", badge("Needs review", "warn")],
   ["F-13", "Unverified", "Some market field values are cached briefly by the API (Get Market reference), so live figures can lag.", "Dashboard", src("market"), badge("Documented", "")],
+  ["F-14", "Process", "GitHub Pages settings could not be changed by the automation token (HTTP 403 for build type and for the /docs folder). The site is therefore published from the repository root on main (legacy source). Repository owner may prefer a different source.", "Publishing", "GitHub Pages settings (repo admin)", badge("Needs review", "warn")],
   ["F-15", "Irregularity (prior session)", "Another session's page stated that gas-price markets were \"not located in demo events\". The official series list does return AAA gas series (for example KXAAAGASM, US gas price; KXAAAGASMINTX, Texas lowest gas price). That statement is contradicted by the API record. The prior pages are preserved in archive/.", "Gas page; archived prior pages", src("gasSeriesApi") + " · " + src("gasEventsApi"), badge("Needs review", "warn")],
   ["F-16", "Superseded pages", "Two sessions built overlapping site pages (merged on main through PRs #1-#3). The current site replaces the overlapping root pages. Their prior versions are kept under archive/ with internal links rewritten, not re-verified line by line. Start at archive/index.html.", "archive/ folder; git history", badge("Needs review", "warn")],
-  ["F-14", "Process", "GitHub Pages settings could not be changed by the automation token (HTTP 403 for build type and for the /docs folder). The site is therefore published from the repository root on main (legacy source). Repository owner may prefer a different source.", "Publishing", "GitHub Pages settings (repo admin)", badge("Needs review", "warn")],
+  ["F-17", "Irregularity", "The gas filter asks for tag <code>Oil &amp; Gas</code> and keeps only tickers starting with <code>KXAAAGAS</code>. It therefore misses AAA-settled gas series without that tag, for example <code>AAAGASMAX</code> (US highest gas price yearly; tag Oil and energy only). Live check 2026-11-20. Proposed fix: query category Economics with tag Oil and energy and keep the AAA gas prefixes, after confirming how the series list is paged.", "Gas page (live code in assets/app.js)", src("seriesEconomicsApi") + " · " + src("tagsApi"), badge("Needs review", "warn")],
+  ["F-18", "Scope", "Diesel series (<code>KXDIESELD</code>, <code>KXDIESELW</code>, <code>KXDIESELMONAK</code>) are AAA-settled but are not gasoline prices, so the gas page excludes them. Open <code>KXDIESELD</code> markets showed zero volume and zero last price on 2026-11-20. Decide whether diesel belongs under gas prices.", "Gas page scope", src("seriesOilEnergyApi") + " · " + src("dieselMarketsApi"), badge("Needs review", "warn")],
+  ["F-19", "Observation", "A <code>status=open</code> request returned markets whose <code>status</code> field reads <code>active</code> (KXDIESELD-26NOV21, 2026-11-20). This matches the response enum in F-03. No change is needed unless a page compares the response field to <code>open</code>.", "All market tables", src("market") + " · " + src("dieselMarketsApi"), badge("Documented", "")],
+  ["F-20", "Irregularity (dash/ suite)", "The <code>dash/</code> gas matcher (title <code>/\\bgas\\b|gasoline|fuel price|SPR\\b/i</code>, ticker <code>/GAS|SPR/i</code>) also matches the Strategic Petroleum Reserve series (KXSPRMIN, live 2026-11-20) and the natural-gas production series KXPAGAS (listed in <code>dash/data/snapshot.json</code>). It is not a gasoline-price filter. Not changed in this session; fix in <code>dash/js/config.js</code>.", "dash/ suite gas topic", src("seriesOilEnergyApi") + " · " + src("verifyLog"), badge("Needs review", "warn")],
 ], { cls: "compact", anchorFirst: true })}
 `);
 

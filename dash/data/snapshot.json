@@ -1,11 +1,12 @@
 {
   "meta": {
-    "captured_at": "2026-11-20T11:10:39Z",
+    "captured_at": "2026-11-20T13:21:00Z",
     "environment": "demo",
     "capture_method": "Direct HTTPS GET to Kalshi official demo Trade API (unauthenticated public endpoints), captured by the build session and frozen here verbatim.",
     "api_root": "https://external-api.demo.kalshi.co/trade-api/v2",
     "api_root_legacy": "https://demo-api.kalshi.co/trade-api/v2",
-    "note": "This is a point-in-time snapshot. The site prefers live data when the browser can reach the API; every row below carries the exact endpoint URL it came from. Values are never inferred: fields not returned by the query are null and flagged on the Flagged for Review page."
+    "note": "This is a point-in-time snapshot. The site prefers live data when the browser can reach the API; every row below carries the exact endpoint URL it came from. Values are never inferred: fields not returned by the query are null and flagged on the Flagged for Review page.",
+    "capture_note": "Refreshed 2026-11-20 ~13:21 UTC from live demo-API reads (external-api.demo.kalshi.co). Elections + crypto live-market rows refreshed; key series volumes refreshed where captured. New verified trades_sample block added for the alert feed."
   },
   "topics": {
     "gas": {
@@ -13,13 +14,91 @@
       "series_query": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50",
       "series_query_2": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&limit=50",
       "series": [
-        { "ticker": "SPRMIN", "title": "SPRMIN (US Strategic Petroleum Reserve minimum)", "category": "Economics", "tags": ["Oil and energy"], "volume_fp": "1269.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/SPR.pdf", "settlement_source": "EIA (https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCSSTUS1&f=W)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50" },
-        { "ticker": "AAAGASD", "title": "US gas price up (daily)", "category": "Economics", "tags": ["Oil and energy"], "volume_fp": "234.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/AAAGAS.pdf", "settlement_source": "AAA (https://gasprices.aaa.com/)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50" },
-        { "ticker": "KXAAAGASDSD", "title": "South Dakota gas price (daily)", "category": "Economics", "tags": ["Oil and energy", "Econ Daily"], "volume_fp": "128.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/AAAGASNEW.pdf", "settlement_source": "AAA (https://gasprices.aaa.com/?state=SD)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50" },
-        { "ticker": "KXAAAGASED", "title": "US gas price on Election Day", "category": "Economics", "tags": ["Oil & Gas", "Oil and energy"], "volume_fp": "89.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/AAAGAS.pdf", "settlement_source": "AAA (https://gasprices.aaa.com/)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50" },
-        { "ticker": "KXPAGAS", "title": "Pennsylvania natural gas production", "category": "Economics", "tags": ["Oil and energy"], "volume_fp": "0.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/ECONSTATE.pdf", "settlement_source": "Federal Reserve Bank of New York (https://www.newyorkfed.org/markets/reference-rates/sofr)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50" },
-        { "ticker": "KXAAAGASCDUT", "title": "Utah gas price (daily)", "category": "Economics", "tags": ["Oil and energy", "Econ Daily"], "volume_fp": "0.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/AAAGASNEW.pdf", "settlement_source": "AAA (https://gasprices.aaa.com/?state=UT)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50" },
-        { "ticker": "KXGAS-MONTH", "title": "Gas monthly (EIA national average)", "category": "Economics", "tags": [], "volume_fp": null, "contract_terms_url": "https://assets.kalshi.com/contract_terms/GAS.pdf", "settlement_source": "U.S. Energy Information Agency (https://www.eia.gov/dnav/pet/PET_PRI_GND_DCUS_NUS_W.htm)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&limit=50" }
+        {
+          "ticker": "SPRMIN",
+          "title": "SPRMIN (US Strategic Petroleum Reserve minimum)",
+          "category": "Economics",
+          "tags": [
+            "Oil and energy"
+          ],
+          "volume_fp": "1269.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/SPR.pdf",
+          "settlement_source": "EIA (https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCSSTUS1&f=W)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "AAAGASD",
+          "title": "US gas price up (daily)",
+          "category": "Economics",
+          "tags": [
+            "Oil and energy"
+          ],
+          "volume_fp": "234.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/AAAGAS.pdf",
+          "settlement_source": "AAA (https://gasprices.aaa.com/)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXAAAGASDSD",
+          "title": "South Dakota gas price (daily)",
+          "category": "Economics",
+          "tags": [
+            "Oil and energy",
+            "Econ Daily"
+          ],
+          "volume_fp": "128.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/AAAGASNEW.pdf",
+          "settlement_source": "AAA (https://gasprices.aaa.com/?state=SD)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXAAAGASED",
+          "title": "US gas price on Election Day",
+          "category": "Economics",
+          "tags": [
+            "Oil & Gas",
+            "Oil and energy"
+          ],
+          "volume_fp": "89.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/AAAGAS.pdf",
+          "settlement_source": "AAA (https://gasprices.aaa.com/)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXPAGAS",
+          "title": "Pennsylvania natural gas production",
+          "category": "Economics",
+          "tags": [
+            "Oil and energy"
+          ],
+          "volume_fp": "0.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/ECONSTATE.pdf",
+          "settlement_source": "Federal Reserve Bank of New York (https://www.newyorkfed.org/markets/reference-rates/sofr)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXAAAGASCDUT",
+          "title": "Utah gas price (daily)",
+          "category": "Economics",
+          "tags": [
+            "Oil and energy",
+            "Econ Daily"
+          ],
+          "volume_fp": "0.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/AAAGASNEW.pdf",
+          "settlement_source": "AAA (https://gasprices.aaa.com/?state=UT)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXGAS-MONTH",
+          "title": "Gas monthly (EIA national average)",
+          "category": "Economics",
+          "tags": [],
+          "volume_fp": null,
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/GAS.pdf",
+          "settlement_source": "U.S. Energy Information Agency (https://www.eia.gov/dnav/pet/PET_PRI_GND_DCUS_NUS_W.htm)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&limit=50"
+        }
       ],
       "live_markets": [],
       "live_note": "At capture time the queried gas series (KXGAS-MONTH, KXAAAGASDSD, AAAGASD, KXXBANNED*) had NO markets with status=open. Gas events run on daily/monthly schedules; the dashboard re-checks live. Source: https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXGAS-MONTH&status=open&limit=10 (empty result 2026-11-20T11:10Z).",
@@ -34,11 +113,56 @@
           "settlement_source": "AAA (https://gasprices.aaa.com/?state=SD)",
           "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASDSD&status=settled&with_nested_markets=true&limit=2",
           "markets": [
-            { "ticker": "KXAAAGASDSD-26NOV14-3.7400", "strike": "Above $3.7400", "result": "no", "settlement_value_dollars": "0.0000", "volume_fp": "0.00", "open_interest_fp": "0.00", "status": "finalized", "rules_primary": "If average regular gas prices for South Dakota are strictly greater than $3.7400 on Nov 14, 2026 according to AAA, then the market resolves to Yes." },
-            { "ticker": "KXAAAGASDSD-26NOV14-3.7450", "strike": "Above $3.7450", "result": "no", "settlement_value_dollars": "0.0000", "volume_fp": "0.00", "open_interest_fp": "0.00", "status": "finalized", "rules_primary": "If average regular gas prices for South Dakota are strictly greater than $3.7450 on Nov 14, 2026 according to AAA, then the market resolves to Yes." },
-            { "ticker": "KXAAAGASDSD-26NOV14-3.7500", "strike": "Above $3.7500", "result": "no", "settlement_value_dollars": "0.0000", "volume_fp": "0.00", "open_interest_fp": "0.00", "status": "finalized", "rules_primary": "If average regular gas prices for South Dakota are strictly greater than $3.7500 on Nov 14, 2026 according to AAA, then the market resolves to Yes." },
-            { "ticker": "KXAAAGASDSD-26NOV14-3.7550", "strike": "Above $3.7550", "result": "no", "settlement_value_dollars": "0.0000", "volume_fp": "0.00", "open_interest_fp": "0.00", "status": "finalized", "rules_primary": "If average regular gas prices for South Dakota are strictly greater than $3.7550 on Nov 14, 2026 according to AAA, then the market resolves to Yes." },
-            { "ticker": "KXAAAGASDSD-26NOV14-3.7600", "strike": "Above $3.7600", "result": "no", "settlement_value_dollars": "0.0000", "volume_fp": "0.00", "open_interest_fp": "0.00", "status": "finalized", "rules_primary": "If average regular gas prices for South Dakota are strictly greater than $3.7600 on Nov 14, 2026 according to AAA, then the market resolves to Yes." }
+            {
+              "ticker": "KXAAAGASDSD-26NOV14-3.7400",
+              "strike": "Above $3.7400",
+              "result": "no",
+              "settlement_value_dollars": "0.0000",
+              "volume_fp": "0.00",
+              "open_interest_fp": "0.00",
+              "status": "finalized",
+              "rules_primary": "If average regular gas prices for South Dakota are strictly greater than $3.7400 on Nov 14, 2026 according to AAA, then the market resolves to Yes."
+            },
+            {
+              "ticker": "KXAAAGASDSD-26NOV14-3.7450",
+              "strike": "Above $3.7450",
+              "result": "no",
+              "settlement_value_dollars": "0.0000",
+              "volume_fp": "0.00",
+              "open_interest_fp": "0.00",
+              "status": "finalized",
+              "rules_primary": "If average regular gas prices for South Dakota are strictly greater than $3.7450 on Nov 14, 2026 according to AAA, then the market resolves to Yes."
+            },
+            {
+              "ticker": "KXAAAGASDSD-26NOV14-3.7500",
+              "strike": "Above $3.7500",
+              "result": "no",
+              "settlement_value_dollars": "0.0000",
+              "volume_fp": "0.00",
+              "open_interest_fp": "0.00",
+              "status": "finalized",
+              "rules_primary": "If average regular gas prices for South Dakota are strictly greater than $3.7500 on Nov 14, 2026 according to AAA, then the market resolves to Yes."
+            },
+            {
+              "ticker": "KXAAAGASDSD-26NOV14-3.7550",
+              "strike": "Above $3.7550",
+              "result": "no",
+              "settlement_value_dollars": "0.0000",
+              "volume_fp": "0.00",
+              "open_interest_fp": "0.00",
+              "status": "finalized",
+              "rules_primary": "If average regular gas prices for South Dakota are strictly greater than $3.7550 on Nov 14, 2026 according to AAA, then the market resolves to Yes."
+            },
+            {
+              "ticker": "KXAAAGASDSD-26NOV14-3.7600",
+              "strike": "Above $3.7600",
+              "result": "no",
+              "settlement_value_dollars": "0.0000",
+              "volume_fp": "0.00",
+              "open_interest_fp": "0.00",
+              "status": "finalized",
+              "rules_primary": "If average regular gas prices for South Dakota are strictly greater than $3.7600 on Nov 14, 2026 according to AAA, then the market resolves to Yes."
+            }
           ]
         }
       ]
@@ -47,12 +171,79 @@
       "label": "Elections",
       "series_query": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50",
       "series": [
-        { "ticker": "KXELECTIONEMERGENCY", "title": "Will Trump declare an election emergency?", "category": "Elections", "tags": ["Trump"], "volume_fp": "7517.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESACTION.pdf", "settlement_source": "the White House (https://www.whitehouse.gov)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50" },
-        { "ticker": "KXVOTEPERCENTWHATLEYNC", "title": "Michael Whatley vote percent in the NC GOP Senate primary", "category": "Elections", "tags": ["Primaries", "US Elections"], "volume_fp": "7.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/VOTEPERCENT.pdf", "settlement_source": "official state or local election division websites (https://www.vote.gov/)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50" },
-        { "ticker": "KXFLEARLYVOTE", "title": "Florida in-person early votes", "category": "Elections", "tags": ["US Elections"], "volume_fp": "5.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/POLITICALSTAT.pdf", "settlement_source": "University of Florida Election Lab (https://election.lab.ufl.edu/early-vote/2026-early-voting/)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50" },
-        { "ticker": "KXSPEAKER120", "title": "120th Congress: Who will be Speaker of the House?", "category": "Elections", "tags": ["US Elections"], "volume_fp": "0.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/USELECTION.pdf", "settlement_source": "Federal Election Commission (https://www.fec.gov)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50" },
-        { "ticker": "KXNOTLMAYOR", "title": "Niagara-on-the-Lake mayoral election winner", "category": "Elections", "tags": ["International elections"], "volume_fp": "0.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/ELECTION.pdf", "settlement_source": "Town of Niagara-on-the-Lake Clerk (https://www.notl.com/elections)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50" },
-        { "ticker": "KXCAMEROONPRES", "title": "Cameroon president", "category": "Elections", "tags": ["International elections"], "volume_fp": "0.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/GOVHEAD.pdf", "settlement_source": "the Associated Press (https://apnews.com/)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50" }
+        {
+          "ticker": "KXELECTIONEMERGENCY",
+          "title": "Election emergency executive action",
+          "category": "Elections",
+          "tags": [
+            "Trump"
+          ],
+          "volume_fp": "7517.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESACTION.pdf",
+          "settlement_source": "the White House (https://www.whitehouse.gov)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXVOTEPERCENTWHATLEYNC",
+          "title": "Michael Whatley vote percent in the NC GOP Senate primary",
+          "category": "Elections",
+          "tags": [
+            "Primaries",
+            "US Elections"
+          ],
+          "volume_fp": "7.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/VOTEPERCENT.pdf",
+          "settlement_source": "official state or local election division websites (https://www.vote.gov/)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXFLEARLYVOTE",
+          "title": "Florida in-person early votes",
+          "category": "Elections",
+          "tags": [
+            "US Elections"
+          ],
+          "volume_fp": "5.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/POLITICALSTAT.pdf",
+          "settlement_source": "University of Florida Election Lab (https://election.lab.ufl.edu/early-vote/2026-early-voting/)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXSPEAKER120",
+          "title": "120th Congress: Who will be Speaker of the House?",
+          "category": "Elections",
+          "tags": [
+            "US Elections"
+          ],
+          "volume_fp": "0.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/USELECTION.pdf",
+          "settlement_source": "Federal Election Commission (https://www.fec.gov)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXNOTLMAYOR",
+          "title": "Niagara-on-the-Lake mayoral election winner",
+          "category": "Elections",
+          "tags": [
+            "International elections"
+          ],
+          "volume_fp": "0.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/ELECTION.pdf",
+          "settlement_source": "Town of Niagara-on-the-Lake Clerk (https://www.notl.com/elections)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXCAMEROONPRES",
+          "title": "Cameroon president",
+          "category": "Elections",
+          "tags": [
+            "International elections"
+          ],
+          "volume_fp": "0.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/GOVHEAD.pdf",
+          "settlement_source": "the Associated Press (https://apnews.com/)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50"
+        }
       ],
       "live_markets": [
         {
@@ -78,7 +269,10 @@
           "expected_expiration_time": "2026-11-03T15:00:00Z",
           "latest_expiration_time": "2027-01-08T15:00:00Z",
           "rules_primary": "If Donald Trump has taken any executive action declaring a national emergency regarding the 2026 United States midterm election before Jan 1, 2027, then the market resolves to Yes.",
-          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXELECTIONEMERGENCY&status=open&limit=10"
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXELECTIONEMERGENCY&status=open&limit=10",
+          "yes_sub_title": "Before Jan 1, 2027",
+          "rules_secondary": "The qualifying action must be of the specific type designated (executive order, presidential memorandum, proclamation, directive, determination, or finding), be signed by the President personally during the specified time period, and explicitly address the topic in the document's operative provisions, title, or official White House summary.",
+          "settlement_source": "Kalshi settlement rules (event ticker KXELECTIONEMERGENCY)"
         },
         {
           "ticker": "KXNEXTNATOSECGEN-99-KIOH",
@@ -163,8 +357,28 @@
       "label": "Culture",
       "series_query": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&limit=50",
       "series": [
-        { "ticker": "KXXBANNEDMURRAYHILLGUY1", "title": "Will @MurrayHillGuy1 get banned from X this year?", "category": "Culture", "tags": [], "volume_fp": null, "contract_terms_url": "https://assets.kalshi.com/contract_terms/XBANNED.pdf", "settlement_source": "news sources incl. NYT, Reuters, WSJ (see contract terms)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&limit=50" },
-        { "ticker": "KXXBANNEDGROK", "title": "Will Grok be banned this year", "category": "Culture", "tags": ["AI"], "volume_fp": null, "contract_terms_url": "https://assets.kalshi.com/contract_terms/XBANNED.pdf", "settlement_source": "news sources incl. NYT, Reuters, WSJ (see contract terms)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&limit=50" }
+        {
+          "ticker": "KXXBANNEDMURRAYHILLGUY1",
+          "title": "Will @MurrayHillGuy1 get banned from X this year?",
+          "category": "Culture",
+          "tags": [],
+          "volume_fp": null,
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/XBANNED.pdf",
+          "settlement_source": "news sources incl. NYT, Reuters, WSJ (see contract terms)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&limit=50"
+        },
+        {
+          "ticker": "KXXBANNEDGROK",
+          "title": "Will Grok be banned this year",
+          "category": "Culture",
+          "tags": [
+            "AI"
+          ],
+          "volume_fp": null,
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/XBANNED.pdf",
+          "settlement_source": "news sources incl. NYT, Reuters, WSJ (see contract terms)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&limit=50"
+        }
       ],
       "live_markets": [],
       "live_note": "Both Culture series had NO open markets at capture time (queried 2026-11-20T11:10Z). The demo Culture board is thin; the site re-checks live. Source: https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXXBANNEDGROK&status=open&limit=10 (empty).",
@@ -174,14 +388,138 @@
       "label": "Crypto",
       "series_query": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=50",
       "series": [
-        { "ticker": "KXDEMOFUTHOURLY", "title": "Demo BTC hourly at-or-above markets", "category": "Crypto", "tags": ["BTC"], "volume_fp": null, "contract_terms_url": null, "settlement_source": "Coinbase Exchange BTC-USD 1-minute candle (per market rules)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXDEMOFUTHOURLY&status=open&limit=5" },
-        { "ticker": "KXBTCHIT85K", "title": "Bitcoin above $85,000 by a date", "category": "Crypto", "tags": ["BTC"], "volume_fp": null, "contract_terms_url": "https://assets.kalshi.com/contract_terms/BTCHITBY.pdf", "settlement_source": "CF Benchmarks BRTI (https://www.cfbenchmarks.com/data/indices/BRTI)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=50" },
-        { "ticker": "ETHMAXY", "title": "How high will Ethereum get this year?", "category": "Crypto", "tags": ["ETH"], "volume_fp": null, "contract_terms_url": "https://assets.kalshi.com/contract_terms/ETHMINMAX.pdf", "settlement_source": "CF Benchmarks ETHUSD_RTI (https://www.cfbenchmarks.com/data/indices/ETHUSD_RTI)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=50" },
-        { "ticker": "KXRIPPLE", "title": "Ripple range (hourly)", "category": "Crypto", "tags": [], "volume_fp": null, "contract_terms_url": "https://assets.kalshi.com/contract_terms/RIPPLE.pdf", "settlement_source": "CF Benchmarks XRPUSD_RTI (https://www.cfbenchmarks.com/data/indices/XRPUSD_RTI)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=50" },
-        { "ticker": "KXBNBD", "title": "BNB Directional (hourly)", "category": "Crypto", "tags": ["BNB", "Crypto"], "volume_fp": null, "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf", "settlement_source": "CF Benchmarks (https://www.cfbenchmarks.com/)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=50" },
-        { "ticker": "KXXRPATH", "title": "XRP ATH", "category": "Crypto", "tags": [], "volume_fp": null, "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTOMINMAX.pdf", "settlement_source": "CF Benchmarks (https://www.cfbenchmarks.com/)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=50" }
+        {
+          "ticker": "KXDEMOFUTHOURLY",
+          "title": "Demo BTC hourly at-or-above markets",
+          "category": "Crypto",
+          "tags": [
+            "BTC"
+          ],
+          "volume_fp": null,
+          "contract_terms_url": null,
+          "settlement_source": "Coinbase Exchange BTC-USD 1-minute candle (per market rules)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXDEMOFUTHOURLY&status=open&limit=5"
+        },
+        {
+          "ticker": "KXBTCHIT85K",
+          "title": "Bitcoin above $85,000 by a date",
+          "category": "Crypto",
+          "tags": [
+            "BTC"
+          ],
+          "volume_fp": null,
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/BTCHITBY.pdf",
+          "settlement_source": "CF Benchmarks BRTI (https://www.cfbenchmarks.com/data/indices/BRTI)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=50"
+        },
+        {
+          "ticker": "ETHMAXY",
+          "title": "How high will Ethereum get this year?",
+          "category": "Crypto",
+          "tags": [
+            "ETH"
+          ],
+          "volume_fp": null,
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/ETHMINMAX.pdf",
+          "settlement_source": "CF Benchmarks ETHUSD_RTI (https://www.cfbenchmarks.com/data/indices/ETHUSD_RTI)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=50"
+        },
+        {
+          "ticker": "KXRIPPLE",
+          "title": "Ripple range (hourly)",
+          "category": "Crypto",
+          "tags": [],
+          "volume_fp": null,
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/RIPPLE.pdf",
+          "settlement_source": "CF Benchmarks XRPUSD_RTI (https://www.cfbenchmarks.com/data/indices/XRPUSD_RTI)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=50"
+        },
+        {
+          "ticker": "KXBNBD",
+          "title": "BNB Directional (hourly)",
+          "category": "Crypto",
+          "tags": [
+            "BNB",
+            "Crypto"
+          ],
+          "volume_fp": null,
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf",
+          "settlement_source": "CF Benchmarks (https://www.cfbenchmarks.com/)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=50"
+        },
+        {
+          "ticker": "KXXRPATH",
+          "title": "XRP ATH",
+          "category": "Crypto",
+          "tags": [],
+          "volume_fp": null,
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTOMINMAX.pdf",
+          "settlement_source": "CF Benchmarks (https://www.cfbenchmarks.com/)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=50"
+        },
+        {
+          "ticker": "KXLTCMAXY",
+          "title": "LTC Max",
+          "category": "Crypto",
+          "tags": [
+            "Litecoin"
+          ],
+          "volume_fp": "71118.00",
+          "settlement_source": "CF Benchmarks",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXSOL26500",
+          "title": "Sol above 500 in 2026",
+          "category": "Crypto",
+          "tags": [
+            "Solana"
+          ],
+          "volume_fp": "209.00",
+          "settlement_source": "CF Benchmarks",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXBNBY",
+          "title": "BNB Yearly",
+          "category": "Crypto",
+          "tags": [
+            "BNB"
+          ],
+          "volume_fp": "54.00",
+          "settlement_source": "CF Benchmarks",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true&limit=50"
+        }
       ],
       "live_markets": [
+        {
+          "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+          "event_ticker": "KXDEMOFUTHOURLY-26NOV20H14",
+          "title": "Demo BTC at or above 61498.92 USD",
+          "yes_sub_title": "At or above reference",
+          "status": "active",
+          "result": "",
+          "last_price_dollars": "0.6500",
+          "previous_price_dollars": "0.0000",
+          "yes_bid_dollars": "0.0100",
+          "yes_bid_size_fp": "10.00",
+          "yes_ask_dollars": "1.0000",
+          "yes_ask_size_fp": "0.00",
+          "no_bid_dollars": "0.0000",
+          "no_ask_dollars": "0.9900",
+          "volume_fp": "2820.00",
+          "volume_24h_fp": "2235.00",
+          "open_interest_fp": "90.00",
+          "notional_value_dollars": "1.0000",
+          "close_time": "2026-11-20T14:00:00Z",
+          "expected_expiration_time": "",
+          "latest_expiration_time": "2026-11-20T14:05:00Z",
+          "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T14:00:00+00:00 closes at or above 61498.92 USD; otherwise NO.",
+          "rules_secondary": "",
+          "settlement_source": "CF Benchmarks / Coinbase Exchange BTC-USD reference (series KXDEMOFUTHOURLY)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXDEMOFUTHOURLY&status=open&limit=10",
+          "topic": "crypto"
+        },
         {
           "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
           "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
@@ -208,7 +546,7 @@
           "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXDEMOFUTHOURLY&status=open&limit=5"
         }
       ],
-      "live_note": "The demo environment carries demo-only hourly BTC markets (KXDEMOFUTHOURLY) with real-time volume. This is the most active focus-topic market at capture time. Official warning (docs.kalshi.com/getting_started/demo_env.md): demo prices may not reflect real markets.",
+      "live_note": "The demo environment carries demo-only hourly BTC markets (KXDEMOFUTHOURLY) with real-time volume. This is the most active focus-topic market at capture time. Official warning (docs.kalshi.com/getting_started/demo_env.md): demo prices may not reflect real markets. Refreshed 2026-11-20 ~13:21 UTC: active hourly demo BTC market KXDEMOFUTHOURLY-26NOV20H14-UP (2,820.00 total volume). Series volumes refreshed (KXLTCMAXY 71,118.00; KXSOL26500 209.00; KXBNBY 54.00).",
       "settled_events": [
         {
           "event_ticker": "KXDEMOFUTHOURLY-26NOV20H11",
@@ -220,7 +558,16 @@
           "settlement_source": "Coinbase Exchange BTC-USD 1-minute candle (per market rules)",
           "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=settled&limit=25",
           "markets": [
-            { "ticker": "KXDEMOFUTHOURLY-26NOV20H11-UP", "strike": "At or above reference", "result": "yes", "settlement_value_dollars": "1.0000", "volume_fp": "8195.00", "open_interest_fp": "45.00", "status": "finalized", "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T11:00:00+00:00 closes at or above 61580.32 USD; otherwise NO." }
+            {
+              "ticker": "KXDEMOFUTHOURLY-26NOV20H11-UP",
+              "strike": "At or above reference",
+              "result": "yes",
+              "settlement_value_dollars": "1.0000",
+              "volume_fp": "8195.00",
+              "open_interest_fp": "45.00",
+              "status": "finalized",
+              "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T11:00:00+00:00 closes at or above 61580.32 USD; otherwise NO."
+            }
           ]
         }
       ]
@@ -229,11 +576,66 @@
       "label": "Golf",
       "series_query": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50",
       "series": [
-        { "ticker": "KXPGAR1T5", "title": "golf top 5 r1 (PGA round-1 top-5 finish)", "category": "Sports", "tags": ["Golf"], "volume_fp": "219.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/GOLFFINISH.pdf", "settlement_source": "ESPN (https://www.espn.com), PGA Tour (https://www.pgatour.com/)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50" },
-        { "ticker": "KXTGLCHAMPION", "title": "TGL Champion", "category": "Sports", "tags": ["Golf"], "volume_fp": "0.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/ACHIEVEMENTS.pdf", "settlement_source": "TGL (https://tglgolf.com/results)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50" },
-        { "ticker": "KXCHAMPTOURR1LEAD", "title": "round 1 leader (championship tour)", "category": "Sports", "tags": ["Golf"], "volume_fp": "0.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/ACHIEVEMENTS.pdf", "settlement_source": "ESPN (https://www.espn.com), PGA Tour (https://www.pgatour.com/)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50" },
-        { "ticker": "KXPGACUTLINE", "title": "PGA What Will the Cut Line Be", "category": "Sports", "tags": ["Golf"], "volume_fp": "0.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/SPORTSTOURNAMENTTHRESHOLD.pdf", "settlement_source": "ESPN (https://www.espn.com), Fox Sports (https://foxsports.com), PGA Tour (https://www.pgatour.com/)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50" },
-        { "ticker": "KXPGAUNDERPAR", "title": "Golfers to Finish Under Par", "category": "Sports", "tags": ["Golf"], "volume_fp": "0.00", "contract_terms_url": "https://assets.kalshi.com/contract_terms/GOLFERSUNDERPAR.pdf", "settlement_source": "ESPN (https://www.espn.com), PGA Tour (https://www.pgatour.com/)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50" }
+        {
+          "ticker": "KXPGAR1T5",
+          "title": "golf top 5 r1 (PGA round-1 top-5 finish)",
+          "category": "Sports",
+          "tags": [
+            "Golf"
+          ],
+          "volume_fp": "219.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/GOLFFINISH.pdf",
+          "settlement_source": "ESPN (https://www.espn.com), PGA Tour (https://www.pgatour.com/)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXTGLCHAMPION",
+          "title": "TGL Champion",
+          "category": "Sports",
+          "tags": [
+            "Golf"
+          ],
+          "volume_fp": "0.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/ACHIEVEMENTS.pdf",
+          "settlement_source": "TGL (https://tglgolf.com/results)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXCHAMPTOURR1LEAD",
+          "title": "round 1 leader (championship tour)",
+          "category": "Sports",
+          "tags": [
+            "Golf"
+          ],
+          "volume_fp": "0.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/ACHIEVEMENTS.pdf",
+          "settlement_source": "ESPN (https://www.espn.com), PGA Tour (https://www.pgatour.com/)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXPGACUTLINE",
+          "title": "PGA What Will the Cut Line Be",
+          "category": "Sports",
+          "tags": [
+            "Golf"
+          ],
+          "volume_fp": "0.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/SPORTSTOURNAMENTTHRESHOLD.pdf",
+          "settlement_source": "ESPN (https://www.espn.com), Fox Sports (https://foxsports.com), PGA Tour (https://www.pgatour.com/)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50"
+        },
+        {
+          "ticker": "KXPGAUNDERPAR",
+          "title": "Golfers to Finish Under Par",
+          "category": "Sports",
+          "tags": [
+            "Golf"
+          ],
+          "volume_fp": "0.00",
+          "contract_terms_url": "https://assets.kalshi.com/contract_terms/GOLFERSUNDERPAR.pdf",
+          "settlement_source": "ESPN (https://www.espn.com), PGA Tour (https://www.pgatour.com/)",
+          "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50"
+        }
       ],
       "live_markets": [],
       "live_note": "Golf series with volume (KXPGAR1T5: 219.00 contracts) had no status=open markets at capture time; PGA markets open around tournament rounds. Source: https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGAR1T5&status=open&limit=10 (empty) and https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGAUNDERPAR&status=open&limit=10 (empty).",
@@ -244,7 +646,15 @@
     "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
     "captured_at": "2026-11-20T11:07:00Z",
     "depth_requested": 10,
-    "orderbook_fp": { "yes_dollars": [["0.0100", "10.00"]], "no_dollars": [] },
+    "orderbook_fp": {
+      "yes_dollars": [
+        [
+          "0.0100",
+          "10.00"
+        ]
+      ],
+      "no_dollars": []
+    },
     "interpretation": "Per docs.kalshi.com/getting_started/orderbook_responses.md: yes_dollars and no_dollars are [price_dollars, count_fp] pairs sorted ascending (best bid last). No asks are returned: a YES bid at price X equals a NO ask at (1-X). Best YES bid here: $0.0100 with 10.00 contracts available at that price; implied best YES ask = $1.00 - $0.00 (no NO bids) -> see market's yes_ask_dollars field ($1.0000).",
     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP/orderbook?depth=10"
   },
@@ -256,16 +666,191 @@
     "end_ts": 1795173039,
     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY/markets/KXDEMOFUTHOURLY-26NOV20H12-UP/candlesticks?start_ts=1795169439&end_ts=1795173039&period_interval=1",
     "candlesticks": [
-      { "end_period_ts": 1795172460, "price_open": "0.6500", "price_high": "0.6500", "price_low": "0.3500", "price_close": "0.6500", "volume_fp": "120.00", "open_interest_fp": "50.00" },
-      { "end_period_ts": 1795172520, "price_open": "0.3500", "price_high": "0.6500", "price_low": "0.3500", "price_close": "0.6500", "volume_fp": "150.00", "open_interest_fp": "30.00" },
-      { "end_period_ts": 1795172580, "price_open": "0.3500", "price_high": "0.6500", "price_low": "0.3500", "price_close": "0.6500", "volume_fp": "150.00", "open_interest_fp": "50.00" },
-      { "end_period_ts": 1795172640, "price_open": "0.3500", "price_high": "0.6500", "price_low": "0.3500", "price_close": "0.6500", "volume_fp": "150.00", "open_interest_fp": "30.00" },
-      { "end_period_ts": 1795172700, "price_open": "0.3500", "price_high": "0.6500", "price_low": "0.3500", "price_close": "0.6500", "volume_fp": "150.00", "open_interest_fp": "50.00" },
-      { "end_period_ts": 1795172760, "price_open": "0.3500", "price_high": "0.6500", "price_low": "0.3500", "price_close": "0.6500", "volume_fp": "150.00", "open_interest_fp": "90.00" },
-      { "end_period_ts": 1795172820, "price_open": "0.3500", "price_high": "0.6500", "price_low": "0.3500", "price_close": "0.6500", "volume_fp": "150.00", "open_interest_fp": "70.00" },
-      { "end_period_ts": 1795172880, "price_open": "0.3500", "price_high": "0.6500", "price_low": "0.3500", "price_close": "0.6500", "volume_fp": "150.00", "open_interest_fp": "90.00" },
-      { "end_period_ts": 1795172940, "price_open": "0.3500", "price_high": "0.6500", "price_low": "0.3500", "price_close": "0.6500", "volume_fp": "150.00", "open_interest_fp": "70.00" },
-      { "end_period_ts": 1795173000, "price_open": "0.3500", "price_high": "0.6500", "price_low": "0.3500", "price_close": "0.6500", "volume_fp": "150.00", "open_interest_fp": "90.00" }
+      {
+        "end_period_ts": 1795172460,
+        "price_open": "0.6500",
+        "price_high": "0.6500",
+        "price_low": "0.3500",
+        "price_close": "0.6500",
+        "volume_fp": "120.00",
+        "open_interest_fp": "50.00"
+      },
+      {
+        "end_period_ts": 1795172520,
+        "price_open": "0.3500",
+        "price_high": "0.6500",
+        "price_low": "0.3500",
+        "price_close": "0.6500",
+        "volume_fp": "150.00",
+        "open_interest_fp": "30.00"
+      },
+      {
+        "end_period_ts": 1795172580,
+        "price_open": "0.3500",
+        "price_high": "0.6500",
+        "price_low": "0.3500",
+        "price_close": "0.6500",
+        "volume_fp": "150.00",
+        "open_interest_fp": "50.00"
+      },
+      {
+        "end_period_ts": 1795172640,
+        "price_open": "0.3500",
+        "price_high": "0.6500",
+        "price_low": "0.3500",
+        "price_close": "0.6500",
+        "volume_fp": "150.00",
+        "open_interest_fp": "30.00"
+      },
+      {
+        "end_period_ts": 1795172700,
+        "price_open": "0.3500",
+        "price_high": "0.6500",
+        "price_low": "0.3500",
+        "price_close": "0.6500",
+        "volume_fp": "150.00",
+        "open_interest_fp": "50.00"
+      },
+      {
+        "end_period_ts": 1795172760,
+        "price_open": "0.3500",
+        "price_high": "0.6500",
+        "price_low": "0.3500",
+        "price_close": "0.6500",
+        "volume_fp": "150.00",
+        "open_interest_fp": "90.00"
+      },
+      {
+        "end_period_ts": 1795172820,
+        "price_open": "0.3500",
+        "price_high": "0.6500",
+        "price_low": "0.3500",
+        "price_close": "0.6500",
+        "volume_fp": "150.00",
+        "open_interest_fp": "70.00"
+      },
+      {
+        "end_period_ts": 1795172880,
+        "price_open": "0.3500",
+        "price_high": "0.6500",
+        "price_low": "0.3500",
+        "price_close": "0.6500",
+        "volume_fp": "150.00",
+        "open_interest_fp": "90.00"
+      },
+      {
+        "end_period_ts": 1795172940,
+        "price_open": "0.3500",
+        "price_high": "0.6500",
+        "price_low": "0.3500",
+        "price_close": "0.6500",
+        "volume_fp": "150.00",
+        "open_interest_fp": "70.00"
+      },
+      {
+        "end_period_ts": 1795173000,
+        "price_open": "0.3500",
+        "price_high": "0.6500",
+        "price_low": "0.3500",
+        "price_close": "0.6500",
+        "volume_fp": "150.00",
+        "open_interest_fp": "90.00"
+      }
+    ]
+  },
+  "trades_sample": {
+    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+    "captured_at": "2026-11-20T13:19:14Z",
+    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXDEMOFUTHOURLY-26NOV20H14-UP&limit=50",
+    "trades": [
+      {
+        "trade_id": "07261d6d-b1c9-91bc-fd1f-1e38baeb4809",
+        "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+        "count_fp": "15.00",
+        "yes_price_dollars": "0.5500",
+        "no_price_dollars": "0.4500",
+        "taker_outcome_side": "no",
+        "taker_book_side": "ask",
+        "created_time": "2026-11-20T13:19:13.798123Z",
+        "is_block_trade": false
+      },
+      {
+        "trade_id": "07261d6d-2f61-be3d-e795-f046e6f7d24c",
+        "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+        "count_fp": "10.00",
+        "yes_price_dollars": "0.4500",
+        "no_price_dollars": "0.5500",
+        "taker_outcome_side": "yes",
+        "taker_book_side": "bid",
+        "created_time": "2026-11-20T13:19:08.807194Z",
+        "is_block_trade": false
+      },
+      {
+        "trade_id": "07261d6d-6c39-9a0c-2ea0-021ddec5f715",
+        "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+        "count_fp": "5.00",
+        "yes_price_dollars": "0.3500",
+        "no_price_dollars": "0.6500",
+        "taker_outcome_side": "yes",
+        "taker_book_side": "bid",
+        "created_time": "2026-11-20T13:19:03.799762Z",
+        "is_block_trade": false
+      },
+      {
+        "trade_id": "07261d6c-e291-b030-12d9-1a2361a8b6fc",
+        "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+        "count_fp": "20.00",
+        "yes_price_dollars": "0.6500",
+        "no_price_dollars": "0.3500",
+        "taker_outcome_side": "no",
+        "taker_book_side": "ask",
+        "created_time": "2026-11-20T13:18:58.798052Z",
+        "is_block_trade": false
+      },
+      {
+        "trade_id": "07261d6c-ab69-bc12-0724-5e3c48248eaf",
+        "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+        "count_fp": "15.00",
+        "yes_price_dollars": "0.5500",
+        "no_price_dollars": "0.4500",
+        "taker_outcome_side": "yes",
+        "taker_book_side": "bid",
+        "created_time": "2026-11-20T13:18:53.789661Z",
+        "is_block_trade": false
+      },
+      {
+        "trade_id": "07261d6c-35c1-a7a7-bcd0-88623685a58e",
+        "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+        "count_fp": "10.00",
+        "yes_price_dollars": "0.4500",
+        "no_price_dollars": "0.5500",
+        "taker_outcome_side": "no",
+        "taker_book_side": "ask",
+        "created_time": "2026-11-20T13:18:48.790529Z",
+        "is_block_trade": false
+      },
+      {
+        "trade_id": "07261d74-17d9-a4cd-ba23-ec090590264e",
+        "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+        "count_fp": "5.00",
+        "yes_price_dollars": "0.3500",
+        "no_price_dollars": "0.6500",
+        "taker_outcome_side": "no",
+        "taker_book_side": "ask",
+        "created_time": "2026-11-20T13:18:43.778125Z",
+        "is_block_trade": false
+      },
+      {
+        "trade_id": "07261d74-7971-9bb6-7060-16984e5e6aef",
+        "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+        "count_fp": "20.00",
+        "yes_price_dollars": "0.6500",
+        "no_price_dollars": "0.3500",
+        "taker_outcome_side": "yes",
+        "taker_book_side": "bid",
+        "created_time": "2026-11-20T13:18:38.807755Z",
+        "is_block_trade": false
+      }
     ]
   }
 }

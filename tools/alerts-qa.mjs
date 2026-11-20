@@ -1,7 +1,8 @@
 // KalshiDash1 — logic test for the alert engine + ROI model (session arena-f89b55f7).
-// Runs the real dash/js/model.js in Node and asserts the rules the Live Alerts page
-// depends on, against values verified from docs.kalshi.com and live demo-API probes
-// (see dash/sources.html rows S-A1…S-A4).
+// Runs the real merged dash/js/alerts.js in Node (with the same stub pattern as
+// tools/qa_alert_test.mjs) and asserts the pure decision core (window.AlertsEngineCore)
+// the Live Alerts page depends on, against values verified from docs.kalshi.com and live
+// demo-API probes (see dash/sources.html rows S-A1…S-A4).
 //
 //   node tools/alerts-qa.mjs
 //
@@ -14,11 +15,30 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const src = fs.readFileSync(path.join(here, "..", "dash", "js", "model.js"), "utf8");
+const ROOT = path.join(here, "..");
+
+/* ---- minimal browser stubs (alerts.js skips page boot: App is undefined here) ---- */
+const store = {};
+const elStub = () => ({ innerHTML: "", textContent: "", style: {}, children: [],
+  appendChild() {}, addEventListener() {}, querySelector() { return null; },
+  querySelectorAll() { return []; } });
+globalThis.document = {
+  hidden: true, readyState: "loading", addEventListener() {},
+  getElementById: () => elStub(), querySelector: () => elStub(),
+  querySelectorAll: () => [], createElement: () => elStub(), body: elStub()
+};
+globalThis.localStorage = {
+  getItem: k => (k in store ? store[k] : null),
+  setItem: (k, v) => { store[k] = String(v); },
+  removeItem: k => { delete store[k]; }
+};
 globalThis.window = globalThis;
-globalThis.module = { exports: {} };
-eval(src);
-const E = globalThis.AlertsEngine;
+globalThis.fetch = () => Promise.resolve({ ok: false, status: 503, json: () => Promise.resolve({}) });
+
+for (const f of ["dash/js/config.js", "dash/js/kalshi.js", "dash/js/data.js", "dash/js/store.js", "dash/js/alerts.js"]) {
+  eval(fs.readFileSync(path.join(ROOT, f), "utf8"));
+}
+const E = globalThis.AlertsEngineCore;
 
 let failed = 0;
 function check(name, cond, detail) {
