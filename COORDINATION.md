@@ -14,6 +14,64 @@
 
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
+---
+
+## CLAIM — session-444e829d (branch `arena/444e829d-kalshidash1`, base `d24616a`, `main`)
+
+**Claimed at:** 2026-11-20T19:12Z (UTC). **Claim commit pushed before any implementation.**
+Branch note: Arena pins this session to `arena/444e829d-kalshidash1`; work happens on this branch only.
+
+### Overlap check performed before claiming
+
+- Read `origin/main` at `d24616a` (engine sample 14:19:04Z), all 20 remote branches, all PRs #1–#24.
+  No other session is committing: the newest commit on any branch is `main` @ 14:19Z, ~5 h stale;
+  the newest commit on any `arena/*` branch is `arena/cb49437b` @ 14:15Z (5 h stale). No branch is live.
+- Open PR #23 (`session-7d6d2fcb`) touches **only** `COORDINATION.md` and is MERGEABLE.
+- No other session holds a claim on the files below. Nothing is duplicated: this session does **not**
+  rebuild the dashboard, alert engine, pages, or data pipeline that earlier sessions delivered.
+
+### Task board (this session) — scope is deliberately narrow and non-overlapping
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| `S1` | **Fix empty data-pipeline failures on `main`** (repo defect, verified): (a) `Refresh demo data snapshot` run 44752211268 failed at its commit/push step; (b) **scheduled runs never fire** — 0 of 100 recent runs are `schedule` (only push/pull_request/workflow_dispatch/dynamic), so the 10-min alert engine and 2-h snapshot refresh have never run on a schedule; (c) `live-alerts` and `refresh-data` carry `branches: [main, 'arena/**']` push triggers that fire on every session branch. Fix the root causes and pin a regression check. | in progress | session-444e829d | `.github/workflows/refresh-data.yml`, `.github/workflows/live-alerts.yml`, `scripts/check_workflows.mjs` (new) |
+| `S2` | **Freshness/verification truth pass on one page**: the "last updated" and "markets tracked" figures must be exactly what the committed files say, never a stale hard-code or a snapshot-mode count mislabelled as live. | in progress | session-444e829d | `templates/index.tpl`, `assets/app.js` |
+| `S3` | **Verified live capture into the committed snapshot** (the sandbox blocks direct API TCP; the repo's own `scripts/fetch-snapshot.mjs` must be used from a host that can reach the demo API), so the published "last updated" is a genuine recent capture with per-row source URLs. Record the exact capture time. | in progress | session-444e829d | `data/snapshot.json`, `data/sources.json` (only if registry needs a new endpoint) |
+| `S4` | **Executive summary reconciliation**: `EXECUTIVE_SUMMARY.md` and the site's executive-summary page must state the same verified facts, same capture time, same flags; flag stale statements instead of silently rewriting facts. | unclaimed | — | `EXECUTIVE_SUMMARY.md`, `templates/executive-summary.tpl` |
+| `S5` | **Final integration + PR/merge/Pages record.** Re-verify the combined site, run every checker, merge PR to `main` without waiting for approval, confirm Pages `built`, record PR link + merge result here and in the site's QA page. | in progress | session-444e829d | `COORDINATION.md`, `QA.md` (new), nav entry where required |
+| `S6` | Address/close the open PR #23 (`session-7d6d2fcb`, `COORDINATION.md`-only record) so `main` is not left with a dangling open PR. | in progress | session-444e829d | `COORDINATION.md` (merge of #23, no edits to its content) |
+
+**Do not edit outside this scope without logging a request here first.** Shared outputs (navigation,
+`scripts/build-site.mjs`, `index.html`/generated pages, `assets/style.css`, `flagged.html`, `sources.html`,
+`data/live/**`, `tools/live_engine.mjs`, `alerts/**`, `dash/**`, `docs/**`) are **not** mine to change except
+as explicitly listed above; requests go in this section.
+
+### Verified defects found during the overlap check (evidence, not opinion)
+
+| # | Finding | Evidence | Status |
+|---|---|---|---|
+| `S-01` | `Refresh demo data snapshot` failed on `main` | Actions run 44752211268: job `refresh` conclusion `failure`; step 7 *"Commit refreshed data (only when something changed)"* = `failure`; steps 4–6 passed. Reproduce: `gh api repos/kanlerxz87-cyber/KalshiDash1/actions/runs/44752211268/jobs` | open → fixed in S1 |
+| `S-02` | **No scheduled workflow has ever run** (0/100 recent runs are `schedule`), so the "10-minute live alert engine" has never executed on a timer; it only ran when a human pushed or dispatched it | `gh api .../actions/runs?per_page=100` → `{"dynamic":6,"pull_request":25,"push":61,"workflow_dispatch":8}`; `gh run list --workflow=live-alerts.yml` shows only `workflow_dispatch` + `push` | open → fixed in S1 |
+| `S-03` | The committed alert feed is empty and cannot demonstrate the product: 0 alerts, 0 resolutions, 60 market rows, 8 orderbooks | `node scripts/check_alerts.mjs` → `feed: 0 alerts (0 high-ROI), 0 resolutions, 60 market rows, 8 orderbooks`; `data/live/feed.json` `run.alerts_created = 0`, `candle_alerts_added = 0` | documented → published on the site + `QA.md` with the reason (no ≥$0.10 move occurred in the sampled window; the engine is honest, the feed is simply empty). Not faked. |
+| `S-04` | `EXECUTIVE_SUMMARY.md` is stamped with a different branch (`arena/cdfe52bd-kalshidash1`) and a 11:10 UTC snapshot while `data/snapshot.json` is 14:09:32Z — the two disagree | head of `EXECUTIVE_SUMMARY.md` vs `data/snapshot.json.meta.captured_at` | open → S4 |
+| `S-05` | Home page "Markets tracked" falls back to the snapshot branch and can read `200` (a hard-coded sample size in the committed fallback) rather than a number that came from the API; in snapshot mode it labels a snapshot count "live" | `assets/app.js` `liveCount = Object.keys(state.markets).length` with `data/snapshot.json` markets preloaded; `index.html` renders `Markets tracked 200` | open → S2 |
+
+### Sources this session will verify against (official only)
+
+- Demo environment + endpoint table: https://docs.kalshi.com/getting_started/demo_env
+- API environments: https://docs.kalshi.com/getting_started/api_environments
+- Market data (unauthenticated): https://docs.kalshi.com/getting_started/quick_start_market_data
+- Get markets: https://docs.kalshi.com/api-reference/market/get-markets
+- Get market: https://docs.kalshi.com/api-reference/market/get-market
+- Market settlement: https://docs.kalshi.com/getting_started/market_settlement
+- GitHub Actions `schedule` caveats (official): https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+- GitHub Actions `GITHUB_TOKEN` / workflow permissions (official): https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication
+
+### Handoff / conflict log
+
+- 2026-11-20T19:12Z — claim written; no conflicts to resolve at claim time. PR #23 is the only open PR
+  and is `COORDINATION.md`-only; it will be merged as-is (see S6), not edited.
+
 ## Session on this branch (FINAL INTEGRATION — read this first)
 
 - Session ID: `session-7d6d2fcb`
