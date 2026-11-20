@@ -1,151 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flagged for Review — KalshiDash1</title>
-<link rel="stylesheet" href="assets/css/style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flagged for review · Kalshi Demo Dashboard</title>
+<meta name="description" content="Irregularities, unverified items and caveats flagged for the reviewer, with source links.">
+<link rel="stylesheet" href="assets/style.css">
 </head>
-<body>
-<div class="site-wrap">
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="brand"><div class="mark">KD</div><div>KalshiDash1</div></div>
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="dashboard.html">Live Dashboard</a>
-        <a href="categories/gas.html">Gas Prices</a>
-        <a href="categories/elections.html">Elections</a>
-        <a href="categories/culture.html">Culture</a>
-        <a href="categories/crypto.html">Crypto</a>
-        <a href="categories/golf.html">Golf</a>
-        <a href="portfolio.html">Portfolio</a>
-        <a href="trades.html">Trades</a>
-        <a href="suggestions.html">Suggestions</a>
-        <a href="questions.html">Questions &amp; Answers</a>
-        <a href="flagged.html" class="active">Flagged for Review</a>
-      </nav>
-    </div>
-  </header>
+<body >
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="active">Flagged for review</a></div></nav>
+<main class="content">
 
-  <div class="hero" style="padding:24px 0 10px;">
-    <h1 style="font-size:22px;margin-bottom:6px;">Flagged for Review</h1>
-    <p style="font-size:14px;color:var(--muted);">Unverified items and irregularities found during line-by-line review. These do <strong>not</strong> block the site going live. Each item includes source links so you can review and request changes after the site is live.</p>
-  </div>
+<h1>Flagged for review</h1>
+<p class="muted">These items do not block the site. Each one needs your review. Source links are included so you can check them.</p>
+<div class="table-wrap"><table  class="compact"><thead><tr><th>ID</th><th>Type</th><th>Item</th><th>Affects</th><th>Sources to check</th><th>Status</th></tr></thead><tbody>
+<tr><td><span id="F-01"></span>F-01</td><td>Unverified</td><td>Browser access (CORS) to the demo API could not be tested from the build sandbox. The live tables depend on it.</td><td>All category pages, dashboard</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener" title="Kalshi docs: Demo environment">Demo environment ↗</a> · <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Orderbook">Get Market Orderbook ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+<tr><td><span id="F-02"></span>F-02</td><td>Limitation</td><td>REST candles are 1 minute minimum. Seconds granularity is recorded only while the page is open, not from the API. WebSocket requires credentials.</td><td>Dashboard</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Candlesticks">Get Market Candlesticks ↗</a> · <a href="https://docs.kalshi.com/getting_started/quick_start_websockets.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start WebSockets">Quick Start WebSockets ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+<tr><td><span id="F-03"></span>F-03</td><td>Derived value</td><td>No dollar-volume field exists in the API. Ranking uses open interest × notional_value_dollars (contracts × $1). This is a derived figure, not an official one.</td><td>Category pages</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a> · <a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener" title="Kalshi docs: Market Settlement">Market Settlement ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+<tr><td><span id="F-04"></span>F-04</td><td>Interpretation</td><td>"Culture" is mapped to Kalshi's Entertainment category. Kalshi has no category named Culture.</td><td>Culture page</td><td><a href="https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Tags for Series Categories">Get Tags for Series Categories ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+<tr><td><span id="F-05"></span>F-05</td><td>Interpretation</td><td>"Gas prices" uses only AAA gas series (KXAAAGAS*). Oil & Gas tag includes WTI and natural gas series, which are excluded.</td><td>Gas page</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?tags=Oil%20%26%20Gas&include_volume=true" target="_blank" rel="noopener" title="Kalshi demo API: Oil &amp; Gas series (live)">Oil &amp; Gas series (live) ↗</a> · <a href="https://gasprices.aaa.com/" target="_blank" rel="noopener" title="AAA (settlement source named in the API series record for gas markets; not independently fetched)">AAA (settlement source named in the API series r ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+<tr><td><span id="F-06"></span>F-06</td><td>Caveat</td><td>Demo prices may not reflect real markets (Kalshi's own warning).</td><td>All price data</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener" title="Kalshi docs: Demo environment">Demo environment ↗</a></td><td><span class="badge ">Documented</span></td></tr>
+<tr><td><span id="F-07"></span>F-07</td><td>Blocker</td><td>Portfolio, trades and P&amp;L not available: no demo API key provided; none requested or stored.</td><td>Portfolio, Trading, Analysis</td><td><a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a></td><td><span class="badge warn">Blocked</span></td></tr>
+<tr><td><span id="F-08"></span>F-08</td><td>Irregularity</td><td>The quick-start order example uses <code>POST /portfolio/events/orders</code> with <code>side: "bid"</code>. The order-direction page says legacy action/side fields "will not be removed before May 28, 2026"; today is 2026-11-20, so the example may be out of date. Not tested (no key).</td><td>Trading page</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start Create your first order">Quick Start Create your first order ↗</a> · <a href="https://docs.kalshi.com/getting_started/order_direction.md" target="_blank" rel="noopener" title="Kalshi docs: Order direction (outcome_side and book_side)">Order direction (outcome_side and book_side) ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+<tr><td><span id="F-09"></span>F-09</td><td>Unverified</td><td>Positions and fills endpoints were not fetched in this session, so their paths are not listed as verified.</td><td>Portfolio</td><td><a href="https://docs.kalshi.com/llms.txt" target="_blank" rel="noopener" title="Kalshi docs: documentation index">documentation index ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+<tr><td><span id="F-10"></span>F-10</td><td>Unverified</td><td>Fee schedule not read. Series records carry a fee_type; the schedule PDF is not verified here.</td><td>Analysis, suggestions</td><td><a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+<tr><td><span id="F-11"></span>F-11</td><td>Repo irregularity</td><td>Repository at base commit f1fa6aa contains only README.md ("# KalshiDash1"). No tests, CI, licence or .gitignore existed before this work.</td><td>Repo</td><td>git history of this repository</td><td><span class="badge ">Noted</span></td></tr>
+<tr><td><span id="F-12"></span>F-12</td><td>Coordination</td><td>Other session branches exist (arena/3f5650f9-kalshidash1 and arena/f661348d-kalshidash1) with claims on the same tasks. Branch 3f5650f9 marks docs as done, but those docs are not on that branch. See COORDINATION.md.</td><td>Process</td><td>COORDINATION.md on this branch</td><td><span class="badge warn">Needs review</span></td></tr>
+<tr><td><span id="F-13"></span>F-13</td><td>Unverified</td><td>Some market field values are cached briefly by the API (Get Market reference), so live figures can lag.</td><td>Dashboard</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a></td><td><span class="badge ">Documented</span></td></tr>
+<tr><td><span id="F-15"></span>F-15</td><td>Irregularity (prior session)</td><td>Another session's page stated that gas-price markets were "not located in demo events". The official series list does return AAA gas series (for example KXAAAGASM, US gas price; KXAAAGASMINTX, Texas lowest gas price). That statement is contradicted by the API record. The prior pages are preserved in archive/.</td><td>Gas page; archived prior pages</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?tags=Oil%20%26%20Gas&include_volume=true" target="_blank" rel="noopener" title="Kalshi demo API: Oil &amp; Gas series (live)">Oil &amp; Gas series (live) ↗</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true" target="_blank" rel="noopener" title="Kalshi demo API: open US gas price events (live)">open US gas price events (live) ↗</a></td><td><span class="badge warn">Needs review</span></td></tr>
+<tr><td><span id="F-16"></span>F-16</td><td>Superseded pages</td><td>Two sessions built overlapping site pages (merged on main through PRs #1-#3). The current site replaces the overlapping root pages. Their prior versions are kept under archive/ with internal links rewritten, not re-verified line by line. Start at archive/index.html.</td><td>archive/ folder; git history</td><td><span class="badge warn">Needs review</span></td></tr>
+<tr><td><span id="F-14"></span>F-14</td><td>Process</td><td>GitHub Pages settings could not be changed by the automation token (HTTP 403 for build type and for the /docs folder). The site is therefore published from the repository root on main (legacy source). Repository owner may prefer a different source.</td><td>Publishing</td><td>GitHub Pages settings (repo admin)</td><td><span class="badge warn">Needs review</span></td></tr>
+</tbody></table></div>
 
-  <div class="section">
-    <h2><span class="tag">Unverified items (values left blank, never inferred)</span></h2>
-    <table class="wide">
-      <thead>
-        <tr><th>#</th><th>Item</th><th>Why unverified</th><th>Source link</th><th>Needed to confirm</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td><td>Gas-price events in demo environment</td>
-          <td>Demo environment listed sports markets at review time; no gas-price events found. Table values left blank.</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-markets.md" target="_blank" rel="noopener">Get Markets</a> &middot; <a href="https://docs.kalshi.com/api-reference/market/get-event.md" target="_blank" rel="noopener">Get Event</a></td>
-          <td>Run <code>GET /markets?status=open</code> then <code>GET /events/{ticker}</code>; check <code>category</code>.</td>
-        </tr>
-        <tr>
-          <td>2</td><td>Election events in demo environment</td>
-          <td>Not found in demo at review time. Table values left blank.</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-markets.md" target="_blank" rel="noopener">Get Markets</a></td>
-          <td>Same discovery method; confirm <code>category</code>.</td>
-        </tr>
-        <tr>
-          <td>3</td><td>Culture events in demo environment</td>
-          <td>Not found in demo at review time. Table values left blank.</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-markets.md" target="_blank" rel="noopener">Get Markets</a></td>
-          <td>Same discovery method; confirm <code>category</code>.</td>
-        </tr>
-        <tr>
-          <td>4</td><td>Crypto events in demo environment</td>
-          <td>Not found in demo at review time. Table values left blank.</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-markets.md" target="_blank" rel="noopener">Get Markets</a></td>
-          <td>Same discovery method; confirm <code>category</code>.</td>
-        </tr>
-        <tr>
-          <td>5</td><td>Golf events in demo environment</td>
-          <td>Not found in demo at review time. Table values left blank.</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-markets.md" target="_blank" rel="noopener">Get Markets</a></td>
-          <td>Same discovery method; confirm <code>category</code>.</td>
-        </tr>
-        <tr>
-          <td>6</td><td>Highest-dollar live event per focus category</td>
-          <td>No events confirmed in any focus category; cannot determine highest dollar amount.</td>
-          <td>—</td>
-          <td>Confirm at least one event per category, then read <code>yes_bid_dollars</code>/<code>no_bid_dollars</code>.</td>
-        </tr>
-        <tr>
-          <td>7</td><td>Event resolutions (yes / no)</td>
-          <td>No confirmed focus-category events, so no resolutions to report.</td>
-          <td><a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener">Market Settlement</a></td>
-          <td>Wait for events to settle; read <code>result</code>.</td>
-        </tr>
-        <tr>
-          <td>8</td><td>Browser (GitHub Pages) can reach demo API / CORS</td>
-          <td>Not tested from GitHub Pages; sandbox outbound HTTPS was blocked (SSL_ERROR_SYSCALL) so it could not be verified here.</td>
-          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment docs</a></td>
-          <td>Open the live dashboard on GitHub Pages and confirm the status banner shows &ldquo;Live data loaded.&rdquo;</td>
-        </tr>
-        <tr>
-          <td>9</td><td>Authenticated portfolio / trade execution</td>
-          <td>Requires demo API key + Ed25519 private key; none provided or requested. Shown as documented structure only.</td>
-          <td><a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener">API Keys</a> &middot; <a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener">Create your first order</a></td>
-          <td>Connect demo credentials; test <code>GET /portfolio/balance</code> and <code>POST /portfolio/events/orders</code>.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section">
-    <h2><span class="tag">Irregularities flagged for review</span></h2>
-    <table class="wide">
-      <thead>
-        <tr><th>#</th><th>Irregularity</th><th>Details</th><th>Source</th><th>Severity</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td><td>Demo environment contents differ from project focus</td>
-          <td>The project focuses on gas / elections / culture / crypto / golf, but the demo environment currently lists sports markets (college football/basketball, NFL). No focus-category events were confirmed.</td>
-          <td>Live demo API (<code>GET /markets?status=open</code>) &middot; <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment docs</a></td>
-          <td><span class="badge badge-warn">high</span></td>
-        </tr>
-        <tr>
-          <td>2</td><td>No sub-minute candle resolution</td>
-          <td>User asked for a &ldquo;seconds&rdquo; graph option; the API only supports 1 / 60 / 1440-minute candlesticks. The dashboard plots 1-minute candles for a seconds lookback and documents this.</td>
-          <td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener">Get Market Candlesticks</a></td>
-          <td><span class="badge badge-warn">medium</span></td>
-        </tr>
-        <tr>
-          <td>3</td><td>Sandbox cannot reach the demo API directly</td>
-          <td>Outbound HTTPS from the build sandbox fails with SSL_ERROR_SYSCALL (all HTTPS hosts). Verification of endpoint shapes was done via the fetch_page tool (Arena infrastructure) and the official docs; live data must be fetched by the browser on GitHub Pages.</td>
-          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment docs</a></td>
-          <td><span class="badge badge-info">informational</span></td>
-        </tr>
-        <tr>
-          <td>4</td><td>No credentials available for authenticated endpoints</td>
-          <td>Portfolio balance, order placement, amend, cancel all require signing. The site cannot execute trades or track a real portfolio without user-supplied demo credentials (and none were requested).</td>
-          <td><a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests.md" target="_blank" rel="noopener">Authenticated Requests</a></td>
-          <td><span class="badge badge-warn">high</span></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section">
-    <h2>Review process</h2>
-    <ol>
-      <li>Open each source link above and verify against the official Kalshi documentation.</li>
-      <li>For unverified items, run the listed discovery step against the demo API and update the category tables only with confirmed values (source-linked).</li>
-      <li>If credentials become available, test authenticated endpoints and mark item 9 resolved.</li>
-      <li>Request changes by opening an issue or pull request against this repo.</li>
-    </ol>
-  </div>
-
-  <div class="footer-inner" style="margin-top:30px;">
-    <p class="small">KalshiDash1 &middot; Flagged for Review &middot; Endpoints verified against <a href="https://docs.kalshi.com" target="_blank" rel="noopener">docs.kalshi.com</a> &middot; Demo environment uses mock funds &middot; Not financial advice.</p>
-  </div>
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
+</main>
 </div>
+<script src="assets/app.js" type="module"></script>
 </body>
 </html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trading · Kalshi Demo Dashboard</title>
+<meta name="description" content="Trade execution status for the Kalshi demo: no orders placed, what the API requires, open issues.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body >
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="active">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div></nav>
+<main class="content">
+
+<h1>Trade execution (demo)</h1>
+<div class="notice"><strong>Status: no trades placed.</strong> Placing orders requires authenticated requests against the demo account. No credentials were provided, so no order was submitted. Nothing on this page is a recommendation to trade.</div>
+
+<h2>Order endpoint as documented (not yet implemented)</h2>
+<div class="table-wrap"><table  class="compact"><thead><tr><th>Item</th><th>Documented value</th><th>Source</th><th>Status</th></tr></thead><tbody>
+<tr><td>Create order path</td><td><code>POST /portfolio/events/orders</code> (in the quick-start example)</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start Create your first order">Quick Start Create your first order ↗</a></td><td><span class="badge warn">UNVERIFIED — see F-08</span></td></tr>
+<tr><td>Order fields in example</td><td><code>ticker</code>, <code>side: "bid"</code>, <code>count</code>, <code>price</code> (dollars string), <code>time_in_force</code>, <code>self_trade_prevention_type</code>, <code>client_order_id</code></td><td><a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start Create your first order">Quick Start Create your first order ↗</a></td><td><span class="badge warn">UNVERIFIED — see F-08</span></td></tr>
+<tr><td>Success response</td><td>HTTP 201 means accepted, not necessarily resting; check <code>remaining_count</code></td><td><a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start Create your first order">Quick Start Create your first order ↗</a></td><td><span class="badge ok">Documented</span></td></tr>
+<tr><td>Error codes</td><td>400 / 401 / 404 / 409 / 429 are described in the quick-start; full list in Order Errors reference</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start Create your first order">Quick Start Create your first order ↗</a></td><td><span class="badge ok">Documented</span></td></tr>
+<tr><td>Trades executed</td><td>0</td><td>—</td><td><span class="badge ">None</span></td></tr>
+</tbody></table></div>
+
+<h2>Blockers</h2>
+<ul>
+  <li>No demo API key (see <a href="portfolio.html">Portfolio</a>).</li>
+  <li>Order-direction fields: the quick-start uses the legacy <code>side</code> field, while the order-direction page recommends <code>outcome_side</code> / <code>book_side</code> (<a href="https://docs.kalshi.com/getting_started/order_direction.md" target="_blank" rel="noopener" title="Kalshi docs: Order direction (outcome_side and book_side)">Order direction (outcome_side and book_side) ↗</a>). Reconcile before any order code is written (<a class="flag" href="flagged.html#F-08">F-08</a>).</li>
+</ul>
+
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
+</main>
+</div>
+<script src="assets/app.js" type="module"></script>
+</body>
+</html>

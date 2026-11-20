@@ -3,197 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Portfolio — KalshiDash1</title>
-<link rel="stylesheet" href="assets/css/style.css">
+<title>Portfolio · Kalshi Demo Dashboard</title>
+<meta name="description" content="Portfolio tracking for the Kalshi demo account: status, required access and what is still missing.">
+<link rel="stylesheet" href="assets/style.css">
 </head>
-<body>
-<header class="site-header">
-  <div class="wrap header-inner">
-    <div class="brand"><span class="mark"></span> KalshiDash1</div>
-    <nav class="main-nav">
-      <a href="index.html">Home</a>
-      <a href="dashboard.html">Live Dashboard</a>
-      <a href="categories.html">Categories</a>
-      <a href="portfolio.html" class="active">Portfolio</a>
-      <a href="suggestions.html">Suggestions</a>
-      <a href="questions.html">Questions &amp; Answers</a>
-      <a href="flagged-review.html">Flagged for Review</a>
-    </nav>
-  </div>
-</header>
+<body >
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="active">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div></nav>
+<main class="content">
 
-<main class="wrap">
-  <section class="section">
-    <div class="section-head">
-      <h1>Portfolio Performance</h1>
-      <p>Paper-trade tracker for the Kalshi demo account. Add trades below; they are stored in your browser (localStorage) and re-valued against live Kalshi demo market prices. Trades are categorized by topic/type so you can review performance and build strategies by trade type.</p>
-      <div class="flag">
-        <b>Live execution requires API keys.</b> Reading a real demo-account portfolio and placing live orders use authenticated Kalshi trade API endpoints (<code>GET /portfolio</code>, <code>GET /trades</code>, <code>POST /portfolio/orders</code>). No API key is stored or transmitted by this site. The tracker below is a local paper simulator only.
-      </div>
-    </div>
+<h1>Portfolio performance (demo account)</h1>
+<div class="notice"><strong>Status: not connected.</strong> Portfolio endpoints require signed requests with a demo API key (KALSHI-ACCESS-KEY, -SIGNATURE, -TIMESTAMP). No key was provided or requested, and no key is stored in this site. No values are shown because none could be verified. See <a class="flag" href="flagged.html#F-07">F-07</a>.</div>
 
-    <div class="panel">
-      <h3>Record a paper trade</h3>
-      <form id="trade-form" class="form-grid">
-        <div class="field"><label>Event / market</label><input id="t-event" type="text" placeholder="e.g. Bitcoin price …" required></div>
-        <div class="field"><label>Market ticker</label><input id="t-ticker" type="text" placeholder="e.g. KXBTCD-…" required></div>
-        <div class="field"><label>Topic</label><select id="t-topic" required>
-          <option value="">Select topic</option>
-          <option>Elections</option><option>Crypto</option><option>Golf</option><option>Culture</option><option>Gas prices</option><option>Other</option>
-        </select></div>
-        <div class="field"><label>Side</label><select id="t-side" required><option value="Yes">Yes</option><option value="No">No</option></select></div>
-        <div class="field"><label>Quantity (contracts)</label><input id="t-qty" type="number" min="1" value="1" required></div>
-        <div class="field"><label>Entry price ($)</label><input id="t-price" type="number" min="0" max="1" step="0.0001" required></div>
-        <div class="field" style="align-self:end"><button class="btn btn-primary" type="submit">Add trade</button></div>
-      </form>
-    </div>
+<h2>Required endpoints and their status</h2>
+<div class="table-wrap"><table  class="compact"><thead><tr><th>Item</th><th>Official endpoint / reference</th><th>Value on this site</th><th>Status</th></tr></thead><tbody>
+<tr><td>Cash balance</td><td><code>GET /portfolio/balance</code> · <a href="https://docs.kalshi.com/getting_started/rate_limits.md" target="_blank" rel="noopener" title="Kalshi docs: Rate Limits and Tiers">Rate Limits and Tiers ↗</a> (balance bucket) · <a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a> (signing)</td><td></td><td><span class="badge warn">UNVERIFIED — no key</span></td></tr>
+<tr><td>Open positions</td><td>Not verified in this session (endpoint list not fetched). <a class="flag" href="flagged.html#F-09">F-09</a></td><td></td><td><span class="badge warn">UNVERIFIED</span></td></tr>
+<tr><td>Fills / trade history</td><td>Not verified in this session. <a class="flag" href="flagged.html#F-09">F-09</a></td><td></td><td><span class="badge warn">UNVERIFIED</span></td></tr>
+<tr><td>Realised P&amp;L</td><td>Not an API field we have verified. Derived P&amp;L would need fees and fills; see <a class="flag" href="flagged.html#F-10">F-10</a></td><td></td><td><span class="badge warn">NOT COMPUTED</span></td></tr>
+</tbody></table></div>
 
-    <div class="panel" style="margin-top:16px">
-      <h3>Paper trades &amp; live P&amp;L</h3>
-      <p class="note">P&amp;L uses the current live Yes-bid price from the Kalshi demo API for the market ticker. Unresolved trades are marked at current bid; resolved trades use the market result.</p>
-      <div class="table-wrap">
-        <table class="data">
-          <thead><tr>
-            <th>Event</th><th>Ticker</th><th>Topic</th><th>Side</th><th>Qty</th><th>Entry $</th><th>Current $</th><th>P&amp;L $</th><th>P&amp;L %</th><th>Status</th><th>Action</th>
-          </tr></thead>
-          <tbody id="trades-body"></tbody>
-        </table>
-      </div>
-      <div class="note" id="summary" style="margin-top:10px"></div>
-    </div>
+<h2>What is needed to switch this on</h2>
+<ol>
+  <li>A demo API key pair. Keys are created on the account page or with <code>POST /trade-api/v2/api_keys/generate</code> (<a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a>).</li>
+  <li>Signing must happen server-side. A static page cannot hold a private key safely. See suggestion S-02 on the Suggestions page.</li>
+  <li>Rate-limit handling: the balance endpoint has its own bucket, one call per second on Basic and Advanced tiers (<a href="https://docs.kalshi.com/getting_started/rate_limits.md" target="_blank" rel="noopener" title="Kalshi docs: Rate Limits and Tiers">Rate Limits and Tiers ↗</a>).</li>
+</ol>
 
-    <div class="panel" style="margin-top:16px">
-      <h3>Performance by trade type (topic)</h3>
-      <p class="note">Grouped P&amp;L to help you see which trade types are working — the basis for strategies by type of trade.</p>
-      <div class="table-wrap">
-        <table class="data">
-          <thead><tr><th>Topic</th><th>Trades</th><th>Realized P&amp;L $</th><th>Unrealized P&amp;L $</th><th>Win rate</th></tr></thead>
-          <tbody id="topic-body"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
 </main>
-
-<footer>
-  KalshiDash1 &middot; Portfolio (paper simulator) &middot; Data is live from <code>external-api.demo.kalshi.co</code> &middot; Demo environment only &middot; Not financial advice.
-</footer>
-<script src="assets/js/app.js"></script>
-<script>
-(function(){
-  const STORE = 'kalshidash_paper_trades';
-  function load(){ try { return JSON.parse(localStorage.getItem(STORE) || '[]'); } catch(e){ return []; } }
-  function save(v){ localStorage.setItem(STORE, JSON.stringify(v)); }
-  const form = document.getElementById('trade-form');
-  const tbody = document.getElementById('trades-body');
-  const topicBody = document.getElementById('topic-body');
-  const summary = document.getElementById('summary');
-  let trades = load();
-
-  function render(){
-    tbody.innerHTML = '';
-    let totRealized = 0, totUnrealized = 0, totCost = 0;
-    const byTopic = {};
-    for (const t of trades){
-      let current = null, pl = 0, plPct = 0, status = 'unresolved';
-      const cost = Number(t.qty) * Number(t.price);
-      totCost += cost;
-      // try live price
-      let live = null;
-      if (window.KalshiDash && window.KalshiDash.KALSHI){
-        try { live = window.KalshiDash.KALSHI.market(t.ticker); } catch(e){ live = null; }
-      }
-      if (t.resolved){
-        const yes = t.result === 'Yes';
-        const payoff = yes ? 1 : 0;
-        pl = (payoff - Number(t.price)) * Number(t.qty);
-        status = `Resolved: ${t.result}`;
-        totRealized += pl;
-      } else if (live && live.last_price_dollars != null){
-        current = Number(live.last_price_dollars);
-        const mark = t.side === 'Yes' ? current : (1 - current);
-        pl = (mark - Number(t.price)) * Number(t.qty);
-        status = `Live — bid $${Number(live.yes_bid_dollars).toFixed(4)}`;
-        totUnrealized += pl;
-      } else {
-        status = 'Live — price unavailable';
-      }
-      plPct = cost ? (pl / cost) * 100 : 0;
-
-      const plClass = pl >= 0 ? 'badge-yes' : 'badge-no';
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${t.event}</td>
-        <td class="ticker">${t.ticker}</td>
-        <td>${t.topic}</td>
-        <td>${t.side}</td>
-        <td>${Number(t.qty).toLocaleString()}</td>
-        <td class="price">${Number(t.price).toFixed(4)}</td>
-        <td class="price">${current != null ? current.toFixed(4) : '—'}</td>
-        <td><span class="badge ${plClass}">${pl >= 0 ? '+' : ''}${pl.toFixed(4)}</span></td>
-        <td>${plPct.toFixed(2)}%</td>
-        <td>${status}</td>
-        <td>
-          ${!t.resolved ? `<button class="btn btn-outline" onclick="resolveTrade('${t.id}')" style="padding:4px 8px;font-size:0.8rem">Resolve</button>` : '—'}
-          <button class="btn btn-outline" onclick="deleteTrade('${t.id}')" style="padding:4px 8px;font-size:0.8rem;color:#dc2626">Del</button>
-        </td>
-      `;
-      tbody.appendChild(row);
-
-      const g = byTopic[t.topic] || {trades:0, realized:0, unrealized:0, wins:0};
-      g.trades++;
-      if (t.resolved){ g.realized += pl; if (pl>0) g.wins++; }
-      else g.unrealized += pl;
-      byTopic[t.topic] = g;
-    }
-    summary.textContent = `Total cost: $${totCost.toFixed(2)} &middot; Realized P&amp;L: $${totRealized.toFixed(2)} &middot; Unrealized P&amp;L: $${totUnrealized.toFixed(2)} &middot; Total trades: ${trades.length}`;
-
-    topicBody.innerHTML = '';
-    for (const [topic, g] of Object.entries(byTopic)){
-      const winRate = g.trades ? (g.wins / g.trades * 100).toFixed(1) : 0;
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${topic}</td><td>${g.trades}</td><td class="price">${g.realized.toFixed(2)}</td><td class="price">${g.unrealized.toFixed(2)}</td><td>${winRate}%</td>`;
-      topicBody.appendChild(row);
-    }
-  }
-
-  window.resolveTrade = (id) => {
-    const t = trades.find(x => x.id === id); if (!t) return;
-    const result = prompt(`Resolve ${t.ticker} (Yes/No):`);
-    if (!result) return;
-    const r = String(result).trim();
-    if (r !== 'Yes' && r !== 'No') { alert('Enter Yes or No'); return; }
-    t.resolved = true; t.result = r;
-    save(trades); render();
-  };
-  window.deleteTrade = (id) => {
-    if (!confirm('Delete this trade?')) return;
-    trades = trades.filter(x => x.id !== id);
-    save(trades); render();
-  };
-
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const t = {
-      id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-      event: document.getElementById('t-event').value.trim(),
-      ticker: document.getElementById('t-ticker').value.trim().toUpperCase(),
-      topic: document.getElementById('t-topic').value,
-      side: document.getElementById('t-side').value,
-      qty: document.getElementById('t-qty').value,
-      price: document.getElementById('t-price').value,
-      resolved: false, result: null
-    };
-    trades.push(t); save(trades);
-    form.reset();
-    document.getElementById('t-topic').selectedIndex = 0;
-    render();
-  });
-
-  // refresh live marks every 5 seconds
-  setInterval(render, 5000);
-  render();
-})();
-</script>
+</div>
+<script src="assets/app.js" type="module"></script>
 </body>
 </html>
