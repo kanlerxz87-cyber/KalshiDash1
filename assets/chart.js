@@ -21,8 +21,15 @@
   /* A no-op 2D context: used when the browser offers no canvas (headless or very old
    * engines) so the page keeps working with tables and text instead of throwing. */
   function nullCtx() {
-    var stub = function () { return { width: 0 }; };
-    return new Proxy({}, { get: function () { return stub; }, set: function () { return true; } });
+    function obj() {
+      var fn = function () { return obj(); };
+      return new Proxy(fn, {
+        get: function (t, k) { return k === 'width' ? 0 : fn; },   /* measureText().width */
+        set: function () { return true; },
+        apply: function () { return obj(); }
+      });
+    }
+    return obj();
   }
 
   function prep(canvas) {
