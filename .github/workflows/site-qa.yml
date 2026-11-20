@@ -34,6 +34,11 @@ jobs:
       - name: Workflow contract check (schedules, push refspecs, token permissions)
         run: node scripts/check_workflows.mjs --selftest && node scripts/check_workflows.mjs
 
+      # F-45: the flagged register is the page a reviewer trusts. Duplicate IDs, gaps or a row
+      # without a source link make it unusable, so it is checked on every push.
+      - name: Flag register integrity (unique IDs, no gaps, one source link per row)
+        run: node scripts/check_flags.mjs
+
       - name: Root-site link and template check (project checker)
         run: node scripts/check-links.mjs
 

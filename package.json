@@ -8,8 +8,9 @@
     "test:feed": "node scripts/check_alerts.mjs",
     "test:page": "node scripts/check_alerts_page.mjs",
     "test:links": "node scripts/check-links.mjs && python3 tools/linkcheck.py",
-    "test": "npm run test:engine && npm run test:feed && npm run test:page && npm run test:provenance && npm run test:links",
-    "test:provenance": "node scripts/check_provenance.mjs"
+    "test": "npm run test:engine && npm run test:feed && npm run test:page && npm run test:provenance && npm run test:flags && npm run test:links",
+    "test:provenance": "node scripts/check_provenance.mjs",
+    "test:flags": "node scripts/check_flags.mjs"
   },
   "devDependencies": {
     "jsdom": "^25.0.1"
