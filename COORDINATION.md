@@ -1202,3 +1202,18 @@ Updated: 2026-11-20 (UTC)
 ## Flagged for review
 
 - None published yet. Add each unverified requirement, data limitation, or implementation irregularity here and on the site's clearly labeled Flagged for Review page; unresolved items do not block deployment.
+
+---
+
+## Session `session-5d7f40a8` — branch `arena/5d7f40a8-kalshidash1` (base `d24616a`, 2026-11-20)
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| V1 | Repo review: verify demo API endpoints and repo Kalshi links against official docs; flag irregularities | **done** (record only; **needs review** for flags) | session-5d7f40a8 | `verification/2026-11-20-5d7f40a8.md`, `COORDINATION.md` (this section) |
+
+- **Sources (fetched 2026-11-20):** https://docs.kalshi.com/getting_started/demo_env · https://docs.kalshi.com/getting_started/api_environments
+- **Verified:** demo REST and WebSocket recommended and legacy hosts match the brief; request-signing rule confirmed.
+- **Could not verify:** live API values (sandbox cannot reach `external-api.demo.kalshi.co`, SSL error, outside allowlist).
+- **Flags (needs review):** (1) repo links contract PDFs to a `kalshi-public-docs-staging` S3 bucket (about 500 occurrences); `assets.kalshi.com` equivalents exist; (2) user-ws and external-feeds hosts not referenced in code; (3) this board file is long with stale "current session" headers.
+- **Not done here:** site rebuild, PR to `main`, merge and Pages publish. Board reserves those for the final integration session. This branch has no content changes vs `main`.
+- Full record: `verification/2026-11-20-5d7f40a8.md`.
