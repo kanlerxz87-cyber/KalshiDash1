@@ -58,6 +58,8 @@
       });
     }, Promise.reject(new Error('start'))).catch(function (e) {
       state.lastError = String(e && e.message || e);
+      // every base failed -> fall back to the bundled snapshot for subsequent loads
+      setMode('snapshot', state.base);
       throw e;
     });
   }
@@ -83,10 +85,6 @@
   }
   function classifyMarket(m) {
     if (seriesTopicIndex && m.series_ticker && seriesTopicIndex[m.series_ticker]) return seriesTopicIndex[m.series_ticker];
-    if (seriesTopicIndex && m.event_ticker) {
-      var et = m.event_ticker;
-      var found = Object.keys(seriesTopicIndex).some(function () { return false; });
-    }
     // regex fallback over ticker + title
     for (var i = 0; i < C.topics.length; i++) {
       var t = C.topics[i];

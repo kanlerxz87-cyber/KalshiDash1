@@ -38,10 +38,12 @@
 
 | Check | Command | Result |
 |---|---|---|
-| Internal link + asset check | `node scripts/check_links.js` | exit 0 (recorded at integration) |
+| Internal link + asset check | `node scripts/check_links.js` | exit 0 — 39 internal links/assets across 10 pages, 0 broken |
+| Headless render test (all 10 pages, scripts executed, live API simulated as unreachable) | jsdom harness (build tooling, not shipped) | ALL PAGES PASS — tables populated from snapshot fallback, resolution log 6 rows, trade log 8 seeded rows, chart/ladder render without errors |
 | Site structure | static HTML/CSS/JS — no build step required | PASS |
 | External source links | all https, all official domains (docs.kalshi.com, external-api.demo.kalshi.co, assets.kalshi.com, plus settlement-source orgs named by the API itself) | PASS |
 | JSON validity | `node -e "JSON.parse(require('fs').readFileSync('docs/data/snapshot.json'))"` | PASS |
+| JS syntax | `node --check` on every file in docs/js/ and scripts/ | PASS |
 
 ## 5. Post-merge integration verification
 
