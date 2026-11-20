@@ -2,6 +2,38 @@
 
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
+## Live claims (current board — read first)
+
+Updated 2026-11-20 (UTC). Only `origin/main` existed on the remote when this session started (all earlier session branches are merged or superseded), so no other session held an active claim.
+
+| ID | Task | Status | Owner | File scope | Notes |
+|----|------|--------|-------|-----------|-------|
+| L1 | Live re-verification of the focus-topic series and the category mapping against the official demo API (gas, culture/entertainment, golf, elections, crypto) | done (gas, culture, category map, diesel; golf, elections, crypto not re-fetched, see record) | `session-e6c3b3b6` (branch `arena/e6c3b3b6-kalshidash1`) | `verification/**` (new) | Each check is a live GET to `external-api.demo.kalshi.co/trade-api/v2`, read with the fetch tool on 2026-11-20. Results in `verification/2026-11-20-e6c3b3b6.md`. |
+| L2 | Correct and extend the root Flagged page and the Sources list with the L1 findings (F-04 refined; new F-17 to F-20; SRC-25 to SRC-30) | done | `session-e6c3b3b6` | `scripts/build-site.mjs`, regenerated root `*.html` | Root pages are generated; regenerated with `node scripts/build-site.mjs`. `node scripts/check-links.mjs` must pass. |
+| L3 | Pull request `arena/e6c3b3b6-kalshidash1` → `main`, merge, confirm GitHub Pages build, record PR link and result here | planned | `session-e6c3b3b6` | `COORDINATION.md` | Merge is done with `gh pr merge <n> --merge` once the checks pass. Flagged items do not block the merge. |
+
+Claim written before any implementation change (commit `7b46a2f`).
+
+### Session e6c3b3b6 — results (2026-11-20, UTC)
+
+**Sources (official, read this session):** demo environment https://docs.kalshi.com/getting_started/demo_env ; Get Series List https://docs.kalshi.com/api-reference/market/get-series-list.md ; Get Markets https://docs.kalshi.com/api-reference/market/get-markets ; tags for series categories https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories.md ; live demo API GETs listed as V1–V9 in `verification/2026-11-20-e6c3b3b6.md`.
+
+**Verification performed:** nine live GETs to `external-api.demo.kalshi.co/trade-api/v2` (exchange status, category→tag map, `category=Culture`, `category=Entertainment`, `Economics` + `Oil and energy`, `Economics` first 50, three open-market queries). Each row of the verification table lists its exact URL. The build sandbox cannot reach `kalshi.co`, so these were read with the fetch tool. Nothing was inferred.
+
+**Findings (flagged, not blocking):**
+- F-04 refined: the official tag map has no `Culture` key, but `series?category=Culture` returns two series with `category: "Culture"`. The earlier statement "Kalshi has no category named Culture" is contradicted by the live series data.
+- F-15 confirmed again: AAA gas series exist in the demo (for example `KXAAAGASDOK`, `KXAAAGASMINTX`).
+- F-17 (new): the gas filter (tag `Oil & Gas` + prefix `KXAAAGAS`) misses AAA-settled `AAAGASMAX` (tag `Oil and energy` only).
+- F-18 (new): diesel series are AAA-settled but are not gasoline. Open `KXDIESELD` markets had zero volume and zero last price.
+- F-19 (new, observation): `status=open` returned markets whose `status` field reads `active`. Consistent with the F-03 enum.
+- F-20 (new): the `dash/` suite's gas matcher also matches `KXSPRMIN` (Strategic Petroleum Reserve) and natural-gas production (`KXPAGAS`). It is not changed in this session; the fix belongs in `dash/js/config.js`.
+
+**Not re-verified this session:** golf, elections and crypto series lists. The earlier snapshot (`dash/data/snapshot.json`, 2026-11-20T11:10Z) is still the only record for them.
+
+**Checks run before commit:** `node scripts/build-site.mjs` (regenerates without diff, so the Pages staleness gate passes), `node scripts/check-links.mjs` (63 pages, no broken internal links), `python3 tools/linkcheck.py` (no broken internal links), `node tools/qa_logic_test.mjs` (all checks passed), `node --check assets/app.js`.
+
+**Handoff / conflict log:** none. No other session branch exists on `origin` (only `main` at `8f80f34` before this session). No merge conflicts.
+
 ## Session on this branch
 
 - Session ID: `session-ef745c36`
