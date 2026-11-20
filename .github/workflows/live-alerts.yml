@@ -75,11 +75,11 @@ jobs:
             git commit -m "data(live): engine sample ${STAMP}"
             PUSHED=false
             for attempt in 1 2 3 4 5; do
-              if ! git fetch origin "refs/heads/$TARGET_BRANCH:refs/remotes/origin/$TARGET_BRANCH"; then
+              if ! git fetch origin "$TARGET_BRANCH"; then
                 echo "::error::could not fetch origin/$TARGET_BRANCH"
                 exit 1
               fi
-              if ! git rebase "refs/remotes/origin/$TARGET_BRANCH"; then
+              if ! git rebase FETCH_HEAD; then
                 git rebase --abort || true
                 echo "::error::could not rebase the engine sample onto origin/$TARGET_BRANCH"
                 exit 1

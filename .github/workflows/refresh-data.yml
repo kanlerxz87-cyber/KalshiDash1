@@ -35,6 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -77,8 +78,8 @@ jobs:
             # between our rebase and push. Failed pushes are retried only after a
             # fresh rebase; other errors fail after the bounded retry count.
             for attempt in 1 2 3 4 5; do
-              git fetch origin "refs/heads/$TARGET_BRANCH:refs/remotes/origin/$TARGET_BRANCH"
-              git rebase "refs/remotes/origin/$TARGET_BRANCH"
+              git fetch origin "$TARGET_BRANCH"
+              git rebase FETCH_HEAD
               if git push origin "HEAD:$TARGET_BRANCH"; then
                 echo "Pushed the refreshed snapshot to origin/$TARGET_BRANCH on attempt $attempt."
                 exit 0
