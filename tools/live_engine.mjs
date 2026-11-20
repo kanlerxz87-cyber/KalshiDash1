@@ -360,25 +360,40 @@ export function marketsQueryUrl(seriesTicker, extra = {}) {
 
 /**
  * Checks each configured category/tag pair against the live taxonomy (S11).
- * A missing category or tag is a hard error: it would silently empty a topic.
+ *
+ * A *hard* failure is raised only when the taxonomy positively contradicts the config: the
+ * category exists and its tag list is present, but the tag is not in it (or the tag list is
+ * null, which means "no tags advertised" and would silently empty a tag filter).
+ *
+ * When a category is absent from tags_by_categories we do NOT fail. The live demo API shows
+ * that this taxonomy is incomplete: `GET /series?category=Culture` returns series whose
+ * `category` is "Culture", while `/search/tags_by_categories` has no "Culture" key at all
+ * (verified 2026-11-20; recorded as irregularity F-A1 in docs/ALERTS.md). The authoritative
+ * behaviour is the `category` filter on Get Series List (S3), so an absent key is recorded as
+ * a note and the discovery step itself proves whether the category works.
  */
 export function checkTaxonomy(taxonomyJson, topics = TOPICS) {
   const map = (taxonomyJson && taxonomyJson.tags_by_categories) || {};
   const problems = [];
+  const notes = [];
   for (const t of topics) {
     for (const q of t.queries) {
-      if (q.category && !(q.category in map)) {
-        problems.push(`topic ${t.id}: category "${q.category}" is not in tags_by_categories`);
+      if (!q.category) continue;
+      if (!(q.category in map)) {
+        notes.push(`topic ${t.id}: category "${q.category}" is not keyed in tags_by_categories; verified against GET /series?category=${q.category} instead`);
+        continue;
       }
       if (q.tags) {
-        const tags = map[q.category] || [];
-        if (!tags.includes(q.tags)) {
+        const tags = map[q.category];
+        if (tags === null || tags === undefined) {
+          problems.push(`topic ${t.id}: category "${q.category}" advertises no tags, so the tag filter "${q.tags}" would return nothing`);
+        } else if (!tags.includes(q.tags)) {
           problems.push(`topic ${t.id}: tag "${q.tags}" is not listed under category "${q.category}"`);
         }
       }
     }
   }
-  return problems;
+  return { problems, notes };
 }
 
 export async function discoverSeries(client, { maxSeries = 12, log = () => {} } = {}) {
@@ -872,14 +887,17 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
 
   const client = makeClient({ log });
   const state = await loadState(dir);
+  let taxonomyNotes = [];
 
   // 0. taxonomy guard (S11)
   const tax = await client.getJson('/search/tags_by_categories');
-  const problems = checkTaxonomy(tax);
+  const { problems, notes } = checkTaxonomy(tax);
   if (problems.length) {
     throw new Error('topic configuration no longer matches the live tag taxonomy:\n  ' + problems.join('\n  '));
   }
-  log('  taxonomy check: OK (every configured category/tag exists)');
+  notes.forEach((n) => log('  taxonomy note: ' + n));
+  taxonomyNotes = notes;
+  log(`  taxonomy check: OK (${notes.length} note(s), no contradictions)`);
 
   // 1. discovery
   const seriesByTopic = await discoverSeries(client, { maxSeries, log });
@@ -931,6 +949,11 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
   next.meta.retries_this_run = client.stats.retries;
   next.meta.series_checked = chosenSeries.map((s) => s.series_ticker);
   next.meta.topic_rules = TOPICS.map(({ id, label, queries, why }) => ({ id, label, queries, why }));
+  next.meta.taxonomy_notes = taxonomyNotes;
+  // A topic that returned no series is reported, never silently shown as an empty board.
+  next.meta.topics_without_series = TOPICS
+    .filter((t) => ((next.topics || {})[t.id] || []).length === 0)
+    .map((t) => t.id);
   next.meta.orderbooks = orderbooks;
 
   log(`  sampled ${next.run.markets_sampled} markets, ${next.run.markets_without_price} without a usable price`);
@@ -1075,8 +1098,14 @@ export function selftest() {
   ok(withCandles.alerts.every((a) => a.model && typeof a.model.score === 'number'), 'merged candle alerts also carry a model score');
   ok(mergeCandleAlerts(withCandles, cs).alerts.length === 2, 'candle alerts are de-duplicated by id');
 
-  // taxonomy guard
-  ok(checkTaxonomy({ tags_by_categories: {} }).length > 0, 'an empty taxonomy is rejected, not silently accepted');
+  // taxonomy guard: an unkeyed category is a note (the live taxonomy is incomplete), but a
+  // contradiction inside a keyed category is a hard failure.
+  const taxEmpty = checkTaxonomy({ tags_by_categories: {} });
+  ok(taxEmpty.problems.length === 0 && taxEmpty.notes.length > 0, 'categories missing from the taxonomy become notes, not silent passes');
+  const taxBadTag = checkTaxonomy({ tags_by_categories: { Sports: ['Soccer'], Elections: ['US Elections'], Crypto: ['BTC'] } });
+  ok(taxBadTag.problems.some((p) => p.includes('Golf')), 'a tag that is not listed under a keyed category is a hard failure');
+  const taxNullTags = checkTaxonomy({ tags_by_categories: { Sports: null } });
+  ok(taxNullTags.problems.some((p) => p.includes('advertises no tags')), 'a keyed category with null tags is a hard failure for a tag filter');
 
   if (fails.length) {
     console.error('\nSELFTEST FAILED:');

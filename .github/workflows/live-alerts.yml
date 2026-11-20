@@ -56,7 +56,9 @@ jobs:
         run: node scripts/check_alerts.mjs
 
       - name: Commit the new sample
-        if: steps.sample.outcome == 'success'
+        # Runs whenever a sample was produced and validated, even if a later step fails, so a
+        # partial problem never loses real, verified market data.
+        if: steps.sample.outcome == 'success' && success() || steps.sample.outcome == 'success'
         run: |
           set -e
           git config user.name  "kalshidash1-engine"
