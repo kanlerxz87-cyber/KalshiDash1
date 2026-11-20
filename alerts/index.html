@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Alerts — two chat feeds · KalshiDash1</title>
+<meta name="description" content="Live alerting for Kalshi demo contracts: every price swing of $0.10 or more in either direction, in a scrolling feed, plus a second feed filtered to the alerts our model scores as high expected ROI.">
+<link rel="stylesheet" href="css/alerts.css">
+</head>
+<body>
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta">
+      <span id="mode-badge" class="badge warn">data: loading…</span>
+      <span id="clock" class="mono small muted"></span>
+    </div>
+  </div>
+  <nav class="site">
+    <a href="../index.html">Home</a>
+    <a href="../dashboard.html">Live dashboard</a>
+    <a href="index.html" class="active">Live alerts</a>
+    <a href="../categories/gas.html">Gas</a>
+    <a href="../categories/elections.html">Elections</a>
+    <a href="../categories/culture.html">Culture</a>
+    <a href="../categories/crypto.html">Crypto</a>
+    <a href="../categories/golf.html">Golf</a>
+    <a href="../portfolio.html">Portfolio</a>
+    <a href="../analysis.html">Analysis</a>
+    <a href="../questions.html">Questions</a>
+    <a href="../sources.html">Sources</a>
+    <a href="../flagged.html">Flagged</a>
+  </nav>
+</header>
+
+<main>
+  <h1>Live alerts — two scrolling feeds</h1>
+  <p class="sub">
+    Every time a contract in gas prices, elections, culture, crypto or golf moves by
+    <strong>$0.10 or more in either direction</strong>, it appears in the
+    <strong>All events</strong> feed. The <strong>High-ROI</strong> feed repeats only the alerts that a
+    documented heuristic scores at or above <span id="roi-threshold-label">0.62</span>. Both feeds scroll in real time
+    and keep working when the page is reloaded, because the engine also runs without a browser open.
+  </p>
+
+  <div id="mode-notice" class="notice">Starting up: reading the engine feed and trying the live demo API…</div>
+
+  <div class="stat-row" id="stats"></div>
+
+  <div class="chats">
+    <!-- ---------------- feed 1: all events ---------------- -->
+    <section class="chat" aria-label="All events alert feed">
+      <header>
+        <span class="title">All events</span>
+        <span class="badge neutral" id="count-all">0</span>
+        <span class="spacer"></span>
+        <label class="chk"><input type="checkbox" id="autoscroll" checked> new at top</label>
+        <button id="btn-filter-topic" class="btn small">Topics: all</button>
+      </header>
+      <div class="log" id="log-all" role="log" aria-live="polite"></div>
+    </section>
+
+    <!-- ---------------- feed 2: high ROI ---------------- -->
+    <section class="chat" aria-label="High ROI alert feed">
+      <header>
+        <span class="title">High ROI</span>
+        <span class="badge accent" id="count-roi">0</span>
+        <span class="spacer"></span>
+        <span class="small muted">model &ge; <span id="roi-threshold-label-2">0.62</span></span>
+      </header>
+      <div class="log" id="log-roi" role="log" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <h2>How an alert is produced</h2>
+  <div class="panel">
+    <ol style="margin:0;padding-left:20px">
+      <li><strong>Discovery.</strong> The engine reads <code>GET /series</code> for each topic
+        (<a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a>)
+        and checks every category and tag it uses against the live tag taxonomy
+        (<a id="lnk-taxonomy" href="https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories" target="_blank" rel="noopener">/search/tags_by_categories</a>).
+        If a category or tag disappears, the run fails loudly instead of quietly showing an empty table.</li>
+      <li><strong>Sampling.</strong> Open markets are read with
+        <code>GET /markets?series_ticker=…&amp;status=open</code>
+        (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>).
+        The tracked price is the last traded price; if there is none, the midpoint of the yes bid and yes ask —
+        and if the book has no real price on both sides, the market is <em>skipped and counted</em>, never guessed.</li>
+      <li><strong>Candles.</strong> The engine also reads 1-minute candles
+        (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Get Market Candlesticks</a>)
+        so a swing that happened entirely between two runs is still reported: an up-swing is
+        <code>close − low ≥ $0.10</code>, a down-swing is <code>high − close ≥ $0.10</code>, using only periods that
+        actually traded. Those rows are marked <span class="badge neutral">candle</span>.</li>
+      <li><strong>Comparison.</strong> Each new sample is compared with the previous sample for the same contract, or,
+        for 30 minutes after an alert, with that alert's price — so a slow grind alerts once, not on every sample.</li>
+      <li><strong>Resolution.</strong> Tracked contracts are re-read until they settle, and their
+        <code>result</code> (<code>yes</code> / <code>no</code>) is recorded with the settlement timestamp
+        (<a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a>).
+        Winning contracts pay $1 (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>).</li>
+    </ol>
+  </div>
+
+  <h2>What the high-ROI score means (and what it does not)</h2>
+  <div class="panel">
+    <p class="small" style="margin-top:0">
+      The score is a <strong>transparent heuristic, not a back-tested or fitted model</strong>. It never predicts an
+      outcome; it ranks how tradable a $0.10 move looks from the fields the API publishes. Weights:
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Weight</th><th>Term</th><th>How it is computed</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td class="num">0.20</td><td>Headroom</td><td><code>min(price_before, 1 − price_before) / 0.50</code></td><td>A move near $0.50 leaves room in both directions; near $0.02 it is mostly noise.</td></tr>
+          <tr><td class="num">0.20</td><td>Move size</td><td><code>|delta| / 0.50</code>, capped at 1</td><td>Bigger moves are bigger signals.</td></tr>
+          <tr><td class="num">0.35</td><td>Liquidity</td><td><code>min(1, volume_24h_fp / 1000)</code></td><td>A move on an empty book cannot be traded, so it is not a high-ROI signal. Largest weight.</td></tr>
+          <tr><td class="num">0.25</td><td>Spread</td><td><code>max(0, 1 − (yes_ask − yes_bid) × 10)</code></td><td>A penny-wide book is cheap to enter and exit; a $0.10 spread eats the move.</td></tr>
+          <tr><td class="num">×0.5</td><td>Staleness</td><td>applied when the sample is over an hour old</td><td>REST market data is cached and can lag the exchange.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small muted" style="margin-bottom:0">
+      Score = weighted sum in [0, 1]; <code>highROI</code> means score ≥ 0.62. Every row shows its own term values under
+      “model terms”, so you can disagree with the ranking and see why. Nothing here is financial advice, and the demo
+      environment uses mock funds whose prices “may not be reflective of those in real markets”
+      (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment</a>).
+    </p>
+  </div>
+
+  <h2>Live price chart — highest-dollar contract</h2>
+  <div class="controls">
+    <span class="small muted">X axis: time · Y axis: contract price</span>
+    <span id="chart-window-btns" class="controls" style="margin:0"></span>
+    <select id="chart-ticker" class="btn" style="max-width:340px"><option value="">loading markets…</option></select>
+  </div>
+  <div class="chart-wrap">
+    <canvas id="chart" height="260" aria-label="Contract price over time"></canvas>
+    <div class="legend">
+      <span><i style="background:#14568f"></i>tracked price</span>
+      <span><i style="background:#1a7f4e"></i>alert ≥ $0.10 up</span>
+      <span><i style="background:#b3372e"></i>alert ≥ $0.10 down</span>
+      <span id="chart-note" class="muted"></span>
+    </div>
+  </div>
+
+  <h2>Highest-dollar live events</h2>
+  <p class="small muted" style="margin-top:0">
+    Ranked by <strong>estimated traded dollars</strong> = contracts traded × tracked price. Kalshi does not publish
+    traded dollars per market in this response, so this column is <em>our estimate</em> from two published fields
+    (<a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market</a>);
+    it is never presented as exchange data.
+  </p>
+  <div class="table-wrap">
+    <table id="markets-table">
+      <thead><tr>
+        <th>Event / contract</th><th>Topic</th><th class="num">Price</th>
+        <th class="num">Bid (size)</th><th class="num">Ask (size)</th>
+        <th class="num">24h vol</th><th class="num">Total vol</th><th class="num">Est. $ traded</th>
+        <th>Closes</th><th>Status</th><th>Source</th>
+      </tr></thead>
+      <tbody><tr><td colspan="11" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <h2>Resolved events — how each one settled</h2>
+  <p class="small muted" style="margin-top:0">Contracts stay tracked until they resolve. The
+    <code>result</code> field is read from the API; a blank result means the exchange has not published a
+    determination yet, and it stays blank here.</p>
+  <div class="table-wrap">
+    <table id="res-table">
+      <thead><tr>
+        <th>Contract</th><th>Topic</th><th>Result</th><th class="num">Settlement value</th>
+        <th>Settled at</th><th class="num">Volume</th><th>Source</th>
+      </tr></thead>
+      <tbody><tr><td colspan="7" class="empty">No resolutions recorded yet by the engine.</td></tr></tbody>
+    </table>
+  </div>
+
+  <h2>Liquidity — contracts available at each price</h2>
+  <p class="small muted" style="margin-top:0">
+    From <a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">Orderbook Responses</a>:
+    Kalshi returns <strong>bids only</strong>. A yes bid at $X is a no ask at $1 − X and vice versa, so the implied asks
+    below are derived exactly that way and labelled as derived. Best bid is the last level because levels are
+    returned in ascending price order.
+  </p>
+  <div id="ladder"></div>
+
+  <h2>Data sources and limits</h2>
+  <div class="panel small">
+    <p style="margin-top:0">
+      <strong>Engine feed:</strong> <code>data/live/feed.json</code>, written by <code>tools/live_engine.mjs</code> on a
+      GitHub Actions schedule. <span id="feed-meta" class="muted"></span>
+    </p>
+    <p>
+      <strong>Browser polling:</strong> the page also calls the public demo API directly
+      (<code>https://external-api.demo.kalshi.co/trade-api/v2</code>,
+      <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment</a>).
+      If your browser is not allowed to make that cross-origin request, the page says so and keeps using the engine
+      feed instead of failing. <span id="live-meta" class="muted"></span>
+    </p>
+    <p>
+      <strong>Public data only.</strong> No API key is used, requested or stored anywhere on this site; orders are not
+      placed from the browser (that needs request signing —
+      <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">authenticated requests</a>).
+      Simulated trading lives under <a href="../portfolio.html">Portfolio</a>.
+    </p>
+    <p style="margin-bottom:0">
+      <strong>Rate limits:</strong> unauthenticated public requests have their own limits and the documented reaction is
+      to back off on <code>429</code> (<a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate Limits</a>);
+      the engine implements exponential backoff and sleeps between requests.
+    </p>
+  </div>
+</main>
+
+<footer class="site">
+  <div class="inner">
+    KalshiDash1 — independent demo dashboard for the Kalshi demo environment. Not affiliated with Kalshi.
+    Not financial advice. Demo prices may not reflect real markets.
+    <a href="../sources.html">Sources</a> · <a href="../flagged.html">Flagged for review</a>
+  </div>
+</footer>
+
+<script src="js/alerts-live.js"></script>
+<script src="js/alerts-page.js"></script>
+</body>
+</html>

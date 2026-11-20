@@ -1,0 +1,77 @@
+name: live-alerts
+
+# The alert engine. GitHub Pages is static, so nothing on the site itself can sample the
+# exchange while nobody is looking. This workflow is what makes the feed genuinely live:
+# it runs tools/live_engine.mjs against the official demo Trade API on a schedule, commits
+# the resulting data/live/feed.json, and Pages republishes it.
+#
+# Sources for everything the engine does: see the header of tools/live_engine.mjs and
+# docs/ALERTS.md.
+
+on:
+  schedule:
+    # Every 10 minutes. GitHub may delay scheduled jobs under load; the engine timestamps
+    # every sample, so a late run is visible rather than silently wrong.
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main, 'arena/**']
+    paths:
+      - 'tools/live_engine.mjs'
+      - '.github/workflows/live-alerts.yml'
+      - 'scripts/check_alerts.mjs'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: live-alerts
+  cancel-in-progress: false
+
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Offline logic selftest (no network)
+        run: node tools/live_engine.mjs --selftest
+
+      - name: Fetch live demo-API sample
+        id: sample
+        run: |
+          set -o pipefail
+          node tools/live_engine.mjs --max-series 12 --candle-markets 6 2>&1 | tee /tmp/engine.log
+        continue-on-error: true
+
+      - name: Validate the feed
+        run: node scripts/check_alerts.mjs
+
+      - name: Commit the new sample
+        if: steps.sample.outcome == 'success'
+        run: |
+          set -e
+          git config user.name  "kalshidash1-engine"
+          git config user.email "engine@users.noreply.github.com"
+          git add data/live/
+          if git diff --cached --quiet -- data/live/; then
+            echo "No market change in this run — nothing to commit."
+          else
+            STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+            git commit -m "data(live): engine sample ${STAMP}"
+            git pull --rebase --autostash origin ${{ github.event.repository.default_branch }} || true
+            git push
+          fi
+
+      - name: Fail the run if the engine could not reach the API
+        if: steps.sample.outcome != 'success'
+        run: |
+          echo "The engine did not complete. Log tail:"
+          tail -40 /tmp/engine.log
+          exit 1
