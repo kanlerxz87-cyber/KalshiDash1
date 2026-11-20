@@ -65,26 +65,44 @@
     return id || '—';
   }
 
-  /* Same price rule as the engine (tools/live_engine.mjs, trackedPrice): never invent a price,
-   * and do not trust a last trade that is incoherent with the live book. The demo returned
-   * last_price_dollars 0.8030 against a 0.002/0.003 book on 2026-11-20, which would otherwise
-   * show as a fake $0.80 crash. */
-  var MAX_LAST_PRICE_BOOK_GAP = 0.25;
+  /* Same price rule as the engine (tools/live_engine.mjs). A binary book is self-checking:
+   * S6 documents yes_ask + no_bid = $1 and yes_bid + no_ask = $1. The demo returned a row for
+   * KXPRESPERSON-28-GABB with yes_ask 0.8030 against no_bid 0.9970, which sums to 1.80 and
+   * produced fake "$0.80" alerts. When a row fails that test the price comes from the NO side
+   * instead and the row is marked. A wide but reciprocal book keeps its last traded price,
+   * because the midpoint of a 0.01/0.94 book means nothing. */
+  var RECIPROCITY_TOLERANCE = 0.02;
+  function bookReciprocity(m) {
+    var yb = num(m.yes_bid_dollars), ya = num(m.yes_ask_dollars);
+    var nb = num(m.no_bid_dollars), na = num(m.no_ask_dollars);
+    var checks = [];
+    if (ya !== null && nb !== null) checks.push(Math.abs(ya + nb - 1));
+    if (yb !== null && na !== null) checks.push(Math.abs(yb + na - 1));
+    if (!checks.length) return { tested: false, ok: null, worst: null };
+    var worst = round(Math.max.apply(null, checks), 4);
+    return { tested: true, ok: worst <= RECIPROCITY_TOLERANCE, worst: worst };
+  }
   function trackedPrice(m) {
     var last = num(m.last_price_dollars);
-    var bid = num(m.yes_bid_dollars);
-    var ask = num(m.yes_ask_dollars);
-    var settled = !!(m.result && m.result !== '');
-    var bookOk = bid !== null && ask !== null && bid > 0 && ask > 0 && ask < 1 && ask >= bid;
-    var mid = bookOk ? round((bid + ask) / 2) : null;
-    if (last !== null && last > 0 && last < 1) {
-      if (!settled && bookOk && Math.abs(last - mid) > MAX_LAST_PRICE_BOOK_GAP) {
-        return { price: mid, field: 'mid (last price incoherent with the book)' };
-      }
-      return { price: last, field: 'last_price_dollars' };
+    var yb = num(m.yes_bid_dollars), ya = num(m.yes_ask_dollars);
+    var nb = num(m.no_bid_dollars), na = num(m.no_ask_dollars);
+    var recip = bookReciprocity(m);
+    var directOk = yb !== null && ya !== null && yb > 0 && ya > 0 && yb < 1 && ya < 1 && ya >= yb;
+    var impliedOk = nb !== null && na !== null && nb > 0 && na > 0 && nb < 1 && na < 1;
+    if (recip.ok !== false) {
+      if (last !== null && last > 0 && last < 1) return { price: last, field: 'last_price_dollars' };
+      if (directOk) return { price: round((yb + ya) / 2), field: 'mid' };
+      if (impliedOk) return { price: round(((1 - na) + (1 - nb)) / 2), field: 'mid(1 - no)' };
+      return { price: null, field: null };
     }
-    if (bookOk) return { price: mid, field: 'mid' };
-    return { price: null, field: null };
+    var impliedMid = impliedOk ? round(((1 - na) + (1 - nb)) / 2) : null;
+    if (impliedMid !== null && impliedMid > 0 && impliedMid < 1) {
+      return { price: impliedMid, field: 'NO-side reading (row failed reciprocity)', book_inconsistent: true };
+    }
+    if (last !== null && last > 0 && last < 1) {
+      return { price: last, field: 'last_price_dollars (row failed reciprocity)', book_inconsistent: true };
+    }
+    return { price: null, field: null, book_inconsistent: true };
   }
 
   /* Same scoring heuristic as the engine (modelScore). Duplicated deliberately: the page
@@ -274,7 +292,7 @@
         volume_fp: m.volume_fp, volume_24h_fp: m.volume_24h_fp, open_interest_fp: m.open_interest_fp,
         est_traded_dollars: (num(m.volume_fp) !== null && tp.price !== null) ? round(num(m.volume_fp) * tp.price, 2) : null,
         close_time: m.close_time, rules_primary: m.rules_primary,
-        contract_terms_url: e.series.source_url ? null : null,
+        book_inconsistent: !!tp.book_inconsistent,
         source_url: e.source_url, sampled_at: new Date(now * 1000).toISOString(), from_browser: true
       };
 
