@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flagged for Review — KalshiDash1</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand"><span class="mark"></span> KalshiDash1</div>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Live Dashboard</a>
+      <a href="categories.html">Categories</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="questions.html">Questions &amp; Answers</a>
+      <a href="flagged-review.html" class="active">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section">
+    <div class="section-head">
+      <h1>Flagged for Review</h1>
+      <p>Irregularities and unverified items. These do <b>not</b> block the site going live. Review them after the site is live and request changes. Every item links to the official source where it can be verified.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th>#</th><th>Item</th><th>Why flagged</th><th>Source / official link</th><th>Severity</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Gas prices — no gas/oil markets found in demo API <code>/events</code> feed.</td>
+            <td>Requested topic has no live data in the demo environment; page intentionally left blank (nothing inferred).</td>
+            <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?limit=200" target="_blank" rel="noopener">Kalshi demo API /events</a> &middot; <a href="https://kalshi.com" target="_blank" rel="noopener">kalshi.com (real markets)</a></td>
+            <td>Medium</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Demo API not reachable from bash/curl in this sandbox (network restricted).</td>
+            <td>All API data was gathered via the fetch_page tool; the live site relies on browser CORS to <code>external-api.demo.kalshi.co</code>, which is untested on the GitHub Pages origin.</td>
+            <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?limit=5" target="_blank" rel="noopener">Kalshi demo API (observed via fetch_page)</a></td>
+            <td>High</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Candles / historical price endpoint not confirmed.</td>
+            <td><code>/markets/{ticker}/candles</code> returned an error via fetch_page; graph currently seeds from live <code>last_price</code> and polls.</td>
+            <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets" target="_blank" rel="noopener">Kalshi demo API /markets</a></td>
+            <td>Medium</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Golf matched within Sports category (no dedicated "Golf" category).</td>
+            <td>Golf markets identified by PGA metadata/title, not a separate category value.</td>
+            <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?category=Sports" target="_blank" rel="noopener">Kalshi demo API /events?category=Sports</a></td>
+            <td>Low</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Culture mapped from Entertainment category.</td>
+            <td>No dedicated "Culture" category; Entertainment used as the closest match.</td>
+            <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?category=Entertainment" target="_blank" rel="noopener">Kalshi demo API /events?category=Entertainment</a></td>
+            <td>Low</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Live trade execution and portfolio require Kalshi API keys (not present).</td>
+            <td><code>GET /portfolio</code>, <code>GET /trades</code>, <code>POST /portfolio/orders</code> are authenticated; paper simulator used instead.</td>
+            <td>Kalshi trade API v2 (auth)</td>
+            <td>High</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>Repository started empty (only README); no prior code to verify.</td>
+            <td>All site files are newly created for this project.</td>
+            <td>Repo: <a href="https://github.com/kanlerxz87-cyber/KalshiDash1" target="_blank" rel="noopener">github.com/kanlerxz87-cyber/KalshiDash1</a></td>
+            <td>Info</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel" style="margin-top:24px">
+      <h3>Verification policy</h3>
+      <p>Every table row on the category pages carries a source link to an official Kalshi demo API endpoint. If a value could not be confirmed from an official source, it is left blank and flagged here. Nothing was inferred or filled in.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  KalshiDash1 &middot; Flagged for Review &middot; Demo environment only &middot; Not financial advice.
+</footer>
+</body>
+</html>

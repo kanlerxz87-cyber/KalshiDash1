@@ -1,92 +1,49 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crypto — KalshiDash1</title>
-<link rel="stylesheet" href="../assets/css/style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crypto · Kalshi Demo Dashboard</title>
+<meta name="description" content="Crypto markets on the Kalshi demo: open markets ranked by open-interest dollars, and recently resolved YES/NO outcomes.">
+<link rel="stylesheet" href="../assets/style.css">
 </head>
-<body>
-<div class="site-wrap">
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="brand"><div class="mark">KD</div><div>KalshiDash1</div></div>
-      <nav>
-        <a href="../index.html">Home</a>
-        <a href="../dashboard.html">Live Dashboard</a>
-        <a href="gas.html">Gas Prices</a>
-        <a href="elections.html">Elections</a>
-        <a href="culture.html">Culture</a>
-        <a href="crypto.html" class="active">Crypto</a>
-        <a href="golf.html">Golf</a>
-        <a href="../portfolio.html">Portfolio</a>
-        <a href="../trades.html">Trades</a>
-        <a href="../suggestions.html">Suggestions</a>
-        <a href="../questions.html">Questions &amp; Answers</a>
-        <a href="../flagged.html">Flagged for Review</a>
-      </nav>
-    </div>
-  </header>
+<body data-page="topic" data-topic="crypto">
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="../index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="../index.html" class="">Home</a><a href="../executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="../categories/gas.html" class="">Gas prices</a><a href="../categories/elections.html" class="">Elections</a><a href="../categories/culture.html" class="">Culture</a><a href="../categories/crypto.html" class="active">Crypto</a><a href="../categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="../dashboard.html" class="">Live dashboard</a><a href="../portfolio.html" class="">Portfolio</a><a href="../trading.html" class="">Trading</a><a href="../analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="../questions.html" class="">Questions & answers</a><a href="../suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="../sources.html" class="">Sources</a><a href="../flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="../docs/index.html" class="">Docs dashboard</a><a href="../docs/events.html" class="">Events & resolutions</a><a href="../docs/methodology.html" class="">Methodology</a><a href="../docs/flagged.html" class="">Docs flagged page</a></div></nav>
+<main class="content">
 
-  <div class="hero" style="padding:24px 0 10px;">
-    <h1 style="font-size:22px;margin-bottom:6px;">Crypto</h1>
-    <p style="font-size:14px;color:var(--muted);">Findings table for Kalshi events related to <strong>crypto</strong>. Tracks live events until resolved, with the resolution (yes / no) and source links. Values are left blank and flagged unverified unless confirmed from an official source.</p>
-  </div>
-
-  <div class="section">
-    <h2><span class="tag">Category focus</span> Crypto</h2>
-    <p>Track live Kalshi events on crypto. For each event: market/event name, ticker, dollar amount (highest dollar live event), status (open / settled), resolution (yes / no / pending), and the official source link.</p>
-    <div class="status warn"><span class="dot"></span><strong>Unverified:</strong> No crypto events were confirmed in the Kalshi demo environment at review time (the demo currently lists sports markets). Values below are intentionally blank. Use the discovery method to confirm.</div>
-  </div>
-
-  <div class="section">
-    <h2>Findings — crypto events</h2>
-    <table class="wide">
-      <thead>
-        <tr>
-          <th>Event / market</th>
-          <th>Ticker</th>
-          <th>Category</th>
-          <th>Highest $ live event</th>
-          <th>Status</th>
-          <th>Resolved (yes / no)</th>
-          <th>Source link</th>
-          <th>Verified?</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="td-blank" colspan="7">No crypto events confirmed in the demo environment. Values left blank per verification policy (never infer or fill in).</td>
-          <td><span class="badge badge-off">unverified</span></td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="note">
-      <strong>Discovery method (official):</strong> call <code>GET /markets?status=open</code> to list open demo markets, then <code>GET /events/{event_ticker}</code> for each event and check its <code>category</code>. Inspect <code>yes_bid_dollars</code>/<code>no_bid_dollars</code> and <code>result</code> (empty = pending, &ldquo;yes&rdquo;/&ldquo;no&rdquo; = resolved) to track until resolution.<br>
-      <strong>Sources:</strong>
-      <ul>
-        <li><a href="https://docs.kalshi.com/api-reference/market/get-markets.md" target="_blank" rel="noopener">Get Markets</a> (public, no auth)</li>
-        <li><a href="https://docs.kalshi.com/api-reference/market/get-event.md" target="_blank" rel="noopener">Get Event</a> (title, category, result)</li>
-        <li><a href="https://docs.kalshi.com/getting_started/quick_start_market_data.md" target="_blank" rel="noopener">Quick Start: Market Data</a></li>
-        <li><a href="https://docs.kalshi.com/getting_started/market_lifecycle.md" target="_blank" rel="noopener">Market Lifecycle</a></li>
-        <li><a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener">Market Settlement</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2>How to track until resolved</h2>
-    <ol>
-      <li>Find crypto events via <code>GET /markets?status=open</code> + <code>GET /events/{event_ticker}</code> (check <code>category</code>).</li>
-      <li>Record ticker, status, and current <code>yes_bid_dollars</code> / <code>no_bid_dollars</code> (dollar amount).</li>
-      <li>Poll until <code>status</code> becomes <code>settled</code>, then read <code>result</code> (&ldquo;yes&rdquo; or &ldquo;no&rdquo;) for the resolution.</li>
-      <li>Add each confirmed row to this table with its official source link.</li>
-    </ol>
-  </div>
-
-  <div class="footer-inner" style="margin-top:30px;">
-    <p class="small">KalshiDash1 &middot; Crypto &middot; Endpoints verified against <a href="https://docs.kalshi.com" target="_blank" rel="noopener">docs.kalshi.com</a> &middot; Demo environment uses mock funds &middot; Not financial advice.</p>
-  </div>
+<h1>Crypto</h1>
+<p class="lead">Series in Kalshi's <code>Crypto</code> category (BTC, ETH, SOL and others, many settled by CF Benchmarks).</p>
+<div class="cards" id="topic-cards">
+  <div class="card"><div class="k">Series in scope</div><div class="v" id="t-series">…</div><div class="s">Top 8 by series volume (contracts)</div></div>
+  <div class="card"><div class="k">Open markets (loaded)</div><div class="v" id="t-open">…</div><div class="s">From up to 2 pages of open events per series</div></div>
+  <div class="card"><div class="k">Open interest, $ (derived)</div><div class="v" id="t-oi">…</div><div class="s">Σ open interest × $1 notional per contract</div></div>
+  <div class="card"><div class="k">Resolved, last 14 days</div><div class="v" id="t-res">…</div><div class="s">Markets with result yes / no</div></div>
 </div>
+<p class="muted" id="t-status">Loading live data from the Kalshi demo API…</p>
+
+<h2>Open markets: ranked by open-interest $ (derived)</h2>
+<p class="muted">Ranking field is derived (see <a class="flag" href="../flagged.html#F-03">F-03</a>). Click a ticker to open the live chart and order book. Prices are dollars per $1 contract.</p>
+<input class="filter" id="open-filter" placeholder="Filter rows (title, ticker, series)…" aria-label="Filter open markets">
+<div id="open-table"></div>
+
+<h2>Recently resolved (YES / NO)</h2>
+<p class="muted">Settled events closed in the last 14 days, from the API's <code>status=settled</code> list. A market's result is its <code>result</code> field.</p>
+<div id="settled-table"></div>
+
+<h2>Series in scope</h2>
+<div id="series-table"></div>
+
+<h2>Sources for this page</h2>
+<ul><li><a href="https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Tags for Series Categories">Get Tags for Series Categories ↗</a></li><li><a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a></li><li><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a></li></ul>
+<p class="muted">Unverified or missing values appear as “—”. Open <a href="../flagged.html">Flagged for review</a> for caveats.</p>
+
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="../flagged.html">Flagged for review</a>.</footer>
+</main>
+</div>
+<script src="../assets/app.js" type="module"></script>
 </body>
 </html>

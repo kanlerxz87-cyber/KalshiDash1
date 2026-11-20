@@ -15,7 +15,9 @@ from pathlib import Path
 from urllib.parse import urlparse, urlunparse
 
 ROOT = Path(__file__).resolve().parents[1]
-LINK_RE = re.compile(r"""(?:href|src|action)\s*=\s*["']([^"']+)["']""", re.IGNORECASE)
+LINK_RE = re.compile(r"""\b(?:href|src|action)\s*=\s*["']([^"']+)["']""", re.IGNORECASE)
+# JS template literals inside inline <script> blocks contain href=/src= fragments that are not links.
+SCRIPT_RE = re.compile(r"<script\b.*?</script>|<style\b.*?</style>", re.IGNORECASE | re.DOTALL)
 SKIP_PREFIXES = ("http://", "https://", "mailto:", "tel:", "javascript:", "data:", "#")
 
 
@@ -43,7 +45,7 @@ def main() -> int:
     external: set[str] = set()
     checked = 0
     for page in pages:
-        text = page.read_text(encoding="utf-8", errors="replace")
+        text = SCRIPT_RE.sub(" ", page.read_text(encoding="utf-8", errors="replace"))
         for raw in LINK_RE.findall(text):
             url = raw.strip()
             if not url:

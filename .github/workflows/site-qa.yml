@@ -1,6 +1,7 @@
 name: site-qa
 
 # Static site: "build" = validate structure, internal links, JS syntax and API-client logic.
+# Complements .github/workflows/pages.yml (which regenerates the root site and checks staleness).
 # Runs on every push and PR so a broken site can never be merged silently.
 
 on:
@@ -18,24 +19,28 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Check internal links (fails on any broken link)
+      - name: Check internal links across the whole published tree (root, docs/, archive/)
         run: python tools/linkcheck.py
+
+      - name: Root-site link and template check (project checker)
+        run: node scripts/check-links.mjs
 
       - name: Check JavaScript syntax
         run: |
           set -e
-          for f in docs/assets/*.js assets/js/*.js; do
+          shopt -s nullglob
+          for f in docs/assets/*.js assets/*.js assets/js/*.js; do
             echo "node --check $f"
             node --check "$f"
           done
 
-      - name: API-client logic tests (mocked documented response shapes)
+      - name: API-client logic tests (mocked, documented response shapes)
         run: node tools/qa_logic_test.mjs
 
       - name: Python tool syntax

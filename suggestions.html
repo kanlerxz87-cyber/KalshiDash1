@@ -1,81 +1,37 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Suggestions — KalshiDash1</title>
-<link rel="stylesheet" href="assets/css/style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suggestions · Kalshi Demo Dashboard</title>
+<meta name="description" content="Suggestions to improve the site and decision-making. Nothing is implemented until you choose.">
+<link rel="stylesheet" href="assets/style.css">
 </head>
-<body>
-<div class="site-wrap">
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="brand"><div class="mark">KD</div><div>KalshiDash1</div></div>
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="dashboard.html">Live Dashboard</a>
-        <a href="categories/gas.html">Gas Prices</a>
-        <a href="categories/elections.html">Elections</a>
-        <a href="categories/culture.html">Culture</a>
-        <a href="categories/crypto.html">Crypto</a>
-        <a href="categories/golf.html">Golf</a>
-        <a href="portfolio.html">Portfolio</a>
-        <a href="trades.html">Trades</a>
-        <a href="suggestions.html" class="active">Suggestions</a>
-        <a href="questions.html">Questions &amp; Answers</a>
-        <a href="flagged.html">Flagged for Review</a>
-      </nav>
-    </div>
-  </header>
+<body >
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="active">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="docs/index.html" class="">Docs dashboard</a><a href="docs/events.html" class="">Events & resolutions</a><a href="docs/methodology.html" class="">Methodology</a><a href="docs/flagged.html" class="">Docs flagged page</a></div></nav>
+<main class="content">
 
-  <div class="hero" style="padding:24px 0 10px;">
-    <h1 style="font-size:22px;margin-bottom:6px;">Suggestions</h1>
-    <p style="font-size:14px;color:var(--muted);">Suggestions for improving the site and for decision-making. Review each suggestion and choose the best path before implementing any changes. None of these are implemented yet; they are proposals to evaluate.</p>
-  </div>
+<h1>Suggestions: review and choose</h1>
+<div class="notice"><strong>Nothing here is implemented.</strong> Each item is a proposal. Choose the path you want; only chosen items will be built.</div>
+<div class="table-wrap"><table  class="compact"><thead><tr><th>ID</th><th>Suggestion</th><th>Why</th><th>Evidence / source</th><th>Decision</th></tr></thead><tbody>
+<tr><td>S-01</td><td>Add a small server-side proxy that caches public Kalshi data.</td><td>Avoids browser CORS limits (M-02) and reduces repeated polling.</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits.md" target="_blank" rel="noopener" title="Kalshi docs: Rate Limits and Tiers">Rate Limits and Tiers ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-02</td><td>Add portfolio tracking using a demo key that is stored only as a server secret.</td><td>Needed for balances, positions, fills and P&amp;L.</td><td><a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-03</td><td>Record a dollar-volume history by snapshotting markets on a schedule.</td><td>The API has no dollar-volume field; history must be built.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-04</td><td>Add WebSocket streaming for seconds-level prices (requires credentials).</td><td>Only path to true second-by-second data.</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start WebSockets">Quick Start WebSockets ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-05</td><td>Define the trade categorisation schema before any order is placed.</td><td>Makes later strategy analysis comparable.</td><td>Internal proposal — see Trade analysis page; no external source.</td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-06</td><td>Add a paper-trade log (no orders sent) to test ideas first.</td><td>Reduces risk of unplanned demo trades.</td><td>Internal proposal — no external source; orders would need <a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start Create your first order">Quick Start Create your first order ↗</a>.</td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-07</td><td>Show fee-adjusted expected value per market once fee schedule is verified.</td><td>Fees change the answer.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a> (fee_type field)</td><td>☐ Choose  ☐ Defer</td></tr>
+<tr><td>S-08</td><td>Add a reviewer checklist that each market has an official source and a verified result before it is used in analysis.</td><td>Keeps the verification rule the brief asks for.</td><td><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
+</tbody></table></div>
+<p class="muted small">Decision recording: this site cannot store choices. Record yours in <code>COORDINATION.md</code> or in your reply.</p>
 
-  <div class="section">
-    <h2><span class="tag">Review before implementing</span> Suggested site improvements</h2>
-    <table class="wide">
-      <thead>
-        <tr><th>#</th><th>Suggestion</th><th>Expected benefit</th><th>Effort</th><th>Decision</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>1</td><td>Add a real WebSocket feed (<code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code>) to push live price updates instead of polling REST.</td><td>True real-time price movement on the graph; lower latency.</td><td>Medium</td><td><span class="badge badge-info">pending review</span></td></tr>
-        <tr><td>2</td><td>Add market discovery: a search box that calls <code>GET /markets?status=open</code> and <code>GET /events/{ticker}</code> so users can pick gas / elections / culture / crypto / golf events without typing tickers.</td><td>Makes the dashboard usable out of the box; surfaces the focus categories.</td><td>Medium</td><td><span class="badge badge-info">pending review</span></td></tr>
-        <tr><td>3</td><td>Add a credentials manager that signs demo API requests in the browser (Web Crypto API, Ed25519) so portfolio/trade execution can connect without sending keys to a server.</td><td>Enables real portfolio tracking and trade execution from the dashboard.</td><td>High</td><td><span class="badge badge-info">pending review</span></td></tr>
-        <tr><td>4</td><td>Persist tracked events (ticker, start price, resolution) to browser IndexedDB so history survives a refresh.</td><td>Lets users review how events resolved (yes/no) over time.</td><td>Low</td><td><span class="badge badge-info">pending review</span></td></tr>
-        <tr><td>5</td><td>Add export (CSV/JSON) of the findings tables and trade log.</td><td>Easy analysis in spreadsheets; audit trail.</td><td>Low</td><td><span class="badge badge-info">pending review</span></td></tr>
-        <tr><td>6</td><td>Add category-specific sub-navigation and a &ldquo;highest dollar amount&rdquo; sort on the findings tables.</td><td>Directly supports the goal of tracking highest-dollar live events.</td><td>Low</td><td><span class="badge badge-info">pending review</span></td></tr>
-        <tr><td>7</td><td>Add a disclaimer banner that demo uses mock funds and this is not financial advice (already present; keep prominent).</td><td>Sets expectations; reduces risk of misinterpretation.</td><td>Low</td><td><span class="badge badge-ok">done (banner present)</span></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section">
-    <h2>Decision-making suggestions (choose the best path before implementing)</h2>
-    <ol>
-      <li><strong>Confirm demo-environment categories first.</strong> Before building category-specific discovery, verify whether gas/elections/culture/crypto/golf markets exist in the demo (they were not present at review time — demo listed sports markets). If absent, either use production markets (with appropriate disclaimers) or keep the category pages as discovery scaffolding.</li>
-      <li><strong>Decide on authentication model.</strong> Browser-side Ed25519 signing keeps keys on the client but requires careful key handling; a server proxy keeps keys off the client but introduces hosting/ops. Pick one before implementing portfolio/trade execution.</li>
-      <li><strong>Pick a single data source for prices.</strong> REST poll vs WebSocket vs both. WebSocket gives live movement; REST is simpler and documented as cached. Decide based on how real-time the graph must be.</li>
-      <li><strong>Set a verification rule for every table row.</strong> Keep the current rule: source link to an official site; blank + unverified if not confirmed. Never infer values.</li>
-      <li><strong>Validate the graph-time interpretation.</strong> The API offers 1/60/1440-minute candles (no sub-minute). Decide whether &ldquo;seconds&rdquo; means a seconds-long lookback at 1-minute resolution, and document that clearly (done on the dashboard).</li>
-    </ol>
-  </div>
-
-  <div class="section">
-    <h2>Review workflow</h2>
-    <ol>
-      <li>Read each suggestion above.</li>
-      <li>Change its &ldquo;Decision&rdquo; status to approved / rejected / deferred.</li>
-      <li>Record the reason in this page or the linked Flagged for Review page.</li>
-      <li>Only implement an approved suggestion; verify against official docs before changing code.</li>
-    </ol>
-    <p class="small">Suggestions and their decision status are proposals only. No changes are made to the site without an explicit review decision.</p>
-  </div>
-
-  <div class="footer-inner" style="margin-top:30px;">
-    <p class="small">KalshiDash1 &middot; Suggestions &middot; Endpoints verified against <a href="https://docs.kalshi.com" target="_blank" rel="noopener">docs.kalshi.com</a> &middot; Demo environment uses mock funds &middot; Not financial advice.</p>
-  </div>
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
+</main>
 </div>
+<script src="assets/app.js" type="module"></script>
 </body>
 </html>

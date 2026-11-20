@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Dashboard — KalshiDash1</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand"><span class="mark"></span> KalshiDash1</div>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="dashboard.html" class="active">Live Dashboard</a>
+      <a href="categories.html">Categories</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="questions.html">Questions &amp; Answers</a>
+      <a href="flagged-review.html">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section">
+    <div class="section-head">
+      <h1>Live Dashboard</h1>
+      <p>Interactive, live price tracking from the Kalshi demo API. X axis = time, Y axis = current contract price ($). Pick a market, choose the graph length (seconds / minutes / hours), and watch the price move. Current liquidity (bid/ask sizes) is shown below the chart.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Price graph</h3>
+      <div class="controls">
+        <div class="ctrl-group">
+          <label for="graph-length">Graph length</label>
+          <select id="graph-length">
+            <option value="30000">30 seconds</option>
+            <option value="60000">1 minute</option>
+            <option value="300000">5 minutes</option>
+            <option value="900000">15 minutes</option>
+            <option value="3600000" selected>1 hour</option>
+            <option value="21600000">6 hours</option>
+            <option value="86400000">24 hours</option>
+          </select>
+        </div>
+        <div class="ctrl-group">
+          <label for="market-pick">Market</label>
+          <select id="market-pick">
+            <option value="">Select a market…</option>
+          </select>
+        </div>
+        <button id="refresh-graph" class="btn btn-outline" style="padding:6px 12px;font-size:0.85rem">Refresh now</button>
+      </div>
+      <div id="liquidity-readout" class="note" style="margin-bottom:10px">Select a market to load live liquidity.</div>
+      <canvas id="priceChart" height="300"></canvas>
+    </div>
+
+    <div class="table-wrap" style="margin-top:24px">
+      <table class="data">
+        <thead><tr>
+          <th>Market (click to graph)</th><th>Ticker</th><th>Topic</th><th>Yes Bid</th><th>Yes Ask</th><th>Last Price</th><th>Open Interest</th><th>Status</th><th>Resolution</th><th>Source</th>
+        </tr></thead>
+        <tbody id="dashboard-table"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer>
+  KalshiDash1 &middot; Live Dashboard &middot; Data is live from <code>external-api.demo.kalshi.co</code> &middot; Demo environment only &middot; Not financial advice.
+</footer>
+<script src="assets/js/app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="assets/js/graph.js"></script>
+<script>
+(function(){
+  const pick = document.getElementById('market-pick');
+  const tbody = document.getElementById('dashboard-table');
+  const btn = document.getElementById('refresh-graph');
+  let allRows = [];
+
+  function fill(market, event, topic){
+    const opt = document.createElement('option');
+    opt.value = market.ticker;
+    opt.textContent = (event ? event.title : 'Event') + ' — ' + (market.title || 'Market');
+    pick.appendChild(opt);
+
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.title = 'Click to graph this market';
+    tr.onclick = () => {
+      pick.value = market.ticker;
+      const canvas = document.getElementById('priceChart');
+      canvas.dataset.ticker = market.ticker;
+      window.KalshiDashGraph.initGraph('priceChart', market.ticker);
+    };
+    const evTick = event ? event.event_ticker : (market.event_ticker || '—');
+    tr.innerHTML = `
+      <td><a href="${event ? window.KalshiDash.KALSHI.eventUrl(evTick) : '#'}" target="_blank" rel="noopener">${event ? event.title : '—'}</a> — ${market.title || '—'}</td>
+      <td class="ticker">${market.ticker || '—'}</td>
+      <td>${topic}</td>
+      <td class="price">${window.KalshiDash.fmtPrice(market.yes_bid_dollars)}</td>
+      <td class="price">${window.KalshiDash.fmtPrice(market.yes_ask_dollars)}</td>
+      <td class="price">${window.KalshiDash.fmtPrice(market.last_price_dollars)}</td>
+      <td>${window.KalshiDash.fmtMoney(market.open_interest_fp)}</td>
+      <td>${market.status || '—'}</td>
+      <td>${market.result ? (market.result==='YES'?'Resolved: Yes':'Resolved: No') : 'unresolved'}</td>
+      <td><a href="${window.KalshiDash.KALSHI.BASE}/markets/${market.ticker}" target="_blank" rel="noopener" class="source">api</a></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  (async () => {
+    try {
+      const rows = window.KalshiDash.joinMarkets();
+      rows.sort((a,b) => {
+        const ao = Number(a.market.open_interest_fp || 0), bo = Number(b.market.open_interest_fp || 0);
+        if (bo !== ao) return bo - ao;
+        const av = Number(a.market.volume_24h_fp || 0), bv = Number(b.market.volume_24h_fp || 0);
+        return bv - av;
+      });
+      allRows = rows.slice(0, 60);
+      for (const r of allRows) fill(r.market, r.event, r.topic);
+      if (allRows.length) {
+        pick.value = allRows[0].market.ticker;
+        document.getElementById('priceChart').dataset.ticker = allRows[0].market.ticker;
+        window.KalshiDashGraph.initGraph('priceChart', allRows[0].market.ticker);
+      }
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="10" class="empty">Unable to load live markets: ${e.message}</td></tr>`;
+    }
+  })();
+
+  pick.addEventListener('change', () => {
+    if (!pick.value) return;
+    document.getElementById('priceChart').dataset.ticker = pick.value;
+    window.KalshiDashGraph.initGraph('priceChart', pick.value);
+  });
+  btn.addEventListener('click', () => {
+    if (!pick.value) return;
+    window.KalshiDashGraph.initGraph('priceChart', pick.value);
+  });
+})();
+</script>
+</body>
+</html>
