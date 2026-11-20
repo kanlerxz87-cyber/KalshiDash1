@@ -18,7 +18,7 @@ import crypto from 'node:crypto';
 const API = process.env.KALSHI_API_ROOT || 'https://external-api.demo.kalshi.co/trade-api/v2';
 const args = process.argv.slice(2);
 const outIdx = args.indexOf('--out');
-const OUT = outIdx >= 0 ? args[outIdx + 1] : path.join(process.cwd(), 'docs', 'data', 'snapshot.json');
+const OUT = outIdx >= 0 ? args[outIdx + 1] : path.join(process.cwd(), 'dash', 'data', 'snapshot.json');
 const wantPortfolio = args.includes('--portfolio');
 
 async function get(pathname) {

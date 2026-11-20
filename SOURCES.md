@@ -46,7 +46,7 @@ Every factual claim in this repository and site maps to a row here. Verification
 | A17 | GET /events?status=open&category=Crypto&with_nested_markets=true&limit=10 | mixed-category events (category ignored — F-01) | flagged; KXNEXTNATOSECGEN rows |
 | A18 | GET /events?status=open&limit=100 | taxonomy sample (World/Elections/Climate/Science categories seen) | research |
 
-All A-requests were issued to `https://external-api.demo.kalshi.co/trade-api/v2/...`; each snapshot row in `docs/data/snapshot.json` carries its own `source_url` field pointing at the exact request.
+All A-requests were issued to `https://external-api.demo.kalshi.co/trade-api/v2/...`; each snapshot row in `dash/data/snapshot.json` carries its own `source_url` field pointing at the exact request.
 
 ## C. Informational third-party pages (verify nothing)
 

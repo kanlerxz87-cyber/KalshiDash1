@@ -2,14 +2,14 @@
 
 A live, dependency-free dashboard for the **Kalshi demo environment** (`https://external-api.demo.kalshi.co/trade-api/v2`), tracking the highest-dollar live events across **gas prices, elections, culture, crypto, and golf** until each market resolves **yes** or **no**, with simulated portfolio/trade analytics, a suggestions review board, and a full questions/gaps register.
 
-**Live site (GitHub Pages):** see the About section of this repo, or open `docs/index.html` locally.
+**Live site (GitHub Pages):** see the About section of this repo, or open `dash/index.html` locally.
 
 ## What's inside
 
 | Path | What it is |
 |---|---|
-| `docs/` | The GitHub Pages site (static HTML/CSS/JS — no build step) |
-| `docs/data/snapshot.json` | Verified point-in-time capture of the official demo API (2026-11-20), every row with its source URL |
+| `dash/` | The GitHub Pages site (static HTML/CSS/JS — no build step) |
+| `dash/data/snapshot.json` | Verified point-in-time capture of the official demo API (2026-11-20), every row with its source URL |
 | `EXECUTIVE_SUMMARY.md` | Executive summary of the brief, the API surface, and findings |
 | `SOURCES.md` | Source register: every claim → official page/endpoint → verification date |
 | `REVIEW.md` | Line-by-line repo review + irregularities |
@@ -44,7 +44,7 @@ python3 -m http.server 8000 --directory docs   # then http://localhost:8000
 # optional: CORS-proof live data (proxies /api/* to the demo host)
 node scripts/local-proxy.mjs                    # then http://localhost:8080
 
-# optional: refresh docs/data/snapshot.json from the official API (no keys needed)
+# optional: refresh dash/data/snapshot.json from the official API (no keys needed)
 node scripts/fetch_snapshot.mjs
 
 # optional: export YOUR demo-account portfolio (keys never leave your machine)

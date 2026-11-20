@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DOCS = path.join(__dirname, '..', 'docs');
+const DOCS = path.join(__dirname, '..', 'dash');
 let errors = 0, checked = 0;
 
 function walk(dir) {

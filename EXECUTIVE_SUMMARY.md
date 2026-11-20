@@ -24,7 +24,7 @@ The endpoint table in the project brief matches the official documentation **exa
 
 ## 3. What was built
 
-1. **GitHub Pages site** (`docs/`) — clean dashboard UI, category subpages, every table row linked to its official source.
+1. **GitHub Pages site** (`dash/`) — clean dashboard UI, category subpages, every table row linked to its official source.
 2. **Live Events tracker** — five topic boards ranked by dollar volume (24h, then total), each row showing price, sizes, volume, open interest, close time and resolution state; markets stay tracked until `result` flips to yes/no. Includes a resolution log built from verified settled markets (e.g. the KXAAAGASDSD-26NOV14 gas strike ladder resolved `no` against AAA prices; KXDEMOFUTHOURLY-26NOV20H11-UP resolved `yes`).
 3. **Market detail** — canvas price chart with time windows (5 min at seconds granularity accumulated in-browser; 1 h/6 h/24 h from 1-minute candles; 7 d from 60-minute candles — the API's finest public candle is 1 minute per [docs](https://docs.kalshi.com/api-reference/market/get-market-candlesticks)), full orderbook ladder with per-price contract counts, rules and settlement sources.
 4. **Simulated trading & portfolio** — browser-recorded trades against live prices, P&L, win rate, exposure, equity curve, settlement watcher; clearly labeled SIMULATED.

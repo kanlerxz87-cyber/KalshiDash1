@@ -1,6 +1,6 @@
 # VERIFICATION.md — Line-by-Line Verification Record
 
-**Verified:** 2026-11-20 · **Session:** session-cdfe52bd · **Method:** every table row, figure, and API claim re-checked against the official source listed in `SOURCES.md`; values that could not be confirmed are blank + flagged (see `docs/flagged.html`).
+**Verified:** 2026-11-20 · **Session:** session-cdfe52bd · **Method:** every table row, figure, and API claim re-checked against the official source listed in `SOURCES.md`; values that could not be confirmed are blank + flagged (see `dash/flagged.html`).
 
 ## 1. Verification rules applied
 
@@ -42,8 +42,8 @@
 | Headless render test (all 10 pages, scripts executed, live API simulated as unreachable) | jsdom harness (build tooling, not shipped) | ALL PAGES PASS — tables populated from snapshot fallback, resolution log 6 rows, trade log 8 seeded rows, chart/ladder render without errors |
 | Site structure | static HTML/CSS/JS — no build step required | PASS |
 | External source links | all https, all official domains (docs.kalshi.com, external-api.demo.kalshi.co, assets.kalshi.com, plus settlement-source orgs named by the API itself) | PASS |
-| JSON validity | `node -e "JSON.parse(require('fs').readFileSync('docs/data/snapshot.json'))"` | PASS |
-| JS syntax | `node --check` on every file in docs/js/ and scripts/ | PASS |
+| JSON validity | `node -e "JSON.parse(require('fs').readFileSync('dash/data/snapshot.json'))"` | PASS |
+| JS syntax | `node --check` on every file in dash/js/ and scripts/ | PASS |
 
 ## 5. Post-merge integration verification
 

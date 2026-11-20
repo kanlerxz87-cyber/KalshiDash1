@@ -8,7 +8,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const DOCS = path.join(process.cwd(), 'docs');
+const DOCS = path.join(process.cwd(), 'dash');
 const UPSTREAM = process.env.KALSHI_API_ROOT || 'https://external-api.demo.kalshi.co/trade-api/v2';
 const PORT = process.env.PORT || 8080;
 
