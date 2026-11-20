@@ -98,6 +98,37 @@ jobs:
             git push origin "HEAD:$BRANCH"
           fi
 
+      # The job log is not always downloadable, so the run publishes what it actually did as a
+      # job summary: coverage, request count and alert count, read from the feed the engine wrote.
+      - name: Publish run summary
+        if: steps.sample.outcome == 'success'
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const f = JSON.parse(fs.readFileSync('data/live/feed.json', 'utf8'));
+          const m = f.meta || {}, r = f.run || {};
+          const rows = [
+            ['Series checked', (m.series_checked || []).length + ' of the 122 series that match the five topics'],
+            ['Series list', (m.series_checked || []).join(', ')],
+            ['Markets sampled', r.markets_sampled],
+            ['Markets without a usable price', r.markets_without_price],
+            ['Trade markets checked', m.trade_markets_checked],
+            ['Candle markets checked', m.candle_markets_checked],
+            ['API requests this run', m.requests_this_run],
+            ['Swing alerts (>= $0.10)', r.alerts_created],
+            ['Alerts kept in state', (f.alerts || []).length],
+            ['Resolutions recorded', (f.resolutions || []).length],
+            ['Threshold', '$' + m.threshold],
+            ['High-ROI cut', m.high_roi_threshold],
+          ];
+          const body = ['## Live alert engine — this run', '', '| | |', '|---|---|',
+            ...rows.map(([k, v]) => `| ${k} | ${v} |`), '',
+            'Zero alerts is a valid result: the engine publishes one only when a published price',
+            'moves by at least $0.10 and the move is corroborated by a second published field.', ''].join('\n');
+          fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, body);
+          console.log(body);
+          NODE
+
       - name: Validation run — sample checked, nothing to commit
         if: steps.sample.outcome == 'success' && github.ref_name != github.event.repository.default_branch
         run: |
