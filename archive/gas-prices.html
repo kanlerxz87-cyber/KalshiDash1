@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gas Prices — KalshiDash1</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand"><span class="mark"></span> KalshiDash1</div>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Live Dashboard</a>
+      <a href="categories.html">Categories</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="questions.html">Questions &amp; Answers</a>
+      <a href="flagged-review.html">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section">
+    <div class="section-head">
+      <h1>Gas Prices</h1>
+      <p>Gas-price markets requested for this dashboard. No gas-price category or matching gas/oil markets were found in the Kalshi demo API <code>/events</code> feed (categories observed: World, Elections, Politics, Science and Technology, Sports, Financials, Entertainment, Economics, Social, Climate and Weather, Crypto, Companies).</p>
+      <div class="flag">
+        <b>Unverified / not available in demo.</b> This page is intentionally empty of values — nothing has been inferred or filled in. Real gas-price markets may trade on Kalshi; confirm at <a href="https://kalshi.com" target="_blank" rel="noopener">kalshi.com</a>. This item is recorded on the <a href="flagged-review.html">Flagged for Review</a> page with source links.
+      </div>
+      <div id="markets-table"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  KalshiDash1 &middot; Gas Prices (flagged) &middot; Data is live from <code>external-api.demo.kalshi.co</code> &middot; Demo environment only &middot; Not financial advice.
+</footer>
+<script src="assets/js/app.js"></script>
+<script>
+window.KalshiDash.renderTable('markets-table', 'gas-prices', {
+  title: 'Gas Prices',
+  note: 'No gas-price markets found in the Kalshi demo API events feed. Left blank and flagged per verification policy.'
+});
+</script>
+</body>
+</html>

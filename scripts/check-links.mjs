@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Offline check of the generated site (repository root, see build-site.mjs):
 //  - every internal href/src resolves to an existing file (and #anchor exists if given)
-//  - every page has a <title>, a <h1>, and the shared navigation
-//  - every page loads the shared stylesheet and script
+//  - generated pages have a <title>, a <h1>, the shared navigation, stylesheet and script
+//    (archive/ holds prior-session pages: link check only)
 // External links are listed (not fetched) so reviewers can check them.
 import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -35,15 +35,20 @@ const idsOf = (file) => {
 for (const file of pages) {
   const html = readFileSync(file, "utf8");
   const rel = file.slice(DOCS.length + 1);
-  if (!/<title>[^<]+<\/title>/.test(html)) errors.push(`${rel}: missing <title>`);
-  if (!/<h1[ >]/.test(html)) errors.push(`${rel}: missing <h1>`);
-  if (!html.includes('class="sidebar"')) errors.push(`${rel}: missing navigation`);
-  if (!/href="[^"]*assets\/style\.css"/.test(html)) errors.push(`${rel}: missing stylesheet link`);
-  if (!/src="[^"]*assets\/app\.js"/.test(html)) errors.push(`${rel}: missing app.js`);
+  // Generated pages must carry the shared template. Archived prior-session pages are checked for links only.
+  if (!rel.startsWith("archive/")) {
+    if (!/<title>[^<]+<\/title>/.test(html)) errors.push(`${rel}: missing <title>`);
+    if (!/<h1[ >]/.test(html)) errors.push(`${rel}: missing <h1>`);
+    if (!html.includes('class="sidebar"')) errors.push(`${rel}: missing navigation`);
+    if (!/href="[^"]*assets\/style\.css"/.test(html)) errors.push(`${rel}: missing stylesheet link`);
+    if (!/src="[^"]*assets\/app\.js"/.test(html)) errors.push(`${rel}: missing app.js`);
+  }
 
   for (const m of html.matchAll(/\b(href|src)="([^"]*)"/g)) {
     const raw = m[2];
     if (raw === "" || raw.startsWith("mailto:") || raw.startsWith("data:")) continue;
+    // JavaScript template placeholders inside archived inline scripts are not links.
+    if (raw.includes("${")) continue;
     if (/^https?:\/\//.test(raw)) { external.add(raw); continue; }
     const [pathPart, hash] = raw.split("#");
     if (pathPart === "") {

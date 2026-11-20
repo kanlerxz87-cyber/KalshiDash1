@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Categories — KalshiDash1</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand"><span class="mark"></span> KalshiDash1</div>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Live Dashboard</a>
+      <a href="categories.html" class="active">Categories</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="questions.html">Questions &amp; Answers</a>
+      <a href="flagged-review.html">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section">
+    <div class="section-head">
+      <h2>Category Subpages</h2>
+      <p>Each subpage loads live events/markets from the Kalshi demo API (<code>/events</code> + <code>/markets</code>) and displays them in a table with source links to the official API. Rows are tracked until resolved (Yes / No).</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="cat">Elections</div>
+        <h3>Elections</h3>
+        <p>Election markets from the demo API. Resolution shown as Resolved: Yes / No / unresolved.</p>
+        <a href="elections.html" class="btn btn-primary" style="padding:8px 14px;font-size:0.85rem">Open Elections</a>
+      </div>
+      <div class="card">
+        <div class="cat">Crypto</div>
+        <h3>Crypto</h3>
+        <p>Bitcoin price markets settled against CF Benchmarks (BRTI).</p>
+        <a href="crypto.html" class="btn btn-primary" style="padding:8px 14px;font-size:0.85rem">Open Crypto</a>
+      </div>
+      <div class="card">
+        <div class="cat">Golf</h3>
+        <h3>Golf (Sports)</h3>
+        <p>PGA golf-majors markets found under the Sports category.</p>
+        <a href="golf.html" class="btn btn-primary" style="padding:8px 14px;font-size:0.85rem">Open Golf</a>
+      </div>
+      <div class="card">
+        <div class="cat">Culture</div>
+        <h3>Culture (Entertainment)</h3>
+        <p>Entertainment markets (e.g. GTA VII release date, Bond theme).</p>
+        <a href="culture.html" class="btn btn-primary" style="padding:8px 14px;font-size:0.85rem">Open Culture</a>
+      </div>
+      <div class="card">
+        <div class="cat">Gas prices</div>
+        <h3>Gas prices</h3>
+        <p>Not found in the Kalshi demo API events feed. Flagged — see Flagged for Review.</p>
+        <a href="gas-prices.html" class="btn btn-outline" style="padding:8px 14px;font-size:0.85rem">Open Gas prices</a>
+      </div>
+    </div>
+    <div class="flag">
+      <b>Verification note.</b> Category assignment comes from each event's <code>category</code> field in the Kalshi demo API <code>/events</code> endpoint. Golf is matched within the Sports category by title/PGA metadata. "Gas prices" has no matching category in the demo feed and is intentionally empty. Source links on every row point to the official <code>external-api.demo.kalshi.co/trade-api/v2</code> endpoints.
+    </div>
+  </section>
+</main>
+
+<footer>
+  KalshiDash1 &middot; Data is live from <code>external-api.demo.kalshi.co</code> &middot; Demo environment only &middot; Not financial advice.
+</footer>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

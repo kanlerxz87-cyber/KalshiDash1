@@ -430,8 +430,15 @@ ${table(["ID", "Type", "Item", "Affects", "Sources to check", "Status"], [
   ["F-11", "Repo irregularity", "Repository at base commit f1fa6aa contains only README.md (\"# KalshiDash1\"). No tests, CI, licence or .gitignore existed before this work.", "Repo", "git history of this repository", badge("Noted", "")],
   ["F-12", "Coordination", "Other session branches exist (arena/3f5650f9-kalshidash1 and arena/f661348d-kalshidash1) with claims on the same tasks. Branch 3f5650f9 marks docs as done, but those docs are not on that branch. See COORDINATION.md.", "Process", "COORDINATION.md on this branch", badge("Needs review", "warn")],
   ["F-13", "Unverified", "Some market field values are cached briefly by the API (Get Market reference), so live figures can lag.", "Dashboard", src("market"), badge("Documented", "")],
+  ["F-15", "Irregularity (prior session)", "Another session's page stated that gas-price markets were \"not located in demo events\". The official series list does return AAA gas series (for example KXAAAGASM, US gas price; KXAAAGASMINTX, Texas lowest gas price). That statement is contradicted by the API record. The prior pages are preserved in archive/.", "Gas page; archived prior pages", src("gasSeriesApi") + " · " + src("gasEventsApi"), badge("Needs review", "warn")],
+  ["F-16", "Superseded pages", "Two sessions built overlapping site pages (merged on main through PRs #1-#3). The current site replaces the overlapping root pages. Their prior versions are kept under archive/ with internal links rewritten, not re-verified line by line. Start at archive/index.html.", "archive/ folder; git history", badge("Needs review", "warn")],
   ["F-14", "Process", "GitHub Pages settings could not be changed by the automation token (HTTP 403 for build type and for the /docs folder). The site is therefore published from the repository root on main (legacy source). Repository owner may prefer a different source.", "Publishing", "GitHub Pages settings (repo admin)", badge("Needs review", "warn")],
 ], { cls: "compact", anchorFirst: true })}
+`);
+
+page("404.html", "Page not found", "This page does not exist on the Kalshi demo dashboard.", `
+<h1>Page not found</h1>
+<p>That page does not exist. Start from the <a href="{{ROOT}}index.html">home page</a> or the <a href="{{ROOT}}sources.html">sources</a> list.</p>
 `);
 
 // ---------- write files ----------
