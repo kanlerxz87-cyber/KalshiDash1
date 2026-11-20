@@ -1,5 +1,17 @@
 # COORDINATION.md — shared task board
 
+## Current Arena session — `arena/c431fca8-kalshidash1` (2026-11-20 UTC)
+
+- Status: active; branched from `d24616a80151e8e51c6334f585d3e0e6d4cde919`.
+- Claim: **repository integration smoke-audit and documentation cleanup**. Initial checks found unresolved Git merge-conflict markers in `README.md`; the advertised `npm test` currently stops because declared dev dependency `jsdom` is not installed in this checkout. I will resolve the README conflict in favor of the more complete merged alert-engine description, run the declared suites after installing locked dependencies, and record exact outcomes/remaining limitations.
+- Scope: `COORDINATION.md`, `README.md` only. No current unfinished task rows were visible in the inherited board; this is a new, non-overlapping audit follow-up. No API claims or live values will be changed.
+- Status: **done; PR merged; latest main Pages deployment succeeded**. Resolved the README conflict in favor of the more complete merged alert-engine entry. No application/site runtime code or market values were changed.
+- Verification (2026-11-20 UTC): `npm ci` installed the lockfile-pinned dev dependencies (0 vulnerabilities); `npm test` passed engine, feed/schema, jsdom page, and both link checks (90 pages; 0 broken internal links). Also passed `node tools/qa_alert_test.mjs` (5 checks), `node tools/alerts-qa.mjs`, `node tools/alerts-render-test.mjs`, `node scripts/check_lab.mjs`, `node tools/qa_logic_test.mjs`, `python3 tools/linkcheck.py` (2,089 internal links checked; 0 broken), `node scripts/check-links.mjs` (90 pages; 0 broken), `git diff --check`, and repository-wide merge-marker scan.
+- Sources / limits: no external sources or live API values were changed. Existing task/source registers (`SOURCES.md`, `VERIFICATION.md`, `sources.html`, `dash/sources.html`, `docs/sources.html`) remain authoritative. Automated internal-link checkers found 267 external links but do not fetch them; no claim is made that all external links were live-checked in this audit. Caution: jsdom reports its known unimplemented canvas notice; page tests explicitly assert chart fallback behavior. Initial `npm test` failed only because `node_modules` was absent; it passed after `npm ci`.
+- Flagged irregularities: no unresolved merge-conflict markers remain. External URL availability was outside the local checker and remains unverified by this run. During the post-merge check, PR #26's session-605bbb3f claim/handoff record was missing from `COORDINATION.md`; this session did not modify another session's section. It was restored by that session's PR #28, merged at 19:13:35 UTC. Its own record notes the F-L4-01…F-L4-08 findings are still not on the shared Flagged page; handoff to the final integrator remains to review/publish those source-backed flags.
+- PR/merge: [#25](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/25), `arena/c431fca8-kalshidash1` → `main`; merged 2026-11-20 19:12:02 UTC as `1a5a9fbcd42ce2a1f4c59c7fa4e86948d81bdbdc`. All four PR checks passed (`build`, `alerts`, and two `qa` checks). Its Pages deployment workflow was cancelled while another session's PR #26 advanced `main`; the next deployment on `main` succeeded for `c57e52e50850626cb0188c7b057310bdbe11b846` (`pages-build-deployment` run 44799957787; Pages API status `built`, error null). The canonical URL is https://kanlerxz87-cyber.github.io/KalshiDash1/. The latest-main deployment is confirmed; this session did not independently fetch the hosted site over HTTP.
+- Post-merge board-record PR: [#29](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/29), merged 2026-11-20 19:14:09 UTC as `7a97822e2723b39955ceff27cd03dd65c4c2904e`; all four checks passed. GitHub Pages deployment run 44800238451 and Pages API status both succeeded/built for that commit. It records the integration handoff noted above.
+
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
 ---
@@ -1289,3 +1301,108 @@ Updated: 2026-11-20 (UTC)
 ## Flagged for review
 
 - None published yet. Add each unverified requirement, data limitation, or implementation irregularity here and on the site's clearly labeled Flagged for Review page; unresolved items do not block deployment.
+
+---
+
+## Claim — session-b71d6814 (branch `arena/b71d6814-kalshidash1`, base `d24616a`)
+
+Arena pins this session to `arena/b71d6814-kalshidash1` (single-branch rule); no `session-<id>/<task>` branches are created.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+| --- | --- | --- | --- | --- |
+| B1 | **Settlement-source provenance audit** (brief: "every table row must have a source link to an official site"): scan every `settlement_sources` URL in the committed snapshot, classify each as official publisher / search-engine / social profile / placeholder, check a sample live against the official demo API, and publish any non-official link as a new flag | **done** (F-34–F-37) | session-b71d6814 | `verification/2026-11-20-b71d6814.md` (new), `templates/flagged.tpl` (additive F-rows only), `COORDINATION.md` (this section only) |
+| B2 | Live spot-check of the highest-dollar rows on the home page against `GET /markets/{ticker}` (last, bid, ask, spread, status, result) | **done** (F-38) | session-b71d6814 | `verification/2026-11-20-b71d6814.md` (same file), `flagged.html` (regenerated) |
+
+Overlap check: no other open claim touches `verification/` for this date or the Flagged template rows beyond F-33. PRs #16 and #23 are the only open integration items at the time of claim; this session does not touch their files.
+
+### Results — session-b71d6814
+
+- **B1 (done).** Scanned all 1,208 `settlement_sources` entries in `data/snapshot.json` (912 unique). 31 entries are non-official or unclear and are published as **F-34** (10 Google search pages, one unfilled `<account>` placeholder), **F-35** (`x.com/elonmusk`), **F-36** (17 entries pointing at `kalshi.com/`), **F-37** (3 NASS voter-info links under rule-text names). Official schema: https://docs.kalshi.com/api-reference/market/get-series-list. Live confirmation of the Culture series via `GET /series?category=Culture`.
+- **B2 (done).** Four golf rows (TMOO, SSTR, KROY, MMEI) checked against `GET /markets/{ticker}`: last price and status match on 4/4; bid, ask and open interest drift on some rows, expected for a 14:09:32 UTC snapshot. Recorded in **F-38**. Reference: https://docs.kalshi.com/getting_started/demo_env and https://docs.kalshi.com/api-reference/market/get-market.
+- **Verification performed:** `node scripts/build-site.mjs` (22 pages), `node scripts/check-links.mjs` (no broken internal links), `python3 tools/linkcheck.py` (OK), `node --check assets/app.js`, `node tools/qa_logic_test.mjs`, `node tools/alerts-qa.mjs`, `node tools/qa_alert_test.mjs` — all pass.
+- **Irregularities / limits:** the sandbox cannot reach `*.kalshi.co` directly; live reads used the fetch tool. The audit classifies sources but does not open each publisher to confirm it is the contract's authority; that needs manual review against each contract's `contract_terms_url`.
+- **Handoff request (for whoever runs the next integration):** F-34–F-37 are open manual-review items. No values were substituted.
+- **Single-branch note:** the brief's `session-<id>/<task>` branch naming cannot be used under this session's pinned branch; all work is on `arena/b71d6814-kalshidash1`.
+
+## Claim — session-605bbb3f (branch `arena/605bbb3f-kalshidash1`, base `d24616a`, 2026-11-20)
+
+Branch note: Arena pins this session to `arena/605bbb3f-kalshidash1`. No other branch or worktree is created.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| L4 | Live re-verification of the **golf, elections and crypto** topics, which `verification/2026-11-20-e6c3b3b6.md` ("Not verified here") left unchecked: series lists, open/active markets, settlement sources, and resolution fields, each against the official demo Trade API and docs.kalshi.com. Unverified values are left blank and flagged. | done | session-605bbb3f | `verification/2026-11-20-605bbb3f.md` (new, session-stamped) and this section of `COORDINATION.md` only |
+
+Shared outputs (site pages, `data/`, `scripts/`, `flagged.html`) are NOT edited. Findings are handed to the final integration session (`session-7d6d2fcb` / I10 line) through the handoff section below.
+
+### Record — session-605bbb3f (L4, 2026-11-20)
+
+- **Output:** `verification/2026-11-20-605bbb3f.md`. Covers 3 golf, 6 elections and 8 crypto series rows from the official series list, with markets checked for 3 golf, 2 elections and 2 crypto series (chunk 0 of each series list read only). Unverified values are left blank in that file.
+- **Sources (official, read 2026-11-20 via the fetch tool):** [Get Series List, Sports+Golf](https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50) · [Elections series](https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50) · [Crypto series](https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true&limit=50) · [Get Markets reference (status and result enums)](https://docs.kalshi.com/api-reference/market/get-markets.md) · [Demo environment](https://docs.kalshi.com/getting_started/demo_env). Market queries are listed in the verification file.
+- **Verification performed:** every value stated in the file was taken from an official response or doc read this session. Response `status` values (`active`, `inactive`, `finalized`) and request filter values were checked against the Get Markets OpenAPI enums. Resolved examples: `KXDPWORLDTOUR-DPWTC26-THAT` (result yes), `KXPRESCUPMATCH-27SEP26R5M2-TKIM` (yes), `KXHOUSENJ11SPECIAL-26-DEM` (yes), `KXLTCMAXY-25-*` (yes). Open example: `KXSCOTTIESLAM-28` (active).
+- **Irregularities (F-L4-01 … F-L4-08, in the verification file):** series-volume vs market-volume not reconciled (`KXDPWORLDTOUR`); last-trade vs quote gap (`KXSCOTTIESLAM-28`); garbled settlement-source names (`KXMAMDANINYC`) including a non-verified `leader.ir` domain; series `KXDJTFLOH` with zero markets; ~308-day settlement lag with blank rules text (`KXLTCMAXY-25`); title typos (`KXXRPY`, trailing space in `KXRYDERCUP`); staging S3 host in `contract_url` values; status vocabulary mismatch (request `open` vs response `active`).
+- **Not verified:** most golf, elections and crypto markets and series rows (see the "Not verified" section of the file). The sandbox cannot reach `*.kalshi.co` directly, so all checks used the fetch tool.
+
+### Handoff — for the final integration session (I10 / session-7d6d2fcb)
+
+1. Shared `flagged.html` and `data/sources.json` are **not** edited here. Please add F-L4-01 … F-L4-08 from `verification/2026-11-20-605bbb3f.md` to the Flagged page, linking the verification file.
+2. The fetch-tool series and market URLs in the verification file are the only sources for L4. Re-run them before quoting any golf, elections or crypto value.
+3. F-L4-03 must not be treated as having official settlement sources. The `leader.ir` and `constitutionalcourt.com` domains were not checked.
+- **Irregularity found during integration (session-b71d6814), not fixed here:** `templates/flagged.tpl` contains duplicate anchor IDs `F-27`, `F-28`, `F-29`, `F-30`, `F-31` (each appears twice, with different content), inherited from earlier sessions. Renumbering would break existing links, so it is recorded for the integration owner to decide. New flags F-34–F-38 do not collide with these IDs.
+
+### PR and merge record (L4) — session-605bbb3f
+
+- Pull request: [#26](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/26) `arena/605bbb3f-kalshidash1` → `main`.
+- Checks on the PR head: `alerts` pass, `build` pass, `qa` pass (site-qa), `qa` pass (suite-qa).
+- Merge: `gh pr merge 26 --merge`, merge commit `c57e52e50850626cb0188c7b057310bdbe11b846`.
+- GitHub Pages: build for `c57e52e` status `built`, no error (`gh api …/pages/builds/latest`). Live: https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html loads.
+- Flagged irregularities F-L4-01 … F-L4-08 are not yet on the shared Flagged page (that file is owned by the integration session); they are in `verification/2026-11-20-605bbb3f.md` and listed in the handoff above.
+- This record lands on `main` via a follow-up PR from the same branch (a record cannot contain its own merge commit).
+
+### PR and merge record — session-b71d6814
+
+- **PR #27** https://github.com/kanlerxz87-cyber/KalshiDash1/pull/27 (`arena/b71d6814-kalshidash1` → `main`). Checks on the final head: `alerts`, `build` (Site build check), `qa` ×2 — all `pass`. `main` moved twice during review (PRs #26, #28, #29 from other sessions); each time `origin/main` was merged into this branch, with the one `COORDINATION.md` conflict resolved by keeping both sections verbatim. No force-push.
+- **Merged** with `gh pr merge 27 --merge` at 2026-11-20T19:16:38Z. Merge commit `e67e70c23e134138835f642f2e1800c39a3f1c33`.
+- **GitHub Pages:** `pages/builds/latest` → commit `e67e70c`, status `built`, no error (created 19:16:39Z, updated 19:17:11Z).
+- **Live check:** `https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html` now lists F-34 to F-38 with source links. A first fetch returned a cached copy without them; a cache-busted fetch showed them.
+- **Still open for the integration owner:** duplicate anchors F-27 to F-31 in `templates/flagged.tpl` (see the note above). F-34 to F-38 are open manual-review items.
+## Session on this branch — session-d1de3583 (current)
+
+- Session ID: `session-d1de3583`
+- Branch: `arena/d1de3583-kalshidash1` (base `d24616a80151e8e51c6334f585d3e0e6d4cde919` = `main`) — Arena manages this branch; this session works only here, commits only here, and pushes only here.
+- Role: final integration for this branch — resolve the committed conflict markers, verify every published official source against docs.kalshi.com, run the full QA battery, then open and merge the PR `arena/d1de3583-kalshidash1` → `main` and confirm GitHub Pages deploys.
+- Scope (files this session touches): `README.md`, `COORDINATION.md` (this board only). No `dash/`, `docs/`, `archive/`, `assets/` or generated site file is changed. No file claimed by another session is touched.
+
+### Task board — session-d1de3583
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| I1 | Resolve the `<<<<<<< HEAD` / `>>>>>>> origin/main` conflict markers in `README.md` — keep the merged alerts-engine row (sessions arena-f89b55f7 + arena/815b546d) per the existing reconciliation record | done | session-d1de3583 | `README.md` |
+| I2 | Verify each official source the site publishes against docs.kalshi.com (demo env, get-markets, rate limits; market settlement, candlesticks and create-order quick start referenced by the site) | done | session-d1de3583 | docs.kalshi.com fetches recorded below |
+| I3 | Full QA battery: build staleness gate, whole-tree internal link check, JS syntax checks | done | session-d1de3583 | repo-wide, read-only checks |
+| I4 | Open PR `arena/d1de3583-kalshidash1` → `main`, merge without waiting (`gh pr merge N --merge`), confirm GitHub Pages builds/deploys, record PR link + merge SHA | in progress | session-d1de3583 | PR via `gh` |
+
+### Sources verified this session (official, fetched line by line)
+
+| Claim on the site | Official source | Result |
+|---|---|---|
+| Demo REST root `https://external-api.demo.kalshi.co/trade-api/v2` (also supported `demo-api.kalshi.co`); WS roots `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (+ `demo-api...`); demo uses mock funds; demo prices may not reflect real markets | https://docs.kalshi.com/getting_started/demo_env | PASS — endpoint table matches the brief exactly; mock-funds and caveat language confirmed |
+| `GET /markets` batch by `tickers` returns every match in one response; responses cached short term; demo server `https://external-api.demo.kalshi.co/trade-api/v2` listed in the OpenAPI servers | https://docs.kalshi.com/api-reference/market/get-markets.md | PASS |
+| Unauthenticated public requests have separate limits; back off on `429`; apply exponential backoff on `429` | https://docs.kalshi.com/getting_started/rate_limits.md | PASS — matches the engine's conservative poll + backoff design |
+
+### QA results this session (all local, against the committed tree)
+
+| Check | Command | Result |
+|---|---|---|
+| Site staleness gate | `node scripts/build-site.mjs --check` | PASS — committed site matches templates and data |
+| Whole-tree internal links (root + docs + archive) | `python3 tools/linkcheck.py` | PASS — 90 pages, 2089 internal links, 0 broken |
+| Root-site link + template check | `node scripts/check-links.mjs` | PASS — 90 pages, no broken internal links, 267 external links listed for review (not fetched) |
+| JS syntax | `node --check` on assets/app.js, chart.js, catalyst.js, strategylab.js, demo-account.js + scripts/*.mjs | PASS |
+| Conflict markers | `grep` for `<<<<<<<`/`>>>>>>>` in published files | PASS — none remain (README.md resolved) |
+
+### Irregularities
+
+None new. All pre-existing flags remain published on the site's `flagged.html` (F-01…F-23) and in this board's flag log; per board policy none of them block the merge, and they stay on the labeled "Flagged for review" page after the site is live.
+
+### PR & merge record (I4)
+
+TBD — recorded below once the PR exists.
