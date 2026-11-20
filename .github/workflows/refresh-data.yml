@@ -69,8 +69,19 @@ jobs:
             echo 'No data change — nothing to commit.'
           else
             git commit -m 'chore(data): refresh demo snapshot from the official Kalshi demo API'
-            git pull --rebase --autostash origin "$TARGET_BRANCH"
-            git push origin "HEAD:$TARGET_BRANCH"
-            echo "Pushed the refreshed snapshot to origin/$TARGET_BRANCH."
+            # A fetch/rebase/push loop closes the race where live-alerts commits
+            # between our rebase and push. Failed pushes are retried only after a
+            # fresh rebase; other errors fail after the bounded retry count.
+            for attempt in 1 2 3 4 5; do
+              git fetch origin "$TARGET_BRANCH"
+              git rebase "origin/$TARGET_BRANCH"
+              if git push origin "HEAD:$TARGET_BRANCH"; then
+                echo "Pushed the refreshed snapshot to origin/$TARGET_BRANCH on attempt $attempt."
+                exit 0
+              fi
+              echo "Push attempt $attempt lost a concurrent-update race; retrying after fetch/rebase."
+            done
+            echo "::error::could not push refreshed snapshot to origin/$TARGET_BRANCH after 5 attempts"
+            exit 1
         env:
           TARGET_BRANCH: ${{ github.ref_name }}
