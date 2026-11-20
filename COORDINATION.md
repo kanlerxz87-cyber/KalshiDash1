@@ -221,7 +221,10 @@ No unique content was discarded; alternate implementations of shared pages are d
   suggestions, questions, flagged) and the root `index.html` / `README.md` link forward to `/docs/`.
 * Flagged/unverified items do not block the merge; they are published on the Flagged pages
   (`flagged.html`, `docs/flagged.html`) with source links.
-* PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/6 (opened by this session)
-* Merge result: merged into `main` by this session without waiting for approval, as instructed.
-* GitHub Pages: legacy source `main` @ `/`; deploy re-checked with
-  `gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds` after the merge.
+* PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/6 — **MERGED** 2026-11-20T11:21:57Z, merge commit `4e94619` on `main` (merged by this session without waiting for approval, as instructed; no approval was required).
+* Checks on the PR before merge: `Site build check` and `site-qa` both `pass` (runs `44726929658`, `44726929750`).
+* GitHub Pages after the merge, at `4e94619`: `pages build and deployment` → `success`; Pages API build status `built`
+  (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds`); `Site build check` → `success`. Live URL:
+  https://kanlerxz87-cyber.github.io/KalshiDash1/ — the docs suite is at `/docs/` (e.g. `/docs/index.html`).
+  Content could not be fetched from this sandbox (outbound network is restricted to allow-listed hosts), so the
+  deploy is confirmed from the Pages API and workflow conclusions rather than by loading the page here.
