@@ -1299,3 +1299,16 @@ Updated: 2026-11-20 (UTC)
 ## Flagged for review
 
 - None published yet. Add each unverified requirement, data limitation, or implementation irregularity here and on the site's clearly labeled Flagged for Review page; unresolved items do not block deployment.
+
+---
+
+## Claim — session-b71d6814 (branch `arena/b71d6814-kalshidash1`, base `d24616a`)
+
+Arena pins this session to `arena/b71d6814-kalshidash1` (single-branch rule); no `session-<id>/<task>` branches are created.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+| --- | --- | --- | --- | --- |
+| B1 | **Settlement-source provenance audit** (brief: "every table row must have a source link to an official site"): scan every `settlement_sources` URL in the committed snapshot, classify each as official publisher / search-engine / social profile / placeholder, check a sample live against the official demo API, and publish any non-official link as a new flag | claimed | session-b71d6814 | `verification/2026-11-20-b71d6814.md` (new), `templates/flagged.tpl` (additive F-rows only), `COORDINATION.md` (this section only) |
+| B2 | Live spot-check of the highest-dollar rows on the home page against `GET /markets/{ticker}` (last, bid, ask, spread, status, result) | claimed | session-b71d6814 | `verification/2026-11-20-b71d6814.md` (same file) |
+
+Overlap check: no other open claim touches `verification/` for this date or the Flagged template rows beyond F-33. PRs #16 and #23 are the only open integration items at the time of claim; this session does not touch their files.
