@@ -53,7 +53,7 @@
   <h2>2 · What the verified data shows</h2>
   <div class="panel">
     <p>At the captured snapshot the demo exchange returned <strong>{{MARKET_COUNT}}</strong> open markets across the five topics
-    from <strong>{{SERIES_COUNT}}</strong> matching series, using <strong>{{ENDPOINT_COUNT}}</strong> documented endpoint calls.
+    from <strong>{{SERIES_COUNT}}</strong> tracked series (top {{SERIES_KEPT_PER_TOPIC}} per topic), using <strong>{{ENDPOINT_COUNT}}</strong> documented endpoint calls.
     Every one of those rows is stored with the exact URL it came from, so the numbers can be checked by re-running the query.</p>
     <div class="table-wrap">
       <table>

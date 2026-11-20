@@ -101,3 +101,9 @@ automated tests so the mechanism is proven independently of whether the demo hap
 * **F-A8:** real demo-account portfolio sync still needs your API key; nothing is requested or stored.
 
 Full detail with links: `flagged.html` (items F-A1 … F-A8) and `docs/ALERTS.md`.
+
+> **ID note.** The alert session's working IDs (F-A1…F-A8) were renumbered when their rows were merged into
+> the single published flagged list, because the earlier batches already used F-21…F-33 and F-34…F-38
+> (session b71d6814's settlement-source audit). The alert-batch mapping is: F-A1 → F-50 · F-A2 → F-51 ·
+> F-A3 → F-03 · F-A4 → F-53 · F-A5 → F-05 · F-A6 → F-57 · F-A7 → F-51 · F-A8 → F-24. See the
+> [Flagged for review page](flagged.html).
