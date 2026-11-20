@@ -52,7 +52,10 @@ jobs:
         id: sample
         run: |
           set -o pipefail
-          node tools/live_engine.mjs --max-series 12 --candle-markets 6 2>&1 | tee /tmp/engine.log
+          # Coverage (F-48): 45 series, 30 candle markets, 50 trade markets, spread across the
+          # five topics by the engine's round-robin. Every request is a documented public
+          # endpoint; the run records its own request count in meta.requests_this_run.
+          node tools/live_engine.mjs --max-series 45 --candle-markets 30 --trade-markets 50 2>&1 | tee /tmp/engine.log
         continue-on-error: true
 
       - name: Validate the feed

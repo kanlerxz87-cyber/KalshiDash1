@@ -88,7 +88,15 @@ export const SWING_THRESHOLD = 0.10;          // brief: >= $0.10 in either direc
 export const ALERT_COOLDOWN_SECONDS = 1800;   // re-arm a ticker after 30 min
 export const HISTORY_RETAIN_SECONDS = 5 * 86400;
 export const MAX_SAMPLES_PER_MARKET = 720;    // 5 days at a 10-minute cadence
-export const MAX_HISTORY_MARKETS = 4;         // the biggest contracts PER TOPIC keep a series
+/* F-48 (2026-11-20, session-444e829d): the engine used to sample 12 series out of 122 matching ones
+ * and to spend its swing detectors on 8 trade markets / 6 candle markets. Measured effect: 671
+ * markets read, of which only 8 crawled over time, so a >= $0.10 swing anywhere else could not be
+ * seen. An alerting system watching 0.35% of the tracked universe is not doing the job the brief
+ * asks for. The budgets below widen coverage ~10x at a bounded request cost; every extra call is
+ * the same documented public endpoint, and the run records its own request count so the cost is
+ * visible instead of guessed. Nothing about the threshold, the corroboration rules or the honesty
+ * rules changes: more markets are watched, the same rules decide what may be published. */
+export const MAX_HISTORY_MARKETS = 12;        // the biggest contracts PER TOPIC keep a price series
 export const MAX_ALERTS = 600;
 export const MAX_RESOLUTIONS = 400;
 
@@ -1180,7 +1188,7 @@ export function collapseDuplicates(alerts) {
 /* ------------------------------------------------------------------ run */
 
 
-export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets = 6, tradeMarkets = 10, candleLookbackMinutes = 180, dryRun = false, log = console.log } = {}) {
+export async function runOnce({ dir = 'data/live', maxSeries = 45, candleMarkets = 30, tradeMarkets = 50, candleLookbackMinutes = 180, dryRun = false, log = console.log } = {}) {
   const started = Math.floor(Date.now() / 1000);
   log(`KalshiDash1 live engine — ${new Date(started * 1000).toISOString()}`);
   log(`  base: ${BASE} (S1)  threshold: $${SWING_THRESHOLD}  max series: ${maxSeries}  candle markets: ${candleMarkets}`);
@@ -1554,13 +1562,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     process.exit(selftest());
   }
   const maxSeriesArg = args.indexOf('--max-series');
-  const maxSeries = maxSeriesArg >= 0 ? parseInt(args[maxSeriesArg + 1], 10) : 12;
+  const maxSeries = maxSeriesArg >= 0 ? parseInt(args[maxSeriesArg + 1], 10) : 45;
   const dirArg = args.indexOf('--dir');
   const dir = dirArg >= 0 ? args[dirArg + 1] : 'data/live';
   const candleArg = args.indexOf('--candle-markets');
-  const candleMarkets = candleArg >= 0 ? parseInt(args[candleArg + 1], 10) : 6;
+  const candleMarkets = candleArg >= 0 ? parseInt(args[candleArg + 1], 10) : 30;
   const tradeArg = args.indexOf('--trade-markets');
-  const tradeMarkets = tradeArg >= 0 ? parseInt(args[tradeArg + 1], 10) : 10;
+  const tradeMarkets = tradeArg >= 0 ? parseInt(args[tradeArg + 1], 10) : 50;
   runOnce({ dir, maxSeries, candleMarkets, tradeMarkets, dryRun: args.includes('--dry-run') })
     .then((st) => {
       // Exit code 0 even with zero alerts: "no swings right now" is a valid, healthy state.
