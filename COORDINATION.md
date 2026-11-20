@@ -44,6 +44,34 @@ Decision: this session did the full site on its own branch, because it may only 
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review` (published on the Flagged page; does not block).
 
+
+## Claim — session-cb49437b (2026-11-20)
+
+- **Session ID:** `session-cb49437b`
+- **Branch:** `arena/cb49437b-kalshidash1` (base `8f80f34`, `main`)
+- **Claimed scope (non-overlapping, all new files):**
+  - `alerts/` (new page + its own `alerts/js/*.js`, `alerts/css/*.css`)
+  - `tools/live_engine.mjs` (new; the alert engine)
+  - `data/live/` (new; engine output: `history.json`, `alerts.json`, `resolutions.json`)
+  - `.github/workflows/live-alerts.yml` (new)
+  - `scripts/check_alerts.mjs` (new; engine + feed validator)
+  - `docs/ALERTS.md` (new; method + verification record)
+- **Integration edits (allowed: this is the final integration session):** `COORDINATION.md`, `README.md`,
+  `EXECUTIVE_SUMMARY.md`, nav in `scripts/build-site.mjs`, `flagged.html` source data.
+- **Will not touch:** `dash/**`, `docs/**` (other sessions' suites), `archive/**`.
+- **Why:** the brief's core requirement — a live alerting system for ≥ $0.10 price swings with two scrolling
+  chat feeds — was not implemented in any existing suite. No existing file contained alert/chat logic
+  (`grep -ril alert` → only `dash/js/store.js` for suggestion review).
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| T-A1 | Live alert engine (≥$0.10 swing detection, resolutions) | in progress | session-cb49437b | `tools/live_engine.mjs`, `data/live/` |
+| T-A2 | Two scrolling chat feeds (all events + high-ROI model filter) | in progress | session-cb49437b | `alerts/` |
+| T-A3 | Scheduled CI capture so the feed is genuinely live | in progress | session-cb49437b | `.github/workflows/live-alerts.yml` |
+| T-A4 | Verification + integration + PR/merge/deploy | unclaimed | — | — |
+
+Claim pushed immediately per the board convention.
+
 ## Verification performed (session-ef745c36, 2026-11-20)
 
 - Read each official page with the fetch tool and recorded the URL in `scripts/build-site.mjs` (`S` object) and on the Sources page.
