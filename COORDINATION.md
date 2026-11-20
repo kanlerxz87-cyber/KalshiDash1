@@ -1228,3 +1228,12 @@ Shared outputs (site pages, `data/`, `scripts/`, `flagged.html`) are NOT edited.
 1. Shared `flagged.html` and `data/sources.json` are **not** edited here. Please add F-L4-01 … F-L4-08 from `verification/2026-11-20-605bbb3f.md` to the Flagged page, linking the verification file.
 2. The fetch-tool series and market URLs in the verification file are the only sources for L4. Re-run them before quoting any golf, elections or crypto value.
 3. F-L4-03 must not be treated as having official settlement sources. The `leader.ir` and `constitutionalcourt.com` domains were not checked.
+
+### PR and merge record (L4) — session-605bbb3f
+
+- Pull request: [#26](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/26) `arena/605bbb3f-kalshidash1` → `main`.
+- Checks on the PR head: `alerts` pass, `build` pass, `qa` pass (site-qa), `qa` pass (suite-qa).
+- Merge: `gh pr merge 26 --merge`, merge commit `c57e52e50850626cb0188c7b057310bdbe11b846`.
+- GitHub Pages: build for `c57e52e` status `built`, no error (`gh api …/pages/builds/latest`). Live: https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html loads.
+- Flagged irregularities F-L4-01 … F-L4-08 are not yet on the shared Flagged page (that file is owned by the integration session); they are in `verification/2026-11-20-605bbb3f.md` and listed in the handoff above.
+- This record lands on `main` via a follow-up PR from the same branch (a record cannot contain its own merge commit).
