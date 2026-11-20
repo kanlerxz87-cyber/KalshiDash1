@@ -102,8 +102,9 @@ Updated: 2026-11-20 (UTC)
 
 ## Flagged for review
 
-- F-07 (new, this session): Alert detection depends on REST polling of `last_price_dollars`/trade prices at 5–10s cadence; the demo API has cache lag and no server-side swing alerting. Fast swings shorter than the poll interval may be missed. Documented on the Flagged page with sources.
-- F-08 (new, this session): Demo hourly BTC markets (`KXDEMOFUTHOURLY-*`) settle hourly and are the most active focus-topic markets; auto-traded strategies therefore run mostly on simulated positions in these markets. No inference about real-market behavior.
+- F-08 (new, this session): Alert detection depends on REST polling of trade prices (GET /markets/trades) at 10s cadence; the demo API has cache lag and no server-side swing alerting. Fast swings shorter than the poll interval may be missed. Documented on the Flagged page with sources.
+- F-09 (new, this session): The high-ROI chat filter is a transparent heuristic (40/30/30 liquidity/open-interest/opportunity score), not an official Kalshi model. Formula documented on the Alerts page and Flagged page.
+- F-10 (new, this session): Automated simulated trading concentrates on the hourly demo BTC markets (KXDEMOFUTHOURLY-*), the most active focus-topic markets; no inference about real-market behavior.
 
 ---
 

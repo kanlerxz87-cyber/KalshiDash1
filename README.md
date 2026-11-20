@@ -81,28 +81,34 @@ CI runs all of the above (plus `node scripts/check-links.mjs`-style syntax check
 A third, independent implementation under `dash/`, published at `/dash/` alongside the others. Nothing from
 any other session was overwritten: its pages, `js/`, `css/` and verified data snapshot live entirely inside `dash/`.
 It adds live→legacy→snapshot data fallback, a canvas price chart with seconds-to-days windows, a full orderbook
-liquidity ladder, a simulated trade/portfolio engine, and a suggestions review queue.
+liquidity ladder, two live scrolling alert chats with a ≥ $0.10 swing detector (trade-by-trade prices from the
+public `/markets/trades` endpoint), an automated simulated-trade engine with five strategies, a simulated
+trade/portfolio engine, and a suggestions review queue.
 
 ## Pages under `dash/`
 
 | Path | Purpose |
 |------|---------|
-| `dash/index.html` | Executive summary + focus-topic glance + highest-dollar rows (live or verified snapshot) |
+| `dash/index.html` | Executive summary + focus-topic glance + highest-dollar rows + live-alerting intro (live or verified snapshot) |
 | `dash/events.html` | Topic boards ranked by dollar volume, tracked to resolution (yes/no) + resolution log |
+| `dash/alerts.html` | Live alerting: two scrolling chats (all events + high-ROI model filter) firing on ≥ $0.10 price swings either direction, each entry with source + catalyst links |
 | `dash/market.html` | Price chart (X = time: 5 min seconds-granularity / 1 h / 6 h / 24 h / 7 d; Y = contract price), orderbook ladder (contracts available at each price), rules + settlement sources, simulated trade ticket |
+| `dash/autotrade.html` | Automated simulated-trade engine: five strategies run automatically against live prices; decisions, controls and stats logged |
 | `dash/portfolio.html` | Simulated P&L, win rate, exposure, equity curve, category breakdown (real demo-account sync needs the owner's keys — see `dash/flagged.html` F-02) |
 | `dash/analysis.html` | Topic × strategy breakdown; strategy definitions mapped to verified exchange mechanics |
-| `dash/suggestions.html` | 8 evidence-backed proposals with approve/reject/implemented review workflow (browser-local) |
+| `dash/executive-summary.html` | Dedicated executive summary page: environment, verified facts, focus-topic activity, capabilities, key findings |
+| `dash/suggestions.html` | 12 evidence-backed proposals with approve/reject/implemented review workflow (browser-local) |
 | `dash/questions.html` | Questions & gaps: known/verified vs missing, with a discovery plan per unknown |
 | `dash/api.html` | Verified API reference: environments, auth, endpoint inventory, data model, rate limits, quirks |
 | `dash/sources.html` | Source register: every row → official docs page or exact API query |
-| `dash/flagged.html` | Flagged for review F-01…F-07 with evidence links and blank-value policy |
+| `dash/flagged.html` | Flagged for review F-01…F-10 with evidence links and blank-value policy |
 
 ## Tools and documents added alongside
 
 | Path | Purpose |
 |------|---------|
 | `dash/data/snapshot.json` | Verified point-in-time capture of the official demo API (2026-11-20) — the only market data committed in the repo; every row carries its `source_url`. Used only as fallback when the browser cannot reach the API, and clearly labeled. |
+| `scripts/refresh_snapshot.py` | Rebuilds the `dash/` snapshot from the latest verified captures (merges rows in place; keeps prior rows and blanks for unconfirmed values) |
 | `EXECUTIVE_SUMMARY.md` | Executive summary of the brief, verified platform facts, findings, blank policy |
 | `SOURCES.md` | Source register (D1–D16 docs rows, A1–A18 live API captures) |
 | `VERIFICATION.md` | Line-by-line verification record incl. headless render test of all 10 pages |
