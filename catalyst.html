@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swing catalyst links · Kalshi Demo Dashboard</title>
+<meta name="description" content="Live annotation layer for sharp (≥ $0.10) Kalshi demo contract price swings: official market/event links, official settlement sources, and clearly labelled possible-catalyst discovery links.">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/catalyst.css">
+</head>
+<body data-page="catalyst">
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html">Home</a><a href="executive-summary.html">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html">Gas prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html">Live dashboard</a><a href="portfolio.html">Portfolio</a><a href="trading.html">Trading</a><a href="analysis.html">Trade analysis</a><a href="catalyst.html" class="active">Swing catalyst links</a><a href="strategylab.html">Strategy lab</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html">Questions &amp; answers</a><a href="suggestions.html">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="docs/index.html">Docs dashboard</a><a href="docs/events.html">Events &amp; resolutions</a><a href="docs/methodology.html">Methodology</a><a href="docs/flagged.html">Docs flagged page</a></div></nav>
+<main class="content">
+
+<h1>Swing catalyst links</h1>
+<p class="lead">Live annotation layer for sharp price moves. When a contract price moves <strong>≥ $0.10 in either direction</strong>,
+the swing is recorded and annotated with <strong>events and website links</strong>: the official Kalshi endpoints the row came from,
+the event's <em>official settlement sources</em> (returned by the API itself), and clearly labelled
+<em>possible-catalyst discovery searches</em>. Discovery links are external news/web searches — they are
+<strong>not evidence of causation</strong>, and nothing on this page asserts what caused a move.</p>
+
+<div class="notice" id="mode-notice"><strong>Data source:</strong> probing the official demo API…</div>
+
+<div class="cards" id="status-cards"></div>
+
+<div class="controls">
+  <label>Chart window <span id="window-btns" class="btn-row"></span></label>
+  <button id="refresh" class="btn">Refresh now</button>
+</div>
+
+<h2>Price chart with swing markers</h2>
+<div class="chart-wrap"><svg id="chart" viewBox="0 0 900 360" role="img" aria-label="Price chart with ≥ $0.10 swing markers"></svg></div>
+<p class="muted small" id="chart-note"></p>
+
+<h2>Live swing feed (scrolling)</h2>
+<p class="muted small">Newest first. Each entry links to the market/event source and possible-catalyst searches.
+Persisted in this browser (<code>localStorage</code>, key <code>kalshidash:catalyst:swings:v1</code>), capped at 400 records.</p>
+<div id="swing-feed" class="feed"></div>
+
+<h2>Highest-dollar focus-topic markets (watchlist)</h2>
+<p class="muted small">Ranked by the derived 24 h dollar-volume estimate <code>volume_24h_fp × last_price_dollars</code>
+(the API has no dollar-volume field — derived, labelled <span class="badge warn">est.</span>; see flag F-03).
+Topic classification is a documented client-side heuristic on the API's category/title/series fields —
+the server-side <code>/events?category=</code> filter is unreliable (verified 2026-11-20: a <code>category=Crypto</code>
+query returned <code>World</code> and <code>Elections</code> events; flag F-01).</p>
+<div id="watch-table"></div>
+
+<h2>Events &amp; official settlement sources</h2>
+<p class="muted small">These links come from the API's <code>settlement_sources</code> field on each event
+(<a href="https://docs.kalshi.com/api-reference/events/get-events" target="_blank" rel="noopener">Get Events ↗</a>) —
+they are the official sources tied to resolution, not inferred causes.</p>
+<div id="event-sources"></div>
+
+<h2>How swings are detected (methodology)</h2>
+<div class="panel">
+<ul>
+  <li><strong>Threshold:</strong> |Δ price| ≥ $0.10 between two observations of <code>last_price_dollars</code>
+  (fixed-point dollar strings — <a href="https://docs.kalshi.com/getting_started/fixed_point_migration" target="_blank" rel="noopener">Fixed-Point Representation ↗</a>).</li>
+  <li><strong>Observation bases</strong> (labelled on every record):
+  <em>live-sample</em> (polled in this browser every 30 s), <em>candle-close</em> (1-min API candle closes,
+  <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Get Market Candlesticks ↗</a>),
+  <em>prev-close</em> (vs the API's <code>previous_price_dollars</code> field when present).</li>
+  <li><strong>Cooldown:</strong> 3 min per ticker + direction, so one move does not spam the feed.</li>
+  <li><strong>Ranking:</strong> watchlist sorted by derived 24 h dollar-volume estimate (labelled; never presented as an official Kalshi figure).</li>
+  <li><strong>Settlement:</strong> markets resolve <code>result</code> = <code>yes</code> or <code>no</code>; winning side receives $1 per contract
+  (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement ↗</a>).</li>
+  <li><strong>Rate limits:</strong> unauthenticated public requests are subject to separate limits and the docs say to back off on 429
+  (<a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate Limits ↗</a>). Exact unauthenticated budgets are not published — the client polls conservatively and backs off 60 s on 429/403.</li>
+</ul>
+</div>
+
+<h2>Sources for this page (verified 2026-11-20)</h2>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Claim on this page</th><th>Official source (re-check link)</th></tr></thead><tbody>
+<tr><td>S1</td><td>Prices are fixed-point dollar strings (up to 4 decimals)</td><td><a href="https://docs.kalshi.com/getting_started/fixed_point_migration" target="_blank" rel="noopener">docs.kalshi.com/getting_started/fixed_point_migration ↗</a></td></tr>
+<tr><td>S2</td><td>Market object fields: <code>last_price_dollars</code>, <code>previous_price_dollars</code>, <code>volume_24h_fp</code>, <code>open_interest_fp</code>, <code>result</code>, <code>status</code></td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">docs.kalshi.com/api-reference/market/get-markets ↗</a></td></tr>
+<tr><td>S3</td><td>Single-market endpoint <code>GET /markets/{ticker}</code></td><td><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">docs.kalshi.com/api-reference/market/get-market ↗</a></td></tr>
+<tr><td>S4</td><td>Events carry <code>title</code>, <code>category</code>, <code>settlement_sources[{name,url}]</code>, nested <code>markets</code></td><td><a href="https://docs.kalshi.com/api-reference/events/get-events" target="_blank" rel="noopener">docs.kalshi.com/api-reference/events/get-events ↗</a></td></tr>
+<tr><td>S5</td><td>1/60/1440-minute candles with <code>price.close_dollars</code></td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">docs.kalshi.com/api-reference/market/get-market-candlesticks ↗</a></td></tr>
+<tr><td>S6</td><td>Settlement pays $1 per winning contract; <code>result</code> = yes/no</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">docs.kalshi.com/getting_started/market_settlement ↗</a></td></tr>
+<tr><td>S7</td><td>Demo environment: mock funds; prices may not reflect real markets; endpoint table (REST + WebSocket hosts)</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">docs.kalshi.com/getting_started/demo_env ↗</a></td></tr>
+<tr><td>S8</td><td>Back off on 429; unauthenticated requests have separate limits</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">docs.kalshi.com/getting_started/rate_limits ↗</a></td></tr>
+<tr><td>S9</td><td>Live probe: <code>/events?category=Crypto&amp;status=open…</code> returned World and Elections categories (filter quirk)</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?category=Crypto&amp;status=open&amp;limit=3&amp;with_nested_markets=true" target="_blank" rel="noopener">external-api.demo.kalshi.co … /events?category=Crypto ↗</a></td></tr>
+<tr><td>S10</td><td>Live probe: <code>/markets?limit=5&amp;status=open</code> response shape (fixed-point fields as documented)</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?limit=5&amp;status=open" target="_blank" rel="noopener">external-api.demo.kalshi.co … /markets?limit=5&amp;status=open ↗</a></td></tr>
+<tr><td>S11</td><td>Gas series map (AAA gasoline: Economics + "Oil and energy", <code>KXAAAGAS*</code>/<code>AAAGAS*</code>; diesel excluded)</td><td><a href="verification/2026-11-20-e6c3b3b6.md">verification/2026-11-20-e6c3b3b6.md</a> (V5–V9, with per-row live URLs)</td></tr>
+</tbody></table></div>
+
+<p class="muted small">Unverified / blank by design: what <em>caused</em> any price move (the API has no news feed —
+discovery links are searches, not causes); exact unauthenticated rate budgets (not published);
+browser CORS behaviour varies — if live reads fail the page says so and falls back to the bundled snapshot.</p>
+
+<div class="foot">KalshiDash1 · Swing catalyst links (session-7f90cf50) · Simulated/annotation tooling for the Kalshi <strong>demo</strong> environment. Not financial advice.</div>
+</main>
+</div>
+<script src="assets/app.js" type="module"></script>
+<script src="assets/catalyst.js" defer></script>
+</body>
+</html>
