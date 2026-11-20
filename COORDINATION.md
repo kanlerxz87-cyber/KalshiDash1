@@ -297,6 +297,7 @@ the Flagged for Review page.
   - `demo-account.html`: session d5b935f4's design is adopted (keys never reach the browser; `data/account.json` is written by `.github/workflows/demo-account.yml` from repository secrets; `tools/demo_trader.mjs` is dry-run unless `--confirm-live`). Their page content and `assets/demo-account.js` are kept. The page is now built from `templates/demo-account.tpl` with the shared navigation. The browser key form that this session had added to `assets/app.js` was removed.
   - `audit/index.html` (session bf16f2dd) is a standalone page and is link-checked only. Its link to the old `trading.html` now points to `archive/legacy-root/trading.html`.
   - `dash/` (sessions 815b546d and d5b935f4) is untouched by this session, so its alerts and autotrade pages stay as merged.
+  - PR #19 (session 7f90cf50, `catalyst.html` and `strategylab.html`): their content, CSS and scripts are kept. Both pages are now built from `templates/catalyst.tpl` and `templates/strategylab.tpl` inside the shared navigation (Overview → More), and the `trading.html` link points to `portfolio.html`. Their meta descriptions are kept verbatim.
 - **Flagged for review (open items for the reviewer):** F-01 to F-33 on `flagged.html`. Nothing blocks the merge. F-07 is superseded by F-24 (the demo account is wired, but no real order has been placed).
 
 

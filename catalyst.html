@@ -1,21 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Swing catalyst links · Kalshi Demo Dashboard</title>
+<title>Swing catalyst links — KalshiDash1</title>
 <meta name="description" content="Live annotation layer for sharp (≥ $0.10) Kalshi demo contract price swings: official market/event links, official settlement sources, and clearly labelled possible-catalyst discovery links.">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="assets/catalyst.css">
 </head>
 <body data-page="catalyst">
-<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
-<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
-<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
-<div class="layout">
-<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html">Home</a><a href="executive-summary.html">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html">Gas prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html">Live dashboard</a><a href="portfolio.html">Portfolio</a><a href="trading.html">Trading</a><a href="analysis.html">Trade analysis</a><a href="catalyst.html" class="active">Swing catalyst links</a><a href="strategylab.html">Strategy lab</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html">Questions &amp; answers</a><a href="suggestions.html">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="docs/index.html">Docs dashboard</a><a href="docs/events.html">Events &amp; resolutions</a><a href="docs/methodology.html">Methodology</a><a href="docs/flagged.html">Docs flagged page</a></div></nav>
-<main class="content">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta">
+      <span id="mode-badge" class="badge warn">data: probing…</span>
+      <span id="clock" class="mono small muted"></span>
+    </div>
+  </div>
+  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">More</span><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="catalyst.html">Swing catalysts</a><a href="strategylab.html">Strategy lab</a></div></nav>
+</header>
 
+<main><div class="wrap">
 <h1>Swing catalyst links</h1>
 <p class="lead">Live annotation layer for sharp price moves. When a contract price moves <strong>≥ $0.10 in either direction</strong>,
 the swing is recorded and annotated with <strong>events and website links</strong>: the official Kalshi endpoints the row came from,
@@ -93,9 +98,23 @@ discovery links are searches, not causes); exact unauthenticated rate budgets (n
 browser CORS behaviour varies — if live reads fail the page says so and falls back to the bundled snapshot.</p>
 
 <div class="foot">KalshiDash1 · Swing catalyst links (session-7f90cf50) · Simulated/annotation tooling for the Kalshi <strong>demo</strong> environment. Not financial advice.</div>
-</main>
-</div>
-<script src="assets/app.js" type="module"></script>
+</div></main>
+
+<footer class="site">
+  <div class="nav-inner">
+    <p><strong>KalshiDash1</strong> — a static dashboard for the official Kalshi <em>demo</em> exchange.
+    Demo only: mock funds, and demo prices may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
+    <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
+       WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
+       Snapshot captured 2026-11-20 13:39:06 UTC ·
+       <a href="sources.html">Sources</a> ·
+       <a href="flagged.html">Flagged for review</a> ·
+       <a href="COORDINATION.md">Coordination board</a></p>
+    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
+    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+  </div></footer>
+<script src="assets/app.js"></script>
 <script src="assets/catalyst.js" defer></script>
 </body>
 </html>

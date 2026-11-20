@@ -65,7 +65,9 @@ const NAV_MORE = [
   ['questions.html', 'Questions'],
   ['suggestions.html', 'Suggestions'],
   ['api.html', 'API reference'],
-  ['demo-account.html', 'Demo account']
+  ['demo-account.html', 'Demo account'],
+  ['catalyst.html', 'Swing catalysts'],
+  ['strategylab.html', 'Strategy lab']
 ];
 
 function navHtml(base = '') {
@@ -327,6 +329,8 @@ const PAGES = [
   { out: 'questions.html', tpl: 'questions.html' },
   { out: 'suggestions.html', tpl: 'suggestions.html' },
   { out: 'api.html', tpl: 'api.html' },
+  { out: 'catalyst.html', tpl: 'catalyst.html' },
+  { out: 'strategylab.html', tpl: 'strategylab.html' },
   { out: '404.html', tpl: '404.html' }
 ];
 
