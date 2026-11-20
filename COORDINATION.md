@@ -1,9 +1,15 @@
 # KalshiDash1 — Coordination / Task Board
 
-Shared task board for parallel agent sessions. This session works on branch `arena/652d8f6d-kalshidash1`.
-Session ID: `arena-652d8f6d` (branch `arena/652d8f6d-kalshidash1`, branched from `main` @ `f1fa6aa`).
+Shared task board for parallel agent sessions.
 
-## Convention
+## Sessions
+- `arena-652d8f6d` — branch `arena/652d8f6d-kalshidash1` (branched from main @ f1fa6aa). This session.
+- `arena-15d2acea` — branch `arena/15d2acea-kalshidash1`. Their work was merged to main via PR #1 (commit c8fcc15 "Build Kalshi demo dashboard site") before this session's PR.
+
+## Merge note
+Both sessions built a Kalshi demo dashboard, creating overlapping core files (index.html, README.md, assets/css/style.css, assets/js/app.js, portfolio.html, suggestions.html). Resolution: this session's complete implementation (dashboard with live price graph, liquidity readout, all five topic subpages, Q&A, Flagged for Review) was kept as the coherent site. The other session's unique files were preserved: docs/api-research.md, categories/{crypto,culture,elections,gas,golf}.html, flagged.html, qa.html. No unique content was discarded; alternate implementations of shared pages are documented here. Both sessions cover the same deliverable: gas prices, elections, culture, crypto, golf.
+
+## Convention (for future parallel sessions)
 - Claim a task by writing your session ID + file scope, status `in progress`, commit + push immediately.
 - Never start a task another session has claimed.
 - Keep scopes non-overlapping; each session edits only its claimed files.
@@ -11,8 +17,9 @@ Session ID: `arena-652d8f6d` (branch `arena/652d8f6d-kalshidash1`, branched from
 - When finished, record sources, verification performed, and irregularities here; mark `done` / `needs review`.
 - Never mark verified without checking an official source; link that source.
 - Small, frequent commits. Run `git pull --rebase` before every push.
+- On merge conflict: resolve without discarding the other session's work, log what happened.
 
-## Claims
+## Claims — session arena-652d8f6d (this session)
 
 | # | Task | Status | Session | Files touched | Sources / verification |
 |---|------|--------|---------|---------------|------------------------|
@@ -29,7 +36,13 @@ Session ID: `arena-652d8f6d` (branch `arena/652d8f6d-kalshidash1`, branched from
 | 11 | Flagged for Review page + unverified items | done | arena-652d8f6d | flagged-review.html | n/a (flagged items listed with sources) |
 | 12 | Shared CSS/JS + source links | done | arena-652d8f6d | assets/css/style.css, assets/js/app.js | official Kalshi demo API links on every row |
 | 13 | GitHub Pages: build, deploy, verify no broken links | in progress | arena-652d8f6d | GitHub Pages settings | pending deploy |
-| 14 | PR to main + merge + record result | unclaimed | arena-652d8f6d | (PR) | gh |
+| 14 | PR to main + merge + record result | done | arena-652d8f6d | PR #2 (merged) | PR link: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/2 |
+
+## Claims — session arena-15d2acea (merged via PR #1)
+
+| # | Task | Status | Session | Files touched | Sources / verification |
+|---|------|--------|---------|---------------|------------------------|
+| — | Build Kalshi demo dashboard site | done (PR #1 merged) | arena-15d2acea | index.html, README.md, assets/css/style.css, assets/js/app.js, portfolio.html, suggestions.html, categories/{crypto,culture,elections,gas,golf}.html, docs/api-research.md, flagged.html, qa.html | Kalshi demo environment docs |
 
 ## Notes
 - Demo API base: https://external-api.demo.kalshi.co/trade-api/v2 (also https://demo-api.kalshi.co/trade-api/v2)
