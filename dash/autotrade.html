@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automated Trading — KalshiDash1</title>
+<meta name="description" content="Automated simulated trade engine testing momentum, mean-reversion, event-catalyst, liquidity-provision and hold-to-resolution strategies on live demo prices.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+  <h1>Automated Simulated Trading</h1>
+  <div class="notice warn">
+    <strong>Simulated only.</strong> This engine executes <strong>simulated trades</strong> against live public demo prices —
+    no real orders are placed. Real execution requires the account holder's demo API keys and signed requests
+    (<code>POST /portfolio/events/orders</code> —
+    <a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a>),
+    which this static site never requests or stores (flagged <a href="flagged.html">F-02</a>). Every simulated trade is recorded
+    with its strategy and reason, then tracked on <a href="portfolio.html">Portfolio</a> and analyzed on
+    <a href="analysis.html">Trade Analysis</a>.
+  </div>
+
+  <div class="grid cols-4" id="at-stats"></div>
+
+  <h2>Engine controls</h2>
+  <div class="panel">
+    <div class="grid cols-3">
+      <div>
+        <label class="field">Contracts per simulated order</label>
+        <input type="number" id="cfg-qty" min="1" step="1">
+        <label class="field">Max open positions</label>
+        <input type="number" id="cfg-maxopen" min="1" step="1">
+      </div>
+      <div>
+        <label class="field">Simulated capital ceiling ($)</label>
+        <input type="number" id="cfg-capital" min="100" step="100">
+        <label class="field">Event-catalyst window (hours)</label>
+        <input type="number" id="cfg-catalyst" min="1" step="1">
+      </div>
+      <div>
+        <label class="field">Minimum model ROI score</label>
+        <input type="number" id="cfg-roi" min="0" max="1" step="0.05">
+        <p class="small muted">Trades are only simulated in markets scoring at least this on the transparent
+        <a href="alerts.html">high-ROI heuristic</a> (F-09).</p>
+      </div>
+    </div>
+
+    <h3>Strategies</h3>
+    <div class="table-wrap">
+      <table id="strategy-table">
+        <thead><tr><th>Strategy</th><th>What it does</th><th>Verification source</th><th>Enabled</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="btnrow" style="margin-top:12px">
+      <button class="btn good" id="save-cfg">Save controls</button>
+      <button class="btn bad" id="reset-trades" title="Deletes all non-seeded simulated trades">Reset engine trades</button>
+      <span class="small muted" id="cfg-msg"></span>
+    </div>
+  </div>
+
+  <h2>Engine decisions (this session)</h2>
+  <div class="table-wrap">
+    <table id="engine-log">
+      <thead><tr><th>Time</th><th>Kind</th><th>Market</th><th>Detail</th><th>Source</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <h2>How the engine decides</h2>
+  <div class="panel">
+    <ol>
+      <li><strong>Watchlist</strong> — the same top-dollar live markets watched by the <a href="alerts.html">alert feeds</a>
+      (top by 24h dollar volume across the five focus topics).</li>
+      <li><strong>Gate</strong> — only markets the transparent high-ROI model scores at or above the configured minimum
+      are traded (score = 40% liquidity + 30% open interest + 30% opportunity; see <a href="alerts.html">Alerts</a>).</li>
+      <li><strong>Entry</strong> — each strategy has a deterministic entry rule (below); positions are simulated at the live
+      last price and tagged with the strategy and the reason.</li>
+      <li><strong>Exit</strong> — open positions are settled when their market resolves <code>yes</code>/<code>no</code>
+      (winning contracts pay $1 — <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>).
+      Positions can also be closed early at the current price if the market price reaches the opposing extreme.</li>
+      <li><strong>Tracking</strong> — every simulated trade flows to <a href="portfolio.html">Portfolio</a> (P&amp;L, win rate,
+      equity curve) and <a href="analysis.html">Trade Analysis</a> (topic × strategy performance).</li>
+    </ol>
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/kalshi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/alerts.js"></script>
+<script src="js/store.js"></script>
+<script src="js/autotrade.js"></script>
+<script src="js/app-common.js"></script>
+<script>
+(function () {
+  'use strict';
+  App.renderHeader('autotrade.html');
+  App.renderFooter();
+  var K = window.K;
+
+  // ---- controls ----
+  function fillControls() {
+    var c = Autotrade.cfg;
+    document.getElementById('cfg-qty').value = c.qty;
+    document.getElementById('cfg-maxopen').value = c.maxOpen;
+    document.getElementById('cfg-capital').value = c.capital;
+    document.getElementById('cfg-catalyst').value = c.catalystHours;
+    document.getElementById('cfg-roi').value = c.minRoi;
+    var s = {
+      'momentum': { desc: 'Enters in the direction of the latest ≥ $0.10 alert swing (Alerts engine).', src: 'https://docs.kalshi.com/api-reference/market/get-trades' },
+      'mean-reversion': { desc: 'Buys YES at prices ≤ $0.15, NO at prices ≥ $0.85 while unresolved (bounded binary prices per Get Market).', src: 'https://docs.kalshi.com/api-reference/market/get-market' },
+      'event-catalyst': { desc: 'Enters high-ROI markets whose close_time is within the configured window (settlement timing).', src: 'https://docs.kalshi.com/getting_started/market_settlement' },
+      'liquidity-provision': { desc: 'Rests simulated orders at both book edges when the spread is ≥ $0.30 (orderbook sizes from the API).', src: 'https://docs.kalshi.com/getting_started/orderbook_responses' },
+      'hold-to-resolution': { desc: 'Enters high-ROI markets and holds until the market resolves yes/no ($1 per winning contract).', src: 'https://docs.kalshi.com/getting_started/market_settlement' }
+    };
+    var tb = document.querySelector('#strategy-table tbody');
+    tb.innerHTML = '';
+    Object.keys(s).forEach(function (id) {
+      var tr = document.createElement('tr');
+      var lbl = (Store.STRATEGIES.filter(function (x) { return x.id === id; })[0] || {}).label || id;
+      tr.innerHTML = '<td><strong>' + K.esc(lbl) + '</strong></td><td>' + K.esc(s[id].desc) + '</td>' +
+        '<td class="src">' + K.apiLink(s[id].src, 'docs') + '</td>' +
+        '<td><input type="checkbox" id="en-' + id + '"' + (Autotrade.cfg.enabled[id] ? ' checked' : '') + '></td>';
+      tb.appendChild(tr);
+    });
+  }
+
+  function saveCfg() {
+    var cfg = Object.assign({}, Autotrade.cfg, {
+      qty: Math.max(1, parseInt(document.getElementById('cfg-qty').value, 10) || 1),
+      maxOpen: Math.max(1, parseInt(document.getElementById('cfg-maxopen').value, 10) || 1),
+      capital: Math.max(100, parseInt(document.getElementById('cfg-capital').value, 10) || 1000),
+      catalystHours: Math.max(1, parseInt(document.getElementById('cfg-catalyst').value, 10) || 24),
+      minRoi: Math.min(1, Math.max(0, parseFloat(document.getElementById('cfg-roi').value) || 0.4))
+    });
+    Object.keys(cfg.enabled).forEach(function (k) {
+      cfg.enabled[k] = document.getElementById('en-' + k).checked;
+    });
+    Autotrade.setCfg(cfg);
+    document.getElementById('cfg-msg').innerHTML = '<span class="badge good">controls saved</span>';
+    render();
+  }
+
+  document.getElementById('save-cfg').addEventListener('click', saveCfg);
+  document.getElementById('reset-trades').addEventListener('click', function () {
+    if (!confirm('Delete all simulated trades placed by the engine (seeded demo rows are kept)?')) return;
+    var t = Store.getTrades().filter(function (x) { return x.seed; });
+    Store.setJSON('trades', t);
+    document.getElementById('cfg-msg').innerHTML = '<span class="badge warn">engine trades deleted</span>';
+    render();
+  });
+
+  function render() {
+    var s = Autotrade.stats();
+    document.getElementById('at-stats').innerHTML =
+      '<div class="stat"><div class="label">Auto-simulated trades</div><div class="value">' + s.auto + '</div><div class="note">placed by the engine (excl. seeded demo rows)</div></div>' +
+      '<div class="stat"><div class="label">Open positions</div><div class="value">' + s.open + '</div><div class="note">awaiting resolution</div></div>' +
+      '<div class="stat"><div class="label">Win rate</div><div class="value">' + (s.winRate === null ? '—' : (s.winRate * 100).toFixed(1) + '%') + '</div><div class="note">settled simulated trades</div></div>' +
+      '<div class="stat"><div class="label">Realized P&amp;L</div><div class="value">' + K.usd(s.realized) + '</div><div class="note">fees not applied (S-05)</div></div>';
+
+    var tb = document.querySelector('#engine-log tbody');
+    tb.innerHTML = '';
+    var rows = Autotrade.log().slice(0, 40);
+    rows.forEach(function (e) {
+      var tr = document.createElement('tr');
+      var detail = e.reason + (e.side ? ' · ' + e.side + ' @ ' + K.usd4(String(e.price)) + ' × ' + Autotrade.cfg.qty : '') +
+        (e.roi !== null && e.roi !== undefined ? ' · ROI ' + e.roi.toFixed(2) : '');
+      tr.innerHTML = '<td class="small nowrap">' + K.fmtTs(e.ts) + '</td>' +
+        '<td><span class="badge ' + (e.kind === 'trade' ? 'good' : (e.kind === 'exit' ? 'accent' : 'warn')) + '">' + K.esc(e.kind) + '</span></td>' +
+        '<td><a href="' + K.marketUrl(e.ticker) + '">' + K.esc(e.ticker) + '</a></td>' +
+        '<td class="small">' + K.esc(detail) + '</td>' +
+        '<td class="src">' + K.apiLink('https://docs.kalshi.com/api-reference/orders/create-order-v2', 'order docs') + '</td>';
+      tb.appendChild(tr);
+    });
+    if (!rows.length) tb.innerHTML = '<tr><td colspan="5" class="muted">No engine decisions yet — the engine is polling the watchlist.</td></tr>';
+  }
+
+  fillControls();
+  render();
+  setInterval(render, 3000);
+  Autotrade.init();
+})();
+</script>
+</body>
+</html>
