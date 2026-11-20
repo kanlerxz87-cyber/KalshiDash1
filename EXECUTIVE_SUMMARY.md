@@ -1,6 +1,50 @@
 # Executive Summary — KalshiDash1
 
-**Date:** 2026-11-20 · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/cdfe52bd-kalshidash1`
+**Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Data capture:** 2026-11-20 19:16:02 UTC
+(`data/snapshot.json`, committed by the `Refresh demo data snapshot` workflow, run 44800509854) ·
+**Site:** https://kanlerxz87-cyber.github.io/KalshiDash1/
+
+> **Read this first.** Everything in §1–§6 below was written by an earlier session against an
+> **11:10 UTC** capture and is kept verbatim as the record. Two things have changed since, and §0
+> replaces those figures. The branch line in the old header named `arena/cdfe52bd-kalshidash1`, which
+> is not the branch this document was published from; that is why the header is now restated here.
+
+## 0. Current verified state (2026-11-20 19:16:02 UTC capture)
+
+Every number below is read from `data/snapshot.json`, which was produced by a real authenticated-free
+call to the official demo API; each row of that file carries the endpoint URL it came from.
+
+| Fact | Value | Source |
+|---|---|---|
+| Demo REST root used | `https://external-api.demo.kalshi.co/trade-api/v2` | [Demo environment](https://docs.kalshi.com/getting_started/demo_env) |
+| Capture time | 2026-11-20 19:16:02 UTC | `data/snapshot.json` → `meta.captured_at` |
+| Open markets found across the five topics | **3,385** | `data/snapshot.json` → `markets_count_all` |
+| Series matched | **122** (gas 30 · elections 30 · culture 2 · crypto 30 · golf 30) | `topics.*.series_count_kept` |
+| Documented endpoints called during the capture | **185** | `meta.endpoints_used` |
+| Culture open markets | **0** — independently confirmed: `GET /markets?series_ticker=KXXBANNEDGROK&status=open` returns `{"markets":[]}` | [live check](https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXXBANNEDGROK&status=open&limit=10) |
+| Gas open markets | 143 · Elections 318 · Crypto 1,756 · Golf 1,168 | `topics.*.live_markets_total` |
+| Alert feed state | **0 alerts, 0 resolutions, 60 sampled markets** at the last engine run | `node scripts/check_alerts.mjs` |
+
+**What this means for a reader.** The dashboard is live and the data is real, but the demo exchange
+has not moved by the alert threshold in the sampled window. An empty alert feed here is an honest
+empty result, not a broken feed: the threshold, detection and rendering are covered by tests, and
+nothing is seeded to make the feed look busy.
+
+**Corrections to §4 below (the 11:10 UTC figures).** §4 says gas, golf and culture had *no open
+markets*. At 19:16 UTC gas, golf, elections and crypto all had open markets (figures above); only
+culture had none, which the live series check confirms. §4's specific market leaders were from a
+different capture and are not restated here, because re-stating them without re-reading the exact
+endpoint would be a guess. The current leaders are on the home page, each with its own source link.
+
+**Data-pipeline defects found and fixed in this session (published as F-44/F-45 on the Flagged page).**
+The scheduled refresh had never run (0 of the last 100 runs were `schedule` events), and the one
+refresh that did run failed at its commit step after its data steps had succeeded. Both are fixed and
+the fix is verified by a green run, 44800509854, which committed the capture above.
+
+---
+
+# (Record below: written by session-cdfe52bd against the 11:10 UTC capture — kept verbatim)
+
 
 ## 1. The brief, in one paragraph
 
