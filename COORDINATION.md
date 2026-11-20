@@ -116,6 +116,36 @@ See `verification/2026-11-20-dd012e26.md` for the exact scope, methods and evide
 
 ---
 
+---
+
+## Current Arena session — `arena/5bb909f6-kalshidash1` — independent verification & live-site audit (V-scope, session-5bb909f6)
+
+- Branch: `arena/5bb909f6-kalshidash1` (base `d24616a` of `main`; rebased onto `origin/main` `e67e70c` at claim time). Arena pins this session to this branch; no other branches/worktrees are created. The brief's `session-<id>/<task>` branch naming is not usable here (same note as session-7f90cf50).
+- Role: **independent verification session** — NOT the final integration session.
+
+### Overlap check at claim time (read from `origin` 2026-11-20 ~19:17 UTC) — respected, not duplicated
+
+| Claimed work | Claimant(s) | State | Outcome |
+|---|---|---|---|
+| R1–R6 final integration: refresh-workflow repair, duplicate flag IDs, nav consolidation, README rewrite, line-by-line integration evidence (touches `flagged.html`, `templates/*`, `index.html`, `categories/*`, `sources.html`, workflows, `README.md`, `VERIFICATION.md`) | `arena-dd012e26` (PR #32, open; commits 19:13–19:17 UTC) | active | respected; none of those files are edited here |
+| "Final integration: verify sources, run QA, publish" claim | `arena-d1de3583` (claim-only PR #30, merged 19:15:31 UTC) | claim recorded | respected; not taken over |
+| Settlement-source provenance audit + golf spot-check (F-27..F-31 dup anchors noted) | `arena-b71d6814` (PR #27, merged 19:16:38 UTC) | done | respected |
+| L4 live re-verification (F-L4-01…F-L4-08) | `arena-605bbb3f` (PRs #26/#28, merged) | done | re-verified independently in V3 below (additive, no files of theirs edited) |
+| Integration smoke-audit + README conflict cleanup | `arena-c431fca8` (PRs #25/#29, merged) | done | respected |
+| Record of PR #16 merge + Pages result | `arena-7d6d2fcb` (PR #23, open since 14:10 UTC, no commits for >60 min) | **stale** | left in place (record-only PR; content already reflected on this board). Noted for the user. Not taken over |
+
+### Task board — session-5bb909f6
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| V1 | **Live-site deployment audit**: fetch the deployed GitHub Pages site over HTTPS, content-check every canonical page, verify deployed internal-link integrity and Pages build status via the API | in progress | session-5bb909f6 | `verification/2026-11-20-5bb909f6.md` (new) |
+| V2 | **External-link liveness audit** (the 267–275 external links the local checkers explicitly do not fetch): all official source links + every settlement-source URL + a systematic sample checked against their hosts; dead/unverifiable links listed for review | in progress | session-5bb909f6 | `verification/2026-11-20-5bb909f6.md`, `tools/external_link_audit.mjs` (new, re-runnable where egress is open) |
+| V3 | **F-L4-01…F-L4-08 independent re-verification** against the live demo API + publication-status check on the shared Flagged page (publication itself belongs to the flagged-page owner / post-merge follow-up) | in progress | session-5bb909f6 | `verification/2026-11-20-5bb909f6.md` |
+| V4 | **Requirements-coverage matrix**: every requirement sentence from the project brief mapped to its implementing page(s) + official source links + verified status (the brief's "collect, organize, and analyze utilizing a full list of requirements") | in progress | session-5bb909f6 | `verification/2026-11-20-5bb909f6.md` |
+| V5 | **Session record + PR to `main` + Pages confirmation + post-merge record** (per brief: merge without waiting for approval; record PR link and merge result) | todo | session-5bb909f6 | `COORDINATION.md` (this section only) |
+
+File scope (hard limit): `verification/2026-11-20-5bb909f6.md` (new), `tools/external_link_audit.mjs` (new), `COORDINATION.md` (this section only). No site pages, templates, data files, or workflows are edited by this session. If V1–V4 find defects in files owned by others, the defect is logged here as a request, not edited.
+
 ## Current Arena session — `arena/c431fca8-kalshidash1` (2026-11-20 UTC)
 
 - Status: active; branched from `d24616a80151e8e51c6334f585d3e0e6d4cde919`.
