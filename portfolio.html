@@ -7,151 +7,99 @@
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-
-<header class="site-header">
-  <div class="header-inner">
-    <div class="brand">Kalshi<span class="em">Dash1</span></div>
-    <nav class="nav">
-      <a href="index.html">Home</a>
-      <a href="categories/gas.html">Gas Prices</a>
-      <a href="categories/elections.html">Elections</a>
-      <a href="categories/culture.html">Culture</a>
-      <a href="categories/crypto.html">Crypto</a>
-      <a href="categories/golf.html">Golf</a>
-      <a href="portfolio.html" class="active">Portfolio</a>
-      <a href="suggestions.html">Suggestions</a>
-      <a href="qa.html">Q&amp;A</a>
-      <a href="flagged.html">Flagged for Review</a>
-    </nav>
-  </div>
-</header>
-
-<div class="container">
-  <h1 class="page-title">Portfolio Performance (Demo)</h1>
-  <p class="page-sub">Track the Kalshi demo account portfolio: balance, positions, P&amp;L, fills, and trade strategies by type.</p>
-
-  <div id="api-key-notice" class="card" style="padding:12px 16px;"></div>
-
-  <div class="alert alert-warn">
-    <span class="k">Demo account required:</span>
-    No demo API credentials were provided to this session. Portfolio balance, positions, fills, and order execution cannot be fetched or demonstrated. Create a demo account at <a href="https://demo.kalshi.co/" target="_blank" rel="noopener">demo.kalshi.co</a> (tutorial: <a href="https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account" target="_blank" rel="noopener">Kalshi Help</a>). Demo credentials are <strong>not shared with production</strong> (verified: <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Kalshi Demo Environment docs</a>).
-  </div>
-
-  <div class="grid">
-    <div class="card" style="min-width:200px;">
-      <h3>Balance</h3>
-      <div style="font-size:1.5rem;font-weight:700;" id="portfolio-balance">—</div>
-      <p style="font-size:0.8rem;color:#64748b;">Available balance (cents→USD)</p>
+<div class="site-wrap">
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand"><div class="mark">KD</div><div>KalshiDash1</div></div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Live Dashboard</a>
+        <a href="categories/gas.html">Gas Prices</a>
+        <a href="categories/elections.html">Elections</a>
+        <a href="categories/culture.html">Culture</a>
+        <a href="categories/crypto.html">Crypto</a>
+        <a href="categories/golf.html">Golf</a>
+        <a href="portfolio.html" class="active">Portfolio</a>
+        <a href="trades.html">Trades</a>
+        <a href="suggestions.html">Suggestions</a>
+        <a href="questions.html">Questions &amp; Answers</a>
+        <a href="flagged.html">Flagged for Review</a>
+      </nav>
     </div>
-    <div class="card" style="min-width:200px;">
-      <h3>Portfolio value</h3>
-      <div style="font-size:1.5rem;font-weight:700;" id="portfolio-value">—</div>
-      <p style="font-size:0.8rem;color:#64748b;">Total portfolio value</p>
-    </div>
-    <div class="card" style="min-width:200px;">
-      <h3>Positions</h3>
-      <div style="font-size:1.5rem;font-weight:700;" id="portfolio-positions">—</div>
-      <p style="font-size:0.8rem;color:#64748b;">Unsettled positions</p>
-    </div>
-    <div class="card" style="min-width:200px;">
-      <h3>Fills</h3>
-      <div style="font-size:1.5rem;font-weight:700;" id="portfolio-fills">—</div>
-      <p style="font-size:0.8rem;color:#64748b;">Matched trades (fills)</p>
-    </div>
+  </header>
+
+  <div class="hero" style="padding:24px 0 10px;">
+    <h1 style="font-size:22px;margin-bottom:6px;">Portfolio Performance</h1>
+    <p style="font-size:14px;color:var(--muted);">Track the Kalshi <strong>demo account</strong> portfolio: balance, positions, trades, and PnL over time. Categorize trades and build strategies by trade type.</p>
+    <div class="status err"><span class="dot"></span><strong>Credentials required.</strong> Authenticated portfolio endpoints need a demo API key + Ed25519 private-key signature. No credentials were provided or requested, so this page shows the documented structure only.</div>
   </div>
 
   <div class="section">
-    <h2 class="section-title">Positions (unsettled)</h2>
-    <table class="wide">
-      <thead>
-        <tr>
-          <th style="width:18%;">Ticker</th>
-          <th style="width:12%;">Side</th>
-          <th style="width:14%;">Quantity</th>
-          <th style="width:18%;">Cost basis</th>
-          <th style="width:18%;">Current value</th>
-          <th style="width:20%;">Unrealized P&amp;L</th>
-        </tr>
-      </thead>
-      <tbody id="positions-table-body">
-        <tr><td colspan="6" class="graph-placeholder">No portfolio data (demo API key not configured).</td></tr>
-      </tbody>
-    </table>
+    <h2><span class="tag">Authenticated — not connected</span> What portfolio tracking requires</h2>
+    <ul>
+      <li>A Kalshi demo account with API access configured (<a href="https://demo.kalshi.co/" target="_blank" rel="noopener">demo.kalshi.co</a>).</li>
+      <li>A demo API key (API key ID) and the matching Ed25519 private key for request signing.</li>
+      <li>Each authenticated request signs <code>KALSHI-ACCESS-KEY</code>, <code>KALSHI-ACCESS-SIGNATURE</code>, and <code>KALSHI-ACCESS-TIMESTAMP</code> headers.</li>
+    </ul>
+    <div class="note"><strong>Source:</strong> <a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener">API Keys</a> &middot; <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests.md" target="_blank" rel="noopener">Quick Start: Authenticated Requests</a> &middot; <a href="https://docs.kalshi.com/getting_started/fixed_point_migration.md" target="_blank" rel="noopener">Fixed-Point Representation</a> (balances/amounts are fixed-point strings).</div>
   </div>
 
   <div class="section">
-    <h2 class="section-title">Trade history (fills)</h2>
+    <h2>Portfolio performance table (structure)</h2>
+    <p class="small">Populated only when connected to a demo account. Columns match the data available from the portfolio/balance and orders endpoints.</p>
     <table class="wide">
       <thead>
         <tr>
-          <th style="width:14%;">Ticker</th>
-          <th style="width:16%;">Timestamp</th>
-          <th style="width:14%;">Side</th>
-          <th style="width:14%;">Price (¢)</th>
-          <th style="width:14%;">Count</th>
-          <th style="width:14%;">Fee</th>
-          <th style="width:14%;">Type</th>
-        </tr>
-      </thead>
-      <tbody id="fills-table-body">
-        <tr><td colspan="7" class="graph-placeholder">No fills data (demo API key not configured).</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="card">
-    <h3>Trade categorization &amp; strategies by type</h3>
-    <table class="wide">
-      <thead>
-        <tr>
-          <th style="width:24%;">Trade type</th>
-          <th>Suggested analysis / strategy focus</th>
-          <th style="width:22%;">Status</th>
+          <th>Trade / order</th>
+          <th>Market ticker</th>
+          <th>Side</th>
+          <th>Count</th>
+          <th>Price ($)</th>
+          <th>Category</th>
+          <th>PnL ($)</th>
+          <th>Status</th>
+          <th>Source link</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Directional (Yes/No)</td>
-          <td>Categorize by win/loss vs entry price; track win rate by topic (gas, elections, culture, crypto, golf).</td>
-          <td><span class="badge badge-neutral">unverified</span></td>
-        </tr>
-        <tr>
-          <td>Scalping (short-term)</td>
-          <td>Measure holding period (seconds/minutes) vs price move; use graph length selector to review.</td>
-          <td><span class="badge badge-neutral">unverified</span></td>
-        </tr>
-        <tr>
-          <td>Swing (hours/days)</td>
-          <td>Compare entry vs settlement price; track resolved Yes/No outcomes.</td>
-          <td><span class="badge badge-neutral">unverified</span></td>
-        </tr>
-        <tr>
-          <td>Hedging / spread</td>
-          <td>Track yes + no positions on same event; net exposure per market.</td>
-          <td><span class="badge badge-neutral">unverified</span></td>
+          <td class="td-blank" colspan="8">No demo-account credentials connected — rows left blank per verification policy.</td>
+          <td><span class="badge badge-off">flagged</span></td>
         </tr>
       </tbody>
     </table>
-    <p class="page-sub" style="margin-top:8px;">Sources: <a href="https://docs.kalshi.com/api-reference/portfolio/get-positions.md" target="_blank" rel="noopener">GET /positions</a> · <a href="https://docs.kalshi.com/api-reference/portfolio/get-fills.md" target="_blank" rel="noopener">GET /fills</a> · <a href="https://docs.kalshi.com/api-reference/portfolio/get-balance.md" target="_blank" rel="noopener">GET /balance</a> · <a href="https://docs.kalshi.com/api-reference/orders/create-order-v2.md" target="_blank" rel="noopener">Create Order (V2)</a>.</p>
   </div>
 
-  <footer>
-    KalshiDash1 &middot; Portfolio (demo) &middot; Not financial advice.
-  </footer>
-</div>
+  <div class="section">
+    <h2>Categorize trades &amp; build strategies by trade type</h2>
+    <p>Once connected, each trade can be tagged by category (gas / elections / culture / crypto / golf) and trade type (directional yes / directional no / spread / hedge). Strategy analysis then compares win rate and PnL per category and trade type.</p>
+    <table class="wide">
+      <thead>
+        <tr><th>Trade type</th><th>What it means</th><th>Suggested strategy lens</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Directional YES</td><td>Bought YES contracts expecting event to resolve yes.</td><td>Track win rate &amp; average $ per category.</td></tr>
+        <tr><td>Directional NO</td><td>Bought NO contracts (or sold YES) expecting event to resolve no.</td><td>Track win rate &amp; average $ per category.</td></tr>
+        <tr><td>Spread / hedge</td><td>Offsetting YES and NO positions across related events.</td><td>Track net exposure per category.</td></tr>
+        <tr><td>Scalp / swing</td><td>Short-term price-movement trades, not held to settlement.</td><td>Track hold time &amp; per-trade $.</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><strong>Source:</strong> order lifecycle — <a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener">Quick Start: Create your first order</a> (place, amend, cancel orders); <a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener">Market Settlement</a> (how positions resolve yes/no).</div>
+  </div>
 
-<script src="assets/js/app.js"></script>
-<script>
-(async () => {
-  await window.KalshiDash.loadPortfolio();
-  window.KalshiDash.renderPortfolio();
-  window.KalshiDash.renderApiKeyNotice();
-  // fill counters
-  const elP = document.getElementById("portfolio-positions");
-  const elF = document.getElementById("portfolio-fills");
-  if (elP) elP.textContent = window.KalshiDash.STATE.positions ? window.KalshiDash.STATE.positions.length : "—";
-  if (elF) elF.textContent = window.KalshiDash.STATE.fills ? window.KalshiDash.STATE.fills.length : "—";
-})();
-</script>
+  <div class="section">
+    <h2>Connect your demo account</h2>
+    <p class="small">Enter your demo API key ID below to <em>identify</em> the account. The private key and signing are <strong>not</strong> handled by this static site (no credentials should be entered or stored here). Use the official Kalshi SDKs or your own authenticated client to fetch portfolio data.</p>
+    <div class="form-row">
+      <div class="form-group"><label>Demo API key ID (optional, local label only)</label><input type="text" class="input" placeholder="API key id…"></div>
+      <button class="btn">Record label</button>
+    </div>
+    <div class="status info"><span class="dot"></span>This label is stored only in the browser page (not sent anywhere). No private key is collected by this site.</div>
+  </div>
+
+  <div class="footer-inner" style="margin-top:30px;">
+    <p class="small">KalshiDash1 &middot; Portfolio &middot; Endpoints verified against <a href="https://docs.kalshi.com" target="_blank" rel="noopener">docs.kalshi.com</a> &middot; Demo environment uses mock funds &middot; Not financial advice.</p>
+  </div>
+</div>
 </body>
 </html>

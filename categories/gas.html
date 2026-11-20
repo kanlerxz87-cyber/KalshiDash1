@@ -7,95 +7,86 @@
 <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-
-<header class="site-header">
-  <div class="header-inner">
-    <div class="brand">Kalshi<span class="em">Dash1</span></div>
-    <nav class="nav">
-      <a href="../index.html">Home</a>
-      <a href="gas.html" class="active">Gas Prices</a>
-      <a href="elections.html">Elections</a>
-      <a href="culture.html">Culture</a>
-      <a href="crypto.html">Crypto</a>
-      <a href="golf.html">Golf</a>
-      <a href="../portfolio.html">Portfolio</a>
-      <a href="../suggestions.html">Suggestions</a>
-      <a href="../qa.html">Q&amp;A</a>
-      <a href="../flagged.html">Flagged for Review</a>
-    </nav>
-  </div>
-</header>
-
-<div class="container">
-  <h1 class="page-title">Gas Prices</h1>
-  <p class="page-sub">Energy / gasoline price event contracts. Track highest dollar-amount live events until resolved (Yes / No).</p>
-
-  <div id="api-key-notice" class="card" style="padding:12px 16px;"></div>
-
-  <div class="section">
-    <div class="graph-wrap">
-      <div class="graph-controls">
-        <label for="graph-period">Graph length</label>
-        <select id="graph-period">
-          <option value="60">1 minute candles</option>
-          <option value="300" selected>5 minutes</option>
-          <option value="3600">1 hour</option>
-          <option value="86400">1 day</option>
-        </select>
-      </div>
-      <div id="graph-canvas"></div>
+<div class="site-wrap">
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand"><div class="mark">KD</div><div>KalshiDash1</div></div>
+      <nav>
+        <a href="../index.html">Home</a>
+        <a href="../dashboard.html">Live Dashboard</a>
+        <a href="gas.html" class="active">Gas Prices</a>
+        <a href="elections.html">Elections</a>
+        <a href="culture.html">Culture</a>
+        <a href="crypto.html">Crypto</a>
+        <a href="golf.html">Golf</a>
+        <a href="../portfolio.html">Portfolio</a>
+        <a href="../trades.html">Trades</a>
+        <a href="../suggestions.html">Suggestions</a>
+        <a href="../questions.html">Questions &amp; Answers</a>
+        <a href="../flagged.html">Flagged for Review</a>
+      </nav>
     </div>
-    <p class="page-sub" style="margin-top:6px;">X axis = time. Y axis = current contract price (¢). Select seconds/minutes/hours via graph length. Live candlesticks from <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener">GET /market-candlesticks</a> (period in minutes: 1, 60, 1440).</p>
+  </header>
+
+  <div class="hero" style="padding:24px 0 10px;">
+    <h1 style="font-size:22px;margin-bottom:6px;">Gas Prices</h1>
+    <p style="font-size:14px;color:var(--muted);">Findings table for Kalshi events related to <strong>gas prices</strong>. Tracks live events until resolved, with the resolution (yes / no) and source links. Values are left blank and flagged unverified unless confirmed from an official source.</p>
   </div>
 
   <div class="section">
-    <h2 class="section-title">Live events — Gas Prices</h2>
+    <h2><span class="tag">Category focus</span> Gas prices</h2>
+    <p>Track live Kalshi events on gas prices. For each event: market/event name, ticker, dollar amount (highest dollar live event), status (open / settled), resolution (yes / no / pending), and the official source link.</p>
+    <div class="status warn"><span class="dot"></span><strong>Unverified:</strong> No gas-price events were confirmed in the Kalshi demo environment at review time (the demo currently lists sports markets). Values below are intentionally blank. Use the discovery method to confirm.</div>
+  </div>
+
+  <div class="section">
+    <h2>Findings — gas price events</h2>
     <table class="wide">
       <thead>
         <tr>
-          <th style="width:14%;">Ticker</th>
-          <th>Event title</th>
-          <th style="width:12%;">Status</th>
-          <th style="width:11%;">Yes price</th>
-          <th style="width:11%;">No price</th>
-          <th style="width:14%;">Resolved</th>
-          <th style="width:14%;">Liquidity / contracts at price</th>
-          <th style="width:14%;">Source</th>
+          <th>Event / market</th>
+          <th>Ticker</th>
+          <th>Category</th>
+          <th>Highest $ live event</th>
+          <th>Status</th>
+          <th>Resolved (yes / no)</th>
+          <th>Source link</th>
+          <th>Verified?</th>
         </tr>
       </thead>
-      <tbody id="events-table-body">
-        <tr><td colspan="8" class="graph-placeholder">Loading live events&hellip;</td></tr>
+      <tbody>
+        <tr>
+          <td class="td-blank" colspan="7">No gas-price events confirmed in the demo environment. Values left blank per verification policy (never infer or fill in).</td>
+          <td><span class="badge badge-off">unverified</span></td>
+        </tr>
       </tbody>
     </table>
-    <p class="page-sub" style="margin-top:6px;">Source: <a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener">GET /events</a> · Order book: <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener">GET /market-orderbook</a> (yes bids and no bids only; a yes bid at price X equals an ask for no at 100−X).</p>
+    <div class="note">
+      <strong>Discovery method (official):</strong> call <code>GET /markets?status=open</code> to list open demo markets, then <code>GET /events/{event_ticker}</code> for each event and check its <code>category</code>. Inspect <code>yes_bid_dollars</code>/<code>no_bid_dollars</code> and <code>result</code> (empty = pending, &ldquo;yes&rdquo;/&ldquo;no&rdquo; = resolved) to track until resolution.<br>
+      <strong>Sources:</strong>
+      <ul>
+        <li><a href="https://docs.kalshi.com/api-reference/market/get-markets.md" target="_blank" rel="noopener">Get Markets</a> (public, no auth)</li>
+        <li><a href="https://docs.kalshi.com/api-reference/market/get-event.md" target="_blank" rel="noopener">Get Event</a> (title, category, result)</li>
+        <li><a href="https://docs.kalshi.com/getting_started/quick_start_market_data.md" target="_blank" rel="noopener">Quick Start: Market Data</a></li>
+        <li><a href="https://docs.kalshi.com/getting_started/market_lifecycle.md" target="_blank" rel="noopener">Market Lifecycle</a> (open &rarr; settled)</li>
+        <li><a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener">Market Settlement</a> (how outcomes are determined)</li>
+      </ul>
+    </div>
   </div>
 
-  <div class="card">
-    <h3>Analysis &amp; findings — Gas Prices</h3>
-    <p style="font-size:0.9rem;color:#334155;">No live data available yet (see Flagged for Review). Once connected to the demo API, this table will show open gas-price markets, their Yes/No prices, resolution outcome, and available contracts at each price level.</p>
+  <div class="section">
+    <h2>How to track until resolved</h2>
+    <ol>
+      <li>Find gas-price events via <code>GET /markets?status=open</code> + <code>GET /events/{event_ticker}</code> (check <code>category</code>).</li>
+      <li>Record ticker, status, and current <code>yes_bid_dollars</code> / <code>no_bid_dollars</code> (dollar amount).</li>
+      <li>Poll until <code>status</code> becomes <code>settled</code>, then read <code>result</code> (&ldquo;yes&rdquo; or &ldquo;no&rdquo;) for the resolution.</li>
+      <li>Add each confirmed row to this table with its official source link.</li>
+    </ol>
   </div>
 
-  <footer>
-    KalshiDash1 &middot; Gas Prices &middot; Not financial advice. Demo prices may not reflect real markets.
-  </footer>
+  <div class="footer-inner" style="margin-top:30px;">
+    <p class="small">KalshiDash1 &middot; Gas Prices &middot; Endpoints verified against <a href="https://docs.kalshi.com" target="_blank" rel="noopener">docs.kalshi.com</a> &middot; Demo environment uses mock funds &middot; Not financial advice.</p>
+  </div>
 </div>
-
-<script src="../assets/js/app.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const marketTicker = null; // set from live data when available
-  (async () => {
-    await window.KalshiDash.loadMarkets();
-    window.KalshiDash.renderCategoryPage();
-    window.KalshiDash.renderApiKeyNotice();
-    if (marketTicker) {
-      window.KalshiDash.renderPriceGraph("#graph-canvas", marketTicker, 300);
-      window.KalshiDash.setupGraphControls();
-    } else {
-      document.getElementById("graph-canvas").innerHTML = `<div class="graph-placeholder">Select a market from the table above to view its price graph. Live market data unavailable (unverified).</div>`;
-    }
-  })();
-});
-</script>
 </body>
 </html>

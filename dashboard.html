@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Dashboard — KalshiDash1</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/charts.js"></script>
+</head>
+<body>
+<div class="site-wrap">
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand"><div class="mark">KD</div><div>KalshiDash1</div></div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html" class="active">Live Dashboard</a>
+        <a href="categories/gas.html">Gas Prices</a>
+        <a href="categories/elections.html">Elections</a>
+        <a href="categories/culture.html">Culture</a>
+        <a href="categories/crypto.html">Crypto</a>
+        <a href="categories/golf.html">Golf</a>
+        <a href="../portfolio.html">Portfolio</a>
+        <a href="../trades.html">Trades</a>
+        <a href="../suggestions.html">Suggestions</a>
+        <a href="../questions.html">Questions &amp; Answers</a>
+        <a href="../flagged.html">Flagged for Review</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero" style="padding:24px 0 10px;">
+    <h1 style="font-size:22px;margin-bottom:6px;">Live Dashboard</h1>
+    <p style="font-size:14px;color:var(--muted);">Interactive contract-price graph and orderbook liquidity from the <strong>Kalshi Demo Trade API</strong> (public market-data endpoints — no authentication required). Enter a demo market ticker to load live data.</p>
+  </div>
+
+  <div class="section">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Market ticker</label>
+        <input type="text" id="d-ticker" class="input" placeholder="e.g. KX... (demo)" value="">
+      </div>
+      <div class="form-group">
+        <label>Series ticker (optional; resolved automatically if left blank)</label>
+        <input type="text" id="d-series" class="input" placeholder="e.g. KX...">
+      </div>
+      <div class="form-group">
+        <label>Graph length</label>
+        <select id="d-range" class="input">
+          <option value="sec">Seconds &mdash; last 60 seconds (1-minute candles)</option>
+          <option value="min" selected>Minutes &mdash; last 60 minutes (1-minute candles)</option>
+          <option value="hour">Hours &mdash; last 6 hours (1-minute candles)</option>
+          <option value="day">Hours &mdash; last 24 hours (1-hour candles)</option>
+        </select>
+      </div>
+      <button class="btn primary" id="d-load">Load market data</button>
+    </div>
+    <div id="d-status" class="status info" style="display:none;"><span class="dot"></span><span id="d-status-text">Loading&hellip;</span></div>
+  </div>
+
+  <div class="section">
+    <h2>Contract price over time</h2>
+    <p class="small">X axis = time &middot; Y axis = current contract price ($) &middot; plots YES candlestick close prices. Granularity is controlled by the graph-length selector above.</p>
+    <div id="d-chart-notice" class="small" style="margin-bottom:8px;">Enter a ticker and click Load market data.</div>
+    <div class="chart-wrap"><canvas id="priceChart"></canvas></div>
+    <div class="note"><strong>API limitation (verified from docs):</strong> candlestick <code>period_interval</code> supports 1, 60, or 1440 minutes only — there is no sub-minute/&ldquo;seconds&rdquo; candle resolution. A seconds lookback still plots the finest available (1-minute) candles. <code>start_ts</code>/<code>end_ts</code> must be Unix seconds; max 5,000 periods per request. <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener">Get Market Candlesticks &rarr;</a></div>
+  </div>
+
+  <div class="section">
+    <h2>Current quotes &amp; key figures</h2>
+    <div class="kpi">
+      <div class="tile"><div class="val" id="d-last-price">—</div><div class="lbl">Last price (YES, $)</div></div>
+      <div class="tile"><div class="val" id="d-yes-bid">—</div><div class="lbl">Best YES bid ($)</div></div>
+      <div class="tile"><div class="val" id="d-yes-ask">—</div><div class="lbl">Best YES ask ($)</div></div>
+      <div class="tile"><div class="val" id="d-no-bid">—</div><div class="lbl">Best NO bid ($)</div></div>
+      <div class="tile"><div class="val" id="d-no-ask">—</div><div class="lbl">Best NO ask ($)</div></div>
+      <div class="tile"><div class="val" id="d-open-int">—</div><div class="lbl">Open interest ($)</div></div>
+      <div class="tile"><div class="val" id="d-volume">—</div><div class="lbl">Volume (contracts)</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Orderbook liquidity — contracts available at each price</h2>
+    <p class="small">Each level shows a price and how many contracts are available (bid size) on the YES and NO sides. In Kalshi binary markets, a YES bid at price X equals a NO ask at (100 − X); only bids are returned by the public orderbook endpoint.</p>
+    <table class="wide">
+      <thead>
+        <tr><th>Level</th><th>YES bid — price / contracts available</th><th>NO bid — price / contracts available</th></tr>
+      </thead>
+      <tbody id="d-orderbook-body"><tr><td colspan="3" class="td-blank center">Load a market to see liquidity.</td></tr></tbody>
+    </table>
+    <div class="note"><strong>Source:</strong> <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener">Get Market Orderbook &rarr;</a> &middot; <a href="https://docs.kalshi.com/getting_started/orderbook_responses.md" target="_blank" rel="noopener">Orderbook responses &rarr;</a> &middot; <a href="https://docs.kalshi.com/getting_started/quick_start_market_data.md" target="_blank" rel="noopener">Quick Start: Market Data (no auth) &rarr;</a></div>
+  </div>
+
+  <div class="section">
+    <h2>How to use</h2>
+    <ol>
+      <li>Open a demo account at <a href="https://demo.kalshi.co/" target="_blank" rel="noopener">demo.kalshi.co</a> and find a market ticker (e.g. from the demo site or <code>GET /markets?status=open</code>).</li>
+      <li>Enter the market ticker above (optionally the series ticker) and click <strong>Load market data</strong>.</li>
+      <li>Watch the live price graph and liquidity table. Change the graph-length selector to view seconds / minutes / hours of price history.</li>
+      <li>Prices and liquidity come straight from the Kalshi demo API in your browser; they may lag the exchange by a few seconds (data is cached briefly).</li>
+    </ol>
+  </div>
+
+  <div class="footer-inner" style="margin-top:30px;">
+    <p class="small">KalshiDash1 &middot; Live Dashboard &middot; Endpoints verified against <a href="https://docs.kalshi.com" target="_blank" rel="noopener">docs.kalshi.com</a> &middot; Demo environment uses mock funds &middot; Not financial advice.</p>
+  </div>
+</div>
+</body>
+</html>

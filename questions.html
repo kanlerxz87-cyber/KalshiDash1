@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questions &amp; Answers — KalshiDash1</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div class="site-wrap">
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand"><div class="mark">KD</div><div>KalshiDash1</div></div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Live Dashboard</a>
+        <a href="categories/gas.html">Gas Prices</a>
+        <a href="categories/elections.html">Elections</a>
+        <a href="categories/culture.html">Culture</a>
+        <a href="categories/crypto.html">Crypto</a>
+        <a href="categories/golf.html">Golf</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="trades.html">Trades</a>
+        <a href="suggestions.html">Suggestions</a>
+        <a href="questions.html" class="active">Questions &amp; Answers</a>
+        <a href="flagged.html">Flagged for Review</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero" style="padding:24px 0 10px;">
+    <h1 style="font-size:22px;margin-bottom:6px;">Questions, Information &amp; Answers</h1>
+    <p style="font-size:14px;color:var(--muted);">A clear list of questions, information, and answers that must be addressed before any decision can be reasonably made — based on what we already have and what we do not have — plus suggestions to discover missing information.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="tag">Pre-decision questions &amp; answers</span> What we have vs. what we need</h2>
+    <table class="wide">
+      <thead>
+        <tr><th>#</th><th>Question / information needed</th><th>Answer / current state</th><th>Source</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td><td>What are the official Kalshi demo API endpoints?</td>
+          <td>REST: <code>https://external-api.demo.kalshi.co/trade-api/v2</code> (also <code>https://demo-api.kalshi.co/trade-api/v2</code>). WebSocket: <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> (also <code>wss://demo-api.kalshi.co/trade-api/ws/v2</code>).</td>
+          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment docs</a></td>
+          <td><span class="badge badge-ok">verified</span></td>
+        </tr>
+        <tr>
+          <td>2</td><td>Can public market data be fetched without authentication?</td>
+          <td>Yes — <code>/markets</code>, <code>/orderbook</code>, <code>/candlesticks</code>, <code>/events</code> need no API key.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data.md" target="_blank" rel="noopener">Quick Start: Market Data</a></td>
+          <td><span class="badge badge-ok">verified</span></td>
+        </tr>
+        <tr>
+          <td>3</td><td>Which focus categories exist in the demo (gas, elections, culture, crypto, golf)?</td>
+          <td>Not confirmed. At review time the demo environment listed sports markets (college football/basketball, NFL); no gas/elections/culture/crypto/golf events were found.</td>
+          <td>Live demo API (<code>GET /markets?status=open</code>)</td>
+          <td><span class="badge badge-off">unverified</span></td>
+        </tr>
+        <tr>
+          <td>4</td><td>What is the highest-dollar live event in each focus category?</td>
+          <td>Not answerable — no events confirmed in those categories. Values left blank per policy.</td>
+          <td>—</td>
+          <td><span class="badge badge-off">unverified</span></td>
+        </tr>
+        <tr>
+          <td>5</td><td>How is an event resolved (yes / no)?</td>
+          <td>When <code>status=settled</code>, read <code>result</code> (&ldquo;yes&rdquo; or &ldquo;no&rdquo;) from <code>GET /events/{event_ticker}</code>.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener">Market Settlement</a></td>
+          <td><span class="badge badge-ok">verified</span></td>
+        </tr>
+        <tr>
+          <td>6</td><td>What candlestick resolutions are available for the price graph?</td>
+          <td><code>period_interval</code> = 1, 60, or 1440 minutes only. No sub-minute (&ldquo;seconds&rdquo;) candles.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md" target="_blank" rel="noopener">Get Market Candlesticks</a></td>
+          <td><span class="badge badge-ok">verified</span></td>
+        </tr>
+        <tr>
+          <td>7</td><td>Can the dashboard execute trades and track portfolio?</td>
+          <td>Only with demo API credentials (API key + Ed25519 private key). None provided or requested. Shown as documented structure only.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener">Create your first order</a></td>
+          <td><span class="badge badge-off">flagged (credentials required)</span></td>
+        </tr>
+        <tr>
+          <td>8</td><td>Does the browser reach the demo API from GitHub Pages?</td>
+          <td>Not confirmed — depends on CORS and network. Dashboard handles connection failure gracefully and reports it.</td>
+          <td>—</td>
+          <td><span class="badge badge-off">unverified</span></td>
+        </tr>
+        <tr>
+          <td>9</td><td>Are demo and production credentials shared?</td>
+          <td>No. Credentials are not shared between demo and production.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment docs</a></td>
+          <td><span class="badge badge-ok">verified</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Suggestions to discover missing information</h2>
+    <ul>
+      <li>Run <code>GET /markets?status=open</code> against <code>https://external-api.demo.kalshi.co/trade-api/v2</code> and scan titles/tickers for gas, elections, culture, crypto, and golf keywords; then <code>GET /events/{ticker}</code> to confirm <code>category</code>.</li>
+      <li>Check <a href="https://kalshi.com/markets" target="_blank" rel="noopener">kalshi.com/markets</a> (production UI) to see which categories Kalshi offers; note these may differ from the demo environment.</li>
+      <li>Read <a href="https://docs.kalshi.com/getting_started/market_lifecycle.md" target="_blank" rel="noopener">Market Lifecycle</a> and <a href="https://docs.kalshi.com/getting_started/market_settlement.md" target="_blank" rel="noopener">Market Settlement</a> to confirm how status and result map to open/settled and yes/no.</li>
+      <li>Test CORS from the GitHub Pages URL by opening the dashboard and watching the status banner; if blocked, flag it on the Flagged for Review page.</li>
+      <li>If credentials become available, test the authenticated portfolio/order endpoints against the demo API and confirm exact request/response shapes.</li>
+    </ul>
+  </div>
+
+  <div class="footer-inner" style="margin-top:30px;">
+    <p class="small">KalshiDash1 &middot; Questions &amp; Answers &middot; Endpoints verified against <a href="https://docs.kalshi.com" target="_blank" rel="noopener">docs.kalshi.com</a> &middot; Demo environment uses mock funds &middot; Not financial advice.</p>
+  </div>
+</div>
+</body>
+</html>

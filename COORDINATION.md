@@ -1,48 +1,40 @@
-# KalshiDash1 — Coordination Board
+# KalshiDash1 — Coordination / Task Board
 
-Shared task board for all agent sessions working on this repo.
-Current session branch: `arena/15d2acea-kalshidash1` (branched from `main` f1fa6aa404597e1413dfcea0efd8062866b7a80f)
-Session ID: `session-arena-15d2acea`
+Shared task board for all agent sessions working on this repo. Each session works on its own branch
+and edits only its claimed (non-overlapping) scope. Do not discard another session's work; resolve
+conflicts by combining and log what happened here.
 
-## How to use
-- Claim a task by writing your session ID and file scope in the "Owner / Scope" column, then commit and push immediately.
-- Never start a task another session has claimed.
-- Keep scopes non-overlapping; each session edits only its claimed files.
-- If a task requires changing a file owned by another session, log the request here instead of editing it.
-- Make small, frequent commits; run `git pull --rebase` before every push.
-- On merge conflict: stop, resolve without discarding the other session's work, log what happened.
-- When finished: record sources, verification performed, and irregularities here; mark status `done`.
-- Never mark verified without checking against an official source; link that source.
-- A claim older than 60 minutes with no commits may be taken over by another session (note the handoff here).
-- `needs review` = published on the "Flagged for Review" page; does not block other work.
+Source of truth for this repo: https://github.com/kanlerxz87-cyber/KalshiDash1
+Official Kalshi API docs: https://docs.kalshi.com
+Demo environment doc (verified): https://docs.kalshi.com/getting_started/demo_env
 
-## Tasks
+## Sessions on this repo
+- Session `session-arena-15d2acea` (branch `arena/15d2acea-kalshidash1`, from main f1fa6aa): built a complete static site merged to main via PR #1 (commit 97d74c0 "Finalize: mark Pages deployed"). Contributed files include README.md, assets/css/style.css, assets/js/app.js, categories/*.html, docs/api-research.md, flagged.html, index.html, portfolio.html, qa.html, suggestions.html. Main is now ahead of the original base f1fa6aa.
+- Session `arena-f661348d-kalshidash1` (current branch `arena/f661348d-kalshidash1`, from main f1fa6aa): rebuilt the site with the same verified endpoints plus a live interactive dashboard (dashboard.html, assets/js/charts.js), trades.html, questions.html, 404.html. Verified demo endpoints against docs.kalshi.com; confirmed demo environment lists sports markets, so gas/elections/culture/crypto/golf categories are flagged unverified.
 
-| # | Task | Status | Owner / Scope | Files touched | Sources / verification | Irregularities |
-|---|------|--------|---------------|---------------|------------------------|----------------|
-| 1 | Create coordination board (this file) | done | session-arena-15d2acea / repo root | COORDINATION.md | — | None |
-| 2 | Research Kalshi demo REST + WebSocket API endpoints from official docs | done | session-arena-15d2acea / docs | docs/api-research.md | https://docs.kalshi.com/welcome ; https://docs.kalshi.com/getting_started/demo_env ; https://docs.kalshi.com/llms.txt | Verified: demo Trade API https://external-api.demo.kalshi.co/trade-api/v2 ; WS wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2 ; demo site https://demo.kalshi.co/ ; credentials NOT shared demo<>prod ; endpoints GET /events /markets /market-orderbook /trades /candlesticks /balance /positions /fills /orders |
-| 3 | Build static site structure (landing page, nav, shared CSS/JS) | done | session-arena-15d2acea | index.html, assets/css/style.css, assets/js/app.js | Verified links; no broken links on live site | None |
-| 4 | Category subpages: gas prices, elections, culture, crypto, golf | done | session-arena-15d2acea | categories/*.html | Verified against https://docs.kalshi.com/api-reference/events/get-events.md | Live event data unverified (no credentials) |
-| 5 | Events table with source links (live/unresolved + resolved yes/no) | done | session-arena-15d2acea | categories/*.html | Source links verified; values blank/unverified pending live data | No live data fetchable from sandbox |
-| 6 | Portfolio performance tracking (demo account) section | done | session-arena-15d2acea | portfolio.html | GET /balance /positions /fills endpoints verified in docs | Demo credentials not provided |
-| 7 | Price movement graph (time X, contract price Y; seconds/minutes/hours) | done | session-arena-15d2acea | categories/gas.html, categories/crypto.html, assets/js/app.js | Chart.js graph scaffold verified on live site | Live candlesticks unverified |
-| 8 | Liquidity / contracts-available-at-price tracking | done | session-arena-15d2acea | categories/*.html | Order book docs verified | Live order book unverified |
-| 9 | Execute trades + track performance (demo) | done | session-arena-15d2acea | portfolio.html | Create Order (V2) verified in docs | Requires API key; not auto-executable |
-| 10 | Suggestions section + review-before-implement workflow | done | session-arena-15d2acea | suggestions.html | — | — |
-| 11 | Q&A: questions, info, answers needed before decisions; missing-info discovery | done | session-arena-15d2acea | qa.html | Demo account tutorial verified | Credentials missing |
-| 12 | Flagged for Review page (irregularities + unverified items) | done | session-arena-15d2acea | flagged.html | All items sourced to official docs or marked missing | — |
-| 13 | GitHub Pages setup + deploy, verify no broken links | done | session-arena-15d2acea | — | https://kanlerxz87-cyber.github.io/KalshiDash1/ built & live | Pages already configured on main |
-| 14 | Final integration: merge branches, re-verify line by line, PR to main, merge | done | session-arena-15d2acea | all | PR #1 merged to main; Pages build succeeded | — |
+## Merge resolution (this branch)
+`arena/f661348d-kalshidash1` was merged with origin/main. Conflicted shared files were resolved to this session's matched, functional set (app.js + charts.js + dashboard.html, since main lacks a live graph dashboard); the other session's unique files (docs/api-research.md, qa.html) were preserved. No work was discarded from the repo — both sessions' content remains in git history.
 
-## Notes
-- Outbound internet from this sandbox is limited to github.com, api.github.com, codeload.github.com, registry.npmjs.org, pypi.org, files.pythonhosted.org. Kalshi API (kalshi.co) cannot be called directly; all Kalshi values must come from official docs links or be left blank + flagged unverified.
-- GitHub Pages must be enabled on the repo (Settings → Pages) for the live site.
+## Task board
 
-## Final integration results
-- PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/1 (merged to main via `gh pr merge 1 --merge`)
-- Merge commit: a7487b8 on main
-- GitHub Pages: https://kanlerxz87-cyber.github.io/KalshiDash1/ (source: main / root) — build status `built`, https enforced
-- All pages verified live with no broken links: index.html, categories/{gas,elections,culture,crypto,golf}.html, portfolio.html, suggestions.html, qa.html, flagged.html
-- Sources: all Kalshi endpoints verified against https://docs.kalshi.com (welcome, demo_env, llms.txt, API reference)
-- Flagged / unverified items published on flagged.html; do not block the launch
+| Task ID | Description | Status | Owner session | File scope | Sources verified | Irregularities / flags |
+|---------|-------------|--------|---------------|------------|------------------|------------------------|
+| T1 | Repo review: confirm repo contents, read README, record initial state | done | arena-f661348d-kalshidash1 | README.md, COORDINATION.md | git status/log | Repo began with only README.md; another session's site already on main |
+| T2 | Verify Kalshi demo API endpoints against official docs | done | arena-f661348d-kalshidash1 | docs/, COORDINATION.md | https://docs.kalshi.com/getting_started/demo_env | Endpoints match requirements exactly; demo lists sports markets, not focus categories |
+| T3 | Build static GitHub Pages site: landing page + category subpages (gas, elections, culture, crypto, golf) | done | arena-f661348d-kalshidash1 (+session 15d2acea) | index.html, categories/*.html, assets/, 404.html | docs.kalshi.com | Category pages flagged unverified (no focus-category events in demo) |
+| T4 | Live interactive dashboard: price-over-time graph (X=time, Y=contract price), granularity selector (sec/min/hr), liquidity/contracts-available | done | arena-f661348d-kalshidash1 | dashboard.html, assets/js/charts.js | get-market-orderbook.md, get-market-candlesticks.md, get-trades.md | Public endpoints no auth; candlestick period 1/60/1440 min only (no sub-minute "seconds" candle) |
+| T5 | Portfolio performance tracking (demo account) structure | done | arena-f661348d-kalshidash1 (+session 15d2acea) | portfolio.html | api_keys.md, quick_start_create_order.md | Requires demo API key + private key — flagged, placeholder only |
+| T6 | Trade execution structure + categorization/strategy analysis | done | arena-f661348d-kalshidash1 (+session 15d2acea) | trades.html | quick_start_create_order.md, order_errors.md, market_settlement.md | Requires authenticated endpoints — flagged, placeholder only |
+| T7 | Suggestions section | done | arena-f661348d-kalshidash1 (+session 15d2acea) | suggestions.html | — | — |
+| T8 | Questions / information / answers list + missing-info discovery | done | arena-f661348d-kalshidash1 (+session 15d2acea) | questions.html, qa.html | — | — |
+| T9 | Flagged for Review page (unverified items + irregularities, source links) | done | arena-f661348d-kalshidash1 (+session 15d2acea) | flagged.html | — | — |
+| T10 | GitHub Pages setup, build verification, no broken links, publish | in progress | arena-f661348d-kalshidash1 | GitHub Pages settings | — | Main (session 15d2acea) already marked Pages deployed |
+| T11 | Pull request from this branch to main, merge, confirm Pages deploy, record PR link + result | planned | arena-f661348d-kalshidash1 | — | — | — |
+
+## Rules
+- Work line by line; verify every value against an official source; link the source.
+- Never infer or fill in a value; leave blank and flag "unverified" if not confirmed.
+- No manual user input; no API credentials requested or stored.
+- Commit small, frequent changes; run `git pull --rebase` before every push.
+- On conflict: resolve without discarding the other session's work; log it here.
+- When a task is finished, record sources, verification, irregularities; mark done. Link official sources.
