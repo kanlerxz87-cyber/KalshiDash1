@@ -67,7 +67,9 @@ const NAV_MORE = [
   ['api.html', 'API reference'],
   ['demo-account.html', 'Demo account'],
   ['catalyst.html', 'Swing catalysts'],
-  ['strategylab.html', 'Strategy lab']
+  ['strategylab.html', 'Strategy lab'],
+  ['dash/alerts.html', 'Alert feeds (dash suite)'],
+  ['dash/autotrade.html', 'Auto-trade engine (dash suite)']
 ];
 
 function navHtml(base = '') {
