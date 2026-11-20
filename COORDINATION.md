@@ -34,7 +34,7 @@ Updated 2026-11-20 (UTC). Only `origin/main` existed on the remote when this ses
 |----|------|--------|-------|-----------|-------|
 | L1 | Live re-verification of the focus-topic series and the category mapping against the official demo API (gas, culture/entertainment, golf, elections, crypto) | done (gas, culture, category map, diesel; golf, elections, crypto not re-fetched, see record) | `session-e6c3b3b6` (branch `arena/e6c3b3b6-kalshidash1`) | `verification/**` (new) | Each check is a live GET to `external-api.demo.kalshi.co/trade-api/v2`, read with the fetch tool on 2026-11-20. Results in `verification/2026-11-20-e6c3b3b6.md`. |
 | L2 | Correct and extend the root Flagged page and the Sources list with the L1 findings (F-04 refined; new F-17 to F-20; SRC-25 to SRC-30) | done | `session-e6c3b3b6` | `scripts/build-site.mjs`, regenerated root `*.html` | Root pages are generated; regenerated with `node scripts/build-site.mjs`. `node scripts/check-links.mjs` must pass. |
-| L3 | Pull request `arena/e6c3b3b6-kalshidash1` → `main`, merge, confirm GitHub Pages build, record PR link and result here | planned | `session-e6c3b3b6` | `COORDINATION.md` | Merge is done with `gh pr merge <n> --merge` once the checks pass. Flagged items do not block the merge. |
+| L3 | Pull request `arena/e6c3b3b6-kalshidash1` → `main`, merge, confirm GitHub Pages build, record PR link and result here | done (PR #11 merged, merge commit `0650abd`) | `session-e6c3b3b6` | `COORDINATION.md` | Merge is done with `gh pr merge <n> --merge` once the checks pass. Flagged items do not block the merge. |
 
 Claim written before any implementation change (commit `7b46a2f`).
 
@@ -57,6 +57,15 @@ Claim written before any implementation change (commit `7b46a2f`).
 **Checks run before commit:** `node scripts/build-site.mjs` (regenerates without diff, so the Pages staleness gate passes), `node scripts/check-links.mjs` (63 pages, no broken internal links), `python3 tools/linkcheck.py` (no broken internal links), `node tools/qa_logic_test.mjs` (all checks passed), `node --check assets/app.js`.
 
 **Handoff / conflict log:** none. No other session branch exists on `origin` (only `main` at `8f80f34` before this session). No merge conflicts.
+
+### Session e6c3b3b6 — PR and merge record (L3)
+
+- PR: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/11 (`arena/e6c3b3b6-kalshidash1` → `main`).
+- CI on the PR before merge: `build` pass, `qa` pass (site-qa), `qa` pass (suite-qa). Merge state `CLEAN`.
+- Merge: `gh pr merge 11 --merge`, merged 2026-11-20T13:22:04Z, merge commit `0650abd2d4fc1063750d2e71c74c5f39d05ecadb`.
+- GitHub Pages: build for `0650abd` status `built`, no error (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest`, created 2026-11-20T13:22:05Z, updated 13:22:25Z). Live check: https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html shows F-04 (refined) and F-17 to F-20.
+- Follow-up (cosmetic): the new flagged rows were placed out of ID order. They are sorted in a follow-up PR from the same branch, with this record. The follow-up PR's merge result is reported in its own PR, because a record cannot contain its own merge commit.
+- Flagged items do not block the merge. They are published on the live Flagged page (F-04, F-05, F-15, F-17 to F-20) with source links for manual review.
 
 ## Session on this branch
 
