@@ -1,26 +1,56 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Page not found · Kalshi Demo Dashboard</title>
-<meta name="description" content="This page does not exist on the Kalshi demo dashboard.">
+<title>Page not found — KalshiDash1</title>
 <link rel="stylesheet" href="assets/style.css">
 </head>
-<body >
-<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
-<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
-<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
-<div class="layout">
-<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="docs/index.html" class="">Docs dashboard</a><a href="docs/events.html" class="">Events & resolutions</a><a href="docs/methodology.html" class="">Methodology</a><a href="docs/flagged.html" class="">Docs flagged page</a></div></nav>
-<main class="content">
+<body data-page="notfound">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta"><span id="clock" class="mono small muted"></span></div>
+  </div>
+  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">More</span><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a></div></nav>
+</header>
 
-<h1>Page not found</h1>
-<p>That page does not exist. Start from the <a href="index.html">home page</a> or the <a href="sources.html">sources</a> list.</p>
+<main><div class="wrap narrow">
+  <h1>That page is not on this site</h1>
+  <p class="sub">The address you followed does not exist in the Kalshi demo dashboard. Everything the site publishes is linked
+  from the navigation above, or from the pages below.</p>
+  <div class="panel">
+    <h2>Where to go</h2>
+    <ul>
+      <li><a href="index.html">Home</a> — the overview, the executive summary and the highest-dollar rows.</li>
+      <li><a href="dashboard.html">Dashboard</a> — the two live alert chats.</li>
+      <li><a href="markets.html">Markets</a> — every tracked market, filterable by topic and by resolution.</li>
+      <li><a href="categories/gas.html">Gas prices</a> · <a href="categories/elections.html">Elections</a> ·
+      <a href="categories/culture.html">Culture</a> · <a href="categories/crypto.html">Crypto</a> ·
+      <a href="categories/golf.html">Golf</a> — one page per focus topic.</li>
+      <li><a href="portfolio.html">Portfolio</a> · <a href="analysis.html">Analysis</a> ·
+      <a href="strategies.html">Strategies</a> — the simulated book and the rules behind it.</li>
+      <li><a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for review</a> ·
+      <a href="questions.html">Questions</a> · <a href="suggestions.html">Suggestions</a> ·
+      <a href="api.html">API reference</a> — the evidence behind every number.</li>
+    </ul>
+  </div>
+</div></main>
 
-<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
-</main>
-</div>
-<script src="assets/app.js" type="module"></script>
+<footer class="site">
+  <div class="nav-inner">
+    <p><strong>KalshiDash1</strong> — a static dashboard for the official Kalshi <em>demo</em> exchange.
+    Demo only: mock funds, and demo prices may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
+    <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
+       WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
+       Snapshot captured 2026-11-20 13:20:58 UTC ·
+       <a href="sources.html">Sources</a> ·
+       <a href="flagged.html">Flagged for review</a> ·
+       <a href="COORDINATION.md">Coordination board</a></p>
+    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
+    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+  </div></footer>
+<script src="assets/app.js"></script>
 </body>
 </html>

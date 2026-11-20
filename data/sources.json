@@ -1,0 +1,227 @@
+{
+  "verified_on": "2026-11-20",
+  "note": "Every row on every table in this site points at one of these sources. 'Verified' means the source was opened and read in this session, or the endpoint was called directly against the official demo host and the captured payload is stored in data/snapshot.json. Nothing on this site is inferred: a value that could not be confirmed from one of these sources is left blank and listed on the Flagged for Review page.",
+  "docs": [
+    {
+      "id": "demo_env",
+      "title": "Test In The Demo Environment",
+      "url": "https://docs.kalshi.com/getting_started/demo_env",
+      "confirms": "Demo environment endpoints (REST https://external-api.demo.kalshi.co/trade-api/v2, also supported https://demo-api.kalshi.co/trade-api/v2; WebSocket wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2 and wss://demo-api.kalshi.co/trade-api/ws/v2); demo uses mock funds; credentials are not shared with production; demo prices and behaviour may not reflect real markets.",
+      "verification": "Read in full on 2026-11-20. The endpoint table matches the brief exactly."
+    },
+    {
+      "id": "api_environments",
+      "title": "API Environments and Endpoints",
+      "url": "https://docs.kalshi.com/getting_started/api_environments",
+      "confirms": "REST and WebSocket base URLs for demo and production; credentials are not shared between environments; the signature covers the full request path from the API root without query parameters.",
+      "verification": "Read in full on 2026-11-20."
+    },
+    {
+      "id": "quick_start_market_data",
+      "title": "Quick Start: Market Data",
+      "url": "https://docs.kalshi.com/getting_started/quick_start_market_data",
+      "confirms": "Public market-data endpoints (series, events, markets, orderbook) require no authentication; market-data responses are cached for a short time so prices, sizes and status can lag the exchange by several seconds.",
+      "verification": "Read on 2026-11-20."
+    },
+    {
+      "id": "quick_start_authenticated_requests",
+      "title": "Quick Start: Authenticated Requests",
+      "url": "https://docs.kalshi.com/getting_started/quick_start_authenticated_requests",
+      "confirms": "Headers KALSHI-ACCESS-KEY, KALSHI-ACCESS-TIMESTAMP (ms) and KALSHI-ACCESS-SIGNATURE; signature = base64 of sign(timestamp + METHOD + path-without-query) using RSA-PSS/SHA-256 (salt length = digest length) or Ed25519; common errors 401, header_timestamp_expired, insufficient_scope.",
+      "verification": "Read in full on 2026-11-20. The signing scheme implemented in assets/app.js follows it exactly."
+    },
+    {
+      "id": "api_keys",
+      "title": "API Keys",
+      "url": "https://docs.kalshi.com/getting_started/api_keys",
+      "confirms": "Where demo API keys are created, the key scopes and the authentication-error codes.",
+      "verification": "Linked from the authentication guide and from demo_env on 2026-11-20. Not quoted on this site - no claim here depends on it."
+    },
+    {
+      "id": "market_settlement",
+      "title": "Market Settlement",
+      "url": "https://docs.kalshi.com/getting_started/market_settlement",
+      "confirms": "On a YES outcome YES holders receive $1.00 per contract; on a NO outcome NO holders receive $1.00 per contract; only net positions are settled; settlement timing varies by market type; settlement fees are zero for simple yes/no determinations.",
+      "verification": "Read in full on 2026-11-20. This is the rule the simulated portfolio settles against."
+    },
+    {
+      "id": "market_lifecycle",
+      "title": "Market Lifecycle",
+      "url": "https://docs.kalshi.com/getting_started/market_lifecycle",
+      "confirms": "Statuses initialized, active, inactive, closed, determined, disputed, amended, finalized; result is yes, no or scalar; settlement_ts is populated once a market reaches finalized; the status= filter maps open->active, closed->any past close_time not yet finalized, settled->finalized.",
+      "verification": "Read in full on 2026-11-20. Drives the resolution tracker."
+    },
+    {
+      "id": "rate_limits",
+      "title": "Rate Limits and Tiers",
+      "url": "https://docs.kalshi.com/getting_started/rate_limits",
+      "confirms": "Token-bucket read/write budgets; most requests cost 10 tokens; unauthenticated public requests are subject to separate limits and callers should back off on 429.",
+      "verification": "Read on 2026-11-20."
+    },
+    {
+      "id": "get_series_list",
+      "title": "Get Series List",
+      "url": "https://docs.kalshi.com/api-reference/market/get-series-list",
+      "confirms": "Query parameters category, tags, include_product_metadata, include_volume and min_updated_ts. There is no limit parameter, so a category query returns every series in that category.",
+      "verification": "Read on 2026-11-20. Confirmed live: the Elections category query returned 2709 series with limit=100 in the URL, i.e. the limit was ignored."
+    },
+    {
+      "id": "get_markets",
+      "title": "Get Markets",
+      "url": "https://docs.kalshi.com/api-reference/market/get-markets",
+      "confirms": "Filters series_ticker, event_ticker, tickers, status, min/max timestamp filters and cursor paging; when tickers is the only filter every matching market is returned in one response; filtered listings can lag the exchange.",
+      "verification": "Read on 2026-11-20 and confirmed live (GET /markets?tickers=... returns the requested tickers in one call)."
+    },
+    {
+      "id": "get_market",
+      "title": "Get Market",
+      "url": "https://docs.kalshi.com/api-reference/market/get-market",
+      "confirms": "Market payload fields and their meaning: last_price_dollars, yes_bid_dollars, yes_ask_dollars, no_bid_dollars, no_ask_dollars, yes_bid_size_fp, yes_ask_size_fp, volume_fp, volume_24h_fp, open_interest_fp, notional_value_dollars (total value of a single contract at settlement), result (yes|no|scalar|''), status, rules_primary, settlement_ts.",
+      "verification": "Read on 2026-11-20 and confirmed against a live demo market payload."
+    },
+    {
+      "id": "get_market_orderbook",
+      "title": "Get Market Orderbook",
+      "url": "https://docs.kalshi.com/api-reference/market/get-market-orderbook",
+      "confirms": "GET /markets/{ticker}/orderbook?depth= returns orderbook_fp.yes_dollars and orderbook_fp.no_dollars, each an array of [price_dollars, contract_count_fp] pairs; depth is 0-100 and 0 returns all levels.",
+      "verification": "Read on 2026-11-20 and confirmed live."
+    },
+    {
+      "id": "get_market_candlesticks",
+      "title": "Get Market Candlesticks",
+      "url": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+      "confirms": "GET /series/{series_ticker}/markets/{ticker}/candlesticks with start_ts, end_ts (seconds) and period_interval of 1, 60 or 1440 minutes; at most 5000 periods per request.",
+      "verification": "Read on 2026-11-20. The path includes the series ticker - the shorter /markets/{ticker}/candlesticks form is not documented."
+    },
+    {
+      "id": "get_events",
+      "title": "Get Events",
+      "url": "https://docs.kalshi.com/api-reference/events/get-events",
+      "confirms": "Event listing endpoint used with series_ticker, status and with_nested_markets to capture resolved events and their market-level results.",
+      "verification": "Called live against the demo host; the captured responses are stored in data/snapshot.json under topics.*.settled_events with their exact request URLs."
+    },
+    {
+      "id": "create_order_v2",
+      "title": "Create Order (V2)",
+      "url": "https://docs.kalshi.com/api-reference/orders/create-order-v2",
+      "confirms": "POST /portfolio/events/orders with body {ticker, client_order_id, side, count, price, time_in_force, self_trade_prevention_type, post_only, cancel_order_on_pause, reduce_only, subaccount, exchange_index}; response {order_id, client_order_id, fill_count, remaining_count, ts_ms}.",
+      "verification": "Read on 2026-11-20. No real order was placed from this site - see the Flagged page."
+    },
+    {
+      "id": "websocket_connection",
+      "title": "WebSocket Connection",
+      "url": "https://docs.kalshi.com/websockets/websocket-connection",
+      "confirms": "The WebSocket endpoint requires API-key authentication during the handshake even for public market-data channels; channels include ticker, orderbook_delta, trade and market_lifecycle_v2.",
+      "verification": "Read on 2026-11-20. This is why the live alert feed on this site polls REST instead of streaming over WebSocket."
+    }
+  ],
+  "api": [
+    {
+      "id": "exchange_status",
+      "title": "GET /exchange/status",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/exchange/status",
+      "confirms": "exchange_active true, trading_active true, and four demo exchange indices (0-3) with intra-exchange transfers active.",
+      "verification": "Called live on 2026-11-20; the response is stored in data/snapshot.json under exchange_status."
+    },
+    {
+      "id": "tags_by_categories",
+      "title": "GET /search/tags_by_categories",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories",
+      "confirms": "The official category -> tag taxonomy of the demo exchange, including Sports -> Golf, Crypto -> BTC/ETH/SOL/..., Elections -> Senate/US Elections/..., Economics -> Oil and energy, and Commerce/Commodities -> Oil & Gas.",
+      "verification": "Called live on 2026-11-20; stored in data/snapshot.json under tags_by_categories."
+    },
+    {
+      "id": "series_gas",
+      "title": "GET /series?category=Economics&tags=Oil and energy",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&tags=Oil%20and%20energy&include_volume=true",
+      "confirms": "The AAA gasoline-price series (KXAAAGAS*, titles such as \"South Carolina gas price\", \"US gas price on Election Day\"), each settling against AAA (gasprices.aaa.com).",
+      "verification": "Called live on 2026-11-20; stored in data/snapshot.json under topics.gas.series with the exact query URL."
+    },
+    {
+      "id": "series_elections",
+      "title": "GET /series?category=Elections",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true",
+      "confirms": "Elections series and their official settlement sources (e.g. Texas Secretary of State, US Congress, state election authorities).",
+      "verification": "Called live on 2026-11-20; stored in data/snapshot.json under topics.elections.series."
+    },
+    {
+      "id": "series_culture",
+      "title": "GET /series?category=Culture",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true",
+      "confirms": "Culture series (for example \"Will Grok be banned this year\") whose settlement sources are the named news organisations that decide the outcome.",
+      "verification": "Called live on 2026-11-20; stored in data/snapshot.json under topics.culture.series."
+    },
+    {
+      "id": "series_crypto",
+      "title": "GET /series?category=Crypto",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true",
+      "confirms": "Crypto series, settling against CF Benchmarks, CoinGecko, CoinMarketCap and other named sources.",
+      "verification": "Called live on 2026-11-20; stored in data/snapshot.json under topics.crypto.series."
+    },
+    {
+      "id": "series_golf",
+      "title": "GET /series?category=Sports&tags=Golf",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true",
+      "confirms": "Golf series selected by the official Sports -> Golf tag.",
+      "verification": "Called live on 2026-11-20; stored in data/snapshot.json under topics.golf.series."
+    },
+    {
+      "id": "markets_by_series",
+      "title": "GET /markets?series_ticker=...&status=open",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets",
+      "confirms": "Open markets per series with prices, sizes, volumes, status and settlement fields.",
+      "verification": "Called live on 2026-11-20; stored in data/snapshot.json under topics.*.live_markets, each row carrying its own source_url."
+    },
+    {
+      "id": "markets_by_tickers",
+      "title": "GET /markets?tickers=...",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets",
+      "confirms": "Batch price refresh used by the live alert feed (one call per 40 tickers).",
+      "verification": "Called live on 2026-11-20 - confirmed that a tickers-only filter returns every requested market in one response."
+    },
+    {
+      "id": "market_detail",
+      "title": "GET /markets/{ticker}",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+      "confirms": "A complete market payload including status finalized, result no, settlement_ts, settlement_value_dollars and rules_primary.",
+      "verification": "Called live on 2026-11-20; the payload is quoted on the Market page."
+    },
+    {
+      "id": "orderbook",
+      "title": "GET /markets/{ticker}/orderbook?depth=20",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets",
+      "confirms": "orderbook_fp.yes_dollars / orderbook_fp.no_dollars - the contracts available at each price.",
+      "verification": "Called live on 2026-11-20; stored in data/snapshot.json under orderbooks."
+    },
+    {
+      "id": "candlesticks",
+      "title": "GET /series/{series}/markets/{ticker}/candlesticks",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/series",
+      "confirms": "Historic 1-minute and 60-minute candles used to draw the price chart and to replay the swing alerts in snapshot mode.",
+      "verification": "Called live on 2026-11-20; stored in data/snapshot.json under candlesticks with the exact query URL."
+    },
+    {
+      "id": "events_settled",
+      "title": "GET /events?series_ticker=...&status=settled&with_nested_markets=true",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/events",
+      "confirms": "Resolved events with their market-level result (yes / no), settlement timestamp and settlement sources.",
+      "verification": "Called live on 2026-11-20; stored in data/snapshot.json under topics.*.settled_events."
+    }
+  ],
+  "external": [
+    {
+      "id": "aaa",
+      "title": "AAA Gas Prices (settlement source for the gas series)",
+      "url": "https://gasprices.aaa.com/",
+      "confirms": "The settlement source named by the gas series themselves (for example https://gasprices.aaa.com/?state=SC).",
+      "verification": "Taken from the settlement_sources field returned by GET /series?category=Economics&tags=Oil and energy on 2026-11-20."
+    },
+    {
+      "id": "demo_ui",
+      "title": "Kalshi demo web app",
+      "url": "https://demo.kalshi.co/",
+      "confirms": "Where a trader can look the same contracts up by hand and where demo API keys are created.",
+      "verification": "Linked from demo_env on 2026-11-20."
+    }
+  ]
+}

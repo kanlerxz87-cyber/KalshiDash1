@@ -54,40 +54,46 @@ async function get(p, tries = 3) {
 const TOPICS = [
   {
     id: 'gas', label: 'Gas Prices',
-    query: '/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=100',
+    query: '/series?category=Economics&tags=Oil%20and%20energy&include_volume=true',
     rule: 'Keep a series when its ticker starts with "KXAAAGAS" (AAA gasoline price series) or its title contains "gas price". Verified against GET /series?category=Economics&tags=Oil and energy — every kept series settles against AAA (gasprices.aaa.com).',
     keep: (s) => /^KXAAAGAS/.test(s.ticker || '') || /gas price/i.test(s.title || '')
   },
   {
     id: 'elections', label: 'Elections',
-    query: '/series?category=Elections&include_volume=true&limit=100',
+    query: '/series?category=Elections&include_volume=true',
     rule: 'Category query only: every series whose categories list contains "Elections" is in this topic.',
     keep: () => true
   },
   {
     id: 'culture', label: 'Culture',
-    query: '/series?category=Culture&include_volume=true&limit=100',
+    query: '/series?category=Culture&include_volume=true',
     rule: 'Category query only: every series whose categories list contains "Culture" is in this topic.',
     keep: () => true
   },
   {
     id: 'crypto', label: 'Crypto',
-    query: '/series?category=Crypto&include_volume=true&limit=100',
+    query: '/series?category=Crypto&include_volume=true',
     rule: 'Category query only: every series whose categories list contains "Crypto" is in this topic.',
     keep: () => true
   },
   {
     id: 'golf', label: 'Golf',
-    query: '/series?category=Sports&tags=Golf&include_volume=true&limit=100',
+    query: '/series?category=Sports&tags=Golf&include_volume=true',
     rule: 'Category "Sports" plus the official tag "Golf" (verified in GET /search/tags_by_categories -> Sports -> ["Golf"]).',
     keep: (s) => (s.tags || []).includes('Golf') || /golf|pga|masters|ryder|open championship/i.test(s.title || '')
   }
 ];
 
+/* NOTE on the series endpoint: Get Series List documents `category`, `tags`,
+ * `include_product_metadata`, `include_volume` and `min_updated_ts` — there is
+ * no `limit` parameter, so a category query returns every series in that
+ * category. We rank the result locally by volume_fp and keep the top slice. */
+
 const MAX_SERIES_PER_TOPIC = 30;   // ranked by series volume_fp (total contracts traded)
 const MAX_MARKETS_PER_SERIES = 200;
+const MAX_TOPIC_MARKET_ROWS = 60;  // rows stored per topic (the site ranks live anyway)
 const ORDERBOOK_TOP_N = 14;
-const CANDLE_TOP_N = 6;
+const CANDLE_TOP_N = 8;
 
 const fp = (v) => (v === undefined || v === null || v === '' ? null : Number(v));
 const round2 = (v) => (v === null || v === undefined ? null : Math.round(v * 100) / 100);
@@ -103,19 +109,21 @@ function seriesRow(s, topic, url) {
     volume_fp: fp(s.volume_fp),
     contract_terms_url: s.contract_terms_url ?? null,
     contract_url: s.contract_url ?? null,
-    settlement_sources: (s.settlement_sources || []).map((x) => ({ name: x.name ?? null, url: x.url ?? null })),
+    settlement_sources: (s.settlement_sources || []).slice(0, 12).map((x) => ({ name: x.name ?? null, url: x.url ?? null })),
     last_updated_ts: s.last_updated_ts ?? null,
     topic,
     source_url: url
   };
 }
 
-function marketRow(m, topic, url) {
+function marketRow(m, topic, url, seriesTicker, settlementSources) {
   return {
     ticker: m.ticker ?? null,
     event_ticker: m.event_ticker ?? null,
     title: m.title ?? m.yes_sub_title ?? null,
     yes_sub_title: m.yes_sub_title ?? null,
+    series_ticker: seriesTicker ?? null,
+    settlement_sources: (settlementSources || []).slice(0, 8).map((x) => ({ name: x.name ?? null, url: x.url ?? null })),
     status: m.status ?? null,
     result: m.result && m.result !== '' ? m.result : null,
     last_price_dollars: fp(m.last_price_dollars),
@@ -136,7 +144,7 @@ function marketRow(m, topic, url) {
     open_time: m.open_time ?? null,
     settlement_ts: m.settlement_ts ?? null,
     settlement_value_dollars: fp(m.settlement_value_dollars),
-    rules_primary: m.rules_primary ?? null,
+    rules_primary: (m.rules_primary || '').slice(0, 700) || null,
     price_level_structure: m.price_level_structure ?? null,
     topic,
     source_url: url
@@ -185,7 +193,7 @@ for (const t of TOPICS) {
     const q = `/markets?series_ticker=${encodeURIComponent(s.ticker)}&status=open&limit=${MAX_MARKETS_PER_SERIES}`;
     const r = await get(q);
     for (const m of (r.data && r.data.markets) || []) {
-      const row = marketRow(m, t.id, r.url);
+      const row = marketRow(m, t.id, r.url, s.ticker, s.settlement_sources);
       live.push(row);
       if (!seenTicker.has(row.ticker)) { seenTicker.add(row.ticker); allMarkets.push(row); }
     }
@@ -231,10 +239,11 @@ for (const t of TOPICS) {
     series_count_returned: rawSeries.length,
     series_count_kept: kept.length,
     series,
-    live_markets: live,
+    live_markets: live.slice(0, MAX_TOPIC_MARKET_ROWS),
+    live_markets_total: live.length,
     settled_events: settled
   };
-  console.log(`  -> ${series.length} series, ${live.length} open markets, ${settled.length} settled events`);
+  console.log(`  -> ${series.length} series, ${live.length} open markets (${settled.length} settled events)`);
 }
 
 /* global ranking by 24h dollar volume (contracts x $1 notional per market) */
@@ -256,13 +265,24 @@ for (const m of snap.markets.slice(0, ORDERBOOK_TOP_N)) {
   await sleep(120);
 }
 
-/* candlesticks: 1-minute for the last 6 hours, 60-minute for the last 7 days */
+/* candlesticks. Official path (docs.kalshi.com/api-reference/market/get-market-candlesticks):
+ *   GET /series/{series_ticker}/markets/{ticker}/candlesticks?start_ts=&end_ts=&period_interval=
+ * period_interval is 1, 60 or 1440 minutes. Stored compactly as [end_period_ts, close_dollars]. */
 for (const m of snap.markets.slice(0, CANDLE_TOP_N)) {
-  const r1 = await get(`/markets/${encodeURIComponent(m.ticker)}/candlesticks?start_ts=${nowSec - 6 * 3600}&end_ts=${nowSec}&period_interval=1`);
-  const r60 = await get(`/markets/${encodeURIComponent(m.ticker)}/candlesticks?start_ts=${nowSec - 7 * 86400}&end_ts=${nowSec}&period_interval=60`);
+  if (!m.series_ticker) continue;
+  const base = `/series/${encodeURIComponent(m.series_ticker)}/markets/${encodeURIComponent(m.ticker)}/candlesticks`;
+  const q1 = `${base}?start_ts=${nowSec - 6 * 3600}&end_ts=${nowSec}&period_interval=1`;
+  const q60 = `${base}?start_ts=${nowSec - 7 * 86400}&end_ts=${nowSec}&period_interval=60`;
+  const r1 = await get(q1);
+  const r60 = await get(q60);
+  const compact = (r) => ((r.data && r.data.candlesticks) || []).map((c) => [
+    c.end_period_ts,
+    c.price && c.price.close_dollars !== undefined && c.price.close_dollars !== null ? Number(c.price.close_dollars) : null
+  ]).filter((x) => x[1] !== null);
   snap.candlesticks[m.ticker] = {
-    m1: { candles: (r1.data && r1.data.candlesticks) || [], source_url: r1.url },
-    m60: { candles: (r60.data && r60.data.candlesticks) || [], source_url: r60.url }
+    series_ticker: m.series_ticker,
+    m1: { candles: compact(r1), source_url: r1.url },
+    m60: { candles: compact(r60), source_url: r60.url }
   };
   await sleep(120);
 }

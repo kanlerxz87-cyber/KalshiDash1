@@ -1,37 +1,137 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Suggestions · Kalshi Demo Dashboard</title>
-<meta name="description" content="Suggestions to improve the site and decision-making. Nothing is implemented until you choose.">
+<title>Suggestions — KalshiDash1</title>
+<meta name="description" content="Concrete proposals for making the Kalshi demo dashboard more live and interactive, each with the reason it matters and the official source it relies on.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
-<body >
-<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
-<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
-<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
-<div class="layout">
-<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="active">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="docs/index.html" class="">Docs dashboard</a><a href="docs/events.html" class="">Events & resolutions</a><a href="docs/methodology.html" class="">Methodology</a><a href="docs/flagged.html" class="">Docs flagged page</a></div></nav>
-<main class="content">
+<body data-page="suggestions">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta">
+      <span id="mode-badge" class="badge warn">data: probing…</span>
+      <span id="clock" class="mono small muted"></span>
+    </div>
+  </div>
+  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">More</span><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a></div></nav>
+</header>
 
-<h1>Suggestions: review and choose</h1>
-<div class="notice"><strong>Nothing here is implemented.</strong> Each item is a proposal. Choose the path you want; only chosen items will be built.</div>
-<div class="table-wrap"><table  class="compact"><thead><tr><th>ID</th><th>Suggestion</th><th>Why</th><th>Evidence / source</th><th>Decision</th></tr></thead><tbody>
-<tr><td>S-01</td><td>Add a small server-side proxy that caches public Kalshi data.</td><td>Avoids browser CORS limits (M-02) and reduces repeated polling.</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits.md" target="_blank" rel="noopener" title="Kalshi docs: Rate Limits and Tiers">Rate Limits and Tiers ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
-<tr><td>S-02</td><td>Add portfolio tracking using a demo key that is stored only as a server secret.</td><td>Needed for balances, positions, fills and P&amp;L.</td><td><a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
-<tr><td>S-03</td><td>Record a dollar-volume history by snapshotting markets on a schedule.</td><td>The API has no dollar-volume field; history must be built.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market">Get Market ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
-<tr><td>S-04</td><td>Add WebSocket streaming for seconds-level prices (requires credentials).</td><td>Only path to true second-by-second data.</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start WebSockets">Quick Start WebSockets ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
-<tr><td>S-05</td><td>Define the trade categorisation schema before any order is placed.</td><td>Makes later strategy analysis comparable.</td><td>Internal proposal — see Trade analysis page; no external source.</td><td>☐ Choose  ☐ Defer</td></tr>
-<tr><td>S-06</td><td>Add a paper-trade log (no orders sent) to test ideas first.</td><td>Reduces risk of unplanned demo trades.</td><td>Internal proposal — no external source; orders would need <a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener" title="Kalshi docs: Quick Start Create your first order">Quick Start Create your first order ↗</a>.</td><td>☐ Choose  ☐ Defer</td></tr>
-<tr><td>S-07</td><td>Show fee-adjusted expected value per market once fee schedule is verified.</td><td>Fees change the answer.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-series-list.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Series List">Get Series List ↗</a> (fee_type field)</td><td>☐ Choose  ☐ Defer</td></tr>
-<tr><td>S-08</td><td>Add a reviewer checklist that each market has an official source and a verified result before it is used in analysis.</td><td>Keeps the verification rule the brief asks for.</td><td><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a></td><td>☐ Choose  ☐ Defer</td></tr>
-</tbody></table></div>
-<p class="muted small">Decision recording: this site cannot store choices. Record yours in <code>COORDINATION.md</code> or in your reply.</p>
+<main><div class="wrap">
+  <div class="page-head">
+    <div class="grow">
+      <h1>Suggestions</h1>
+      <p class="sub">How to make the dashboard more live, more interactive and more useful for a trader deciding on a contract.
+      Each proposal says what it changes, why it matters, and which official source it rests on.</p>
+    </div>
+  </div>
 
-<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
-</main>
-</div>
-<script src="assets/app.js" type="module"></script>
+  <h2>Already built into this site</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:240px">Suggestion</th><th>What it does</th><th style="width:320px">Why it matters</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Two scrolling chat panes</strong></td>
+          <td>One pane posts every move ≥ $0.10, the other posts only the moves the ROI model likes. Both scroll, filter by topic
+          and direction, and can be paused.</td>
+          <td>A trader watches a screen instead of a table. The split keeps signal and noise apart instead of hiding the noise.</td></tr>
+        <tr><td><strong>Resolution announcements</strong></td>
+          <td>When a tracked market is determined, the chat posts the result — yes or no — with the settlement source.</td>
+          <td>The brief asks to follow events until they resolve; the answer belongs in the same stream as the price moves.</td></tr>
+        <tr><td><strong>Candidate source links</strong></td>
+          <td>Every swing message links the market page, the event's official settlement source and the exact API row.</td>
+          <td>One click from "something moved" to the page that decides the outcome.</td></tr>
+        <tr><td><strong>Time-window chart</strong></td>
+          <td>30 s, 1 min, 5 min, 15 min, 1 h, 6 h and 24 h windows on the same chart, with the alert threshold drawn in.</td>
+          <td>The brief asks for a time axis with a selectable span and a price axis; the threshold line shows at a glance whether a
+          move would have triggered an alert.</td></tr>
+        <tr><td><strong>Order-book ladder</strong></td>
+          <td>Contracts available at each price on both sides, with a depth bar.</td>
+          <td>Answers "how many contracts are available at a given price" directly, and feeds the depth term of the ROI score.</td></tr>
+        <tr><td><strong>Simulated strategy engine</strong></td>
+          <td>Five published strategies run automatically against live prices, settle on resolution, and are ranked by result.</td>
+          <td>Turns a tracker into something that produces testable strategies instead of just showing prices.</td></tr>
+        <tr><td><strong>Topic isolation</strong></td>
+          <td>Each topic has its own page with its series, open markets, liquidity and resolved events, and the topic pages are
+          linked from the navigation.</td>
+          <td>The brief asks to keep topics separate while keeping events grouped inside a topic.</td></tr>
+        <tr><td><strong>Self-refreshing data</strong></td>
+          <td>A GitHub Actions job re-captures the demo snapshot on a schedule, so the fallback data never drifts far from the market.</td>
+          <td>A static site needs a live snapshot to stay useful when the browser cannot reach the API.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Next, in priority order</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:56px">#</th><th style="width:260px">Proposal</th><th>Detail</th><th style="width:120px">Impact</th><th style="width:120px">Effort</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><strong>Real WebSocket feed</strong></td>
+          <td>Subscribe to the <code>ticker</code>, <code>orderbook_delta</code> and <code>market_lifecycle_v2</code> channels for the
+          tracked contracts. This removes the REST cache lag and gives true tick-level swings.</td>
+          <td>High</td><td>Medium</td></tr>
+        <tr><td>2</td><td><strong>Push alerts to the browser</strong></td>
+          <td>Use the Web Notification API so a ≥ $0.10 move can be announced outside the tab, with the same ROI filter applied.</td>
+          <td>High</td><td>Low</td></tr>
+        <tr><td>3</td><td><strong>Backtest the strategies</strong></td>
+          <td>Replay the captured candlestick history through each strategy to publish an expected win rate before the auto-trader
+          is switched on.</td>
+          <td>High</td><td>High</td></tr>
+        <tr><td>4</td><td><strong>Spread and slippage on the fill</strong></td>
+          <td>Record the depth at the fill price so the simulator can show the realistic fill, not just the touch price.</td>
+          <td>Medium</td><td>Medium</td></tr>
+        <tr><td>5</td><td><strong>Watchlist with target prices</strong></td>
+          <td>Let the trader set a price level on a contract and have the chat shout when it is crossed, with the ROI score attached.</td>
+          <td>Medium</td><td>Low</td></tr>
+        <tr><td>6</td><td><strong>Alert log export</strong></td>
+          <td>Download the captured alert history as CSV so a day of swings can be reviewed outside the browser.</td>
+          <td>Medium</td><td>Low</td></tr>
+        <tr><td>7</td><td><strong>Cross-topic comparison chart</strong></td>
+          <td>Plot the ROI score of the leading contract in each topic over time, so the trader can see where activity is moving.</td>
+          <td>Medium</td><td>Medium</td></tr>
+        <tr><td>8</td><td><strong>Resolution calendar</strong></td>
+          <td>A timeline of the tracked contracts' <code>close_time</code> and <code>expected_expiration_time</code> so the trader can
+          see what resolves when.</td>
+          <td>Medium</td><td>Low</td></tr>
+        <tr><td>9</td><td><strong>Per-strategy risk limits</strong></td>
+          <td>Cap exposure per strategy and per topic, and show the limit being consumed next to each open position.</td>
+          <td>Medium</td><td>Medium</td></tr>
+        <tr><td>10</td><td><strong>Shared portfolio across devices</strong></td>
+          <td>Move the simulated trades off local storage into a hosted store, so a phone and a laptop see the same book.</td>
+          <td>Low</td><td>High</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>What would make the charts simpler, not busier</h2>
+  <div class="panel">
+    <ul>
+      <li>One number per chart — the current price and the change — with the axis doing the rest. No dual axes, no gauges.</li>
+      <li>The threshold drawn as a single dashed line so "is this an alert?" is a glance, not a calculation.</li>
+      <li>Sparklines in the tables instead of full charts: the full chart belongs on the market page only.</li>
+      <li>Colour used only for direction and for status, so a green bar always means the same thing.</li>
+      <li>Every chart captioned with the endpoint and the window it came from, so a reader can reproduce it.</li>
+    </ul>
+  </div>
+</div></main>
+
+<footer class="site">
+  <div class="nav-inner">
+    <p><strong>KalshiDash1</strong> — a static dashboard for the official Kalshi <em>demo</em> exchange.
+    Demo only: mock funds, and demo prices may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
+    <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
+       WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
+       Snapshot captured 2026-11-20 13:20:58 UTC ·
+       <a href="sources.html">Sources</a> ·
+       <a href="flagged.html">Flagged for review</a> ·
+       <a href="COORDINATION.md">Coordination board</a></p>
+    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
+    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+  </div></footer>
+<script src="assets/app.js"></script>
 </body>
 </html>

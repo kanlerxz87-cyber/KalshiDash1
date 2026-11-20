@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strategies and the ROI model — KalshiDash1</title>
+<meta name="description" content="The exact rules behind every simulated strategy and behind the ROI score used by the high-ROI chat pane, with the API fields each rule reads.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="strategies">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta">
+      <span id="mode-badge" class="badge warn">data: probing…</span>
+      <span id="clock" class="mono small muted"></span>
+    </div>
+  </div>
+  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">More</span><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a></div></nav>
+</header>
+
+<main><div class="wrap">
+  <div class="page-head">
+    <div class="grow">
+      <h1>Strategies and the ROI model</h1>
+      <p class="sub">Every rule that produces a simulated trade, and every term of the score that filters the high-ROI chat
+      pane, written out so it can be recomputed from the same public API fields.</p>
+    </div>
+  </div>
+
+  <h2>Simulated trading strategies</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Strategy</th><th>Exact rule</th><th>API fields it reads</th><th>Typical holding</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Momentum</strong></td>
+          <td>Go long YES when the reference price rose at least $0.05 across the last 3 observations; go long NO when it fell at least $0.05.</td>
+          <td><code>last_price_dollars</code>, <code>yes_bid_dollars</code>, <code>yes_ask_dollars</code></td>
+          <td>Until the move reverses</td></tr>
+        <tr><td><strong>Mean reversion</strong></td>
+          <td>Buy YES when the price is at or below $0.25 and the last move was down; buy NO when the price is at or above $0.75 and the last move was up.</td>
+          <td><code>last_price_dollars</code> and the previous observation</td>
+          <td>Until the price reverts or the market resolves</td></tr>
+        <tr><td><strong>Favorite (liquidity)</strong></td>
+          <td>Buy YES in the most liquid market of its topic when the ROI score is at least 70 and the price is at least $0.80.</td>
+          <td><code>yes_bid_size_fp</code>, <code>yes_ask_size_fp</code>, <code>volume_24h_fp</code>, <code>last_price_dollars</code></td>
+          <td>To resolution</td></tr>
+        <tr><td><strong>Longshot</strong></td>
+          <td>Buy NO in markets priced at or below $0.15 whose ROI score is at least 60.</td>
+          <td><code>last_price_dollars</code> plus the ROI components</td>
+          <td>To resolution</td></tr>
+        <tr><td><strong>Volume catalyst</strong></td>
+          <td>Buy YES when 24-hour contract volume is at least 5× the total open interest and the ROI score is at least 60.</td>
+          <td><code>volume_24h_fp</code>, <code>open_interest_fp</code> plus the ROI components</td>
+          <td>Until the move fades</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted">Fills are recorded at the current touch (the YES ask for a YES order, the NO bid for a NO order) and
+  fall back to the last traded price when the touch is empty. Position size defaults to 10 contracts and is configurable in
+  <code>assets/app.js</code>. Settlement follows the published rule: the winning side receives $1.00 per contract.</p>
+
+  <h2>The ROI score</h2>
+  <div class="panel">
+    <p>The score used by the right-hand chat pane is a weighted sum of five normalised components. Every component is between
+    0 and 1 and is derived from fields the Kalshi API returns, so any reader can recompute it.</p>
+    <div class="table-wrap" style="margin:12px 0">
+      <table class="compact">
+        <thead><tr><th>Component</th><th>Weight</th><th>Definition</th><th>Source fields</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Liquidity</strong></td><td class="num">0.26</td><td><code>min(1, (yes_bid_size_fp + yes_ask_size_fp) / 300)</code> — contracts resting at the best prices.</td><td><code>yes_bid_size_fp</code>, <code>yes_ask_size_fp</code></td></tr>
+          <tr><td><strong>Depth</strong></td><td class="num">0.16</td><td><code>min(1, total_contracts_in_book / 1200)</code> across both sides of the order book.</td><td><code>GET /markets/{ticker}/orderbook</code></td></tr>
+          <tr><td><strong>Tightness</strong></td><td class="num">0.22</td><td><code>1 − min(1, spread / 0.10)</code> where spread is <code>yes_ask − yes_bid</code>; a missing touch scores 0.25.</td><td><code>yes_bid_dollars</code>, <code>yes_ask_dollars</code></td></tr>
+          <tr><td><strong>Volume</strong></td><td class="num">0.14</td><td><code>min(1, volume_24h_fp / 20000)</code> — contracts traded in 24 hours.</td><td><code>volume_24h_fp</code></td></tr>
+          <tr><td><strong>Volatility</strong></td><td class="num">0.22</td><td><code>min(1, |Δprice| / 0.30)</code> over the last observed interval.</td><td>consecutive <code>last_price_dollars</code> observations</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>Score</strong> = 100 × (0.26·liquidity + 0.16·depth + 0.22·tightness + 0.14·volume + 0.22·volatility).</p>
+    <p>The high-ROI chat pane posts a move when this score is at least the filter value shown on the dashboard toolbar
+    (default 55). The score is a <strong>ranking heuristic, not a recommendation</strong>: it measures how tradable a contract
+    looks right now, not whether it will pay off.</p>
+  </div>
+
+  <h2>How a new strategy is added</h2>
+  <div class="panel">
+    <ol>
+      <li>Write the rule as a threshold on fields the API already returns — no hidden state, no look-ahead.</li>
+      <li>Add it to <code>STRATEGIES</code> in <code>assets/app.js</code> with its exact wording, so the same text appears in the
+      simulator and on this page.</li>
+      <li>Let the auto-trader run it, then read its row on the <a href="analysis.html">analysis</a> page.</li>
+      <li>Compare it against the other strategies on win rate, total P&amp;L and average trade, and keep or drop it.</li>
+    </ol>
+    <p class="small muted">The simulator is honest about its limits: it fills at the touch it can see, ignores fees, and settles
+    only when the exchange publishes a result. Those limitations are listed on the <a href="flagged.html">Flagged for Review</a> page.</p>
+  </div>
+</div></main>
+
+<footer class="site">
+  <div class="nav-inner">
+    <p><strong>KalshiDash1</strong> — a static dashboard for the official Kalshi <em>demo</em> exchange.
+    Demo only: mock funds, and demo prices may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
+    <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
+       WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
+       Snapshot captured 2026-11-20 13:20:58 UTC ·
+       <a href="sources.html">Sources</a> ·
+       <a href="flagged.html">Flagged for review</a> ·
+       <a href="COORDINATION.md">Coordination board</a></p>
+    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
+    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+  </div></footer>
+<script src="assets/app.js"></script>
+</body>
+</html>

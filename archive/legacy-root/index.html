@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home · Kalshi Demo Dashboard</title>
+<meta name="description" content="Live Kalshi demo dashboard: highest-activity gas, election, culture, crypto and golf markets.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="home">
+<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
+<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
+<div class="layout">
+<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="active">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="../../docs/index.html" class="">Docs dashboard</a><a href="../../docs/events.html" class="">Events & resolutions</a><a href="../../docs/methodology.html" class="">Methodology</a><a href="../../docs/flagged.html" class="">Docs flagged page</a></div></nav>
+<main class="content">
+
+<h1>Kalshi Demo Dashboard</h1>
+<p class="lead">A simple, read-only dashboard of the <strong>Kalshi demo</strong> exchange. It ranks open markets by open-interest dollar value in five topics, tracks resolved outcomes (YES / NO), and shows price history and order-book liquidity.</p>
+
+<div class="cards" id="status-cards">
+  <div class="card"><div class="k">Exchange status (demo, live)</div><div class="v" id="ex-status">Loading…</div><div class="s" id="ex-detail"></div></div>
+  <div class="card"><div class="k">Data as of</div><div class="v" id="asof">—</div><div class="s">Read live in your browser from the demo API.</div></div>
+  <div class="card"><div class="k">Portfolio &amp; trading</div><div class="v">Not connected</div><div class="s">Needs a demo API key. See <a href='portfolio.html'>Portfolio</a>.</div></div>
+</div>
+
+<h2>Topics</h2>
+<div class="cards topic-cards">
+  <a class="card link" href="categories/gas.html"><div class="k">Category</div><div class="v">Gas prices</div><div class="s">AAA-settled US gas price markets</div></a>
+  <a class="card link" href="categories/elections.html"><div class="k">Category</div><div class="v">Elections</div><div class="s">Kalshi "Elections" category</div></a>
+  <a class="card link" href="categories/culture.html"><div class="k">Category</div><div class="v">Culture</div><div class="s">Kalshi "Entertainment" category (see flag F-04)</div></a>
+  <a class="card link" href="categories/crypto.html"><div class="k">Category</div><div class="v">Crypto</div><div class="s">Kalshi "Crypto" category</div></a>
+  <a class="card link" href="categories/golf.html"><div class="k">Category</div><div class="v">Golf</div><div class="s">Kalshi "Sports" category, "Golf" tag</div></a>
+</div>
+
+<h2>Key findings (short)</h2>
+<ul>
+  <li>Public market data (events, series, markets, order books, candlesticks) is readable without credentials. Verified on 2026-11-20 (see <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Market Orderbook">Get Market Orderbook ↗</a> and <a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener" title="Kalshi API ref: Get Events">Get Events ↗</a>).</li>
+  <li>Resolved markets carry <code>result</code> = <code>yes</code> or <code>no</code> and <code>status</code> = <code>finalized</code> (example: KXAAAGASM-26OCT31-2.50 resolved <code>yes</code>, <a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=settled&with_nested_markets=true" target="_blank" rel="noopener" title="Kalshi demo API: settled US gas price events (live)">settled US gas price events (live) ↗</a>).</li>
+  <li>The API has no "dollar volume" field. Dollar figures on this site are derived and labelled as such (see flag F-03).</li>
+  <li>No trades have been placed and no portfolio data is available: no demo API key was provided. See <a class="flag" href="flagged.html#F-07">F-07</a>.</li>
+</ul>
+<p><a href="executive-summary.html">Read the full executive summary →</a></p>
+
+<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
+</main>
+</div>
+<script src="assets/app.js" type="module"></script>
+</body>
+</html>

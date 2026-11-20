@@ -1,41 +1,96 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Portfolio · Kalshi Demo Dashboard</title>
-<meta name="description" content="Portfolio tracking for the Kalshi demo account: status, required access and what is still missing.">
+<title>Simulated portfolio — KalshiDash1</title>
+<meta name="description" content="Simulated Kalshi demo portfolio: paper trades, realised and unrealised P&amp;L, win rate, exposure, equity curve and the auto-trader that runs the published strategies.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
-<body >
-<header class="topbar"><button class="menu-btn" aria-label="Toggle menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
-<a class="brand" href="index.html">Kalshi Demo Dashboard</a>
-<span class="sub">Data: Kalshi demo API · not financial advice · demo prices may not reflect real markets</span></header>
-<div class="layout">
-<nav class="sidebar"><div class="nav-group"><div class="nav-title">Overview</div><a href="index.html" class="">Home</a><a href="executive-summary.html" class="">Executive summary</a></div><div class="nav-group"><div class="nav-title">Categories</div><a href="categories/gas.html" class="">Gas prices</a><a href="categories/elections.html" class="">Elections</a><a href="categories/culture.html" class="">Culture</a><a href="categories/crypto.html" class="">Crypto</a><a href="categories/golf.html" class="">Golf</a></div><div class="nav-group"><div class="nav-title">Tools</div><a href="dashboard.html" class="">Live dashboard</a><a href="portfolio.html" class="active">Portfolio</a><a href="trading.html" class="">Trading</a><a href="analysis.html" class="">Trade analysis</a></div><div class="nav-group"><div class="nav-title">Decisions</div><a href="questions.html" class="">Questions & answers</a><a href="suggestions.html" class="">Suggestions</a></div><div class="nav-group"><div class="nav-title">Reference</div><a href="sources.html" class="">Sources</a><a href="flagged.html" class="">Flagged for review</a></div><div class="nav-group"><div class="nav-title">Live suite (docs/)</div><a href="docs/index.html" class="">Docs dashboard</a><a href="docs/events.html" class="">Events & resolutions</a><a href="docs/methodology.html" class="">Methodology</a><a href="docs/flagged.html" class="">Docs flagged page</a></div></nav>
-<main class="content">
+<body data-page="portfolio">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta">
+      <span id="mode-badge" class="badge warn">data: probing…</span>
+      <span id="clock" class="mono small muted"></span>
+    </div>
+  </div>
+  <nav class="site"><div class="nav-inner"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="markets.html">Markets</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Analysis</a><a href="strategies.html">Strategies</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><span class="nav-sep">Topics</span><a href="categories/gas.html">Gas Prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><span class="nav-sep">More</span><a href="questions.html">Questions</a><a href="suggestions.html">Suggestions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a></div></nav>
+</header>
 
-<h1>Portfolio performance (demo account)</h1>
-<div class="notice"><strong>Status: not connected.</strong> Portfolio endpoints require signed requests with a demo API key (KALSHI-ACCESS-KEY, -SIGNATURE, -TIMESTAMP). No key was provided or requested, and no key is stored in this site. No values are shown because none could be verified. See <a class="flag" href="flagged.html#F-07">F-07</a>.</div>
+<main><div class="wrap">
+  <div class="page-head">
+    <div class="grow">
+      <h1>Simulated portfolio</h1>
+      <p class="sub">Paper trades executed in your browser against live demo prices, settled the way Kalshi settles:
+      the winning side receives $1.00 per contract when the market is determined.
+      <strong>No real order is ever sent from this site.</strong> For your actual demo account, see
+      <a href="demo-account.html">Demo account</a>.</p>
+    </div>
+    <div class="btnrow">
+      <button class="btn" id="reset-trades">Clear simulated trades</button>
+    </div>
+  </div>
 
-<h2>Required endpoints and their status</h2>
-<div class="table-wrap"><table  class="compact"><thead><tr><th>Item</th><th>Official endpoint / reference</th><th>Value on this site</th><th>Status</th></tr></thead><tbody>
-<tr><td>Cash balance</td><td><code>GET /portfolio/balance</code> · <a href="https://docs.kalshi.com/getting_started/rate_limits.md" target="_blank" rel="noopener" title="Kalshi docs: Rate Limits and Tiers">Rate Limits and Tiers ↗</a> (balance bucket) · <a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a> (signing)</td><td></td><td><span class="badge warn">UNVERIFIED — no key</span></td></tr>
-<tr><td>Open positions</td><td>Not verified in this session (endpoint list not fetched). <a class="flag" href="flagged.html#F-09">F-09</a></td><td></td><td><span class="badge warn">UNVERIFIED</span></td></tr>
-<tr><td>Fills / trade history</td><td>Not verified in this session. <a class="flag" href="flagged.html#F-09">F-09</a></td><td></td><td><span class="badge warn">UNVERIFIED</span></td></tr>
-<tr><td>Realised P&amp;L</td><td>Not an API field we have verified. Derived P&amp;L would need fees and fills; see <a class="flag" href="flagged.html#F-10">F-10</a></td><td></td><td><span class="badge warn">NOT COMPUTED</span></td></tr>
-</tbody></table></div>
+  <div id="mode-notice" class="notice">Probing the official demo API…</div>
 
-<h2>What is needed to switch this on</h2>
-<ol>
-  <li>A demo API key pair. Keys are created on the account page or with <code>POST /trade-api/v2/api_keys/generate</code> (<a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener" title="Kalshi docs: API Keys">API Keys ↗</a>).</li>
-  <li>Signing must happen server-side. A static page cannot hold a private key safely. See suggestion S-02 on the Suggestions page.</li>
-  <li>Rate-limit handling: the balance endpoint has its own bucket, one call per second on Basic and Advanced tiers (<a href="https://docs.kalshi.com/getting_started/rate_limits.md" target="_blank" rel="noopener" title="Kalshi docs: Rate Limits and Tiers">Rate Limits and Tiers ↗</a>).</li>
-</ol>
+  <div class="grid cols-4" id="portfolio-stats"></div>
 
-<footer class="foot">Built 2026-11-20 from official Kalshi documentation and the public Kalshi demo API. Every table row links to its official source. Unverified values are left blank and listed on <a href="flagged.html">Flagged for review</a>.</footer>
-</main>
-</div>
-<script src="assets/app.js" type="module"></script>
+  <h2>Equity curve</h2>
+  <div class="chart-box">
+    <canvas id="equity-chart" class="short"></canvas>
+    <div class="chart-legend"><span><i style="background:#4c9aff"></i>cumulative realised P&amp;L per settled paper trade</span></div>
+  </div>
+
+  <h2>Auto-trader</h2>
+  <div class="panel">
+    <div class="row">
+      <div class="shrink"><label class="switch"><input type="checkbox" id="auto-trade"> Run the published strategies automatically</label></div>
+      <div><p class="small muted" style="margin:0">Each strategy is defined with exact thresholds on
+      <a href="strategies.html">Strategies</a>. The auto-trader opens one paper position per market per strategy, fills at the
+      current touch, and settles automatically when the market is determined.</p></div>
+    </div>
+  </div>
+
+  <h2>Trade log</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Time</th><th>Market</th><th>Topic</th><th>Side</th><th class="num">Contracts</th><th class="num">Entry</th><th class="num">Last</th><th>Strategy</th><th>P&amp;L</th><th>Result</th><th>Source</th></tr></thead>
+      <tbody id="portfolio-trades"></tbody>
+    </table>
+  </div>
+
+  <h2>How the settlement rule is applied</h2>
+  <div class="panel">
+    <ul>
+      <li>On a <strong>yes</strong> outcome the YES holders receive $1.00 per contract; on a <strong>no</strong> outcome the NO
+      holders receive $1.00 per contract — <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>.</li>
+      <li>A paper trade is settled when the market reaches <code>determined</code> or <code>finalized</code> with a result of
+      yes or no — <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a>.</li>
+      <li>Realised P&amp;L = (payout − entry price) × contracts. Fees are not applied: Kalshi states settlement fees are zero for
+      simple yes/no determinations, and the simulator does not model a trading fee.</li>
+      <li>Mark-to-market uses the last observed price, not a guaranteed exit price.</li>
+    </ul>
+    <p class="small muted">Trades are stored in this browser's local storage only. Clearing the browser data removes them.</p>
+  </div>
+</div></main>
+
+<footer class="site">
+  <div class="nav-inner">
+    <p><strong>KalshiDash1</strong> — a static dashboard for the official Kalshi <em>demo</em> exchange.
+    Demo only: mock funds, and demo prices may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
+    <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
+       WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
+       Snapshot captured 2026-11-20 13:20:58 UTC ·
+       <a href="sources.html">Sources</a> ·
+       <a href="flagged.html">Flagged for review</a> ·
+       <a href="COORDINATION.md">Coordination board</a></p>
+    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
+    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+  </div></footer>
+<script src="assets/app.js"></script>
+<script src="assets/chart.js"></script>
 </body>
 </html>
