@@ -1,0 +1,42 @@
+name: site-qa
+
+# Static site: "build" = validate structure, internal links, JS syntax and API-client logic.
+# Runs on every push and PR so a broken site can never be merged silently.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check internal links (fails on any broken link)
+        run: python tools/linkcheck.py
+
+      - name: Check JavaScript syntax
+        run: |
+          set -e
+          for f in docs/assets/*.js assets/js/*.js; do
+            echo "node --check $f"
+            node --check "$f"
+          done
+
+      - name: API-client logic tests (mocked documented response shapes)
+        run: node tools/qa_logic_test.mjs
+
+      - name: Python tool syntax
+        run: python -m py_compile tools/*.py
