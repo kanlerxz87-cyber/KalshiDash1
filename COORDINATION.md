@@ -1,5 +1,78 @@
 # COORDINATION.md — shared task board
 
+## Current Arena session — `arena/dd012e26-kalshidash1` (2026-11-20 UTC) — FINAL INTEGRATION
+
+- Session ID: `dd012e26`. Branch: `arena/dd012e26-kalshidash1` (base `d24616a`, `main`; branch fast-forwarded to `c57e52e` = `main` after PRs #25/#26 landed).
+- Role: **final integration session.** Re-verifies the combined tree, repairs the defects found in the
+  line-by-line review, consolidates the published navigation, fixes the failing scheduled refresh job,
+  then opens and merges the PR to `main` and confirms the GitHub Pages deploy.
+
+### Overlap check at claim time (read from `origin`, 2026-11-20 ~19:25 UTC) — respected, not duplicated
+
+| Claimed work | Claimant | Outcome |
+|---|---|---|
+| README merge-conflict repair + repo smoke audit | `session-c431fca8` (PR #25, merged) | respected; **their** resolution of `README.md` is kept as-is and is not re-done here |
+| L4 live re-verification of golf/elections/crypto | `session-605bbb3f` (PR #26, merged) | respected; their `verification/2026-11-20-605bbb3f.md` is untouched and their F-L4-* items are adopted as-is |
+| Alert engine + two scrolling chats | `session-cb49437b` (PR #24, merged) | respected; only the **flag-ID references** inside their files are renumbered (they asked for it implicitly by leaving duplicate IDs) |
+| Root-site generator, templates, `data/`, workflows | `session-7d6d2fcb` (PR #16, merged) | finished; this session takes the shared outputs over as the integration session |
+
+### Task board — session-dd012e26
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| R1 | **Repair the failing `Refresh demo data snapshot` job on `main`** (it failed at the push step on PR #24 and on the `arena/cb49437b` push: the push used `git rev-parse --abbrev-ref HEAD` and no rebase, so it lost a race with the concurrent `live-alerts` push to `main`). | **done** | session-dd012e26 | `.github/workflows/refresh-data.yml` |
+| R2 | **Fix duplicate flag IDs on the Flagged for Review page.** `F-27`…`F-31` each appear twice (the alert-engine set from session-cb49437b was appended after the integration set, out of numeric order). The alert-engine set is renumbered `F-34`…`F-38`, moved into numeric order, and every in-repo reference to the old IDs is updated. | **done** | session-dd012e26 | `templates/flagged.tpl`, `flagged.html` (generated), `docs/ALERTS.md`, `alerts/index.html`, `alerts/js/alerts-page.js` |
+| R3 | **Complete the navigation consolidation** left half-finished by session-7d6d2fcb: `dash/index.html`, `dash/api.html`, `dash/executive-summary.html`, `dash/market.html` were unreachable from the landing page. One canonical nav now reaches every published page, the live alert console is a first-class nav entry, and the two earlier suites are labelled as supplementary rather than left as orphans. | **done** | session-dd012e26 | `scripts/build-site.mjs`, `templates/*.tpl` (nav/footer text only), regenerated root pages |
+| R4 | **Record the new irregularities found in the line-by-line review** (duplicate flag IDs; the failing refresh job; the scheduled-workflow gap; the `package.json`/`package-lock.json` dependency mismatch) on the site's Flagged for Review page with sources, per the brief. | **done** | session-dd012e26 | `templates/flagged.tpl`, `flagged.html` (generated) |
+| R5 | **Re-verify the combined tree line by line** against official sources and record it. | **done** | session-dd012e26 | `verification/2026-11-20-dd012e26.md` (new), `VERIFICATION.md`, `COORDINATION.md` |
+| R6 | **PR to `main`, merge, confirm the Pages deploy**, record the result. | **in progress** | session-dd012e26 | `COORDINATION.md` (this section only) |
+
+### Verification performed (session-dd012e26, 2026-11-20 UTC)
+
+- Official docs re-read with the fetch tool: `demo_env` (endpoint table, mock-funds warning),
+  `orderbook_responses` ($1.00 reciprocity, bids-only orderbook, implied-ask formula).
+- Live demo API re-read with the fetch tool: `GET /exchange/status`, `GET /markets?series_ticker=KXAAAGASW&status=open&limit=3`.
+  The live payload was compared field by field against the committed `data/snapshot.json` row for
+  `KXAAAGASW-26NOV23-3.9400` — every field matches (`last_price_dollars` 0.0200, `yes_bid_dollars` 0,
+  `yes_ask_dollars` 1, `no_bid_dollars` 0, `no_ask_dollars` 1, `volume_fp` 3421.27, `open_interest_fp` 3421.27,
+  `notional_value_dollars` 1, `status` active, `result` "" → blank on the site).
+- Whole-tree QA, all green on the merged tree: `npm test` (engine selftest, feed schema, jsdom page
+  render, both link checkers), `node scripts/build-site.mjs --check` (site not stale),
+  `node scripts/check-links.mjs` (90 pages, 0 broken internal links), `python3 tools/linkcheck.py`
+  (2,089 internal links, 0 broken), `node tools/qa_alert_test.mjs` (5), `node tools/alerts-qa.mjs` (37),
+  `node tools/alerts-render-test.mjs`, `node scripts/check_lab.mjs` (21), `node tools/qa_logic_test.mjs`,
+  `node scripts/check_links.js` (dash/, 69 links), `python3 -m py_compile tools/*.py`,
+  `node --check` on every published script, repository-wide merge-marker scan (0 found).
+- CI on this branch: `Site build check`, `site-qa`, `alerts-qa`, `suite-qa` all succeeded for the PR.
+
+### Irregularities found in this session's review (all published on `flagged.html`)
+
+- **F-34** — the alert-engine flag set was appended with duplicate IDs `F-27`…`F-31`; renumbered to
+  `F-34`…`F-38` and every reference updated. Source: this repository's `flagged.html` before the fix.
+- **F-35** — `/search/tags_by_categories` omits `Culture` while `GET /series?category=Culture` serves it
+  (upstream inconsistency, previously `F-28`).
+- **F-36** — browser → demo-API access (CORS) is unconfirmed from the build sandbox; the console detects a
+  blocked request and falls back to the engine feed (previously `F-29`).
+- **F-37** — the `Culture` topic is canonical in the API but has no tag list (previously `F-30`).
+- **F-38** — the high-ROI score is a published heuristic, not a back-tested model (previously `F-31`).
+- **F-39** — the `Refresh demo data snapshot` job failed on `main`: the push step used a detached-HEAD refspec
+  and no rebase, so it lost a race with the concurrent `live-alerts` push. Fixed in this session.
+  Source: the failed run `44752211268` (steps 1–6 success, step 7 failure).
+- **F-40** — no `schedule`-triggered workflow run has ever been recorded for this repository
+  (`GET /repos/kanlerxz87-cyber/KalshiDash1/actions/runs?event=schedule` → `total_count: 0`), although
+  `live-alerts.yml` declares `*/10 * * * *` and `refresh-data.yml` declares `23 */2 * * *`. GitHub only
+  schedules workflows on the default branch and the queue can be delayed; the schedules are left in place and
+  the in-browser live poll remains the primary live path.
+- **F-41** — `package.json` declares one dev dependency (`jsdom`) while `package-lock.json` still carries
+  `playwright`, `puppeteer-core` and `@sparticuz/chromium` entries and a different root `name`. `npm ci`
+  succeeds and installs only the `jsdom` tree; the stale entries are harmless but misleading.
+
+### PR & merge record (R6)
+
+- *To be completed when the PR is opened and merged. Nothing in this section is written in advance.*
+
+---
+
 ## Current Arena session — `arena/c431fca8-kalshidash1` (2026-11-20 UTC)
 
 - Status: active; branched from `d24616a80151e8e51c6334f585d3e0e6d4cde919`.
