@@ -77,6 +77,7 @@
     var up = a.direction === 'up';
     var dir = up ? '▲ up' : '▼ down';
     var isCandle = a.detection === 'candle';
+    var isTrade = a.detection === 'trade';
     var model = a.model || {};
     var reasons = (model.reasons || []).map(A.esc).join(' · ');
     var sources = [];
@@ -90,6 +91,7 @@
       '<div class="top">' +
         '<span class="who">' + A.esc(A.topicLabel(a.topic)) + '</span>' +
         '<span class="badge ' + (up ? 'up' : 'down') + '">' + dir + ' ' + A.usd(a.abs_delta, 2) + '</span>' +
+        (isTrade ? '<span class="badge neutral" title="Detected between two consecutive trades — the sharpest public price view">trade</span>' : '') +
         (isCandle ? '<span class="badge neutral" title="Detected from 1-minute candlesticks, not from two samples">candle</span>' : '') +
         (model.highROI ? '<span class="badge accent">model ' + Number(model.score).toFixed(2) + '</span>' : '') +
         '<span class="when" title="' + A.esc(a.ts || '') + '">' + timeAgo(a.ts) + '</span>' +

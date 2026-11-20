@@ -52,6 +52,10 @@
  *      https://docs.kalshi.com/getting_started/quick_start_market_data
  *  S11 The live demo tag taxonomy that this engine's topic rules are checked against
  *      https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories
+ *  S13 GET /markets/trades — unauthenticated; one record per completed trade with
+ *      `yes_price_dollars`, `count_fp`, `created_time`, `trade_id`; filterable by `ticker`
+ *      and by `min_ts`/`max_ts` (seconds); `limit` 1..1000; unknown ticker returns 200 with
+ *      an empty list   https://docs.kalshi.com/api-reference/market/get-trades
  *
  * HONESTY RULES BAKED INTO THE CODE
  * ---------------------------------
@@ -953,10 +957,113 @@ export function mergeCandleAlerts(state, candleAlerts) {
   return next;
 }
 
+
+/* ------------------------------------------------------------------ trade swings */
+
+/**
+ * Trade-level swing detection (S13).
+ *
+ * This is the sharpest public, unauthenticated view of price: every completed trade carries
+ * its own price and timestamp, so a swing that happened between two 10-minute samples is
+ * still visible — and visible at the exact trade that caused it.
+ *
+ * Rules:
+ *   * trades are sorted oldest-first by `created_time`;
+ *   * a trade is compared with the most recent *earlier* trade inside `windowSeconds`
+ *     (default 30 min). Comparing across a long gap would report unrelated prices as a swing;
+ *   * any |Δ| >= threshold fires, in the direction of the move;
+ *   * consecutive trades carrying the same repeated move are collapsed to the first one.
+ *
+ * `yes_price_dollars` is the only price used, because the contract price displayed everywhere
+ * else is the YES price (S5); `no_price_dollars` is its complement and would double-count.
+ */
+export function tradeSwings({ ticker, topic, title, trades, threshold = SWING_THRESHOLD, windowSeconds = 1800,
+  sourceUrl = null, meta = {} }) {
+  const parsed = (trades || [])
+    .map((t) => ({
+      ts: Date.parse(t.created_time) / 1000,
+      price: num(t.yes_price_dollars),
+      count: num(t.count_fp),
+      id: t.trade_id || null,
+    }))
+    .filter((t) => Number.isFinite(t.ts) && t.price !== null && t.price > 0 && t.price < 1)
+    .sort((a, b) => a.ts - b.ts);
+
+  const out = [];
+  let lastSig = null;
+  for (let i = 1; i < parsed.length; i++) {
+    const cur = parsed[i];
+    // most recent earlier trade inside the window
+    let ref = null;
+    for (let j = i - 1; j >= 0; j--) {
+      if (cur.ts - parsed[j].ts > windowSeconds) break;
+      ref = parsed[j];
+      break;
+    }
+    if (!ref) { lastSig = null; continue; }
+    const delta = round(cur.price - ref.price, 4);
+    if (Math.abs(delta) + 1e-12 < threshold) { lastSig = null; continue; }
+    const direction = delta > 0 ? 'up' : 'down';
+    const sig = `${direction}:${ref.price}:${cur.price}`;
+    if (sig === lastSig) continue;
+    lastSig = sig;
+    out.push({
+      id: `trade:${ticker}@${Math.floor(cur.ts)}`,
+      ts: new Date(cur.ts * 1000).toISOString(),
+      ticker,
+      topic,
+      title,
+      direction,
+      from: round(ref.price, 4),
+      to: round(cur.price, 4),
+      delta,
+      abs_delta: round(Math.abs(delta), 4),
+      threshold,
+      baseline_kind: 'previous trade within 30 min',
+      detection: 'trade',
+      trade: { trade_id: cur.id, count_fp: cur.count, at: new Date(cur.ts * 1000).toISOString(), ref_at: new Date(ref.ts * 1000).toISOString() },
+      ...meta,
+      source_url: sourceUrl,
+    });
+  }
+  return out;
+}
+
+/** Trades for one market since `minTs` (S13). Returns raw trades plus the exact request URL. */
+export async function fetchTrades(client, { ticker, minTs, limit = 1000 }) {
+  const p = new URLSearchParams();
+  p.set('ticker', ticker);
+  if (minTs) p.set('min_ts', String(Math.floor(minTs)));
+  p.set('limit', String(limit));
+  const path = `/markets/trades?${p.toString()}`;
+  const data = await client.getJson(path);
+  return { trades: data.trades || [], source_url: client.base + path, cursor: data.cursor || '' };
+}
+
+/**
+ * Collapse alerts that describe the same swing from different detectors, keeping the most
+ * precise one (trade > candle > sample). Without this, one $0.10 move could appear three
+ * times in the feed and look like three separate events.
+ */
+export function collapseDuplicates(alerts) {
+  const precision = { trade: 3, candle: 2, sample: 1 };
+  const rank = (a) => precision[a.detection || 'sample'] || 1;
+  const kept = [];
+  for (const a of [...alerts].sort((x, y) => rank(y) - rank(x))) {
+    const dup = kept.find((k) =>
+      k.ticker === a.ticker &&
+      k.direction === a.direction &&
+      Math.abs((Date.parse(k.ts) || 0) - (Date.parse(a.ts) || 0)) <= 180000);
+    if (!dup) kept.push(a);
+  }
+  kept.sort((x, y) => String(y.ts).localeCompare(String(x.ts)));
+  return kept;
+}
+
 /* ------------------------------------------------------------------ run */
 
 
-export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets = 6, candleLookbackMinutes = 180, dryRun = false, log = console.log } = {}) {
+export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets = 6, tradeMarkets = 10, candleLookbackMinutes = 180, dryRun = false, log = console.log } = {}) {
   const started = Math.floor(Date.now() / 1000);
   log(`KalshiDash1 live engine — ${new Date(started * 1000).toISOString()}`);
   log(`  base: ${BASE} (S1)  threshold: $${SWING_THRESHOLD}  max series: ${maxSeries}  candle markets: ${candleMarkets}`);
@@ -990,6 +1097,29 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
   const resolutions = await collectResolutions(client, next, { maxSeries, log });
   if (resolutions.length) next = applySample(next, { nowSeconds: now, markets: [], resolutions, topicsFound: seriesByTopic, runId });
 
+  // 4b. trade-level swings on the biggest rows of each topic (sharpest public view, S13).
+  // Only trades since the last run are read, so the request is small and nothing is re-reported.
+  const tradeAlerts = [];
+  const perTopicTrades = Math.max(1, Math.ceil(tradeMarkets / TOPICS.length));
+  const tradeTargets = topMarketsByTopic(next, perTopicTrades).slice(0, tradeMarkets);
+  const tradeLookback = Math.max(1800, Math.min(6 * 3600, (now - (Date.parse(state.meta?.generated_at || 0) / 1000) || 3600) + 600));
+  for (const m of tradeTargets) {
+    try {
+      const { trades, source_url } = await fetchTrades(client, { ticker: m.ticker, minTs: now - tradeLookback });
+      const found = tradeSwings({
+        ticker: m.ticker, topic: m.topic, title: m.title, trades, sourceUrl: source_url,
+        meta: { event_ticker: m.event_ticker, series_ticker: m.series_ticker, contract_terms_url: m.contract_terms_url },
+      });
+      tradeAlerts.push(...found);
+      log(`  trades ${m.ticker}: ${trades.length} in ${Math.round(tradeLookback / 60)} min, ${found.length} swing(s)`);
+    } catch (e) {
+      log(`  trades failed for ${m.ticker}: ${e.message}`);
+    }
+  }
+  if (tradeAlerts.length) next = mergeCandleAlerts(next, tradeAlerts); // same merge/score path
+  next.meta.trade_markets_checked = tradeTargets.length;
+  next.meta.trade_lookback_seconds = tradeLookback;
+
   // 5. candle-based swings on the biggest rows (catches moves between sparse samples, S12)
   const candleAlerts = [];
   // Spread the candle budget across the five topics: ranking globally would spend every
@@ -1019,6 +1149,11 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
 
   // 6. orderbooks for the biggest rows
   const orderbooks = await collectOrderbooks(client, next, { log });
+
+  // One swing can be seen by three detectors; keep only the most precise row.
+  const beforeDedupe = next.alerts.length;
+  next.alerts = collapseDuplicates(next.alerts);
+  next.meta.duplicates_collapsed = beforeDedupe - next.alerts.length;
 
   next.meta.base_url = BASE;
   next.meta.legacy_base_url = LEGACY_BASE;
@@ -1208,6 +1343,28 @@ export function selftest() {
   ok(withCandles.alerts.every((a) => a.model && typeof a.model.score === 'number'), 'merged candle alerts also carry a model score');
   ok(mergeCandleAlerts(withCandles, cs).alerts.length === 2, 'candle alerts are de-duplicated by id');
 
+  // trade swings
+  const nowT = 1_760_000_000;
+  const tr = (sec, price, id) => ({ trade_id: id, created_time: new Date((nowT + sec) * 1000).toISOString(), yes_price_dollars: price.toFixed(4), count_fp: '10.00' });
+  const tradeRows = [tr(-600, 0.30, 'a'), tr(-300, 0.32, 'b'), tr(-120, 0.45, 'c'), tr(-60, 0.45, 'd')];
+  const ts1 = tradeSwings({ ticker: 'T', topic: 'crypto', title: 'x', trades: tradeRows, sourceUrl: 'https://example.invalid/t' });
+  ok(ts1.length === 1, 'trade walk finds exactly one >= $0.10 jump');
+  ok(ts1[0].direction === 'up' && Math.abs(ts1[0].abs_delta - 0.13) < 1e-9, 'trade swing measures the real jump ($0.32 -> $0.45)');
+  ok(ts1[0].detection === 'trade' && ts1[0].trade && ts1[0].trade.trade_id === 'c', 'trade swing names the trade that caused it');
+  ok(tradeSwings({ ticker: 'T', topic: 'crypto', title: 'x', trades: [tr(-600, 0.30, 'a'), tr(-540, 0.35, 'b')] }).length === 0, 'a $0.05 trade move does not alert');
+  ok(tradeSwings({ ticker: 'T', topic: 'crypto', title: 'x', trades: [tr(-99999, 0.10, 'a'), tr(-10, 0.95, 'b')] }).length === 0, 'a jump across a gap wider than the window is not reported as one swing');
+  ok(tradeSwings({ ticker: 'T', topic: 'crypto', title: 'x', trades: [] }).length === 0, 'no trades -> no alerts');
+
+  // duplicate collapsing keeps the most precise detector
+  const collapsed = collapseDuplicates([
+    { id: 's', ticker: 'T', direction: 'up', ts: new Date(nowT * 1000).toISOString(), detection: 'sample' },
+    { id: 'c', ticker: 'T', direction: 'up', ts: new Date((nowT + 60) * 1000).toISOString(), detection: 'candle' },
+    { id: 't', ticker: 'T', direction: 'up', ts: new Date((nowT + 30) * 1000).toISOString(), detection: 'trade' },
+    { id: 'o', ticker: 'U', direction: 'up', ts: new Date(nowT * 1000).toISOString(), detection: 'sample' }
+  ]);
+  ok(collapsed.length === 2, 'the same swing from three detectors becomes one row (plus the other ticker)');
+  ok(collapsed.some((a) => a.id === 't') && !collapsed.some((a) => a.id === 's'), 'the trade-level row is the one kept');
+
   // taxonomy guard: an unkeyed category is a note (the live taxonomy is incomplete), but a
   // contradiction inside a keyed category is a hard failure.
   const taxEmpty = checkTaxonomy({ tags_by_categories: {} });
@@ -1239,7 +1396,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const dir = dirArg >= 0 ? args[dirArg + 1] : 'data/live';
   const candleArg = args.indexOf('--candle-markets');
   const candleMarkets = candleArg >= 0 ? parseInt(args[candleArg + 1], 10) : 6;
-  runOnce({ dir, maxSeries, candleMarkets, dryRun: args.includes('--dry-run') })
+  const tradeArg = args.indexOf('--trade-markets');
+  const tradeMarkets = tradeArg >= 0 ? parseInt(args[tradeArg + 1], 10) : 10;
+  runOnce({ dir, maxSeries, candleMarkets, tradeMarkets, dryRun: args.includes('--dry-run') })
     .then((st) => {
       // Exit code 0 even with zero alerts: "no swings right now" is a valid, healthy state.
       console.log('done. alerts in state:', st.alerts.length);
