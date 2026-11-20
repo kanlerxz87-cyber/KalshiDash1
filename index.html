@@ -1,119 +1,132 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KalshiDash1 — Kalshi Demo Dashboard</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-<div class="site-wrap">
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="brand"><div class="mark">KD</div><div>KalshiDash1</div></div>
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="dashboard.html">Live Dashboard</a>
-        <a href="categories/gas.html">Gas Prices</a>
-        <a href="categories/elections.html">Elections</a>
-        <a href="categories/culture.html">Culture</a>
-        <a href="categories/crypto.html">Crypto</a>
-        <a href="categories/golf.html">Golf</a>
-        <a href="portfolio.html">Portfolio</a>
-        <a href="trades.html">Trades</a>
-        <a href="suggestions.html">Suggestions</a>
-        <a href="questions.html">Questions &amp; Answers</a>
-        <a href="flagged.html">Flagged for Review</a>
-      </nav>
-    </div>
-  </header>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand"><span class="mark"></span> KalshiDash1</div>
+    <nav class="main-nav">
+      <a href="index.html" class="active">Home</a>
+      <a href="dashboard.html">Live Dashboard</a>
+      <a href="categories.html">Categories</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="questions.html">Questions &amp; Answers</a>
+      <a href="flagged-review.html">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
 
-  <div class="hero">
+<main class="wrap">
+  <section class="hero">
+    <div class="tag"><b>Kalshi demo environment</b> &middot; REST Trade API v2 &middot; Client-side live data</div>
     <h1>KalshiDash1</h1>
-    <p>A clean, simple dashboard for tracking live Kalshi demo events — focused on <strong>gas prices, elections, culture, crypto, and golf</strong> — with live contract-price graphs, orderbook liquidity, portfolio performance tracking, trade execution structure, and a decision-making suggestions section.</p>
-    <div class="actions">
-      <a class="btn primary" href="dashboard.html">Open Live Dashboard</a>
-      <a class="btn" href="flagged.html">View Flagged for Review</a>
+    <p>Executive dashboard for the <b>Kalshi demo trade API</b> (<code>external-api.demo.kalshi.co/trade-api/v2</code>). Tracks live events, contract price movements, liquidity, and portfolio performance — focused on gas prices, elections, culture, crypto, and golf.</p>
+    <div class="cta-row">
+      <a href="dashboard.html" class="btn btn-primary">Open Live Dashboard</a>
+      <a href="categories.html" class="btn btn-outline">Browse Categories</a>
+      <a href="flagged-review.html" class="btn btn-outline">Flagged for Review</a>
     </div>
-    <div class="grid-intro">
+  </section>
+
+  <section class="section" id="executive-summary">
+    <div class="section-head">
+      <h2>Executive Summary</h2>
+      <p>Key details you should know before using this dashboard.</p>
+    </div>
+    <div class="grid">
       <div class="card">
-        <h3>Focus categories</h3>
-        <p>Gas prices &middot; Elections &middot; Culture &middot; Crypto &middot; Golf. Each has its own subpage with a findings table and source links.</p>
+        <div class="cat">Platform</div>
+        <h3>Kalshi Demo Trade API v2</h3>
+        <p>REST API base: <code>https://external-api.demo.kalshi.co/trade-api/v2</code> (also <code>https://demo-api.kalshi.co/trade-api/v2</code>). WebSocket: <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code>.</p>
+        <div class="card-footer">Source: <a href="https://external-api.demo.kalshi.co/trade-api/v2/events?limit=5" target="_blank" rel="noopener">Kalshi demo API (observed)</a></div>
       </div>
       <div class="card">
-        <h3>Live price graph</h3>
-        <p>X axis = time, Y axis = contract price. Choose the graph length (seconds / minutes / hours). Shows current liquidity and contracts available at each price.</p>
+        <div class="cat">Scope</div>
+        <h3>Five topic tracks</h3>
+        <p>Gas prices, elections, culture, crypto, and golf only. Each topic has its own category subpage with a table of live events/markets.</p>
+        <div class="card-footer">Subpages: <a href="categories.html">all categories</a></div>
       </div>
       <div class="card">
-        <h3>Portfolio &amp; trades</h3>
-        <p>Track demo-account portfolio performance, categorize trades, and build strategies by trade type. Authenticated endpoints require your own demo API credentials.</p>
+        <div class="cat">Tracking</div>
+        <h3>Live until resolved</h3>
+        <p>Events are tracked until they resolve. Resolution is shown as <b>Resolved: Yes</b> or <b>Resolved: No</b> (or "unresolved" while live), taken directly from each market's <code>result</code> field.</p>
+        <div class="card-footer">Field: <code>result</code> on /markets/{ticker}</div>
       </div>
       <div class="card">
-        <h3>Suggestions &amp; questions</h3>
-        <p>A suggestions section for site/decision improvements plus a pre-decision questions/information/answers list with missing-info discovery steps.</p>
+        <div class="cat">Graph</div>
+        <h3>Price movement over time</h3>
+        <p>Interactive chart: X axis = time, Y axis = current contract price. Choose graph length (seconds, minutes, hours). Shows current bid/ask liquidity and contract sizes.</p>
+        <div class="card-footer">Library: Chart.js (CDN)</div>
+      </div>
+      <div class="card">
+        <div class="cat">Portfolio</div>
+        <h3>Demo account performance</h3>
+        <p>Paper-trade tracker for the Kalshi demo account: categorize trades, review performance, and build strategies by trade type. Live order execution requires Kalshi API keys (not stored here).</p>
+        <div class="card-footer">See: Portfolio page</div>
+      </div>
+      <div class="card">
+        <div class="cat">Data quality</div>
+        <h3>Verified against official sources</h3>
+        <p>Every table row carries a source link to an official Kalshi API endpoint. Values that cannot be confirmed are left blank and flagged. Nothing is inferred.</p>
+        <div class="card-footer">See: <a href="flagged-review.html">Flagged for Review</a></div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="section">
-    <h2><span class="tag">Verified demo endpoints</span> Kalshi Demo Trade API</h2>
-    <p>The demo environment uses mock funds and is separate from production. Credentials are <strong>not</strong> shared between demo and production.</p>
-    <table class="wide">
-      <thead>
-        <tr><th>Surface</th><th>Recommended demo endpoint</th><th>Also supported</th><th>Source</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>REST Trade API</td>
-          <td class="nowrap">https://external-api.demo.kalshi.co/trade-api/v2</td>
-          <td class="nowrap">https://demo-api.kalshi.co/trade-api/v2</td>
-          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment docs</a></td>
-        </tr>
-        <tr>
-          <td>WebSocket API</td>
-          <td class="nowrap">wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</td>
-          <td class="nowrap">wss://demo-api.kalshi.co/trade-api/ws/v2</td>
-          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment docs</a></td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="note"><strong>Source:</strong> <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Kalshi API docs — Test In The Demo Environment</a>. Endpoints verified against the official documentation and match the values in this project's requirements.</div>
-  </div>
+  <section class="section">
+    <div class="section-head">
+      <h2>Topics</h2>
+      <p>Select a category to view its live events table.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="cat">Elections</div>
+        <h3>Elections</h3>
+        <p>Live election markets (e.g. next Secretary General, next Pope, 2032 presidential party). Tracked until resolved Yes/No.</p>
+        <a href="elections.html" class="btn btn-outline" style="padding:8px 14px;font-size:0.85rem">View elections</a>
+      </div>
+      <div class="card">
+        <div class="cat">Crypto</div>
+        <h3>Crypto</h3>
+        <p>Bitcoin price markets settled against CF Benchmarks (BRTI). Tracked until resolved.</p>
+        <a href="crypto.html" class="btn btn-outline" style="padding:8px 14px;font-size:0.85rem">View crypto</a>
+      </div>
+      <div class="card">
+        <div class="cat">Golf</h3>
+        <p>Golf majors markets (PGA) under the Sports category. Tracked until resolved.</p>
+        <a href="golf.html" class="btn btn-outline" style="padding:8px 14px;font-size:0.85rem">View golf</a>
+      </div>
+      <div class="card">
+        <div class="cat">Culture</div>
+        <h3>Culture (Entertainment)</h3>
+        <p>Entertainment markets (e.g. GTA VII release date, Bond theme). Tracked until resolved.</p>
+        <a href="culture.html" class="btn btn-outline" style="padding:8px 14px;font-size:0.85rem">View culture</a>
+      </div>
+      <div class="card">
+        <div class="cat">Gas prices</div>
+        <h3>Gas prices</h3>
+        <p>No gas-price markets were found in the Kalshi demo API events feed. Flagged as not available in demo — see Flagged for Review.</p>
+        <a href="gas-prices.html" class="btn btn-outline" style="padding:8px 14px;font-size:0.85rem">View gas prices</a>
+      </div>
+    </div>
+  </section>
 
-  <div class="section">
-    <h2><span class="tag">Important verification note</span> What is — and isn't — confirmed</h2>
-    <ul>
-      <li>The demo API endpoints above are <strong>verified</strong> against the official Kalshi documentation (source linked).</li>
-      <li>Public market-data endpoints (<code>/markets</code>, <code>/orderbook</code>, <code>/candlesticks</code>) need <strong>no authentication</strong> and are called live by the browser in the dashboard.</li>
-      <li><strong>Demo environment contents:</strong> at the time of review the demo environment listed sports markets (college football/basketball, NFL). Markets for <strong>gas prices, elections, culture, crypto, and golf</strong> were <strong>not confirmed</strong> in the demo environment. Those categories are flagged <span class="badge badge-off">unverified</span> on their subpages with the official discovery method as the source. No values were inferred or filled in.</li>
-      <li><strong>Authenticated endpoints</strong> (portfolio balance, order placement/execution) require a demo API key + Ed25519 private-key signature. No credentials were provided or requested, so portfolio/trade execution is shown as a documented structure only and is <span class="badge badge-off">flagged</span>.</li>
-    </ul>
-    <div class="note">Every table row on this site carries a source link to an official Kalshi site. If a value cannot be confirmed from an official source, it is left blank and flagged unverified. See <a href="flagged.html">Flagged for Review</a>.</div>
-  </div>
+  <section class="section">
+    <div class="section-head">
+      <h2>How the data is verified</h2>
+      <p>No values are inferred or filled in. Each row links to its official Kalshi API source. Where the demo API has no data for a topic, the topic page says so explicitly and the item is flagged for review.</p>
+    </div>
+  </section>
+</main>
 
-  <div class="section">
-    <h2><span class="tag">Navigation</span> Site sections</h2>
-    <table class="wide">
-      <thead><tr><th>Section</th><th>Page</th><th>What you&rsquo;ll find</th></tr></thead>
-      <tbody>
-        <tr><td>Live Dashboard</td><td><a href="dashboard.html">dashboard.html</a></td><td>Interactive contract-price graph (time &rarr; price), liquidity table, granularity selector.</td></tr>
-        <tr><td>Gas Prices</td><td><a href="categories/gas.html">categories/gas.html</a></td><td>Findings table for gas-price events, sources, verification status.</td></tr>
-        <tr><td>Elections</td><td><a href="categories/elections.html">categories/elections.html</a></td><td>Findings table for election events, sources, verification status.</td></tr>
-        <tr><td>Culture</td><td><a href="categories/culture.html">categories/culture.html</a></td><td>Findings table for culture events, sources, verification status.</td></tr>
-        <tr><td>Crypto</td><td><a href="categories/crypto.html">categories/crypto.html</a></td><td>Findings table for crypto events, sources, verification status.</td></tr>
-        <tr><td>Golf</td><td><a href="categories/golf.html">categories/golf.html</a></td><td>Findings table for golf events, sources, verification status.</td></tr>
-        <tr><td>Portfolio</td><td><a href="portfolio.html">portfolio.html</a></td><td>Demo-account portfolio performance structure (credentials required).</td></tr>
-        <tr><td>Trades</td><td><a href="trades.html">trades.html</a></td><td>Trade execution structure, categorization, strategy framework (credentials required).</td></tr>
-        <tr><td>Suggestions</td><td><a href="suggestions.html">suggestions.html</a></td><td>Site/decision-improvement suggestions with review workflow.</td></tr>
-        <tr><td>Questions &amp; Answers</td><td><a href="questions.html">questions.html</a></td><td>Pre-decision questions, information, answers, and missing-info discovery.</td></tr>
-        <tr><td>Flagged for Review</td><td><a href="flagged.html">flagged.html</a></td><td>Unverified items and irregularities with source links.</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="footer-inner" style="margin-top:30px;">
-    <p class="small">KalshiDash1 &middot; Built on the Kalshi Demo Trade API &middot; Endpoints verified against <a href="https://docs.kalshi.com" target="_blank" rel="noopener">docs.kalshi.com</a> &middot; Not financial advice. Demo environment uses mock funds.</p>
-  </div>
-</div>
+<footer>
+  KalshiDash1 &middot; Built on the Kalshi demo trade API v2 &middot; Data is live from <code>external-api.demo.kalshi.co</code> &middot; Not financial advice. Demo environment only.
+</footer>
 </body>
 </html>

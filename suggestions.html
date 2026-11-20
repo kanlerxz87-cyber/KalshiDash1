@@ -1,81 +1,139 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Suggestions — KalshiDash1</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-<div class="site-wrap">
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="brand"><div class="mark">KD</div><div>KalshiDash1</div></div>
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="dashboard.html">Live Dashboard</a>
-        <a href="categories/gas.html">Gas Prices</a>
-        <a href="categories/elections.html">Elections</a>
-        <a href="categories/culture.html">Culture</a>
-        <a href="categories/crypto.html">Crypto</a>
-        <a href="categories/golf.html">Golf</a>
-        <a href="portfolio.html">Portfolio</a>
-        <a href="trades.html">Trades</a>
-        <a href="suggestions.html" class="active">Suggestions</a>
-        <a href="questions.html">Questions &amp; Answers</a>
-        <a href="flagged.html">Flagged for Review</a>
-      </nav>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand"><span class="mark"></span> KalshiDash1</div>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Live Dashboard</a>
+      <a href="categories.html">Categories</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="suggestions.html" class="active">Suggestions</a>
+      <a href="questions.html">Questions &amp; Answers</a>
+      <a href="flagged-review.html">Flagged for Review</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section">
+    <div class="section-head">
+      <h1>Suggestions for Better Decision Making</h1>
+      <p>This section is dedicated to suggestions for improving the site and your trading decisions. Review each suggestion and choose the best path before implementing any changes. None of these are applied automatically.</p>
     </div>
-  </header>
 
-  <div class="hero" style="padding:24px 0 10px;">
-    <h1 style="font-size:22px;margin-bottom:6px;">Suggestions</h1>
-    <p style="font-size:14px;color:var(--muted);">Suggestions for improving the site and for decision-making. Review each suggestion and choose the best path before implementing any changes. None of these are implemented yet; they are proposals to evaluate.</p>
-  </div>
+    <div class="panel">
+      <h3>Suggested improvements (review before implementing)</h3>
+      <table class="data">
+        <thead><tr><th>#</th><th>Suggestion</th><th>Why it helps decision making</th><th>Effort</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Add Kalshi WebSocket subscription (wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2) for real-time price ticks instead of 3-second polling.</td>
+            <td>Faster, push-based price movement on the graph with no stale polls.</td>
+            <td>Medium</td>
+            <td>Proposed</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Store Kalshi demo API key securely (env/secret, never in the repo) and call <code>GET /portfolio</code>, <code>GET /trades</code>, <code>POST /portfolio/orders</code> for live execution.</td>
+            <td>Enables real demo-account performance tracking and actual trade execution rather than paper simulation.</td>
+            <td>High</td>
+            <td>Proposed</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Add historical price candles endpoint (<code>/markets/{ticker}/candles</code>) to backfill the graph so the X/Y chart starts with real history, not just live ticks.</td>
+            <td>Lets you analyze price trends over seconds/minutes/hours from the moment a market is selected.</td>
+            <td>Medium</td>
+            <td>Proposed</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Add gas-price markets once located (they were not in the demo feed) so all five requested topics have live data.</td>
+            <td>Completes the requested scope: gas prices, elections, culture, crypto, golf.</td>
+            <td>Low</td>
+            <td>Blocked (data missing)</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Add "highest dollar amount" ranking using notional volume (price × size × contracts) rather than open interest alone.</td>
+            <td>Surfaces the truly largest-dollar live events first.</td>
+            <td>Low</td>
+            <td>Proposed</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Add resolved-trade export (CSV) from the paper tracker so results can be analyzed offline by trade type.</td>
+            <td>Supports strategy creation based on the type of trade.</td>
+            <td>Low</td>
+            <td>Proposed</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>Add settlement-source verification per market (display the event's settlement sources from /events).</td>
+            <td>Lets you confirm how each event will be resolved before trading.</td>
+            <td>Low</td>
+            <td>Proposed</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>Add price alerts (e.g. notify when Yes bid crosses a threshold) for watched markets.</td>
+            <td>Helps act on price movements without watching the graph constantly.</td>
+            <td>Medium</td>
+            <td>Proposed</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-  <div class="section">
-    <h2><span class="tag">Review before implementing</span> Suggested site improvements</h2>
-    <table class="wide">
-      <thead>
-        <tr><th>#</th><th>Suggestion</th><th>Expected benefit</th><th>Effort</th><th>Decision</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>1</td><td>Add a real WebSocket feed (<code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code>) to push live price updates instead of polling REST.</td><td>True real-time price movement on the graph; lower latency.</td><td>Medium</td><td><span class="badge badge-info">pending review</span></td></tr>
-        <tr><td>2</td><td>Add market discovery: a search box that calls <code>GET /markets?status=open</code> and <code>GET /events/{ticker}</code> so users can pick gas / elections / culture / crypto / golf events without typing tickers.</td><td>Makes the dashboard usable out of the box; surfaces the focus categories.</td><td>Medium</td><td><span class="badge badge-info">pending review</span></td></tr>
-        <tr><td>3</td><td>Add a credentials manager that signs demo API requests in the browser (Web Crypto API, Ed25519) so portfolio/trade execution can connect without sending keys to a server.</td><td>Enables real portfolio tracking and trade execution from the dashboard.</td><td>High</td><td><span class="badge badge-info">pending review</span></td></tr>
-        <tr><td>4</td><td>Persist tracked events (ticker, start price, resolution) to browser IndexedDB so history survives a refresh.</td><td>Lets users review how events resolved (yes/no) over time.</td><td>Low</td><td><span class="badge badge-info">pending review</span></td></tr>
-        <tr><td>5</td><td>Add export (CSV/JSON) of the findings tables and trade log.</td><td>Easy analysis in spreadsheets; audit trail.</td><td>Low</td><td><span class="badge badge-info">pending review</span></td></tr>
-        <tr><td>6</td><td>Add category-specific sub-navigation and a &ldquo;highest dollar amount&rdquo; sort on the findings tables.</td><td>Directly supports the goal of tracking highest-dollar live events.</td><td>Low</td><td><span class="badge badge-info">pending review</span></td></tr>
-        <tr><td>7</td><td>Add a disclaimer banner that demo uses mock funds and this is not financial advice (already present; keep prominent).</td><td>Sets expectations; reduces risk of misinterpretation.</td><td>Low</td><td><span class="badge badge-ok">done (banner present)</span></td></tr>
-      </tbody>
-    </table>
-  </div>
+    <div class="panel" style="margin-top:24px">
+      <h3>Choose a path before implementing</h3>
+      <p class="note">Pick the suggestion(s) to implement, record the decision, then create a follow-up task in COORDINATION.md. Do not implement anything here automatically.</p>
+      <div class="form-grid">
+        <div class="field"><label>Decision</label><input id="ch-suggestion" type="text" placeholder="Which suggestion #?"></div>
+        <div class="field"><label>Decision</label><select id="ch-decision"><option value="approve">Approve</option><option value="defer">Defer</option><option value="reject">Reject</option></select></div>
+        <div class="field"><label>Rationale</label><input id="ch-rationale" type="text" placeholder="Why this path"></div>
+        <div class="field" style="align-self:end"><button class="btn btn-primary" onclick="recordDecision()">Record decision</button></div>
+      </div>
+      <div id="decisions-list" class="note" style="margin-top:12px"></div>
+    </div>
+  </section>
+</main>
 
-  <div class="section">
-    <h2>Decision-making suggestions (choose the best path before implementing)</h2>
-    <ol>
-      <li><strong>Confirm demo-environment categories first.</strong> Before building category-specific discovery, verify whether gas/elections/culture/crypto/golf markets exist in the demo (they were not present at review time — demo listed sports markets). If absent, either use production markets (with appropriate disclaimers) or keep the category pages as discovery scaffolding.</li>
-      <li><strong>Decide on authentication model.</strong> Browser-side Ed25519 signing keeps keys on the client but requires careful key handling; a server proxy keeps keys off the client but introduces hosting/ops. Pick one before implementing portfolio/trade execution.</li>
-      <li><strong>Pick a single data source for prices.</strong> REST poll vs WebSocket vs both. WebSocket gives live movement; REST is simpler and documented as cached. Decide based on how real-time the graph must be.</li>
-      <li><strong>Set a verification rule for every table row.</strong> Keep the current rule: source link to an official site; blank + unverified if not confirmed. Never infer values.</li>
-      <li><strong>Validate the graph-time interpretation.</strong> The API offers 1/60/1440-minute candles (no sub-minute). Decide whether &ldquo;seconds&rdquo; means a seconds-long lookback at 1-minute resolution, and document that clearly (done on the dashboard).</li>
-    </ol>
-  </div>
-
-  <div class="section">
-    <h2>Review workflow</h2>
-    <ol>
-      <li>Read each suggestion above.</li>
-      <td>Change its &ldquo;Decision&rdquo; status to approved / rejected / deferred.</li>
-      <li>Record the reason in this page or the linked Flagged for Review page.</li>
-      <li>Only implement an approved suggestion; verify against official docs before changing code.</td>
-    </ol>
-    <p class="small">Suggestions and their decision status are proposals only. No changes are made to the site without an explicit review decision.</p>
-  </div>
-
-  <div class="footer-inner" style="margin-top:30px;">
-    <p class="small">KalshiDash1 &middot; Suggestions &middot; Endpoints verified against <a href="https://docs.kalshi.com" target="_blank" rel="noopener">docs.kalshi.com</a> &middot; Demo environment uses mock funds &middot; Not financial advice.</p>
-  </div>
-</div>
+<footer>
+  KalshiDash1 &middot; Suggestions &middot; Demo environment only &middot; Not financial advice.
+</footer>
+<script>
+(function(){
+  const STORE = 'kalshidash_decisions';
+  function load(){ try { return JSON.parse(localStorage.getItem(STORE) || '[]'); } catch(e){ return []; } }
+  function save(v){ localStorage.setItem(STORE, JSON.stringify(v)); }
+  function recordDecision(){
+    const s = document.getElementById('ch-suggestion').value.trim();
+    const d = document.getElementById('ch-decision').value;
+    const r = document.getElementById('ch-rationale').value.trim();
+    if (!s || !r) { alert('Fill in suggestion # and rationale'); return; }
+    const dec = { id: Date.now().toString(), suggestion: s, decision: d, rationale: r, at: new Date().toISOString() };
+    const list = load(); list.push(dec); save(list);
+    document.getElementById('ch-suggestion').value = ''; document.getElementById('ch-rationale').value = '';
+    renderDecisions();
+  }
+  function renderDecisions(){
+    const list = load();
+    const box = document.getElementById('decisions-list');
+    if (!list.length){ box.innerHTML = 'No decisions recorded yet.'; return; }
+    box.innerHTML = '<strong>Recorded decisions:</strong><ul style="margin:8px 0 0 20px">' + list.map(x => `<li>${x.at} — Suggestion #${x.suggestion}: <b>${x.decision}</b> — ${x.rationale}</li>`).join('') + '</ul>';
+  }
+  renderDecisions();
+})();
+</script>
 </body>
 </html>
