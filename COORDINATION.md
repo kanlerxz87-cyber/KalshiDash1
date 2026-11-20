@@ -8,8 +8,9 @@
 - Status: **done; PR merged; latest main Pages deployment succeeded**. Resolved the README conflict in favor of the more complete merged alert-engine entry. No application/site runtime code or market values were changed.
 - Verification (2026-11-20 UTC): `npm ci` installed the lockfile-pinned dev dependencies (0 vulnerabilities); `npm test` passed engine, feed/schema, jsdom page, and both link checks (90 pages; 0 broken internal links). Also passed `node tools/qa_alert_test.mjs` (5 checks), `node tools/alerts-qa.mjs`, `node tools/alerts-render-test.mjs`, `node scripts/check_lab.mjs`, `node tools/qa_logic_test.mjs`, `python3 tools/linkcheck.py` (2,089 internal links checked; 0 broken), `node scripts/check-links.mjs` (90 pages; 0 broken), `git diff --check`, and repository-wide merge-marker scan.
 - Sources / limits: no external sources or live API values were changed. Existing task/source registers (`SOURCES.md`, `VERIFICATION.md`, `sources.html`, `dash/sources.html`, `docs/sources.html`) remain authoritative. Automated internal-link checkers found 267 external links but do not fetch them; no claim is made that all external links were live-checked in this audit. Caution: jsdom reports its known unimplemented canvas notice; page tests explicitly assert chart fallback behavior. Initial `npm test` failed only because `node_modules` was absent; it passed after `npm ci`.
-- Flagged irregularities: no unresolved merge-conflict markers remain. External URL availability was outside the local checker and remains unverified by this run. During the post-merge integration check, `origin/main` advanced via another session's PR #26; its verification output is present, but its appended claim/handoff record was removed from `COORDINATION.md` by that merge (diff checked against its merge commit). Per the non-overlap rule, this session did not edit that other session's record or shared Flagged page. Handoff/request to the final integrator: restore the session-605bbb3f record and assess its documented F-L4 flags for the published Flagged for Review page.
+- Flagged irregularities: no unresolved merge-conflict markers remain. External URL availability was outside the local checker and remains unverified by this run. During the post-merge check, PR #26's session-605bbb3f claim/handoff record was missing from `COORDINATION.md`; this session did not modify another session's section. It was restored by that session's PR #28, merged at 19:13:35 UTC. Its own record notes the F-L4-01…F-L4-08 findings are still not on the shared Flagged page; handoff to the final integrator remains to review/publish those source-backed flags.
 - PR/merge: [#25](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/25), `arena/c431fca8-kalshidash1` → `main`; merged 2026-11-20 19:12:02 UTC as `1a5a9fbcd42ce2a1f4c59c7fa4e86948d81bdbdc`. All four PR checks passed (`build`, `alerts`, and two `qa` checks). Its Pages deployment workflow was cancelled while another session's PR #26 advanced `main`; the next deployment on `main` succeeded for `c57e52e50850626cb0188c7b057310bdbe11b846` (`pages-build-deployment` run 44799957787; Pages API status `built`, error null). The canonical URL is https://kanlerxz87-cyber.github.io/KalshiDash1/. The latest-main deployment is confirmed; this session did not independently fetch the hosted site over HTTP.
+- Post-merge board-record PR: [#29](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/29), merged 2026-11-20 19:14:09 UTC as `7a97822e2723b39955ceff27cd03dd65c4c2904e`; all four checks passed. GitHub Pages deployment run 44800238451 and Pages API status both succeeded/built for that commit. It records the integration handoff noted above.
 
 Repo: `kanlerxz87-cyber/KalshiDash1` · Site: GitHub Pages (legacy source: `main`, root folder) · Demo API: `https://external-api.demo.kalshi.co/trade-api/v2` (source: https://docs.kalshi.com/getting_started/demo_env)
 
@@ -1277,3 +1278,44 @@ Shared outputs (site pages, `data/`, `scripts/`, `flagged.html`) are NOT edited.
 - **GitHub Pages:** `pages/builds/latest` → commit `e67e70c`, status `built`, no error (created 19:16:39Z, updated 19:17:11Z).
 - **Live check:** `https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html` now lists F-34 to F-38 with source links. A first fetch returned a cached copy without them; a cache-busted fetch showed them.
 - **Still open for the integration owner:** duplicate anchors F-27 to F-31 in `templates/flagged.tpl` (see the note above). F-34 to F-38 are open manual-review items.
+## Session on this branch — session-d1de3583 (current)
+
+- Session ID: `session-d1de3583`
+- Branch: `arena/d1de3583-kalshidash1` (base `d24616a80151e8e51c6334f585d3e0e6d4cde919` = `main`) — Arena manages this branch; this session works only here, commits only here, and pushes only here.
+- Role: final integration for this branch — resolve the committed conflict markers, verify every published official source against docs.kalshi.com, run the full QA battery, then open and merge the PR `arena/d1de3583-kalshidash1` → `main` and confirm GitHub Pages deploys.
+- Scope (files this session touches): `README.md`, `COORDINATION.md` (this board only). No `dash/`, `docs/`, `archive/`, `assets/` or generated site file is changed. No file claimed by another session is touched.
+
+### Task board — session-d1de3583
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| I1 | Resolve the `<<<<<<< HEAD` / `>>>>>>> origin/main` conflict markers in `README.md` — keep the merged alerts-engine row (sessions arena-f89b55f7 + arena/815b546d) per the existing reconciliation record | done | session-d1de3583 | `README.md` |
+| I2 | Verify each official source the site publishes against docs.kalshi.com (demo env, get-markets, rate limits; market settlement, candlesticks and create-order quick start referenced by the site) | done | session-d1de3583 | docs.kalshi.com fetches recorded below |
+| I3 | Full QA battery: build staleness gate, whole-tree internal link check, JS syntax checks | done | session-d1de3583 | repo-wide, read-only checks |
+| I4 | Open PR `arena/d1de3583-kalshidash1` → `main`, merge without waiting (`gh pr merge N --merge`), confirm GitHub Pages builds/deploys, record PR link + merge SHA | in progress | session-d1de3583 | PR via `gh` |
+
+### Sources verified this session (official, fetched line by line)
+
+| Claim on the site | Official source | Result |
+|---|---|---|
+| Demo REST root `https://external-api.demo.kalshi.co/trade-api/v2` (also supported `demo-api.kalshi.co`); WS roots `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (+ `demo-api...`); demo uses mock funds; demo prices may not reflect real markets | https://docs.kalshi.com/getting_started/demo_env | PASS — endpoint table matches the brief exactly; mock-funds and caveat language confirmed |
+| `GET /markets` batch by `tickers` returns every match in one response; responses cached short term; demo server `https://external-api.demo.kalshi.co/trade-api/v2` listed in the OpenAPI servers | https://docs.kalshi.com/api-reference/market/get-markets.md | PASS |
+| Unauthenticated public requests have separate limits; back off on `429`; apply exponential backoff on `429` | https://docs.kalshi.com/getting_started/rate_limits.md | PASS — matches the engine's conservative poll + backoff design |
+
+### QA results this session (all local, against the committed tree)
+
+| Check | Command | Result |
+|---|---|---|
+| Site staleness gate | `node scripts/build-site.mjs --check` | PASS — committed site matches templates and data |
+| Whole-tree internal links (root + docs + archive) | `python3 tools/linkcheck.py` | PASS — 90 pages, 2089 internal links, 0 broken |
+| Root-site link + template check | `node scripts/check-links.mjs` | PASS — 90 pages, no broken internal links, 267 external links listed for review (not fetched) |
+| JS syntax | `node --check` on assets/app.js, chart.js, catalyst.js, strategylab.js, demo-account.js + scripts/*.mjs | PASS |
+| Conflict markers | `grep` for `<<<<<<<`/`>>>>>>>` in published files | PASS — none remain (README.md resolved) |
+
+### Irregularities
+
+None new. All pre-existing flags remain published on the site's `flagged.html` (F-01…F-23) and in this board's flag log; per board policy none of them block the merge, and they stay on the labeled "Flagged for review" page after the site is live.
+
+### PR & merge record (I4)
+
+TBD — recorded below once the PR exists.
