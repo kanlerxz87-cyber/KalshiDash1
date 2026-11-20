@@ -28,6 +28,11 @@ jobs:
       - name: Engine logic selftest (offline, no network)
         run: node tools/live_engine.mjs --selftest
 
+      # F-48: the engine used to sample 12 of 122 series, so a >= $0.10 move most places could
+      # not be detected at all. This fails if the coverage budgets are lowered silently.
+      - name: Engine coverage check (budgets, per-topic spread, threshold)
+        run: node tools/check_coverage.mjs
+
       - name: Validate the committed engine feed (if the engine has produced one)
         run: node scripts/check_alerts.mjs
 

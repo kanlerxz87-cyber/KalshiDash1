@@ -96,7 +96,12 @@ export const MAX_SAMPLES_PER_MARKET = 720;    // 5 days at a 10-minute cadence
  * the same documented public endpoint, and the run records its own request count so the cost is
  * visible instead of guessed. Nothing about the threshold, the corroboration rules or the honesty
  * rules changes: more markets are watched, the same rules decide what may be published. */
-export const MAX_HISTORY_MARKETS = 12;        // the biggest contracts PER TOPIC keep a price series
+export const MAX_HISTORY_MARKETS = 12;
+/* Coverage budgets (F-48). Exported so a test can assert them, and used as the real defaults of
+ * every discovery/sampling function so no call site can silently fall back to the old, narrow set. */
+export const DEFAULT_MAX_SERIES = 45;
+export const DEFAULT_CANDLE_MARKETS = 30;
+export const DEFAULT_TRADE_MARKETS = 50;        // the biggest contracts PER TOPIC keep a price series
 export const MAX_ALERTS = 600;
 export const MAX_RESOLUTIONS = 400;
 
@@ -515,7 +520,7 @@ export function checkTaxonomy(taxonomyJson, topics = TOPICS) {
   return { problems, notes };
 }
 
-export async function discoverSeries(client, { maxSeries = 12, log = () => {} } = {}) {
+export async function discoverSeries(client, { maxSeries = DEFAULT_MAX_SERIES, log = () => {} } = {}) {
   const byTopic = {};
   const seen = new Set();
   for (const t of TOPICS) {
@@ -550,7 +555,7 @@ export async function discoverSeries(client, { maxSeries = 12, log = () => {} } 
 }
 
 /** Collect open markets for the highest-volume series, within a request budget. */
-export async function collectMarkets(client, seriesByTopic, { maxSeries = 12, log = () => {} } = {}) {
+export async function collectMarkets(client, seriesByTopic, { maxSeries = DEFAULT_MAX_SERIES, log = () => {} } = {}) {
   const flat = [];
   for (const t of TOPICS) {
     for (const s of seriesByTopic[t.id] || []) flat.push({ ...s, topic: t.id });
@@ -880,7 +885,7 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
  * For every tracked market that is no longer open, read its settled state.
  * Uses GET /markets?series_ticker=..&status=settled (S4) and GET /markets/{ticker} (S5).
  */
-export async function collectResolutions(client, state, { maxSeries = 12, log = () => {} } = {}) {
+export async function collectResolutions(client, state, { maxSeries = DEFAULT_MAX_SERIES, log = () => {} } = {}) {
   const trackedSeries = new Set();
   for (const m of Object.values(state.markets || {})) {
     if (m && m.series_ticker) trackedSeries.add(m.series_ticker);
@@ -1188,7 +1193,7 @@ export function collapseDuplicates(alerts) {
 /* ------------------------------------------------------------------ run */
 
 
-export async function runOnce({ dir = 'data/live', maxSeries = 45, candleMarkets = 30, tradeMarkets = 50, candleLookbackMinutes = 180, dryRun = false, log = console.log } = {}) {
+export async function runOnce({ dir = 'data/live', maxSeries = DEFAULT_MAX_SERIES, candleMarkets = DEFAULT_CANDLE_MARKETS, tradeMarkets = DEFAULT_TRADE_MARKETS, candleLookbackMinutes = 180, dryRun = false, log = console.log } = {}) {
   const started = Math.floor(Date.now() / 1000);
   log(`KalshiDash1 live engine — ${new Date(started * 1000).toISOString()}`);
   log(`  base: ${BASE} (S1)  threshold: $${SWING_THRESHOLD}  max series: ${maxSeries}  candle markets: ${candleMarkets}`);
@@ -1562,13 +1567,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     process.exit(selftest());
   }
   const maxSeriesArg = args.indexOf('--max-series');
-  const maxSeries = maxSeriesArg >= 0 ? parseInt(args[maxSeriesArg + 1], 10) : 45;
+  const maxSeries = maxSeriesArg >= 0 ? parseInt(args[maxSeriesArg + 1], 10) : DEFAULT_MAX_SERIES;
   const dirArg = args.indexOf('--dir');
   const dir = dirArg >= 0 ? args[dirArg + 1] : 'data/live';
   const candleArg = args.indexOf('--candle-markets');
-  const candleMarkets = candleArg >= 0 ? parseInt(args[candleArg + 1], 10) : 30;
+  const candleMarkets = candleArg >= 0 ? parseInt(args[candleArg + 1], 10) : DEFAULT_CANDLE_MARKETS;
   const tradeArg = args.indexOf('--trade-markets');
-  const tradeMarkets = tradeArg >= 0 ? parseInt(args[tradeArg + 1], 10) : 50;
+  const tradeMarkets = tradeArg >= 0 ? parseInt(args[tradeArg + 1], 10) : DEFAULT_TRADE_MARKETS;
   runOnce({ dir, maxSeries, candleMarkets, tradeMarkets, dryRun: args.includes('--dry-run') })
     .then((st) => {
       // Exit code 0 even with zero alerts: "no swings right now" is a valid, healthy state.
