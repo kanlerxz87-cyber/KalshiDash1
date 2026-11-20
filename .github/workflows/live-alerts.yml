@@ -1,0 +1,87 @@
+name: live-alerts
+
+# The alert engine. GitHub Pages is static, so nothing on the site itself can sample the
+# exchange while nobody is looking. This workflow is what makes the feed genuinely live:
+# it runs tools/live_engine.mjs against the official demo Trade API on a schedule, commits
+# the resulting data/live/feed.json, and Pages republishes it.
+#
+# Sources for everything the engine does: see the header of tools/live_engine.mjs and
+# docs/ALERTS.md.
+
+on:
+  # IMPORTANT: GitHub only fires `schedule` for the repository's DEFAULT branch. Once this is
+  # merged to main the 10-minute cadence starts automatically; on a feature branch only the
+  # manual dispatch and push triggers below can run it.
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main, 'arena/**']
+    paths:
+      - 'tools/live_engine.mjs'
+      - '.github/workflows/live-alerts.yml'
+      - 'scripts/check_alerts.mjs'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: live-alerts
+  cancel-in-progress: false
+
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    steps:
+      # On the schedule this resolves to the default branch; a manual dispatch can target
+      # this session's branch so the engine can be exercised before the merge.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Offline logic selftest (no network)
+        run: node tools/live_engine.mjs --selftest
+
+      - name: Fetch live demo-API sample
+        id: sample
+        run: |
+          set -o pipefail
+          node tools/live_engine.mjs --max-series 12 --candle-markets 6 2>&1 | tee /tmp/engine.log
+        continue-on-error: true
+
+      - name: Validate the feed
+        run: node scripts/check_alerts.mjs
+
+      - name: Commit the new sample
+        # Runs whenever a sample was produced and validated, even if a later step fails, so a
+        # partial problem never loses real, verified market data.
+        if: steps.sample.outcome == 'success' && success() || steps.sample.outcome == 'success'
+        run: |
+          set -e
+          git config user.name  "kalshidash1-engine"
+          git config user.email "engine@users.noreply.github.com"
+          git add data/live/
+          if git diff --cached --quiet -- data/live/; then
+            echo "No market change in this run — nothing to commit."
+          else
+            STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+            git commit -m "data(live): engine sample ${STAMP}"
+            git pull --rebase --autostash origin ${{ github.ref_name }} || true
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+
+      - name: Fail the run if the engine could not reach the API
+        if: steps.sample.outcome != 'success'
+        run: |
+          echo "The engine did not complete. Log tail:"
+          tail -40 /tmp/engine.log
+          # Surface the cause as annotations, because the raw job log is not always
+          # downloadable; annotations are always readable through the API.
+          tail -12 /tmp/engine.log | while IFS= read -r line; do
+            echo "::error::engine: $line"
+          done
+          exit 1

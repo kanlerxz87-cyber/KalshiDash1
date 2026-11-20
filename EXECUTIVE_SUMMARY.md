@@ -52,3 +52,52 @@ Real demo-account portfolio figures (requires the account holder's API keys — 
 4. **S-05** Fee-aware P&L using per-series `fee_type`/`fee_multiplier`.
 
 Full detail: `SOURCES.md` (provenance), `VERIFICATION.md` (checks), `COORDINATION.md` (task log), site pages **Questions & Gaps** and **Flagged for Review**.
+
+---
+
+# Addendum — live alerting system (session-cb49437b, 2026-11-20)
+
+## The gap this closed
+
+The brief's central mechanism — **live alerting on contract-price swings of $0.10 or more, shown as
+two scrolling chats** — was not implemented anywhere in the repository. A grep for alert/chat logic
+found only a suggestion-review widget. Everything below was added, tested and run against the live
+demo API.
+
+## What now exists
+
+| Component | Where | What it does |
+|---|---|---|
+| Alert engine | `tools/live_engine.mjs` | Discovers the five focus topics, samples prices, detects ≥ $0.10 moves (sample-to-sample **and** from 1-minute candles), tracks resolutions, scores alerts |
+| Live console | `alerts/index.html` | Two scrolling feeds: **All events** and **High ROI**; price chart (5 min → 7 days); per-topic highest-dollar boards; resolution log; liquidity ladders |
+| Scheduled sampler | `.github/workflows/live-alerts.yml` | Runs every 10 minutes so the record continues with no browser open |
+| Feed validator | `scripts/check_alerts.mjs` | Blocks any published row that is below threshold, has an invented price, or cites a non-official source |
+| Page test | `scripts/check_alerts_page.mjs` | jsdom render test of both feeds, the filter and the no-invented-price rule |
+
+## The honest state of the data
+
+The engine ran successfully against `https://external-api.demo.kalshi.co/trade-api/v2` and captured
+real markets for gas, elections, crypto and golf. **Alerts so far: zero.** The demo exchange is
+quiet — repeated samples of the top contracts returned identical prices. The feeds display that
+state instead of seeding example alerts, and the threshold, detection and rendering are covered by
+automated tests so the mechanism is proven independently of whether the demo happens to move.
+
+## Verified platform facts (see `docs/ALERTS.md` §2 for links)
+
+* Public market data needs no authentication; **orders, balances and positions do**.
+* The WebSocket ticker channel is real-time but its handshake is **authenticated**, so a static site
+  cannot stream prices; this design uses a scheduled sampler plus in-page polling, and says so.
+* Kalshi publishes **no traded-dollar field**, so "highest dollar amount" is estimated as
+  contracts × price and labelled as an estimate everywhere.
+* Winning contracts pay $1; results are `yes` / `no` / `scalar`.
+
+## Findings that need your review
+
+* **F-A1 (upstream API inconsistency):** the demo API's tag taxonomy omits `Culture` even though
+  `GET /series?category=Culture` serves Culture series. The engine's own guard found this.
+* **F-A3:** the dollar ranking is derived, not official.
+* **F-A4:** the high-ROI feed uses a published heuristic, not a back-tested model.
+* **F-A5:** "gas prices" deliberately excludes crude oil that shares the same tag.
+* **F-A8:** real demo-account portfolio sync still needs your API key; nothing is requested or stored.
+
+Full detail with links: `flagged.html` (items F-A1 … F-A8) and `docs/ALERTS.md`.

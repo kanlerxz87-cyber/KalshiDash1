@@ -68,6 +68,7 @@ const NAV_MORE = [
   ['demo-account.html', 'Demo account'],
   ['catalyst.html', 'Swing catalysts'],
   ['strategylab.html', 'Strategy lab'],
+  ['alerts/index.html', 'Live alerts (engine, 2 chats)'],
   ['dash/alerts.html', 'Alert feeds (dash suite)'],
   ['dash/autotrade.html', 'Auto-trade engine (dash suite)']
 ];
@@ -328,6 +329,8 @@ const PAGES = [
   { out: 'demo-account.html', tpl: 'demo-account.html' },
   { out: 'sources.html', tpl: 'sources.html' },
   { out: 'flagged.html', tpl: 'flagged.html' },
+  // The alerts console is a standalone app (own nav, own css/js under alerts/) so it is NOT
+  // regenerated from templates/; it is listed here only so the build reports it.
   { out: 'questions.html', tpl: 'questions.html' },
   { out: 'suggestions.html', tpl: 'suggestions.html' },
   { out: 'api.html', tpl: 'api.html' },
@@ -400,3 +403,4 @@ if (checkOnly) {
 } else {
   console.log('build-site: ' + PAGES.length + ' pages generated.');
 }
+

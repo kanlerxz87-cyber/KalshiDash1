@@ -36,7 +36,10 @@ def local_target(url: str) -> str | None:
 
 
 def main() -> int:
-    pages = sorted(p for p in ROOT.rglob("*.html") if ".git" not in p.parts)
+    # node_modules is dev-only tooling (jsdom/link-check helpers), never published; scanning its
+    # vendored demo HTML produced false "broken link" reports. Exclude it from the page walk.
+    SKIP_DIRS = {".git", "node_modules", "__pycache__"}
+    pages = sorted(p for p in ROOT.rglob("*.html") if not (SKIP_DIRS & set(p.parts)))
     if not pages:
         print("no HTML files found", file=sys.stderr)
         return 1

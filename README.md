@@ -129,3 +129,29 @@ trade/portfolio engine, and a suggestions review queue.
 
 Conventions of this suite: every table row links its official source; unconfirmed values stay blank and are
 listed on the Flagged page; portfolio/trade data is simulated and labeled as such; not financial advice.
+
+---
+
+# Live alerts — two scrolling feeds (added by session-cb49437b)
+
+`alerts/index.html` is a live alerting console for the Kalshi demo exchange. It watches the five
+focus topics (gas prices, elections, culture, crypto, golf) and posts a message to a scrolling feed
+whenever a contract moves **$0.10 or more in either direction**. A second feed repeats only the
+alerts a documented heuristic scores as high expected ROI. Both feeds link the exact API row behind
+each alert, plus the contract terms and settlement sources.
+
+```bash
+node tools/live_engine.mjs --selftest     # offline logic test, no network
+node tools/live_engine.mjs                # one live sample, writes data/live/
+node scripts/check_alerts.mjs             # validate the published feed
+node scripts/check_alerts_page.mjs        # render + behaviour test of the page (jsdom)
+```
+
+* **Why a scheduled job:** GitHub Pages is static, so nothing on the site can sample the exchange
+  while nobody is looking. `.github/workflows/live-alerts.yml` runs the engine every 10 minutes and
+  commits `data/live/feed.json`; the page reads that and additionally polls the public API while it
+  is open.
+* **What it will not do:** place orders or read a portfolio. Those endpoints need a signed request
+  with the account holder's key; the site holds no credentials and never asks for them.
+* Method, sources and every irregularity: [`docs/ALERTS.md`](docs/ALERTS.md). Flagged items with
+  links: [`flagged.html`](flagged.html).

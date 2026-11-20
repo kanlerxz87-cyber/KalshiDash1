@@ -44,7 +44,9 @@ for (const file of pages) {
   const html = readFileSync(file, "utf8");
   const rel = file.slice(ROOT.length + 1);
   // dash/, docs/, audit/ and archive/ are independent pages / suites / preserved trees: link-checked only.
-  const independent = rel.startsWith("archive/") || rel.startsWith("dash/") || rel.startsWith("docs/") || rel.startsWith("audit/");
+  // alerts/ (session-cb49437b) is a standalone console with its own nav and assets, so it is
+  // link-checked but exempt from the shared-template assertions, like dash/ and docs/.
+  const independent = rel.startsWith("archive/") || rel.startsWith("dash/") || rel.startsWith("docs/") || rel.startsWith("audit/") || rel.startsWith("alerts/");
 
   if (!independent) {
     if (!/<title>[^<]+<\/title>/.test(html)) errors.push(`${rel}: missing <title>`);
