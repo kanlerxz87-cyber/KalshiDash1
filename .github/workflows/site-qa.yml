@@ -28,6 +28,12 @@ jobs:
       - name: Check internal links across the whole published tree (root, docs/, archive/)
         run: python tools/linkcheck.py
 
+      # session-444e829d (S1): the data workflows commit with GITHUB_TOKEN and run on cron.
+      # A read-only token, a detached-HEAD push, a swallowed rebase or a cron GitHub cannot
+      # honour fails silently — the site keeps saying "live" over stale data (F-39/F-40).
+      - name: Workflow contract check (schedules, push refspecs, token permissions)
+        run: node scripts/check_workflows.mjs --selftest && node scripts/check_workflows.mjs
+
       - name: Root-site link and template check (project checker)
         run: node scripts/check-links.mjs
 

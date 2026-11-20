@@ -11,12 +11,15 @@ name: Refresh demo data snapshot
 
 on:
   workflow_dispatch:
+  # Scheduled jobs always run on the repository's default branch (main) and GitHub can delay
+  # them under load — https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
   schedule:
     - cron: '23 */2 * * *'
+  # `main` only. The previous `'arena/**'` wildcard fired this job on every ephemeral session
+  # branch, where its commit step lost the race with the session's own push (F-39/F-40).
   push:
     branches:
       - main
-      - 'arena/**'
     paths:
       - 'scripts/fetch-snapshot.mjs'
       - 'scripts/build-site.mjs'
@@ -50,16 +53,26 @@ jobs:
         run: |
           if [ -f scripts/check-links.mjs ]; then node scripts/check-links.mjs; fi
 
+      # ROOT CAUSE of the failed run 44752211268 (2026-11-20), all data steps green (F-39):
+      #   * `actions/checkout@v4` leaves a detached HEAD, so `git rev-parse --abbrev-ref HEAD`
+      #     returns the literal string "HEAD" and the push target was `HEAD:HEAD` -> rejected;
+      #   * `set -e` then failed the whole job while the refresh itself had already succeeded.
+      # The fix uses the commit SHA (always valid, works detached) and re-checks the ref before
+      # pushing. Only `data/snapshot.json` is committed: generated HTML is rebuilt by the
+      # `Site build check` workflow, and committing both made two bots race over the same files.
+      - name: Rebase onto the latest default branch
+        run: git pull --rebase --autostash origin "${GITHUB_DEFAULT_BRANCH:-main}"
+
       - name: Commit refreshed data (only when something changed)
         run: |
-          set -e
+          set -euo pipefail
           git config user.name  'kalshidash-bot'
           git config user.email 'kalshidash-bot@users.noreply.github.com'
           git add data/snapshot.json
-          if [ -f scripts/build-site.mjs ]; then git add -- '*.html' assets categories; fi
           if git diff --cached --quiet; then
             echo 'No data change — nothing to commit.'
-          else
-            git commit -m 'chore(data): refresh demo snapshot from the official Kalshi demo API'
-            git push origin "HEAD:$(git rev-parse --abbrev-ref HEAD)"
+            exit 0
           fi
+          git commit -m 'chore(data): refresh demo snapshot from the official Kalshi demo API'
+          git push origin "HEAD:${GITHUB_DEFAULT_BRANCH:-main}"
+          echo "Pushed refreshed snapshot to ${GITHUB_DEFAULT_BRANCH:-main}."

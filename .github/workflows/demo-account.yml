@@ -45,5 +45,8 @@ jobs:
             git config user.name "kalshidash-bot"
             git config user.email "actions@users.noreply.github.com"
             git commit -m "demo-account: refresh data/account.json [skip ci]"
-            git push
+            # Explicit refspec: a bare `git push` fails when the checkout is in detached HEAD
+            # (checkout@v4 default), which is exactly how the sibling refresh job failed
+            # (F-39). Scheduled runs always execute on the default branch (W1).
+            git push origin "HEAD:${GITHUB_REF_NAME}"
           fi

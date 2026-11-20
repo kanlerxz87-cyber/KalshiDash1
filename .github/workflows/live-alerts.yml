@@ -15,8 +15,10 @@ on:
   schedule:
     - cron: '*/10 * * * *'
   workflow_dispatch:
+  # `main` only: the previous `'arena/**'` wildcard fired the engine on every ephemeral session
+  # branch and shared this concurrency group with the real 10-minute run (F-40).
   push:
-    branches: [main, 'arena/**']
+    branches: [main]
     paths:
       - 'tools/live_engine.mjs'
       - '.github/workflows/live-alerts.yml'
@@ -70,8 +72,12 @@ jobs:
           else
             STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
             git commit -m "data(live): engine sample ${STAMP}"
-            git pull --rebase --autostash origin ${{ github.ref_name }} || true
-            git push origin HEAD:${{ github.ref_name }}
+            # A failed rebase must stop the run: previously it was swallowed with `|| true`
+            # and the push then raced the session's own commits (F-40). A scheduled run is
+            # always on the default branch, so ${GITHUB_DEFAULT_BRANCH} is the right target.
+            BRANCH="${GITHUB_DEFAULT_BRANCH:-main}"
+            git pull --rebase --autostash origin "$BRANCH"
+            git push origin "HEAD:$BRANCH"
           fi
 
       - name: Fail the run if the engine could not reach the API
