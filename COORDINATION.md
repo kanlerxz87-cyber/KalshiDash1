@@ -1271,6 +1271,13 @@ Shared outputs (site pages, `data/`, `scripts/`, `flagged.html`) are NOT edited.
 - Flagged irregularities F-L4-01 … F-L4-08 are not yet on the shared Flagged page (that file is owned by the integration session); they are in `verification/2026-11-20-605bbb3f.md` and listed in the handoff above.
 - This record lands on `main` via a follow-up PR from the same branch (a record cannot contain its own merge commit).
 
+### PR and merge record — session-b71d6814
+
+- **PR #27** https://github.com/kanlerxz87-cyber/KalshiDash1/pull/27 (`arena/b71d6814-kalshidash1` → `main`). Checks on the final head: `alerts`, `build` (Site build check), `qa` ×2 — all `pass`. `main` moved twice during review (PRs #26, #28, #29 from other sessions); each time `origin/main` was merged into this branch, with the one `COORDINATION.md` conflict resolved by keeping both sections verbatim. No force-push.
+- **Merged** with `gh pr merge 27 --merge` at 2026-11-20T19:16:38Z. Merge commit `e67e70c23e134138835f642f2e1800c39a3f1c33`.
+- **GitHub Pages:** `pages/builds/latest` → commit `e67e70c`, status `built`, no error (created 19:16:39Z, updated 19:17:11Z).
+- **Live check:** `https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html` now lists F-34 to F-38 with source links. A first fetch returned a cached copy without them; a cache-busted fetch showed them.
+- **Still open for the integration owner:** duplicate anchors F-27 to F-31 in `templates/flagged.tpl` (see the note above). F-34 to F-38 are open manual-review items.
 ## Session on this branch — session-d1de3583 (current)
 
 - Session ID: `session-d1de3583`
