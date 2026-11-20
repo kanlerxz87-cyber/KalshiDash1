@@ -1212,3 +1212,29 @@ Updated: 2026-11-20 (UTC)
 ## Flagged for review
 
 - None published yet. Add each unverified requirement, data limitation, or implementation irregularity here and on the site's clearly labeled Flagged for Review page; unresolved items do not block deployment.
+
+---
+
+## Claim — session-605bbb3f (branch `arena/605bbb3f-kalshidash1`, base `d24616a`, 2026-11-20)
+
+Branch note: Arena pins this session to `arena/605bbb3f-kalshidash1`. No other branch or worktree is created.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| L4 | Live re-verification of the **golf, elections and crypto** topics, which `verification/2026-11-20-e6c3b3b6.md` ("Not verified here") left unchecked: series lists, open/active markets, settlement sources, and resolution fields, each against the official demo Trade API and docs.kalshi.com. Unverified values are left blank and flagged. | done | session-605bbb3f | `verification/2026-11-20-605bbb3f.md` (new, session-stamped) and this section of `COORDINATION.md` only |
+
+Shared outputs (site pages, `data/`, `scripts/`, `flagged.html`) are NOT edited. Findings are handed to the final integration session (`session-7d6d2fcb` / I10 line) through the handoff section below.
+
+### Record — session-605bbb3f (L4, 2026-11-20)
+
+- **Output:** `verification/2026-11-20-605bbb3f.md`. Covers 3 golf, 6 elections and 8 crypto series rows from the official series list, with markets checked for 3 golf, 2 elections and 2 crypto series (chunk 0 of each series list read only). Unverified values are left blank in that file.
+- **Sources (official, read 2026-11-20 via the fetch tool):** [Get Series List, Sports+Golf](https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&tags=Golf&include_volume=true&limit=50) · [Elections series](https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true&limit=50) · [Crypto series](https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true&limit=50) · [Get Markets reference (status and result enums)](https://docs.kalshi.com/api-reference/market/get-markets.md) · [Demo environment](https://docs.kalshi.com/getting_started/demo_env). Market queries are listed in the verification file.
+- **Verification performed:** every value stated in the file was taken from an official response or doc read this session. Response `status` values (`active`, `inactive`, `finalized`) and request filter values were checked against the Get Markets OpenAPI enums. Resolved examples: `KXDPWORLDTOUR-DPWTC26-THAT` (result yes), `KXPRESCUPMATCH-27SEP26R5M2-TKIM` (yes), `KXHOUSENJ11SPECIAL-26-DEM` (yes), `KXLTCMAXY-25-*` (yes). Open example: `KXSCOTTIESLAM-28` (active).
+- **Irregularities (F-L4-01 … F-L4-08, in the verification file):** series-volume vs market-volume not reconciled (`KXDPWORLDTOUR`); last-trade vs quote gap (`KXSCOTTIESLAM-28`); garbled settlement-source names (`KXMAMDANINYC`) including a non-verified `leader.ir` domain; series `KXDJTFLOH` with zero markets; ~308-day settlement lag with blank rules text (`KXLTCMAXY-25`); title typos (`KXXRPY`, trailing space in `KXRYDERCUP`); staging S3 host in `contract_url` values; status vocabulary mismatch (request `open` vs response `active`).
+- **Not verified:** most golf, elections and crypto markets and series rows (see the "Not verified" section of the file). The sandbox cannot reach `*.kalshi.co` directly, so all checks used the fetch tool.
+
+### Handoff — for the final integration session (I10 / session-7d6d2fcb)
+
+1. Shared `flagged.html` and `data/sources.json` are **not** edited here. Please add F-L4-01 … F-L4-08 from `verification/2026-11-20-605bbb3f.md` to the Flagged page, linking the verification file.
+2. The fetch-tool series and market URLs in the verification file are the only sources for L4. Re-run them before quoting any golf, elections or crypto value.
+3. F-L4-03 must not be treated as having official settlement sources. The `leader.ir` and `constitutionalcourt.com` domains were not checked.
