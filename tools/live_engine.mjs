@@ -84,7 +84,7 @@ export const SWING_THRESHOLD = 0.10;          // brief: >= $0.10 in either direc
 export const ALERT_COOLDOWN_SECONDS = 1800;   // re-arm a ticker after 30 min
 export const HISTORY_RETAIN_SECONDS = 5 * 86400;
 export const MAX_SAMPLES_PER_MARKET = 720;    // 5 days at a 10-minute cadence
-export const MAX_HISTORY_MARKETS = 24;        // only the biggest contracts keep a series
+export const MAX_HISTORY_MARKETS = 4;         // the biggest contracts PER TOPIC keep a series
 export const MAX_ALERTS = 600;
 export const MAX_RESOLUTIONS = 400;
 
@@ -522,7 +522,7 @@ export async function loadState(dir) {
  * Applies one sample cycle to the state. Pure: no I/O, no clock — everything is passed in,
  * which is what makes it testable offline (see --selftest).
  */
-export function applySample(state, { nowSeconds, markets, resolutions = [], topicsFound = {} }) {
+export function applySample(state, { nowSeconds, markets, resolutions = [], topicsFound = {}, runId = null }) {
   const next = structuredClone(state);
   next.alerts = next.alerts || [];
   next.history = next.history || {};
@@ -531,13 +531,19 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
 
   // Merged, not reset: runOnce() calls applySample() twice (samples, then resolutions) and a
   // reset would report "0 markets sampled" for a run that sampled dozens.
+  // Counters accumulate across the calls that make up ONE run (samples, then resolutions),
+  // and start from zero for a new run. runId identifies the run.
   const prevRun = next.run || {};
+  const sameRun = runId !== null && prevRun.run_id === runId;
+  const carry = sameRun ? prevRun : {};
   next.run = {
+    run_id: runId !== null ? runId : (prevRun.run_id || null),
     sampled_at: new Date(nowSeconds * 1000).toISOString(),
     markets_sampled: 0,
     markets_without_price: 0,
     alerts_created: 0,
-    candle_alerts_added: prevRun.candle_alerts_added || 0,
+    candle_alerts_added: carry.candle_alerts_added || 0,
+    untracked_settled_seen: carry.untracked_settled_seen || 0,
   };
 
   // ---- latest alert timestamp per ticker, used to decide the alert baseline
@@ -695,9 +701,9 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
   for (const a of newAlerts) if (!known.has(a.id)) next.alerts.push(a);
   next.alerts.sort((a, b) => String(b.ts).localeCompare(String(a.ts)));
   next.alerts = next.alerts.slice(0, MAX_ALERTS);
-  next.run.alerts_created = (prevRun.alerts_created || 0) + newAlerts.length;
-  next.run.markets_sampled = (prevRun.markets_sampled || 0) + next.run.markets_sampled;
-  next.run.markets_without_price = (prevRun.markets_without_price || 0) + next.run.markets_without_price;
+  next.run.alerts_created = (carry.alerts_created || 0) + newAlerts.length;
+  next.run.markets_sampled = (carry.markets_sampled || 0) + next.run.markets_sampled;
+  next.run.markets_without_price = (carry.markets_without_price || 0) + next.run.markets_without_price;
 
   // ---- prune history
   const cutoff = nowSeconds - HISTORY_RETAIN_SECONDS;
@@ -709,7 +715,7 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
 
   // Keep history only for the biggest contracts, and bound the market map, so the committed
   // state stays small enough to update every 10 minutes.
-  const keep = new Set(topMarkets(next, MAX_HISTORY_MARKETS).map((m) => m.ticker));
+  const keep = new Set(topMarketsByTopic(next, MAX_HISTORY_MARKETS).map((m) => m.ticker));
   for (const ticker of Object.keys(next.history)) if (!keep.has(ticker)) delete next.history[ticker];
 
   const marketTickers = Object.keys(next.markets);
@@ -977,15 +983,19 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
 
   // 3. sample + detect
   const now = Math.floor(Date.now() / 1000);
-  let next = applySample(state, { nowSeconds: now, markets, topicsFound: seriesByTopic });
+  const runId = new Date(now * 1000).toISOString();
+  let next = applySample(state, { nowSeconds: now, markets, topicsFound: seriesByTopic, runId });
 
   // 4. resolutions
   const resolutions = await collectResolutions(client, next, { maxSeries, log });
-  if (resolutions.length) next = applySample(next, { nowSeconds: now, markets: [], resolutions, topicsFound: seriesByTopic });
+  if (resolutions.length) next = applySample(next, { nowSeconds: now, markets: [], resolutions, topicsFound: seriesByTopic, runId });
 
   // 5. candle-based swings on the biggest rows (catches moves between sparse samples, S12)
   const candleAlerts = [];
-  const candleTargets = topMarkets(next, candleMarkets);
+  // Spread the candle budget across the five topics: ranking globally would spend every
+  // candle request on the highest-volume topic (elections) and never look at crypto/golf.
+  const perTopicCandles = Math.max(1, Math.ceil(candleMarkets / TOPICS.length));
+  const candleTargets = topMarketsByTopic(next, perTopicCandles).slice(0, candleMarkets);
   for (const m of candleTargets) {
     if (!m.series_ticker) continue;
     try {
@@ -1058,6 +1068,19 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
     log('  --dry-run: nothing written');
   }
   return next;
+}
+
+/** Highest-dollar rows per topic: one topic can never starve the others. */
+export function topMarketsByTopic(state, perTopic = 4) {
+  const out = [];
+  for (const t of TOPICS) {
+    const rows = Object.values(state.markets || {})
+      .filter((m) => m && m.topic === t.id && m.price !== null)
+      .sort((a, b) => (b.est_traded_dollars || 0) - (a.est_traded_dollars || 0))
+      .slice(0, perTopic);
+    out.push(...rows);
+  }
+  return out;
 }
 
 /** Per-topic board, so topics stay separate and each one ranks its own top contracts. */
