@@ -273,7 +273,7 @@ const CATEGORY_PAGES = TOPICS.map((t) => ({
   <div class="table-wrap"><table class="compact"><thead><tr>
     <th>Series ticker</th><th>Title</th><th>Category</th><th>Official tags</th><th class="num">Volume (contracts)</th>
     <th>Official settlement source(s)</th><th>Source</th></tr></thead>
-    <tbody>{{CATEGORY_SERIES:${t.id}}}</tbody></table></div>
+    <tbody id="series-body">{{CATEGORY_SERIES:${t.id}}}</tbody></table></div>
 
   <h2>Open markets — highest dollar amount first</h2>
   <p class="sub">Dollar volume = contracts traded x the contract's settlement value
@@ -366,7 +366,8 @@ function replacements(text, base = '') {
 
 let stale = [];
 for (const page of PAGES) {
-  const src = page.tpl ? path.join(TPL, page.tpl) : null;
+  // templates are stored as *.tpl so the whole-tree HTML link checker never treats them as published pages
+  const src = page.tpl ? path.join(TPL, page.tpl.replace(/\.html$/, '.tpl')) : null;
   let html;
   if (src) {
     if (!fs.existsSync(src)) { console.error('missing template', src); process.exit(1); }

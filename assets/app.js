@@ -122,6 +122,12 @@
   }
   function clamp01(v) { return Math.max(0, Math.min(1, v)); }
   function $(sel, root) { return (root || document).querySelector(sel); }
+  /* Table body by id: the id may sit on the <tbody> itself or on a wrapper/table that contains it. */
+  function tbodyOf(id) {
+    var el = document.getElementById(id);
+    if (!el) return null;
+    return el.tagName === 'TBODY' ? el : el.querySelector('tbody');
+  }
   function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
 
   /* ================================================================ settings */
@@ -810,7 +816,7 @@
   /* ---------------------------------------------------------- shared header */
   function renderChrome() {
     var page = document.body.getAttribute('data-page') || '';
-    var nav = $('#nav');
+    var nav = $('#nav') || $('nav.site');
     if (nav) {
       $$('a', nav).forEach(function (a) {
         var href = a.getAttribute('href');
@@ -821,10 +827,11 @@
     }
     var clockEl = $('#clock');
     if (clockEl) {
-      var t = setInterval(function () {
+      var tick = function () {
         clockEl.textContent = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-      }, 1000);
-      t();
+      };
+      tick();
+      setInterval(tick, 1000);
     }
     var modeEl = $('#mode-badge');
     if (modeEl) {
@@ -868,8 +875,8 @@
     var notice = $('#mode-notice');
     statusNotice(notice);
     var cards = $('#status-cards');
-    var topBody = $('#top-table tbody');
-    var topicBody = $('#topic-table tbody');
+    var topBody = tbodyOf('top-table-body');
+    var topicBody = tbodyOf('topic-table');   /* topic overview is generated statically; no live body on this page */
 
     function paint() {
       var rows = sortedMarkets(function (m) { return m.status !== 'finalized' && m.status !== 'settled'; }).slice(0, 12);
@@ -918,7 +925,7 @@
     var feedState = { topic: 'all', dir: 'all', minSwing: s.threshold, roiCut: s.roiCut };
     var logA = $('#chat-all .log'), logB = $('#chat-roi .log');
     var cntA = $('#chat-all .count'), cntB = $('#chat-roi .count');
-    var moversBody = $('#movers tbody');
+    var moversBody = tbodyOf('movers');
 
     /* seed the feed from the persisted alert log so the panes are never empty */
     state.alerts = getAlerts();
@@ -971,7 +978,7 @@
         moversBody.innerHTML = rows.length ? rows.map(function (m) { return marketRowHtml(m); }).join('')
           : '<tr><td colspan="12" class="muted">No open focus-topic markets available right now.</td></tr>';
       }
-      var rt = $('#roi-table tbody');
+      var rt = tbodyOf('roi-table');
       if (rt) {
         var rr = Object.keys(state.markets).map(function (k) { return state.markets[k]; })
           .filter(function (m) { return m.status !== 'finalized' && m.status !== 'settled'; })
@@ -1341,7 +1348,7 @@
 
   /* --------------------------------------------------------- portfolio page */
   pages.portfolio = function () {
-    var tradesBody = $('#portfolio-trades tbody');
+    var tradesBody = tbodyOf('portfolio-trades');
     var statsEl = $('#portfolio-stats');
     var curve = $('#equity-chart');
 
@@ -1351,7 +1358,7 @@
       if (statsEl) {
         statsEl.innerHTML =
           '<div class="stat"><div class="label">Realized P&amp;L</div><div class="value ' + (st.realized >= 0 ? 'up' : 'down') + '">' + usd(st.realized) + '</div><div class="note">settled simulated trades</div></div>' +
-          '<div class="stat"><div classlabel="label">Win rate</div><div class="value">' + (st.winRate === null ? '—' : pct(st.winRate, 1)) + '</div><div class="note">' + st.wins + ' wins / ' + st.losses + ' losses</div></div>' +
+          '<div class="stat"><div class="label">Win rate</div><div class="value">' + (st.winRate === null ? '—' : pct(st.winRate, 1)) + '</div><div class="note">' + st.wins + ' wins / ' + st.losses + ' losses</div></div>' +
           '<div class="stat"><div class="label">Open exposure</div><div class="value">' + usd(st.openExposure) + '</div><div class="note">' + st.open + ' open positions</div></div>' +
           '<div class="stat"><div class="label">Mark-to-market</div><div class="value ' + (st.unrealized >= 0 ? 'up' : 'down') + '">' + usd(st.unrealized) + '</div><div class="note">against the latest observed price</div></div>';
       }
@@ -1465,8 +1472,8 @@
   /* ----------------------------------------------------------- analysis page */
   pages.analysis = function () {
     var body = $('#analysis-body');
-    var stratBody = $('#strategy-stats tbody');
-    var topicBody = $('#topic-stats tbody');
+    var stratBody = tbodyOf('strategy-stats');
+    var topicBody = tbodyOf('topic-stats');
 
     function paint() {
       var trades = getTrades();
@@ -1537,11 +1544,11 @@
   function init() {
     renderChrome();
     var page = document.body.getAttribute('data-page') || '';
-    if (pages[page]) pages[page]();
 
+    /* Each page renderer binds its own controls and listeners, so it must run exactly once.
+     * It runs after the snapshot is available (the snapshot is the fallback when the live API is unreachable). */
     loadSnapshot().then(function () {
-      var p = document.body.getAttribute('data-page');
-      if (pages[p]) pages[p]();   // repaint with snapshot data first
+      if (pages[page]) pages[page]();
     });
 
     probe().then(function (live) {

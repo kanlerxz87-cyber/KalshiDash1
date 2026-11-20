@@ -18,13 +18,21 @@
 
   function dpr() { return window.devicePixelRatio || 1; }
 
+  /* A no-op 2D context: used when the browser offers no canvas (headless or very old
+   * engines) so the page keeps working with tables and text instead of throwing. */
+  function nullCtx() {
+    var stub = function () { return { width: 0 }; };
+    return new Proxy({}, { get: function () { return stub; }, set: function () { return true; } });
+  }
+
   function prep(canvas) {
     var ratio = dpr();
-    var w = canvas.clientWidth || canvas.parentNode.clientWidth || 600;
+    var w = canvas.clientWidth || (canvas.parentNode && canvas.parentNode.clientWidth) || 600;
     var h = canvas.clientHeight || 300;
     canvas.width = Math.round(w * ratio);
     canvas.height = Math.round(h * ratio);
-    var ctx = canvas.getContext('2d');
+    var ctx = canvas.getContext ? canvas.getContext('2d') : null;
+    if (!ctx) ctx = nullCtx();
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     ctx.clearRect(0, 0, w, h);
     return { ctx: ctx, w: w, h: h };
