@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strategies &amp; Trade Analysis — KalshiDash1</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="strategies">
+<header class="top"><div class="wrap top-inner">
+  <div class="brand">Kalshi<span>Dash1</span> <span class="badge">DEMO — mock funds</span></div>
+  <nav class="main"><a href="index.html">Dashboard</a><a href="executive-summary.html">Executive Summary</a><a href="events.html">Events &amp; Resolutions</a><a href="portfolio.html">Portfolio</a><a href="trade.html">Trade</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for Review</a></nav>
+</div></header>
+<main class="wrap">
+  <h1>Trade analysis &amp; strategies</h1>
+  <p class="muted">Trades are categorized by <strong>category</strong> (gas / elections / culture / crypto / golf), <strong>side</strong> (buy/sell), and <strong>price bucket</strong> (&lt;20¢, 20–40¢, 40–60¢, 60–80¢, &gt;80¢). Category stats from your simulator trades are on the <a href="portfolio.html">Portfolio</a> page. This page adds backtests: simple rules evaluated on <strong>real Kalshi candlesticks</strong> for the market selected on the dashboard.</p>
+  <div class="notice"><strong>Educational only — not financial advice.</strong> Backtests use past prices, ignore fees/slippage unless stated, and do not predict future outcomes. Do not trade real money based on these illustrations.</div>
+  <h2>Strategy templates</h2>
+  <div class="card" style="overflow:auto"><table>
+    <thead><tr><th>Strategy</th><th>Rule (hourly candles)</th><th>Intuition</th><th>Risk note</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Favorite</strong></td><td>Buy when price ≥ 80¢; hold to end of window</td><td>High-probability outcomes</td><td>Limited upside (max +20¢); one loss wipes ~4 wins</td></tr>
+      <tr><td><strong>Longshot</strong></td><td>Buy when price ≤ 20¢; hold to end of window</td><td>Cheap optionality</td><td>Most expire worthless; needs high hit rate to profit</td></tr>
+      <tr><td><strong>Momentum</strong></td><td>Buy when close &gt; previous close; sell when signal flips</td><td>Trend continuation</td><td>Whipsaws in range-bound markets; fees eat small moves</td></tr>
+      <tr><td><strong>Mean reversion</strong></td><td>Buy when price &lt; 40¢; sell when signal flips</td><td>Overreaction fade</td><td>“Cheap” can get cheaper; no floor at 0¢</td></tr>
+    </tbody></table></div>
+  <h2>Run a backtest</h2>
+  <p class="muted small">Select a market on the <a href="index.html">Dashboard</a> first (click a ranked row), then run. Uses the last 7 days of hourly candlesticks for that market via <code>GET /series/{series}/markets/{ticker}/candlesticks</code> — <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">docs</a>.</p>
+  <div class="row">
+    <div><label>Strategy</label><select id="bt-strategy"><option value="favorite">Favorite (≥80¢)</option><option value="longshot">Longshot (≤20¢)</option><option value="momentum">Momentum</option><option value="reversion">Mean reversion (&lt;40¢)</option></select></div>
+    <div class="auto"><button id="bt-run">Run backtest</button></div>
+  </div>
+  <div class="card" style="margin-top:12px"><p id="bt-result" class="muted">No backtest run yet.</p></div>
+  <h2>How to turn results into a strategy</h2>
+  <ol>
+    <li>Run each template on several markets per category; compare win rate and P&amp;L per contract.</li>
+    <li>Check the price-bucket breakdown of your own trades (Portfolio page) — are you profitable in the buckets you actually trade?</li>
+    <li>Only consider a strategy “promising” if it survives across categories and time windows. Anything else is noise.</li>
+    <li>Record the chosen path on the <a href="suggestions.html">Suggestions</a> page before implementing changes.</li>
+  </ol>
+</main>
+<footer><div class="wrap">KalshiDash1 · Demo data only · Not financial advice · <a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for Review</a></div></footer>
+<script src="assets/kalshi.js"></script><script src="assets/chart.js"></script><script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suggestions — KalshiDash1</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="suggestions">
+<header class="top"><div class="wrap top-inner">
+  <div class="brand">Kalshi<span>Dash1</span> <span class="badge">DEMO — mock funds</span></div>
+  <nav class="main"><a href="index.html">Dashboard</a><a href="executive-summary.html">Executive Summary</a><a href="events.html">Events &amp; Resolutions</a><a href="portfolio.html">Portfolio</a><a href="trade.html">Trade</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for Review</a></nav>
+</div></header>
+<main class="wrap">
+  <h1>Suggestions &amp; decision log</h1>
+  <p class="muted">Review the options, vote, and pick a path <strong>before</strong> anything is implemented. Voting and the chosen path are stored in your browser only (no backend), so this page is a decision aid, not a database — see SUG-08 for persisting it.</p>
+  <p class="muted small" id="chosen-note">No path chosen yet in this browser.</p>
+
+  <h2>SUG-01 · Persistent snapshot store (resolution history)</h2>
+  <div class="card" data-sug="SUG-01">
+    <p><strong>Problem.</strong> Today all tables are live-only. Kalshi moves settled markets to historical endpoints on a rolling cutoff (<a href="https://docs.kalshi.com/getting_started/historical_data" target="_blank" rel="noopener">Historical Data</a>), so a resolution seen this week can disappear from <code>GET /markets</code> later.</p>
+    <p><strong>Options.</strong> (a) Commit a JSON snapshot to the repo from a scheduled workflow (no server needed; auditable via git history). (b) Run the Python collector in <code>tools/</code> on a cron outside GitHub. (c) Keep live-only and accept data loss.</p>
+    <p class="muted small"><strong>Trade-offs.</strong> (a) gives a free, transparent, versioned record but refreshes only as often as the workflow runs (GitHub Actions schedules are ~5 min at best and can be delayed). (b) is freshest but needs a machine you own. (c) costs nothing and loses the tracking requirement over time.</p>
+    <p><strong>Recommendation.</strong> (a) hourly workflow writing <code>data/snapshots/*.json</code>, plus (b) if you want sub-minute history.</p>
+    <p><div class="row"><div class="auto"><button class="secondary vote-btn">▲ Helpful</button> <span class="vote-count muted">0</span></div><div class="auto"><button class="secondary pick-btn">Choose this path</button></div></div></p>
+  </div>
+
+  <h2>SUG-02 · Server-side WebSocket bridge</h2>
+  <div class="card" data-sug="SUG-02">
+    <p><strong>Problem.</strong> Kalshi's WebSocket API requires signed headers on the handshake, and browsers cannot set custom WebSocket headers — so this static site cannot stream (<a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">WS quick start</a>, <a href="https://docs.kalshi.com/getting_started/order_direction" target="_blank" rel="noopener">order direction docs</a> for the <code>use_yes_price</code> note).</p>
+    <p><strong>Options.</strong> (a) Keep 5-second REST polling (current). (b) Add a tiny WS→SSE relay (Cloudflare Worker / small Node service) that holds the signed connection and streams to the page. (c) Use <code>min_updated_ts</code> delta polling to cut request volume.</p>
+    <p class="muted small"><strong>Trade-offs.</strong> (a) zero infrastructure, ~1–3 s latency floor, uses read budget. (b) true sub-second ticks and orderbook deltas, but adds a deployed service and a place for your demo key to live. (c) cheaper polling without any infra, still not a stream.</p>
+    <p><strong>Recommendation.</strong> Do (c) now; add (b) only if second-level reaction actually changes your decisions.</p>
+    <p><div class="row"><div class="auto"><button class="secondary vote-btn">▲ Helpful</button> <span class="vote-count muted">0</span></div><div class="auto"><button class="secondary pick-btn">Choose this path</button></div></div></p>
+  </div>
+
+  <h2>SUG-03 · Better dollar-size ranking</h2>
+  <div class="card" data-sug="SUG-03">
+    <p><strong>Problem.</strong> There is no documented “dollar amount traded” field. <code>notional_value_dollars</code> is “the total value of a single contract at settlement” — i.e. $1 per contract, not volume (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>). So the dashboard currently ranks by <em>estimate</em>: <code>volume_fp × last price</code>.</p>
+    <p><strong>Options.</strong> (a) Keep the estimate label (current). (b) Rank by <code>GET /markets/trades</code> summing <code>count × price</code> per market — closest to a true traded-dollar figure, more requests. (c) Rank by series <code>volume_fp</code> with <code>include_volume=true</code> (documented field) for a coarser but official series-level view.</p>
+    <p class="muted small"><strong>Trade-offs.</strong> (b) is the most defensible definition of “highest dollar amount”, but paginating trades for many markets costs read budget and time. (c) is cheap and official but not per-market or per-event.</p>
+    <p><strong>Recommendation.</strong> (b) for a weekly “true notional” audit column, (a) for the live ranking.</p>
+    <p><div class="row"><div class="auto"><button class="secondary vote-btn">▲ Helpful</button> <span class="vote-count muted">0</span></div><div class="auto"><button class="secondary pick-btn">Choose this path</button></div></div></p>
+  </div>
+
+  <h2>SUG-04 · Explicit resolution pipeline</h2>
+  <div class="card" data-sug="SUG-04">
+    <p><strong>Problem.</strong> Resolution is read from <code>Market.result</code> (<code>yes</code>/<code>no</code>/<code>scalar</code>/<code>""</code>) plus <code>settlement_ts</code> / <code>settlement_value_dollars</code>. The docs also describe determination → settlement timing (<code>settlement_timer_seconds</code>) and that the response <code>status</code> enum (<code>active</code>, <code>determined</code>, <code>finalized</code>…) differs from the filter enum (<code>open</code>, <code>settled</code>…) — <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>.</p>
+    <p><strong>Options.</strong> (a) Keep result-only display (current, safest). (b) Show the full lifecycle (<code>status</code> + <code>determined</code> vs <code>finalized</code>) so “awaiting settlement” is visible. (c) Add <code>GET /events?with_nested_markets=true</code> for event-level rollups (multi-market events like elections).</p>
+    <p class="muted small"><strong>Trade-offs.</strong> (b) prevents misreading a determined-but-unsettled market as final. (c) is needed for events with several outcomes (e.g. “who wins the nomination” with many candidates).</p>
+    <p><strong>Recommendation.</strong> (b) + (c), keeping <code>result</code> as the only source of YES/NO.</p>
+    <p><div class="row"><div class="auto"><button class="secondary vote-btn">▲ Helpful</button> <span class="vote-count muted">0</span></div><div class="auto"><button class="secondary pick-btn">Choose this path</button></div></div></p>
+  </div>
+
+  <h2>SUG-05 · Category filter fidelity</h2>
+  <div class="card" data-sug="SUG-05">
+    <p><strong>Problem.</strong> “Gas prices / elections / culture / crypto / golf” are matched by keyword rules over <code>GET /series</code> title, <code>category</code>, <code>categories[]</code> and ticker. Kalshi's own discovery categories are exact, case-sensitive strings on the <code>category</code> filter (<a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a>), and the real list of category names is not published in the docs we could read.</p>
+    <p><strong>Options.</strong> (a) Keep keyword rules (current). (b) Enumerate the distinct <code>categories[]</code> values from a live series response once, then use Kalshi's exact <code>category=</code> filter. (c) Maintain an explicit allow-list of series tickers reviewed by you.</p>
+    <p class="muted small"><strong>Trade-offs.</strong> (b) is the most “official” mapping and cheap to run, but depends on Kalshi's category names lining up with your five topics (e.g. golf may sit under a sports category). (c) is highest precision, needs human upkeep.</p>
+    <p><strong>Recommendation.</strong> (b) with (a) as fallback, and publish the resulting mapping table on each category page for audit.</p>
+    <p><div class="row"><div class="auto"><button class="secondary vote-btn">▲ Helpful</button> <span class="vote-count muted">0</span></div><div class="auto"><button class="secondary pick-btn">Choose this path</button></div></div></p>
+  </div>
+
+  <h2>SUG-06 · Order lifecycle in the Trade page</h2>
+  <div class="card" data-sug="SUG-06">
+    <p><strong>Problem.</strong> The Trade page places a V2 limit order but does not list, amend or cancel resting orders. <code>201</code> only means accepted, and reads lag the engine briefly (<a href="https://docs.kalshi.com/api-reference/orders/get-order" target="_blank" rel="noopener">Get Order</a>).</p>
+    <p><strong>Options.</strong> (a) Add a “My open demo orders” table with cancel (<code>DELETE /portfolio/events/orders/{order_id}</code>). (b) Add amend price/qty (<code>POST …/amend</code>). (c) Add <code>queue position</code> display (<a href="https://docs.kalshi.com/api-reference/orders/get-order-queue-position" target="_blank" rel="noopener">Get Order Queue Position</a>) so you can see how far you are from a fill.</p>
+    <p class="muted small"><strong>Trade-offs.</strong> (a) is needed to avoid leaving stray demo orders around; (c) is genuinely decision-relevant for fill probability but is a per-order call.</p>
+    <p><strong>Recommendation.</strong> (a) now, (c) next, (b) only if you start using resting limit orders seriously.</p>
+    <p><div class="row"><div class="auto"><button class="secondary vote-btn">▲ Helpful</button> <span class="vote-count muted">0</span></div><div class="auto"><button class="secondary pick-btn">Choose this path</button></div></div></p>
+  </div>
+
+  <h2>SUG-07 · Fees in simulator accounting</h2>
+  <div class="card" data-sug="SUG-07">
+    <p><strong>Problem.</strong> The simulator books fills at price × quantity with no fee. Real Kalshi fees are per-contract and quadratic in price, with series-level <code>fee_type</code> / <code>fee_multiplier</code> (<a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">series fields</a>); the schedule is published as a PDF on kalshi.com and rounding rules are documented in <a href="https://docs.kalshi.com/getting_started/fee_rounding" target="_blank" rel="noopener">Fee Rounding</a>.</p>
+    <p><strong>Options.</strong> (a) Keep fee-free simulator, clearly labeled (current). (b) Apply the documented quadratic formula with the series' <code>fee_type</code>/<code>fee_multiplier</code>. (c) Show both gross and after-fee P&amp;L columns.</p>
+    <p class="muted small"><strong>Trade-offs.</strong> Cheap side orders (1–5¢) are where fees bite hardest; ignoring them overstates strategy quality. (c) preserves comparability with (a).</p>
+    <p><strong>Recommendation.</strong> (c), with the formula and its source link printed next to the number.</p>
+    <p><div class="row"><div class="auto"><button class="secondary vote-btn">▲ Helpful</button> <span class="vote-count muted">0</span></div><div class="auto"><button class="secondary pick-btn">Choose this path</button></div></div></p>
+  </div>
+
+  <h2>SUG-08 · Durable decisions &amp; multi-user review</h2>
+  <div class="card" data-sug="SUG-08">
+    <p><strong>Problem.</strong> Votes and the chosen path are browser-local, so two reviewers cannot see each other's choices and choices vanish when storage is cleared.</p>
+    <p><strong>Options.</strong> (a) Keep browser-local (zero infra, current). (b) A “decision log” markdown file in the repo that a maintainer updates via PR — durable, reviewable, needs a commit. (c) Add a small backend (Issues/Notion/DB) for real multi-user state.</p>
+    <p class="muted small"><strong>Trade-offs.</strong> (b) fits this repo's no-server design and the coordination workflow already in <code>COORDINATION.md</code>. (c) is the only true multi-user option.</p>
+    <p><strong>Recommendation.</strong> (b) now: this page becomes the read-only view of <code>DECISIONS.md</code>.</p>
+    <p><div class="row"><div class="auto"><button class="secondary vote-btn">▲ Helpful</button> <span class="vote-count muted">0</span></div><div class="auto"><button class="secondary pick-btn">Choose this path</button></div></div></p>
+  </div>
+
+  <h2>SUG-09 · Chart fidelity (1-minute candles and live samples)</h2>
+  <div class="card" data-sug="SUG-09">
+    <p><strong>Problem.</strong> Candlesticks support only 1, 60 and 1440-minute periods (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">docs</a>), so “seconds” resolution comes from our own 5-second polls (and 1-second sampling with a connected demo key), not from official history.</p>
+    <p><strong>Options.</strong> (a) Keep two clearly-labeled sources (current). (b) Persist our samples to the snapshot store (SUG-01) so sub-minute history accumulates over time. (c) Add a “candles vs samples” toggle with source badges on every point.</p>
+    <p class="muted small"><strong>Trade-offs.</strong> (b) is what actually makes a seconds axis meaningful on reload; (c) is nearly free and prevents misreading.</p>
+    <p><strong>Recommendation.</strong> (c) immediately, (b) alongside SUG-01.</p>
+    <p><div class="row"><div class="auto"><button class="secondary vote-btn">▲ Helpful</button> <span class="vote-count muted">0</span></div><div class="auto"><button class="secondary pick-btn">Choose this path</button></div></div></p>
+  </div>
+
+  <h2>SUG-10 · Trust &amp; verification UX</h2>
+  <div class="card" data-sug="SUG-10">
+    <p><strong>Problem.</strong> Verification is currently a page of tables. A reader cannot click a number in a live table to see its source field.</p>
+    <p><strong>Options.</strong> (a) Add per-cell tooltips with endpoint + field name (e.g. “<code>GET /markets</code> → <code>volume_fp</code>”). (b) Add a “raw JSON” drawer for each row. (c) Timestamp every cell with fetch time and cache warning.</p>
+    <p class="muted small"><strong>Trade-offs.</strong> (b) is the strongest audit tool and cheap for a static site; (a) is the biggest readability win for non-technical review.</p>
+    <p><strong>Recommendation.</strong> (b) then (a); keep (c) as a footer line per table.</p>
+    <p><div class="row"><div class="auto"><button class="secondary vote-btn">▲ Helpful</button> <span class="vote-count muted">0</span></div><div class="auto"><button class="secondary pick-btn">Choose this path</button></div></div></p>
+  </div>
+</main>
+<footer><div class="wrap">KalshiDash1 · Demo data only · Not financial advice · <a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for Review</a></div></footer>
+<script src="assets/kalshi.js"></script><script src="assets/chart.js"></script><script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Executive Summary — KalshiDash1</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="summary">
+<header class="top"><div class="wrap top-inner">
+  <div class="brand">Kalshi<span>Dash1</span> <span class="badge">DEMO — mock funds</span></div>
+  <nav class="main"><a href="index.html">Dashboard</a><a href="executive-summary.html">Executive Summary</a><a href="events.html">Events &amp; Resolutions</a><a href="portfolio.html">Portfolio</a><a href="trade.html">Trade</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for Review</a></nav>
+</div></header>
+<main class="wrap">
+  <h1>Executive summary</h1>
+  <p class="muted">Every factual claim below is sourced. The full line-by-line verification table is on the <a href="sources.html">Sources</a> page; anything that could not be confirmed is on the <a href="flagged.html">Flagged for Review</a> page and is <strong>not</strong> stated as fact here.</p>
+
+  <h2>1. What this project is</h2>
+  <p>KalshiDash1 is a live, interactive dashboard that tracks the <strong>highest-dollar open events</strong> on Kalshi’s <strong>demo</strong> environment, restricted to five topics: <strong>gas prices, elections, culture, crypto, and golf</strong>. It follows each tracked event until it resolves, records whether it resolved <strong>YES or NO</strong>, tracks portfolio performance, categorizes trades, supports trade execution, and charts price movements with liquidity (orderbook depth).</p>
+  <p>It is a <strong>static GitHub Pages site</strong> (no server, no build step). Live market data is fetched directly in the visitor’s browser from Kalshi’s public demo API, so prices are always current — or the page explicitly says it cannot reach the API. No prices are ever hard-coded.</p>
+
+  <h2>2. Official endpoints used (verified)</h2>
+  <div class="card" style="overflow:auto"><table>
+    <thead><tr><th>Surface</th><th>Recommended demo endpoint</th><th>Also supported</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>REST Trade API</td><td><code>https://external-api.demo.kalshi.co/trade-api/v2</code></td><td><code>https://demo-api.kalshi.co/trade-api/v2</code></td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment docs</a></td></tr>
+      <tr><td>WebSocket API</td><td><code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code></td><td><code>wss://demo-api.kalshi.co/trade-api/ws/v2</code></td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment docs</a></td></tr>
+      <tr><td>Demo web app</td><td colspan="2"><code>https://demo.kalshi.co/</code> (mock funds; credentials are not shared with production)</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment docs</a></td></tr>
+    </tbody></table></div>
+  <p class="muted small">Production equivalents (<code>https://external-api.kalshi.com/trade-api/v2</code>) are documented for reference only — this dashboard never trades on production. Source: <a href="https://docs.kalshi.com/getting_started/api_environments" target="_blank" rel="noopener">API Environments and Endpoints</a>.</p>
+
+  <h2>3. How “highest dollar amount” is defined</h2>
+  <p>Kalshi’s public API does <strong>not</strong> publish a single “dollar amount” per event. Markets expose <code>volume_fp</code> (contracts traded) and price fields. This dashboard therefore ranks by a <strong>transparent estimate: estimated traded notional = volume × last price</strong>, shown alongside raw volume and open interest so the estimate can be audited. The estimate is labeled as an estimate everywhere it appears. See <a href="methodology.html">Methodology</a> and <a href="flagged.html">Flagged F-05</a>.</p>
+
+  <h2>4. What the dashboard does</h2>
+  <div class="grid cols2">
+    <div class="card"><h3>Live tracking</h3><ul>
+      <li>Discovers series for the 5 categories live from <code>GET /series</code> (no hard-coded tickers).</li>
+      <li>Ranks open markets by estimated notional; click a row for chart + orderbook.</li>
+      <li>Follows events until <code>status = settled</code>, then shows the API <code>result</code> (YES/NO).</li></ul></div>
+    <div class="card"><h3>Price chart &amp; liquidity</h3><ul>
+      <li>X = time (60s, 5m, 15m, 1h, 6h, 24h, 7d), Y = contract price ($0–$1).</li>
+      <li>Orderbook table: contracts available at each price, cumulative depth, notional per level.</li>
+      <li>Best bid/ask derived using the binary equivalence (YES bid X ⇔ NO ask 100−X).</li></ul></div>
+    <div class="card"><h3>Portfolio &amp; trading</h3><ul>
+      <li><strong>Simulator</strong> (works with zero setup): local paper portfolio, $1,000 starting cash (configurable assumption, labeled as such).</li>
+      <li><strong>Demo account</strong> (optional connect): balance, positions, fills via signed requests; key stays in the browser.</li>
+      <li>Trade execution in both modes; demo orders use the official V2 order endpoint.</li></ul></div>
+    <div class="card"><h3>Analysis &amp; strategies</h3><ul>
+      <li>Trades categorized by category, side, and price bucket; stats per category.</li>
+      <li>Strategy backtests run locally on real candlesticks (educational, not advice).</li>
+      <li>Suggestions page for reviewing improvements and choosing a path; Open Questions page lists missing information.</li></ul></div>
+  </div>
+
+  <h2>5. Key limitations (read before deciding)</h2>
+  <ul>
+    <li><strong>Demo ≠ real:</strong> “The price and behavior of markets in the demo environment may not be reflective of those in real markets.” (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">source</a>)</li>
+    <li><strong>No demo credentials were provided</strong> with this task, so the live demo portfolio starts empty until a user connects a demo API key in the browser. The simulator is fully functional meanwhile. See <a href="questions.html">Open Questions Q-01</a>.</li>
+    <li><strong>Browser CORS</strong> for the demo API could not be confirmed from the build environment; the site handles failure explicitly. See <a href="flagged.html">Flagged F-01</a>.</li>
+    <li><strong>REST data is cached</strong> by Kalshi for a short time and can lag the exchange by seconds; WebSockets are recommended for current state. (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">source</a>)</li>
+    <li><strong>Nothing here is financial advice.</strong> Backtests are illustrations on past prices.</li>
+  </ul>
+
+  <h2>6. Where to go next</h2>
+  <p><a class="btn" href="index.html">Open the live dashboard</a> · <a class="btn secondary" href="suggestions.html">Review suggestions</a> · <a class="btn secondary" href="questions.html">Open questions</a> · <a class="btn secondary" href="sources.html">Verification table</a></p>
+</main>
+<footer><div class="wrap">KalshiDash1 · Demo data only · Not financial advice · <a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for Review</a></div></footer>
+<script src="assets/kalshi.js"></script><script src="assets/chart.js"></script><script src="assets/app.js"></script>
+</body>
+</html>

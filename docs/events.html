@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Events &amp; Resolutions — KalshiDash1</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="events">
+<header class="top"><div class="wrap top-inner">
+  <div class="brand">Kalshi<span>Dash1</span> <span class="badge">DEMO — mock funds</span></div>
+  <nav class="main"><a href="index.html">Dashboard</a><a href="executive-summary.html">Executive Summary</a><a href="events.html">Events &amp; Resolutions</a><a href="portfolio.html">Portfolio</a><a href="trade.html">Trade</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for Review</a></nav>
+</div></header>
+<main class="wrap">
+  <h1>Tracked events &amp; resolutions</h1>
+  <p class="muted">Each tracked market is followed until <code>status = settled</code>. The resolution column shows the API <code>result</code> field (<strong>YES</strong> or <strong>NO</strong>) once settled — blank/“—” while open. Source for status values: <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets docs</a> (status: <code>unopened, open, closed, settled</code>).</p>
+  <div class="row"><div><span id="live-status" class="badge warn">CONNECTING…</span> <span id="last-refresh" class="muted small"></span></div>
+  <div class="auto"><button id="refresh-events" class="secondary">↻ Refresh</button></div></div>
+  <div id="dash-error" class="notice err" style="display:none"></div>
+  <div class="notice info" id="settled-note">Checking for settled markets…</div>
+  <div class="card" style="overflow:auto"><table>
+    <thead><tr><th>Category</th><th>Market</th><th>Status</th><th>Resolution (YES/NO)</th><th class="num">Last price</th><th class="num">Est. notional</th><th>Close / expiry</th></tr></thead>
+    <tbody id="events-body"><tr><td colspan="7" class="muted">Loading live events…</td></tr></tbody>
+  </table></div>
+  <h2>How resolution tracking works</h2>
+  <ol>
+    <li>The dashboard polls open markets in the 5 categories (same ranking as the dashboard).</li>
+    <li>When a market’s <code>status</code> becomes <code>settled</code>, its <code>result</code> is displayed. If the API returns an empty result for a settled market, the page says so explicitly instead of guessing.</li>
+    <li>Settled markets older than Kalshi’s historical cutoff move to <code>GET /historical/markets</code> — <a href="https://docs.kalshi.com/getting_started/historical_data" target="_blank" rel="noopener">Historical Data docs</a>. Long-term archiving of resolutions is listed as a suggestion (<a href="suggestions.html">SUG-04</a>).</li>
+  </ol>
+  <p class="muted small">Tip: keep this page open — it refreshes live. For a permanent record, export the table (browser print → PDF) or use the Python snapshot tool in <code>tools/kalshi_client.py</code> (see README).</p>
+</main>
+<footer><div class="wrap">KalshiDash1 · Demo data only · Not financial advice · <a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for Review</a></div></footer>
+<script src="assets/kalshi.js"></script><script src="assets/chart.js"></script><script src="assets/app.js"></script>
+</body>
+</html>

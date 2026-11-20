@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KalshiDash1 — Live Dashboard (Demo)</title>
+<meta name="description" content="Live Kalshi demo dashboard: highest-dollar open events in gas prices, elections, culture, crypto and golf, with price charts and liquidity.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="dashboard">
+<header class="top"><div class="wrap top-inner">
+  <div class="brand">Kalshi<span>Dash1</span> <span class="badge">DEMO — mock funds</span></div>
+  <nav class="main" aria-label="Main">
+    <a href="index.html">Dashboard</a><a href="executive-summary.html">Executive Summary</a><a href="events.html">Events &amp; Resolutions</a>
+    <a href="portfolio.html">Portfolio</a><a href="trade.html">Trade</a><a href="strategies.html">Strategies</a>
+    <a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for Review</a>
+  </nav>
+</div></header>
+<main class="wrap">
+  <h1>Live dashboard — highest-dollar open events</h1>
+  <p class="muted">Tracked categories only: <strong>gas prices · elections · culture · crypto · golf</strong>. Data is fetched live in your browser from the Kalshi <strong>demo</strong> API (<code>https://external-api.demo.kalshi.co/trade-api/v2</code>). Demo prices “may not be reflective of those in real markets” — <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">official demo docs</a>. Nothing on this page is hard-coded; if the API cannot be reached, the page says so instead of showing invented prices.</p>
+  <div class="row">
+    <div><span id="live-status" class="badge warn">CONNECTING…</span> <span id="last-refresh" class="muted small"></span> <span id="exchange-status" class="badge">EXCHANGE STATUS…</span></div>
+    <div class="auto"><button id="refresh-btn" class="secondary">↻ Refresh rankings</button> <button id="ws-btn" class="secondary">WebSocket status</button></div>
+  </div>
+  <div id="dash-error" class="notice err" style="display:none"></div>
+  <div id="ws-note" class="notice" style="display:none"></div>
+
+  <div class="grid cols4" style="margin-top:14px">
+    <div class="card"><div class="kpi-sub">Series discovered (live)</div><div class="kpi" id="kpi-series">—</div><div class="kpi-sub">across 5 categories</div></div>
+    <div class="card"><div class="kpi-sub">Open markets ranked</div><div class="kpi" id="kpi-markets">—</div><div class="kpi-sub">by estimated traded notional</div></div>
+    <div class="card"><div class="kpi-sub">Top estimated notional</div><div class="kpi" id="kpi-top">—</div><div class="kpi-sub">volume × last price (estimate)</div></div>
+    <div class="card"><div class="kpi-sub">Simulator cash</div><div class="kpi" id="kpi-cash">—</div><div class="kpi-sub">local paper portfolio</div></div>
+  </div>
+
+  <h2>Highest-dollar live events (top 25)</h2>
+  <p class="muted small">Ranking metric: <strong>estimated traded notional = contract volume × last price</strong>, summed per market. Kalshi does not publish an event-level dollar total in the public API, so this is a transparent estimate — see <a href="methodology.html">Methodology</a> and <a href="flagged.html">Flagged F-05</a>. Click a row to load its chart and orderbook.</p>
+  <div class="card" style="overflow:auto">
+  <table>
+    <thead><tr><th>#</th><th>Category</th><th>Market</th><th class="num">Est. notional</th><th class="num">Volume</th><th class="num">Last price</th><th class="num">Open interest</th><th>Close / expiry</th></tr></thead>
+    <tbody id="ranked-body"><tr><td colspan="8" class="muted">Loading live rankings…</td></tr></tbody>
+  </table>
+  </div>
+
+  <h2>Price chart — <span id="sel-title">select a market above</span></h2>
+  <p class="muted small" id="sel-sub"></p>
+  <div class="row">
+    <div class="pill-group" role="group" aria-label="Time window">
+      <button data-window="60">60s</button><button data-window="300">5m</button><button data-window="900">15m</button>
+      <button data-window="3600" class="active">1h</button><button data-window="21600">6h</button><button data-window="86400">24h</button><button data-window="604800">7d</button>
+    </div>
+    <div class="auto muted small">Last: <strong id="sel-price">—</strong> · <span id="sel-vol"></span> · <span id="sel-oi"></span></div>
+  </div>
+  <canvas id="price-chart" class="chart" aria-label="Price chart, x axis time, y axis contract price"></canvas>
+  <p class="muted small">X axis = time · Y axis = current contract price ($0–$1). Windows ≤5m use live samples polled every 5s (Kalshi candlesticks start at 1-minute granularity — <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">candlestick docs</a>). Longer windows use official candlesticks. See <a href="flagged.html">Flagged F-08</a>.</p>
+
+  <h2>Liquidity / orderbook</h2>
+  <p class="muted small" id="best-bid-ask">Select a market to load its orderbook.</p>
+  <div class="grid cols2">
+    <div class="card" style="overflow:auto">
+      <table><thead><tr><th>Side</th><th class="num">Price</th><th class="num">Contracts</th><th class="num">Cumulative</th><th class="num">Notional</th></tr></thead>
+      <tbody id="book-body"><tr><td colspan="5" class="muted">No market selected.</td></tr></tbody></table>
+      <p class="muted small" id="book-totals"></p>
+      <button id="refresh-book" class="secondary">↻ Refresh orderbook</button>
+    </div>
+    <div class="card"><canvas id="depth-chart" class="depth" aria-label="Orderbook depth chart"></canvas>
+      <p class="muted small">Kalshi returns YES and NO bids only; a YES bid at X is equivalent to a NO ask at (100−X) — <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">orderbook docs</a>. “How many contracts at a given price” = the Contracts column above.</p>
+    </div>
+  </div>
+
+  <h2>Series discovered live (audit trail)</h2>
+  <p class="muted small">Series tickers are <strong>not hard-coded</strong> — they are discovered from <code>GET /series</code> by keyword rules (see Methodology). This table shows exactly what matched, so you can audit the filter.</p>
+  <div class="card" style="overflow:auto"><table><thead><tr><th>Category</th><th class="num">Series</th><th>Matched series (first 8)</th></tr></thead><tbody id="series-body"><tr><td colspan="3" class="muted">Discovering…</td></tr></tbody></table></div>
+
+  <div class="notice info"><strong>How to use this page:</strong> 1) Wait for LIVE badge. 2) Click any ranked row. 3) Pick a time window. 4) Read liquidity in the orderbook table. 5) Trade in the <a href="trade.html">simulator</a> (works now) or connect a demo account on the <a href="portfolio.html">Portfolio</a> page for real demo orders. Full method: <a href="methodology.html">Methodology</a>.</div>
+</main>
+<footer><div class="wrap">KalshiDash1 · Demo data only · Not financial advice · Sources: <a href="sources.html">Sources &amp; verification</a> · <a href="flagged.html">Flagged for Review</a></div></footer>
+<script src="assets/kalshi.js"></script>
+<script src="assets/chart.js"></script>
+<script src="assets/app.js"></script>
+<script>
+/* KPIs filled from shared state after load */
+(function(){
+  var orig = window.KalshiDash;
+  setInterval(function(){
+    var s = document.querySelector('#ranked-body');
+    if(!s) return;
+    var rows = s.querySelectorAll('tr[data-ticker]');
+    var k = document.getElementById('kpi-markets'); if(k && rows.length) k.textContent = rows.length + '+';
+    var first = rows[0];
+    var t = document.getElementById('kpi-top');
+    if(t && first){ var cells = first.querySelectorAll('td'); if(cells[3]) t.textContent = cells[3].textContent; }
+    var sb = document.querySelector('#series-body');
+    var ks = document.getElementById('kpi-series');
+    if(ks && sb){ var total=0; sb.querySelectorAll('tr').forEach(function(tr){ var c=tr.querySelectorAll('td')[1]; if(c) total += parseInt(c.textContent)||0; }); if(total) ks.textContent = total; }
+    var sim = null; try{ sim = JSON.parse(localStorage.getItem('kalshidash_sim_v1')); }catch(e){}
+    var kc = document.getElementById('kpi-cash'); if(kc) kc.textContent = sim ? '$' + Number(sim.cash).toLocaleString(undefined,{minimumFractionDigits:2}) : '$1,000.00';
+  }, 2000);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio — KalshiDash1</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="portfolio">
+<header class="top"><div class="wrap top-inner">
+  <div class="brand">Kalshi<span>Dash1</span> <span class="badge">DEMO — mock funds</span></div>
+  <nav class="main"><a href="index.html">Dashboard</a><a href="executive-summary.html">Executive Summary</a><a href="events.html">Events &amp; Resolutions</a><a href="portfolio.html">Portfolio</a><a href="trade.html">Trade</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="sources.html">Sources</a><a href="flagged.html">Flagged for Review</a></nav>
+</div></header>
+<main class="wrap">
+  <h1>Portfolio performance</h1>
+  <p class="muted">Two portfolios live on this page: <strong>(A) the local simulator</strong> — works immediately, no credentials, stored only in your browser; and <strong>(B) your Kalshi demo account</strong> — optional, connected with your own demo API key. Demo account docs: <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment</a> · <a href="https://docs.kalshi.com/getting_started/api_keys" target="_blank" rel="noopener">API Keys</a>.</p>
+
+  <h2>A. Simulator portfolio (local paper trading)</h2>
+  <div class="grid cols3">
+    <div class="card"><div class="kpi-sub">Simulator cash</div><div class="kpi" id="sim-cash">—</div><div class="kpi-sub">Starting cash $1,000 (assumption — reset to change)</div></div>
+    <div class="card"><div class="kpi-sub">Positions</div><div class="kpi" id="sim-pos-count">—</div><div class="kpi-sub">open simulator positions</div></div>
+    <div class="card"><div class="kpi-sub">Trades recorded</div><div class="kpi" id="sim-trade-count">—</div><div class="kpi-sub">categorized below</div></div>
+  </div>
+  <div class="card" style="overflow:auto;margin-top:12px"><table>
+    <thead><tr><th>Position</th><th>Category</th><th class="num">Qty</th><th class="num">Avg price</th><th class="num">Cost basis</th></tr></thead>
+    <tbody id="sim-pos-body"><tr><td colspan="5" class="muted">No simulator positions yet.</td></tr></tbody></table></div>
+  <h3>Simulator trades (categorized)</h3>
+  <div class="card" style="overflow:auto"><table>
+    <thead><tr><th>Time</th><th>Market</th><th>Category</th><th>Side</th><th class="num">Qty</th><th class="num">Price</th><th>Price bucket</th><th>Mode</th></tr></thead>
+    <tbody id="sim-trades-body"><tr><td colspan="8" class="muted">No simulator trades yet. Go to the <a href="trade.html">Trade</a> page.</td></tr></tbody></table></div>
+  <h3>Trade counts by category</h3>
+  <div class="card" style="overflow:auto"><table>
+    <thead><tr><th>Category</th><th class="num">Trades</th><th class="num">Buys</th><th class="num">Sells</th><th class="num">Traded notional</th></tr></thead>
+    <tbody id="cat-stats"><tr><td colspan="5" class="muted">No trades to categorize yet.</td></tr></tbody></table></div>
+  <button id="sim-reset" class="secondary">Reset simulator (erase local trades)</button>
+  <p class="muted small">Simulator fills use the live demo price at trade time. If the API is unreachable, trades are refused rather than filled at invented prices. Simulator data never leaves your browser.</p>
+
+  <h2>B. Kalshi demo account (optional)</h2>
+  <p><span id="demo-badge" class="badge warn">DEMO NOT CONNECTED</span></p>
+  <div class="notice info"><strong>Security:</strong> your private key is stored only in this browser’s <code>localStorage</code> and sent only to <code>external-api.demo.kalshi.co</code> as a request signature. It is never committed to GitHub and never sent anywhere else. Requests are signed as <code>timestamp + METHOD + path</code> with RSA-PSS (SHA-256) — <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">official authenticated-request guide</a>. Ed25519 keys are attempted in browsers that support them; otherwise use an RSA key (see <a href="flagged.html">Flagged F-02</a>).</p>
+  <form class="demo-connect-form card">
+    <h3>Connect demo account</h3>
+    <label>API Key ID (from demo.kalshi.co → API Keys)</label>
+    <input name="keyId" autocomplete="off" placeholder="e.g. your-demo-key-id">
+    <label>Private key (.key PEM contents)</label>
+    <textarea name="privateKey" rows="6" autocomplete="off" placeholder="-----BEGIN PRIVATE KEY----- …"></textarea>
+    <div class="row" style="margin-top:10px"><div class="auto"><button type="submit">Connect (browser-only)</button></div>
+    <div class="auto"><button type="button" class="secondary demo-disconnect">Disconnect &amp; erase key</button></div></div>
+    <p class="form-msg muted small"></p>
+  </form>
+  <div class="card" style="margin-top:12px"><p id="demo-balance">Connect a demo account above to see live demo balance, positions and fills. Until then, the simulator above is the working portfolio.</p></div>
+  <div class="card" style="overflow:auto;margin-top:12px"><h3>Demo positions</h3><table>
+    <thead><tr><th>Ticker</th><th class="num">Position</th><th>Settlement status</th></tr></thead>
+    <tbody id="demo-pos-body"><tr><td colspan="3" class="muted">Not connected.</td></tr></tbody></table></div>
+  <div class="card" style="overflow:auto;margin-top:12px"><h3>Demo fills (recent)</h3><table>
+    <thead><tr><th>Time</th><th>Ticker</th><th class="num">Count</th><th class="num">Price</th></tr></thead>
+    <tbody id="demo-fills-body"><tr><td colspan="4" class="muted">Not connected.</td></tr></tbody></table></div>
+  <p class="muted small">Endpoints: <code>GET /portfolio/balance</code>, <code>GET /portfolio/positions</code>, <code>GET /portfolio/fills</code> — see <a href="sources.html">Sources S-18…S-20</a>. Balance polling is rate-limited separately (Basic tier: once per second) — <a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate Limits docs</a>.</p>
+</main>
+<footer><div class="wrap">KalshiDash1 · Demo data only · Not financial advice · <a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for Review</a></div></footer>
+<script src="assets/kalshi.js"></script><script src="assets/chart.js"></script><script src="assets/app.js"></script>
+<script>
+setInterval(function(){
+  try{ var s=JSON.parse(localStorage.getItem('kalshidash_sim_v1')); if(!s) return;
+    var pc=document.getElementById('sim-pos-count'); if(pc) pc.textContent=Object.keys(s.positions||{}).length;
+    var tc=document.getElementById('sim-trade-count'); if(tc) tc.textContent=(s.trades||[]).length;
+  }catch(e){}
+},1500);
+</script>
+</body>
+</html>
