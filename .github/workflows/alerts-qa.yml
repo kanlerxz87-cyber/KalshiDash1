@@ -34,12 +34,18 @@ jobs:
       - name: Render the alert page in jsdom and assert its behaviour
         run: node scripts/check_alerts_page.mjs
 
+      # Proves the honesty guarantee: the header badge shows the MEASURED age of the last
+      # engine sample and degrades to STALE, and never claims live when the feed is unreadable.
+      - name: Freshness badge reports measured age (jsdom)
+        run: node scripts/check_freshness_badge.mjs
+
       - name: JavaScript syntax
         run: |
           set -e
           for f in alerts/js/*.js assets/freshness.js tools/live_engine.mjs \
                    tools/freshness_check.mjs scripts/keepalive.mjs \
-                   scripts/check_alerts.mjs scripts/check_alerts_page.mjs; do
+                   scripts/check_alerts.mjs scripts/check_alerts_page.mjs \
+                   scripts/check_freshness_badge.mjs; do
             echo "node --check $f"
             node --check "$f"
           done

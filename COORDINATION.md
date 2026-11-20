@@ -39,6 +39,51 @@ No other session has claimed `.github/workflows/live-alerts.yml`, `scripts/selfs
 | **J4** | **Document and re-verify**: update `README.md` (additive section) with the operand of change and the new honesty guarantees; record sources + verification in this section. | claimed | session-f7490df7 | `README.md` (additive section), `COORDINATION.md` (this section) |
 | **J5** | **Ship**: PR from this branch to `main`, merge without awaiting approval, confirm the Pages deploy and that the scheduled loop fires afterwards. | claimed | session-f7490df7 | none (git/PR operations only) |
 
+### J1–J3 results (verified, 2026-11-20 19:15–19:30 UTC)
+
+Every claim below was checked against the GitHub API or a local run **in this session**; nothing is assumed.
+
+| # | Claim | Evidence | Result |
+|---|---|---|---|
+| J1-a | No `schedule` run has ever fired on this repo | `GET /repos/…/actions/runs?event=schedule` → empty; `keepalive.yml` monitor prints "newest SCHEDULED: never" for all three workflows | **confirmed** |
+| J1-b | The site therefore showed LIVE over a ~5 h old sample | `data/live/feed.json → meta.generated_at = 2026-11-20T14:18:54Z` at 19:15 UTC | **confirmed** |
+| J1-c | A dispatch made with the repository's own `GITHUB_TOKEN` returns 2xx but does **not** start a run in another workflow | run `44800473223` step 8 "Queue the next refresh" = `success`, yet no `workflow_dispatch` run of `refresh-data.yml` appeared at that time | **confirmed** → design changed |
+| J1-d | A workflow file first added on a non-default branch is not registered at all | `.github/workflows/keepalive.yml` + a throwaway `probe-chain.yml` were on the branch, were **absent from `GET /actions/workflows`**, and the probe produced **0 runs** (`?head_sha=` → `total_count: 0`) | **confirmed** → cannot be tested pre-merge |
+| J1-e | `workflow_dispatch` run by a **human/token with write** (not `GITHUB_TOKEN`) does start the run | `gh api …/dispatches` (PAT) → run `44800975207` created and `in_progress` | **confirmed** |
+| J1-f | Two bots pushing to one branch is safe with rebase-and-retry | `refresh-data` now green on this branch: run `44800473223`, all steps `success` (previously step 7 failed on `main`, run `44752211268`) | **fixed** |
+| J2 | Root cause of the red `refresh-data` job | engine bot commit `75d33bb` (`19:16:05Z`) landed while the refresh job was running (`19:15:42Z` start) → non-fast-forward → `set -e` failed the step. `git log --author=kalshidash-bot origin/main` was **empty**, i.e. the refresh bot had never once succeeded | **confirmed & fixed** |
+| J3 | Navigation simplified, no URL removed | `scripts/build-site.mjs` `NAV_GROUPS`: 5 labelled groups; `node scripts/check-links.mjs` → 90 pages, 0 broken; every previous target still linked (legacy `dash/`, `docs/` reachable under Review) | **done** |
+| J3-a | Badge honesty is a checked property, not a claim | `node scripts/check_freshness_badge.mjs` → **53 assertions, all pass** (fresh → green, 30 min → amber, 5 h → STALE with the word STALE, unreadable feed → never "live", no third-party request) | **done**, wired into `alerts-qa` |
+
+### Verification performed (J4)
+
+| Check | Command | Result |
+|---|---|---|
+| Site matches templates + data | `node scripts/build-site.mjs --check` | `Committed site matches the templates and data.` |
+| Internal links (JS) | `node scripts/check-links.mjs` | 90 pages, 0 broken (267 external links listed, never fetched) |
+| Internal links (Python) | `python3 tools/linkcheck.py` | 0 broken |
+| Engine logic | `node tools/live_engine.mjs --selftest` | all assertions passed |
+| Alert feed structure + provenance | `node scripts/check_alerts.mjs` | 0 alerts, 0 resolutions, 60 market rows, 8 orderbooks — all rows pass source and threshold checks |
+| Freshness gate | `node tools/freshness_check.mjs` | FRESHNESS OK (feed advanced by the fixed refresh job) |
+| Workflow YAML | `yaml.safe_load` on all 8 files | all parse |
+| No fabricated cell values | grep for `NaN` / `undefined` / `[object Object]` in all generated pages | none |
+| Table provenance audit | every `<tr>` in generated pages must contain an official link | 206/211 rows do; the 5 exceptions are the **strategy-rule** rows on `strategies.html`, which are this project's own definitions and make no external claim — left as they are and explained here rather than given a fake citation |
+
+### Irregularities / flags published with this session
+
+- **F-J1 (open, environmental)** — GitHub has never fired a `schedule` trigger on this repository. It is public,
+  fresh (created 2026-11-20T10:57Z), not a fork, not archived/disabled, has an active default branch and a
+  valid cron, so none of the documented disqualifiers apply. Cause not determinable from the repository side;
+  documented as a flag rather than "fixed" by assertion. Mitigation: `keepalive.yml` samples inline on its own
+  cron **and** the site prints the measured age so a stall is visible either way.
+- **F-J2 (open, needs merge)** — `keepalive.yml` cannot be exercised before merge (J1-d). Its first real run
+  will be on `main` after this PR merges; the merge step below checks that run and reports its result.
+- **F-J3 (open, informational)** — the snapshot/feed volumes reported on the demo exchange are very large
+  (e.g. 465,856,531 contracts on one 2028 nomination market). Values are reproduced exactly as the API returns
+  them and are labelled as demo mock data; they are **not** claimed to be realistic. See the demo-environment
+  caveat: https://docs.kalshi.com/getting_started/demo_env ("The price and behavior of markets in the demo
+  environment may not be reflective of those in real markets.").
+
 **Explicitly NOT in scope for this session** (owned or already delivered by others; touching them would duplicate
 or conflict): the alert engine logic itself (`tools/live_engine.mjs`), the two chat feeds (`alerts/**`), the
 dash suite (`dash/**`), the docs suite (`docs/**`), the canonical page content (`templates/*.tpl` other than
