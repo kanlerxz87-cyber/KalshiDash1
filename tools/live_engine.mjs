@@ -82,8 +82,9 @@ export const BASE = 'https://external-api.demo.kalshi.co/trade-api/v2';
 export const LEGACY_BASE = 'https://demo-api.kalshi.co/trade-api/v2';
 export const SWING_THRESHOLD = 0.10;          // brief: >= $0.10 in either direction
 export const ALERT_COOLDOWN_SECONDS = 1800;   // re-arm a ticker after 30 min
-export const HISTORY_RETAIN_SECONDS = 8 * 86400;
-export const MAX_SAMPLES_PER_MARKET = 4000;
+export const HISTORY_RETAIN_SECONDS = 5 * 86400;
+export const MAX_SAMPLES_PER_MARKET = 720;    // 5 days at a 10-minute cadence
+export const MAX_HISTORY_MARKETS = 24;        // only the biggest contracts keep a series
 export const MAX_ALERTS = 600;
 export const MAX_RESOLUTIONS = 400;
 
@@ -437,7 +438,31 @@ export async function collectMarkets(client, seriesByTopic, { maxSeries = 12, lo
     for (const s of seriesByTopic[t.id] || []) flat.push({ ...s, topic: t.id });
   }
   flat.sort((a, b) => (b.volume_fp || 0) - (a.volume_fp || 0));
-  const chosen = flat.slice(0, maxSeries);
+
+  /* The brief requires the five topics to stay separate and all to be covered, so the
+   * request budget is shared round-robin: the top series of each topic first, then the next
+   * tier, and only then whatever is left. A pure global ranking lets one high-volume topic
+   * (golf, in the first live run) consume every slot and leave gas/culture empty. */
+  const perTopicCap = Math.max(1, Math.ceil(maxSeries / TOPICS.length));
+  const chosen = [];
+  const picked = new Set();
+  for (let tier = 0; tier < perTopicCap; tier++) {
+    for (const t of TOPICS) {
+      if (chosen.length >= maxSeries) break;
+      const rows = (seriesByTopic[t.id] || []).slice().sort((a, b) => (b.volume_fp || 0) - (a.volume_fp || 0));
+      const s = rows[tier];
+      if (!s || picked.has(s.series_ticker)) continue;
+      picked.add(s.series_ticker);
+      chosen.push({ ...s, topic: t.id });
+    }
+  }
+  // Any remaining budget goes to the highest-volume series not yet chosen.
+  for (const s of flat) {
+    if (chosen.length >= maxSeries) break;
+    if (picked.has(s.series_ticker)) continue;
+    picked.add(s.series_ticker);
+    chosen.push(s);
+  }
 
   const seriesMap = {};
   for (const s of flat) seriesMap[s.series_ticker] = s;
@@ -504,11 +529,15 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
   next.markets = next.markets || {};
   next.resolutions = next.resolutions || [];
 
+  // Merged, not reset: runOnce() calls applySample() twice (samples, then resolutions) and a
+  // reset would report "0 markets sampled" for a run that sampled dozens.
+  const prevRun = next.run || {};
   next.run = {
     sampled_at: new Date(nowSeconds * 1000).toISOString(),
     markets_sampled: 0,
     markets_without_price: 0,
     alerts_created: 0,
+    candle_alerts_added: prevRun.candle_alerts_added || 0,
   };
 
   // ---- latest alert timestamp per ticker, used to decide the alert baseline
@@ -574,13 +603,16 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
     }
 
     // ---- history
+    // Stored as a compact [timestamp, price] pair: the file is committed on every run, so a
+    // verbose object per sample multiplied by dozens of markets made state.json grow to
+    // several megabytes. Bid/ask/volume live on the latest row in `markets`, not in history.
     const hist = next.history[ticker] || [];
-    hist.push({ t: nowSeconds, p: price, bid, ask, vol24 });
+    hist.push([nowSeconds, price]);
     next.history[ticker] = hist.slice(-MAX_SAMPLES_PER_MARKET);
 
     // ---- baseline: previous sample, or the last alert inside the cooldown window
     const prev = hist.length >= 2 ? hist[hist.length - 2] : null;
-    let baseline = prev ? prev.p : null;
+    let baseline = prev ? prev[1] : null;
     let baselineKind = 'previous sample';
     const la = lastAlertAt[ticker];
     if (la && nowSeconds - la.t <= ALERT_COOLDOWN_SECONDS) {
@@ -654,14 +686,28 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
   for (const a of newAlerts) if (!known.has(a.id)) next.alerts.push(a);
   next.alerts.sort((a, b) => String(b.ts).localeCompare(String(a.ts)));
   next.alerts = next.alerts.slice(0, MAX_ALERTS);
-  next.run.alerts_created = newAlerts.length;
+  next.run.alerts_created = (prevRun.alerts_created || 0) + newAlerts.length;
+  next.run.markets_sampled = (prevRun.markets_sampled || 0) + next.run.markets_sampled;
+  next.run.markets_without_price = (prevRun.markets_without_price || 0) + next.run.markets_without_price;
 
   // ---- prune history
   const cutoff = nowSeconds - HISTORY_RETAIN_SECONDS;
   for (const [ticker, hist] of Object.entries(next.history)) {
-    const kept = hist.filter((s) => s.t >= cutoff).slice(-MAX_SAMPLES_PER_MARKET);
+    const kept = hist.filter((smp) => Array.isArray(smp) && smp[0] >= cutoff).slice(-MAX_SAMPLES_PER_MARKET);
     if (kept.length) next.history[ticker] = kept;
     else delete next.history[ticker];
+  }
+
+  // Keep history only for the biggest contracts, and bound the market map, so the committed
+  // state stays small enough to update every 10 minutes.
+  const keep = new Set(topMarkets(next, MAX_HISTORY_MARKETS).map((m) => m.ticker));
+  for (const ticker of Object.keys(next.history)) if (!keep.has(ticker)) delete next.history[ticker];
+
+  const marketTickers = Object.keys(next.markets);
+  if (marketTickers.length > 300) {
+    const ordered = topMarkets(next, 300).map((m) => m.ticker);
+    const keepMarkets = new Set(ordered);
+    for (const ticker of marketTickers) if (!keepMarkets.has(ticker)) delete next.markets[ticker];
   }
 
   next.topics = topicsFound || {};
@@ -1000,7 +1046,7 @@ export function topMarkets(state, limit = 60) {
 export function slimHistory(state, limit = 12) {
   const top = topMarkets(state, limit).map((m) => m.ticker);
   const out = {};
-  for (const t of top) if (state.history[t]) out[t] = state.history[t].slice(-400);
+  for (const t of top) if (state.history[t]) out[t] = state.history[t].slice(-400);  // [[t, price], ...]
   return out;
 }
 

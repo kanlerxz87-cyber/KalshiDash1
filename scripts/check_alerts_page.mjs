@@ -65,10 +65,9 @@ const feed = {
       source_url: BASE + '/markets?series_ticker=KXGOLF&status=open'
     }
   ],
+  // Compact [timestamp, price] pairs — the real engine format.
   history: {
-    'KXHIGH-1': [
-      { t: now - 1800, p: 0.30 }, { t: now - 900, p: 0.34 }, { t: now - 300, p: 0.45 }, { t: now - 60, p: 0.46 }
-    ]
+    'KXHIGH-1': [[now - 1800, 0.30], [now - 900, 0.34], [now - 300, 0.45], [now - 60, 0.46]]
   },
   orderbooks: {
     'KXHIGH-1': {

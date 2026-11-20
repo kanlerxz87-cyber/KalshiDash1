@@ -337,10 +337,15 @@
     ctx.clearRect(0, 0, w, h);
 
     var pad = { l: 46, r: 12, t: 12, b: 26 };
-    var pts = A.history(ui.chartTicker) || [];
+    // History is a compact array of [timestamp, price] pairs (see tools/live_engine.mjs);
+    // the object form {t,p} is still accepted so an older cached feed keeps rendering.
+    var raw = A.history(ui.chartTicker) || [];
     var now = Math.floor(Date.now() / 1000);
     var from = now - ui.chartWindow;
-    pts = pts.filter(function (p) { return p.t >= from; });
+    var pts = raw.map(function (smp) {
+      if (Array.isArray(smp)) return { t: smp[0], p: smp[1] };
+      return { t: smp.t, p: smp.p };
+    }).filter(function (p) { return p && p.t >= from && typeof p.p === 'number'; });
 
     // axes
     ctx.strokeStyle = '#e3e8ee';

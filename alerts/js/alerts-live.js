@@ -249,13 +249,13 @@
 
       var hist = state.live.history[ticker] || (state.live.history[ticker] = []);
       var prev = hist.length ? hist[hist.length - 1] : null;
-      var baseline = prev ? prev.p : null;
+      var baseline = prev ? prev[1] : null;
       var kind = 'previous sample';
       var la = lastAlert[ticker];
       if (la && now - la.t <= 1800) { baseline = la.price; kind = 'last alert (within 30 min)'; }
 
-      hist.push({ t: now, p: tp.price, bid: bid, ask: ask, vol24: vol24 });
-      if (hist.length > 4000) hist.splice(0, hist.length - 4000);
+      hist.push([now, tp.price]);
+      if (hist.length > 720) hist.splice(0, hist.length - 720);
 
       state.live.markets[ticker] = {
         ticker: ticker, event_ticker: m.event_ticker, series_ticker: e.series.ticker,
