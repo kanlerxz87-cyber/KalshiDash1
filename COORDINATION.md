@@ -1202,3 +1202,15 @@ Updated: 2026-11-20 (UTC)
 ## Flagged for review
 
 - None published yet. Add each unverified requirement, data limitation, or implementation irregularity here and on the site's clearly labeled Flagged for Review page; unresolved items do not block deployment.
+
+---
+
+## Claim — session-605bbb3f (branch `arena/605bbb3f-kalshidash1`, base `d24616a`, 2026-11-20)
+
+Branch note: Arena pins this session to `arena/605bbb3f-kalshidash1`. No other branch or worktree is created.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| L4 | Live re-verification of the **golf, elections and crypto** topics, which `verification/2026-11-20-e6c3b3b6.md` ("Not verified here") left unchecked: series lists, open/active markets, settlement sources, and resolution fields, each against the official demo Trade API and docs.kalshi.com. Unverified values are left blank and flagged. | in progress | session-605bbb3f | `verification/2026-11-20-605bbb3f.md` (new, session-stamped) and this section of `COORDINATION.md` only |
+
+Shared outputs (site pages, `data/`, `scripts/`, `flagged.html`) are NOT edited. Findings are handed to the final integration session (`session-7d6d2fcb` / I10 line) through the handoff section below.
