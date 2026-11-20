@@ -10,11 +10,21 @@ Overlap check (read from `origin` on 2026-11-20 before claiming): already claime
 
 | ID | Task | Status | Owner | Files touched (only these) |
 |---|---|---|---|---|
-| R1 | Repo hygiene: `tools/__pycache__/*.pyc` are tracked in git; untrack them and add `__pycache__/` and `*.pyc` to `.gitignore` | in progress | session-bf16f2dd | `.gitignore`, `tools/__pycache__/*.pyc` (untrack only) |
-| R2 | Verified-facts page `audit/index.html` (not linked from the shared nav): each official fact checked against docs.kalshi.com or the live demo API, with the captured value, plus irregularities found in the repo | in progress | session-bf16f2dd | `audit/index.html` (new) |
-| R3 | Record this session's sources, verification, irregularities and PR/merge result in this section | in progress | session-bf16f2dd | `COORDINATION.md` (this section only) |
+| R1 | Repo hygiene: `tools/__pycache__/*.pyc` are tracked in git; untrack them and add `__pycache__/` and `*.pyc` to `.gitignore` | done | session-bf16f2dd | `.gitignore`, `tools/__pycache__/*.pyc` (untrack only) |
+| R2 | Verified-facts page `audit/index.html` (not linked from the shared nav): each official fact checked against docs.kalshi.com or the live demo API, with the captured value, plus irregularities found in the repo | done | session-bf16f2dd | `audit/index.html` (new) |
+| R3 | Record this session's sources, verification, irregularities and PR/merge result in this section | done (PR/merge result below) | session-bf16f2dd | `COORDINATION.md` (this section only) |
 
 Not in scope for this session: data tables, shared index/navigation, the dashboard, alerts, portfolio and trading. Those belong to the claimed sessions above or require demo API credentials this session does not have.
+
+
+### Record — session bf16f2dd (2026-11-20)
+
+- **Sources read (official):** [Demo environment](https://docs.kalshi.com/getting_started/demo_env) · [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets) · [Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) · [WebSocket connection](https://docs.kalshi.com/websockets/websocket-connection) · [Rate limits and tiers](https://docs.kalshi.com/getting_started/rate_limits). Live demo API (fetched 2026-11-20): [exchange/status](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status) · [settled KXAAAGASM events](https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=settled&with_nested_markets=true) · [search/tags_by_categories](https://external-api.demo.kalshi.co/trade-api/v2/search/tags_by_categories).
+- **Verification:** 16 facts checked line by line; 10 verified, 3 partial, 3 unverified or not in the API (V1–V16 in `audit/index.html`). Every row has a source link. Unconfirmed values were left blank or flagged, not filled in.
+- **Checks run:** `python3 tools/linkcheck.py` (no broken internal links), `node scripts/check-links.mjs` (no broken internal links), `node scripts/build-site.mjs` (no diff in generated files), HTML tag balance check on `audit/index.html`.
+- **Irregularities (R-01…R-10, on the page):** tracked `.pyc` files and missing ignore rules (fixed on this branch); README says no market data is committed while `dash/data/snapshot.json` is committed (open, dash owner); three overlapping site trees (`7d6d2fcb` I2); three link checkers; pages.yml staleness gate covers only root paths; notional-value wording not confirmed (V9); stale top section of this board; F-14/F-16 ordering; CORS not browser-tested (F-01).
+- **Blocked, not done:** portfolio, trades and live WebSocket alerts need a demo API key (WebSocket auth verified, V11). The sandbox cannot reach Kalshi hosts with `curl`; live values were read with the fetch tool.
+- **Not changed (shared outputs):** site index, navigation, data tables and the root Flagged page. Those stay with the final integration session. `audit/index.html` is reachable by URL and is not in the nav.
 
 ## Session on this branch
 
