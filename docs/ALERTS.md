@@ -63,16 +63,36 @@ A run **fails loudly** if a tag disappears from a category that publishes tags, 
 board can never be caused silently by a stale filter. See irregularity **F-A1** for the one
 category that the taxonomy does not key.
 
-### 3.2 The tracked price
-`trackedPrice()`, identical in the engine and the page:
+### 3.2 The tracked price — and why this is the most important rule here
 
-1. `last_price_dollars`, when it is strictly between 0 and 1;
-2. otherwise the midpoint of `yes_bid_dollars` and `yes_ask_dollars`, but **only** when both sides
-   are a real book (bid > 0 and ask < 1);
-3. otherwise **null**. The market is skipped and counted in `markets_without_price`.
+`trackedPrice()`, identical in the engine and the page. It is deliberately defensive, because
+the demo API was measured returning prices that contradict each other (see the run record in §5).
 
-Step 3 matters: a book of bid $0.00 / ask $1.00 has no price, and averaging it would have
-invented $0.50. The first automated test of this file caught exactly that bug and it was fixed.
+A binary book is self-checking. S6 documents the reciprocity that must hold:
+
+```
+yes_ask + no_bid = $1.00        yes_bid + no_ask = $1.00
+```
+
+The rule, in order:
+
+1. **Reciprocity test.** If both sides are present and `|yes_ask + no_bid − 1| > $0.02` (or the
+   same for `yes_bid + no_ask`), the row contradicts itself. The price is then taken from the
+   **NO side** (`1 − no price`), which the corrupt field was not part of, and the row is marked
+   `book_inconsistent`.
+2. **Stale-last-price test.** On a *tight* book (spread ≤ $0.10, where a midpoint is meaningful)
+   a `last_price_dollars` more than $0.25 from the midpoint is treated as stale and the midpoint is
+   used instead. A **wide** but reciprocal book keeps its last traded price — replacing a real
+   0.943 trade with the midpoint of a 0.01/0.94 book would be worse than useless. That case is a
+   documented live market (`KXPRESNOMD-28-JP`).
+3. **Corroboration.** A swing found by *sampling* is published as an alert only if the new price is
+   within $0.10 of a **second published field** — the book (yes quotes or 1 − no quotes) or
+   `previous_price_dollars`. Uncorroborated swings are suppressed and counted, never shown.
+   Trade- and candle-detected alerts are exempt: their price *is* a published trade.
+4. **Otherwise null.** The market is skipped and counted in `markets_without_price`.
+
+Every branch returns a published quote, a published previous price, or null. No midpoint is ever
+invented from an empty book, and no default value exists anywhere in this path.
 
 ### 3.3 Alert rule
 An alert is raised when |new price − baseline| ≥ **$0.10**.
@@ -173,7 +193,14 @@ Defects found in real data and fixed (each would have been invisible without run
 3. **Wrong counters** — `markets_sampled` reported 0 because the state was reset on the second
    `applySample()` call of the same run. Fixed with a `run_id`-scoped accumulator.
 
-Alerts so far: **0**, and that is the honest result. The demo exchange is quiet — repeated samples
+A fifth and sixth pass then fixed the **price-coherence defect** (F-A9) in four layers —
+reciprocity, stale-last-price, corroboration, and a clean state reset — after the demo API was
+caught returning `last_price_dollars: 0.8030` for a market whose book was `yes 0.0020 / 0.0030`
+and whose `previous_price_dollars` was `0.0030`. That is a $0.80 jump from $0.003, and every
+version of the rule before the final one would have published it as a real alert. It was caught by
+re-reading the single-market endpoint after an alert looked implausible, not by code review.
+
+Alerts so far: **0 after the reset**, and that is the honest result. The demo exchange is quiet — repeated samples
 of the top contracts returned identical prices (0.99, 0.94, 0.98) across runs. The feeds say so;
 nothing was seeded to make the page look busy. See F-A6.
 
