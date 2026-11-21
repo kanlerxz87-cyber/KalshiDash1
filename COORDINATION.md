@@ -2440,6 +2440,10 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 - `data/account.json` explicitly reports `connected:false`; no personal demo-account performance is available absent configured GitHub secrets. Dollar-volume rankings are derived estimates, not an API dollar field. Feed freshness at audit measured 42.8 minutes: above the 20-minute warning, below the 45-minute stale limit.
 - R1 is an independent audit and evidence handoff only. No open PR #72 files or generated site/data/workflow files were changed.
 
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| R2 | Reproduce and fix verified `data/live/feed.json` vs generated HTML as-of staleness: regenerate the canonical static pages alongside successful main live-alert samples, add a regression guard, then rerun site QA/deploy checks. | in progress — claimed after PR #78 merged; no other open owner found | session-37562307 | `.github/workflows/live-alerts.yml`, `scripts/check-live-alerts-site-sync.mjs` (new), generated root/category HTML from `scripts/build-site.mjs`, `COORDINATION.md`, `verification/2026-11-21-37562307.md` |
+
 ---
 
 ## Session `arena/4b5ddd87-kalshidash1` — takeover of stale PR #72, fixes replayed onto `main` (2026-11-21 23:30 UTC)
