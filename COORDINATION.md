@@ -2373,3 +2373,31 @@ session's `awaiting` key was regenerated from the committed `state.json` by its 
 - **Pages:** build for merge commit `b4f357f` — `status: built`, `error.message: null`, created 2026-11-21T20:39:18Z → updated 20:39:47Z ([Pages build API](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest)).
 - **Live-site spot check post-deploy:** `https://kanlerxz87-cyber.github.io/KalshiDash1/catalyst.html` serves the corrected text ("Get Events documents no `category` parameter… flag F-62") and the relabelled S9 source row with the official Get Events parameter-list link.
 - **Irregularities:** none new. F-62 is now marked "Corrected 2026-11-21" on `flagged.html`. The previously flagged stale-feed item was independently cleared by session-96019ad5 dispatching `live-alerts.yml` (run 44946124127 → commit `25885b9`); freshness at this session's final QA was FRESHNESS OK. Observations left open for a future scope (recorded in `verification/2026-11-21-c144ad6a.md`): undocumented `limit` on `/series` in `alerts/js/alerts-live.js` (`limit=200`) and `scripts/fetch_snapshot.mjs` (`limit=50`, some URLs published in `sources.html`); superseded `dash/`/`docs/` builds retain the old F-01 wording; dated K1 records keep the original text.
+
+---
+
+## Session `arena/a2706f31-kalshidash1` — final end-to-end verification, no changes required (2026-11-21)
+
+- Session ID: `session-a2706f31`. Branch: `arena/a2706f31-kalshidash1` (Arena-managed; commit/push only here; branched from `b81f9f2731a12fd90e0287cd1d77ded58c35d79e` = `origin/main`, 0 ahead / 0 behind). Status: **active → complete**.
+- Role: final end-to-end verification of the complete repository against the project brief. All features from the brief are already implemented, committed, and verified by prior sessions. This session confirmed the combined state, re-ran the full QA battery, confirmed GitHub Pages is live, and recorded the result in `verification/2026-11-21-a2706f31.md`.
+- Sandbox limitation: direct network access to `*.kalshi.co` and `kanlerxz87-cyber.github.io` is blocked (TLS handshake failure). All verification uses committed local artifacts, the repo's own offline checkers, and the public GitHub API via `api.github.com`. No external market data was fetched or inferred.
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| A1 | Full QA battery: `npm ci && npm test` (engine, feed, guard, resolution, page, ids, rows, lab, CORS, links) | done | session-a2706f31 | none (read-only verification) |
+| A2 | `node scripts/build-site.mjs --check` — site not stale | done | session-a2706f31 | none |
+| A3 | `node scripts/check-html-ids.mjs` — 561 ids, 0 duplicates | done | session-a2706f31 | none |
+| A4 | Confirm GitHub Pages live: `status: built`, HTTPS enforced, source `main` | done | session-a2706f31 | none |
+| A5 | Verify requirements coverage: all 19 brief requirements mapped to implementation | done | session-a2706f31 | `verification/2026-11-21-a2706f31.md` (new) |
+| A6 | Record session verification record | done | session-a2706f31 | `verification/2026-11-21-a2706f31.md` (new) |
+| A7 | PR to `main` and merge | not required — branch == `main`, working tree clean, no changes to merge | session-a2706f31 | n/a |
+
+### Results — session-a2706f31 (2026-11-21 ~22:30 UTC)
+
+- `npm test`: **PASS** — engine selftest, feed checker (14 alerts, threshold 0.1, every row carries source_url), flood-guard 5/5, resolution logic 15/15, jsdom page render, duplicate-id scan (561 ids, 0 dupes), source rows (813 enforced, 100% sourced, 0 missing), strategy lab 22/22, CORS evidence 21/21 (F-66 holds), link checker (90 pages, 2,151 internal links, 0 broken).
+- `node scripts/build-site.mjs --check`: **PASS** — "Committed site matches the templates and data."
+- `node scripts/check-html-ids.mjs`: **PASS** — 89 HTML files, 561 ids, 0 duplicates.
+- GitHub Pages: **LIVE** — `https://kanlerxz87-cyber.github.io/KalshiDash1/`, status `built`, error `null`, HTTPS enforced.
+- Data: `data/live/feed.json` generated `2026-11-21T22:26:12.000Z` (14 alerts: 9 crypto, 5 elections; 0 high-ROI; 0 resolutions). `data/snapshot.json` captured `2026-11-21T16:02:38.983Z`.
+- **No changes committed:** working tree clean, branch == `main` at `b81f9f2`. No PR or merge required.
+- Flagged irregularities (pre-existing, unchanged): F-02 (demo-account key required), F-03 (derived dollar-volume estimate), F-07 (portfolio blocked without key), F-66 (browser cannot sign requests), plus F-01, F-04–F-06, F-08–F-65, F-67–F-70 as documented on `flagged.html`. None block the site.
