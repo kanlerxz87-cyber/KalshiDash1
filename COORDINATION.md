@@ -1633,9 +1633,17 @@ TBD — recorded below once the PR exists.
 
 | ID | Task | Status | Owner | Files touched |
 |---|---|---|---|---|
-| R1 | **Line-by-line repo review**: templates, root site, scripts, tools, data, docs, workflows — verify the live site's claims against the committed tree and against official sources; record irregularities in the verification file. | in progress | session-4830ab32 | `verification/2026-11-21-4830ab32.md` |
-| R2 | **QA battery**: `build-site.mjs --check`, both link checkers, engine selftest, feed check, page-render/behaviour tests, JS syntax checks, conflict-marker scan. | in progress | session-4830ab32 | (read-only) |
-| R3 | **Live-site verification**: fetch the published GitHub Pages site and confirm the key pages serve, nav reaches the pages, and the alert feed is present and fresh. | in progress | session-4830ab32 | (read-only) |
-| R4 | **PR → merge → Pages confirmation + board record**. | unclaimed | session-4830ab32 | `COORDINATION.md` |
+| R1 | **Line-by-line repo review**: templates, root site, scripts, tools, data, docs, workflows — verify the live site's claims against the committed tree and against official sources; record irregularities in the verification file. | **done** — one defect found and fixed (duplicate `F-54` anchor → `F-58`); everything else clean. | session-4830ab32 | `verification/2026-11-21-4830ab32.md` |
+| R2 | **QA battery**: `build-site.mjs --check`, both link checkers, engine selftest, feed check, page-render/behaviour tests, JS syntax checks, conflict-marker scan. | **done** — all checks pass (see verification file, 11/11 syntax, 52-file id scan clean after fix). | session-4830ab32 | (read-only) |
+| R3 | **Live-site verification**: fetch the published GitHub Pages site and confirm the key pages serve, nav reaches the pages, and the alert feed is present and fresh. | **done** — `/`, `/executive-summary.html`, `/alerts/index.html` all serve current snapshot data (captured 2026-11-21T00:55:22Z). | session-4830ab32 | (read-only) |
+| R4 | **PR → merge → Pages confirmation + board record**. | **in progress** | session-4830ab32 | `COORDINATION.md` |
 
 Rules honoured: only files in scope are edited; no other session's file is modified (PR #39's files are off-limits); no value is inferred — unverified values stay blank and are flagged in the verification file; `git pull --rebase` before every push.
+
+### Record — session-4830ab32 (R1–R3, 2026-11-21)
+
+- **Defect found & fixed (D-4830ab32-1):** duplicate anchor `id="F-54"` in `templates/flagged.tpl` / `flagged.html` — the environmental no-scheduled-workflow row was renumbered to the next free id `F-58`; the series-list-filters row keeps `F-54` (its `#F-54` in-page anchor from the F-L4-01 row and the V-session record still resolve to it). Generated `flagged.html` rebuilt; 52-file duplicate-id scan clean; both internal-link checkers pass.
+- **Irregularities recorded, not fixed (out of scope):** stale F-57 row (claims "zero alerts so far" while the committed feed holds 99 alerts on one ticker — PR #39 in flight) · stale root `EXECUTIVE_SUMMARY.md` (claims "Alerts so far: zero") · scheduled `live-alerts.yml` and `refresh-data.yml` runs fail at the commit/write-back step (engine + validation pass) — R1 defect still open on `main` · `culture` topic has 0 open markets at capture (honest state, not a defect).
+- **Actions audit:** keepalive schedule run 2026-11-21T00:54:57Z → success (feed is genuinely live, last sample 2026-11-21T00:55:11Z). Live-alerts schedule 2026-11-21T02:54:41Z → failure at "Commit the new sample" (selftest, sample, validate all passed). Refresh-data schedule 2026-11-21T03:17:16Z → failure (same defect class). Log text could not be downloaded in this sandbox; recorded as-is.
+- **Unverified / not re-fetched:** all F-01…F-57 flag rows (kept as written); browser live-poll (covered by jsdom page test); demo-account real-key flow (no key provided, per the brief).
+- **Handoff for the integration owner:** after PR #39 merges, re-verify the F-57 row and the exec-summary markdown note against the regenerated feed; consider re-running the scheduled write-back (R1) now that the inflation is visible — flagged, not fixed here.
