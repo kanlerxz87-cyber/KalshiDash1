@@ -1,10 +1,28 @@
 # Executive Summary — KalshiDash1
 
-**Date:** 2026-11-20 · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/cdfe52bd-kalshidash1`
+**Updated:** 2026-11-21 · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/bfc2de45-kalshidash1`
+
+> **Scope and freshness note:** Sections 4–6 below preserve the historical findings from the explicitly dated
+> 2026-11-20 11:10 UTC snapshot; those numbers are not current-market claims. Current repository/feed checks and
+> the newly found stale-feed discrepancy are recorded in [the 2026-11-21 verification report](verification/2026-11-21-bfc2de45.md).
+> The canonical live site is the root GitHub Pages build linked from [README](README.md), not the older `dash/` suite.
 
 ## 1. The brief, in one paragraph
 
 Build a live, interactive dashboard for the Kalshi **demo** exchange that (a) tracks the highest-dollar live events in **gas prices, elections, culture, crypto, and golf** until they resolve **yes/no**, (b) shows price movement on a time-axis chart (seconds/minutes/hours windows) and orderbook liquidity (contracts available at each price), (c) executes trades and tracks portfolio performance on the demo account with trade categorization and strategy analysis, (d) proposes improvements through a reviewable suggestions board, and (e) lists every question, known fact, and missing input before decisions are made — all verified line-by-line against official sources, published as a GitHub Pages site, with nothing inferred.
+
+## Current operational status (2026-11-21 UTC)
+
+The product and its offline tests are present, but the committed background feed is **not current** at this audit:
+
+| Check | Observed state | Source |
+|---|---|---|
+| Exchange status | Official demo status endpoint returned active at the time checked; this is a point-in-time response. | [Official demo exchange status](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status) |
+| Published background feed | Local freshness check reported the feed 330.6 minutes old (stale limit: 45 minutes). It contains 99 alert rows, all for one ticker, while its latest run reports 0 newly created alerts and 0 resolutions. Do not read this as 99 distinct confirmed events or validated ROI performance; see [F-BFC-01](verification/2026-11-21-bfc2de45.md#f-bfc-01--feed-and-narrative-disagree-about-alerts-after-reset). | [Committed feed](data/live/feed.json) · [official market endpoint for the ticker](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-AKLO) |
+| Automated data write-back | Latest alert and snapshot workflows failed at the commit/write-back step. The available annotations expose exit code 2, but the exact cause could not be verified from the unavailable raw runner logs. | [Live alerts run](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44858392056) · [snapshot run](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44860334644) |
+| Offline checks | Site freshness/build, alert logic, rendering, and internal links passed; the feed-freshness check failed. Full command results are in the [dated verification report](verification/2026-11-21-bfc2de45.md#repository-and-automated-verification). | [Verification report](verification/2026-11-21-bfc2de45.md) |
+
+The row counts above describe the committed artifact, not live market truth. The dashboard's interactive browser path may still obtain public live data, but this audit did not validate every visitor's browser/CORS path. The demo API currently reports the tracked election market as active with YES at `$0.0030`; the older `$0.80`-scale alerts are flagged for historical-source review, not retrospectively declared false. See [F-BFC-01 and F-BFC-02](verification/2026-11-21-bfc2de45.md#findings-requiring-review).
 
 ## 2. Verified platform facts (official sources only)
 
