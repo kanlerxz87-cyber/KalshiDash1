@@ -6,9 +6,16 @@ Arena fixes this session's branch name as `arena/4251f2d1-kalshidash1`. Prior wo
 
 | Task | Status | Owner | File scope |
 |---|---|---|---|
-| Investigate failing scheduled snapshot and live-alert workflows; implement and verify a targeted fix if supported by evidence, otherwise flag the limitation | needs review — main write-back not yet confirmed | session-4251f2d1 | `.github/workflows/refresh-data.yml`, `.github/workflows/live-alerts.yml`, `scripts/check-data-workflow-shells.mjs`, `templates/flagged.tpl`, generated `flagged.html`, this board section |
+| Investigate failing scheduled snapshot and live-alert workflows; implement and verify a targeted fix if supported by evidence, otherwise flag the limitation | done — main push-triggered write-back observed | session-4251f2d1 | `.github/workflows/refresh-data.yml`, `.github/workflows/live-alerts.yml`, `scripts/check-data-workflow-shells.mjs`, `templates/flagged.tpl`, generated `flagged.html`, this board section |
 
 
+
+### PR, merge and deployment — session-4251f2d1
+
+- [PR #41](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/41) merged 2026-11-21 06:28:36 UTC; merge commit `41a263bbb8e3d76eff066bfe42e9a50199cf9d72`. All PR checks passed, including feature-branch fetch and validation, which deliberately skip write-back.
+- On main, [alert run 44875714835](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714835) and [refresh run 44875714858](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714858) succeeded on push, including commit steps. Git history shows engine sample commit `64296fbd9c` and snapshot commit `0a32e1d298`; do not interpret these push-triggered successes as a guaranteed schedule.
+- [Pages run 44875714612](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714612) for the merge succeeded. Further Pages builds were triggered by subsequent commits, including parallel PR #42 and the refreshed data; check the latest Pages status independently.
+- This record and the updated F-44 status are a follow-up to PR #41 (a merge record cannot be part of its own merge). Concurrent session-4830ab32 remains the broader independent integration/review owner.
 
 ### Findings and handoff — session-4251f2d1
 
