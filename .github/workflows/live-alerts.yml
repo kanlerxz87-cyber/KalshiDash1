@@ -35,6 +35,7 @@ on:
       - 'tools/live_engine.mjs'
       - '.github/workflows/live-alerts.yml'
       - 'scripts/check_alerts.mjs'
+      - 'scripts/check-data-workflow-shells.mjs'
       - 'scripts/publish-data.sh'
 
 permissions:
@@ -58,6 +59,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Check data workflow shell syntax
+        run: node scripts/check-data-workflow-shells.mjs
 
       - name: Sync the working tree to the remote tip
         # The checkout can be a few minutes behind the branch. Starting from the real tip

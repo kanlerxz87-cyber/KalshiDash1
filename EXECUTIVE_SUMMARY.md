@@ -7,15 +7,36 @@
 > 1. **The alert chat carried one event 99 times.** The published feed held 99 alerts and every one came from a single contract flapping between $0.80 and $0.00. The de-duplication rule now keeps one swing per contract per 15 minutes, and the committed feed was re-de-duplicated with the engine's own code: **99 rows → 12**.
 > 2. **The "Resolved events" table could never fill.** A resolution was kept only while its contract was still open — and a contract leaves the open set the moment it settles, so the live feed reported *500 settled markets seen, 0 recorded*. The engine now remembers every contract it has followed, so the yes/no outcome of a followed event is kept. The brief's "track live events until they resolve" requirement can now actually be met.
 > 3. **The guard written to catch (1) could not fail a run** — it sat after the block that exits on violations. It is now a fixed-point check and demonstrably fails on the old feed.
-> 4. **Two of the three data-publishing workflows failed on every scheduled run** (`live-alerts` and `Refresh demo data snapshot`), while their capture and validation steps passed. The cause was three writers racing on one branch with three different concurrency groups while publishing overlapping generated files through a `git rebase` that conflicts by construction. Publishing was replaced by a helper that **moves** the branch tip and fast-forwards — no merge, so nothing can conflict — and a test that proves it now runs in CI. This is **not** claimed fixed until a scheduled run on `main` succeeds.
+> 4. **Two of the three data-publishing workflows failed on every scheduled run** (`live-alerts` and `Refresh demo data snapshot`), while their capture and validation steps passed. Two causes, both now addressed: the commit scripts were missing a closing `fi`, so bash could not parse the step at all (a syntax error exits with code 2 — exactly the job annotation those runs carried); and the three writers raced on one branch with three different concurrency groups while publishing overlapping generated files through a `git rebase` that conflicts by construction. Publishing is now a helper that **moves** the branch tip and fast-forwards — no merge, so nothing can conflict — a `bash -n` check over every workflow shell block guards the first cause, and a test that proves the second runs in CI. This is **not** claimed fixed until a scheduled run on `main` succeeds.
 >
-> Full evidence, with the official sources re-read for each claim: [`verification/2026-11-21-9bee7c49.md`](verification/2026-11-21-9bee7c49.md). Everything a reviewer should check is on the site's [Flagged for review](https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html) page (F-40, F-58–F-63).
+> Full evidence, with the official sources re-read for each claim: [`verification/2026-11-21-9bee7c49.md`](verification/2026-11-21-9bee7c49.md). Everything a reviewer should check is on the site's [Flagged for review](https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html) page (F-60–F-65).
 
 **Earlier record:** 2026-11-20 · session cdfe52bd · `arena/cdfe52bd-kalshidash1`
+
+**Updated:** 2026-11-21 · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/bfc2de45-kalshidash1`
+
+> **Scope and freshness note:** Sections 4–6 below preserve the historical findings from the explicitly dated
+> 2026-11-20 11:10 UTC snapshot; those numbers are not current-market claims. Current repository/feed checks and
+> the newly found stale-feed discrepancy are recorded in [the 2026-11-21 verification report](verification/2026-11-21-bfc2de45.md).
+> The canonical live site is the root GitHub Pages build linked from [README](README.md), not the older `dash/` suite.
 
 ## 1. The brief, in one paragraph
 
 Build a live, interactive dashboard for the Kalshi **demo** exchange that (a) tracks the highest-dollar live events in **gas prices, elections, culture, crypto, and golf** until they resolve **yes/no**, (b) shows price movement on a time-axis chart (seconds/minutes/hours windows) and orderbook liquidity (contracts available at each price), (c) executes trades and tracks portfolio performance on the demo account with trade categorization and strategy analysis, (d) proposes improvements through a reviewable suggestions board, and (e) lists every question, known fact, and missing input before decisions are made — all verified line-by-line against official sources, published as a GitHub Pages site, with nothing inferred.
+
+## Current operational status (2026-11-21 UTC)
+
+The background pipeline initially failed its write-back check during this audit, but was fixed and verified by parallel session PR #41 before this update. Current state at **2026-11-21 06:30 UTC**:
+
+| Check | Observed state | Source |
+|---|---|---|
+| Exchange status | Official demo status endpoint returned active at the time checked; this is a point-in-time response. | [Official demo exchange status](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status) |
+| Published background feed | Freshness check passed at 1.2 minutes old (45-minute stale limit). The feed has 173 alert rows: 99 for an election ticker and 74 for a BTC ticker. Its most recent run says 0 trade alerts, 60 candle alerts added, and 0 resolutions. This is not 173 distinct markets or validated ROI performance; see [F-BFC-01/F-BFC-03](verification/2026-11-21-bfc2de45.md#findings-requiring-review). | [Committed feed](data/live/feed.json) · [official election market](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-AKLO) · [official BTC market](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500) |
+| Automated data write-back | Fixed by [PR #41](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/41); main-branch live-alert and snapshot runs both succeeded and committed fresh data. | [Live alerts run](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714835) · [snapshot run](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714858) |
+| GitHub Pages | Latest Pages build for main commit `0a32e1d` reports `built` with no error. | [Pages build API](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest) |
+| Offline checks | Current feed freshness, site staleness/build, alert logic, rendering, and internal links passed. Full historical and follow-up command results are in the [dated verification report](verification/2026-11-21-bfc2de45.md#repository-and-automated-verification). | [Verification report](verification/2026-11-21-bfc2de45.md) |
+
+Feed row counts describe the committed artifact, not independent confirmation of 173 distinct market events. Official demo trades for the BTC ticker alternate between `$0.97` and `$0.01` while the current book is very wide; those API-returned values are preserved but flagged for review rather than labelled false or treated as a reliable ROI signal. The interactive browser path was not checked across every visitor's CORS/network setup. See [F-BFC-01 through F-BFC-03](verification/2026-11-21-bfc2de45.md#findings-requiring-review).
 
 ## 2. Verified platform facts (official sources only)
 

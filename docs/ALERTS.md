@@ -200,9 +200,23 @@ and whose `previous_price_dollars` was `0.0030`. That is a $0.80 jump from $0.00
 version of the rule before the final one would have published it as a real alert. It was caught by
 re-reading the single-market endpoint after an alert looked implausible, not by code review.
 
-Alerts so far: **0 after the reset**, and that is the honest result. The demo exchange is quiet — repeated samples
-of the top contracts returned identical prices (0.99, 0.94, 0.98) across runs. The feeds say so;
-nothing was seeded to make the page look busy. See F-53.
+Alerts so far: the latest sample (2026-11-21T06:34:10Z) created **0 new trade alerts** and added 58 candle
+alerts (247 duplicates collapsed). The persisted feed retains its rows across the retained range, and the
+one-swing-per-ticker flood fix (PR #39) is now applied to the **whole** retained list on every run — the feed
+holds **31 rows**: 12 for `KXPRESNOMD-28-AKLO` and 19 for `KXBTCY-27JAN0100-B97500`. Before that fix the same
+feed held 173 rows (99 + 74), which made the scrolling chat carry a single event 99 times. An independent
+offline re-de-duplication using the engine's own exported `collapseDuplicates()` produced exactly the same
+12 rows for `KXPRESNOMD-28-AKLO`, so the two methods cross-check each other.
+
+Both remaining tickers are historical and must not be acted on without review: the $0.80 swing on
+`KXPRESNOMD-28-AKLO` is a demo-order-book flap, and `KXBTCY-27JAN0100-B97500` oscillates between $0.01 and
+$0.97. Nothing was seeded to make the page look busy. See F-53, F-61, F-BFC-01 and F-BFC-03.
+
+**Resolutions.** The feed currently records **0** resolutions, and that is the honest state: no followed
+contract has settled yet. Until 2026-11-21 the engine could not record a resolution at all — it kept one only
+while the contract was still open, and a contract leaves the open set the moment it settles (measured: 500
+settled markets seen, 0 recorded). The engine now keeps a `followed` registry of every ticker it has ever
+sampled, so the yes/no outcome of a followed event is kept. See F-63.
 
 ---
 
@@ -214,7 +228,7 @@ nothing was seeded to make the page look busy. See F-53.
 | Real portfolio/P&L from the demo account | same signing requirement | same |
 | WebSocket streaming | authenticated handshake (S10) | a server-side proxy holding a key |
 | A committed auto-trader | "automate simulated trades" is served by the simulator on `portfolio.html`; shipping an unattended bot that writes trades with no signed account would be simulated data pretending to be real | owner decision, plus keys |
-| Back-tested model | would require a sufficient alert sample; there are 0 real alerts so far, and fitting a model to 0 points would be fabrication | wait for real swings, then fit and validate out-of-sample |
+| Back-tested model | would require a sufficient alert sample; the current feed holds 31 deduplicated rows on two tickers that are historical and are not validated ROI performance, so fitting a model to this sample would be fabrication | wait for real, deduplicated swings, then fit and validate out-of-sample |
 
 ---
 
@@ -229,7 +243,7 @@ Full list with links: [Flagged for review](../flagged.html#F-50). Alert-specific
 | F-03 (existing) | No traded-dollar field exists; ranking is `volume_fp × price`, labelled as an estimate |
 | F-53 | The high-ROI model is a documented heuristic, not a back-tested model |
 | F-05 (existing) | "Gas prices" excludes crude oil that shares the `Oil & Gas` tag — a judgement call, stated openly |
-| F-57 | Zero alerts so far because the demo is quiet; nothing is seeded |
+| F-57 / F-BFC-01 / F-BFC-03 | History vs current state: no contract has moved the full $0.10 threshold in the LATEST sample (0 new trade alerts), but the persisted feed holds 173 historical rows on two tickers — these must not be acted on as real events (the 74 BTC rows are also extreme oscillations, see F-BFC-03); nothing is seeded to make the page look busy |
 | F-51 | No streaming: schedule + polling only, because the WS handshake needs a key |
 | F-24 (existing) | Demo-account portfolio sync still needs the owner's key |
 
