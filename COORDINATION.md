@@ -2476,5 +2476,44 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 - **Checks on the merge commit:** `suite-qa` [44961105775](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105775) success · `site-qa` [44961105797](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105797) success · `alerts-qa` [44961105729](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105729) success · `Site build check` [44961105747](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105747) success · `live-alerts` [44961105708](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105708) success, producing sample commit `8b490d8`.
 - **Pages:** build [44961105097](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105097) success for the merge commit; the build for the follow-on data commit `8b490d8` reports `status: built`, `error.message: null`. Site settings: `built`, HTTPS enforced, source `main`.
 - **Live-site spot checks (after the CDN cache refreshed):** `flagged.html` serves F-71…F-75 with the corrected F-71/F-72/F-74 wording and the F-75 row; `market.html` serves the corrected ladder header (`→ NO ask (1 − YES bid)` / `→ YES ask (1 − NO bid)`); generated pages carry an absolute `data-asof`. One defect was caught by this spot check and is fixed in the follow-up: the best-bid/best-ask summary printed subpenny prices with two decimals ("$0.00" for $0.0020); it now uses the same 4-dp contract format as the ladder.
+- **ID collision with parallel work, resolved without discarding either side:** this session had just published
+  **F-76** (subpenny best-bid/ask shown as $0.00) and **F-77** (the provenance list was dropped by the engine's next
+  sample) when `session-2ea8e33c` merged its own **F-76** (build-staleness gate) and **F-77** (feed regression) to
+  `main` first. `main`'s IDs are kept as published; this session's two findings were renumbered **F-78** and **F-79**
+  in the template, the code comments, the validator message and the verification record. No other session's text was
+  rewritten. The merge's three conflicts (`COORDINATION.md`, `templates/flagged.tpl`, generated `flagged.html`) were
+  resolved by keeping both sessions' rows and their F-76/F-77, and dropping only this session's duplicate F-75 row
+  (the corrected F-75 text is the one kept).
+
 - **Left open on purpose:** the committed sample's age is still governed by the unreliable schedule (F-55/F-58), and no fresher sample was fabricated; every push to `main` triggers `live-alerts`, which refreshes it. F-01/F-51/F-66 (browser signing limits) are untouched.
 
+---
+---
+
+## Session `arena/2ea8e33c-kalshidash1` — final integration, verification & Pages publish (2026-11-21 UTC)
+
+- Session ID: `session-2ea8e33c`. Branch `arena/2ea8e33c-kalshidash1` (Arena-pinned, status `active`),
+  rebased onto `main` at `9761bf5`.
+- Read the board before claiming. PR #72 was already integrated by sessions `75d8eb9c` / `a2706f31`
+  (PRs #73/#75/#76) and its own reopened work was integrated by `4b5ddd87` (PR #78), so this session
+  **did not re-integrate either**; it verified the combined result and fixed what the combined result
+  actually broke.
+- Overlap handled, not discarded: `4b5ddd87` independently fixed the same `check_rescore_retained`
+  ordering flake this session had found (id-sorted fingerprint). During the rebase this session took
+  **their** fix and dropped its duplicate, and published no separate flag row for the flake. Their
+  F-75 (age penalty) was kept as published; this session's new rows were renumbered **F-76/F-77** to
+  avoid reusing an ID.
+- Claimed scope (non-overlapping): `scripts/build-site.mjs`, `scripts/check_build_staleness.mjs`
+  (new), `.github/workflows/pages.yml`, `.github/workflows/site-qa.yml`, `package.json`,
+  `templates/flagged.tpl` (append rows only), regenerated root HTML,
+  `verification/2026-11-21-2ea8e33c.md`, this board. No data file was hand-edited; the only data
+  change came from dispatching the engine.
+
+### Task board — session-2ea8e33c
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| V1 | Verify the combined site against official sources; record each source and result | done — 8 sources in `verification/2026-11-21-2ea8e33c.md` §1 | session-2ea8e33c | `verification/2026-11-21-2ea8e33c.md` |
+| V2 | **F-76**: every ~10-minute data commit made all 22 pages "stale" (as-of clock vs byte comparison); the Pages gate would fail the next push. Fix + regression test, negative-checked | done | session-2ea8e33c | `scripts/build-site.mjs`, `scripts/check_build_staleness.mjs`, `.github/workflows/pages.yml`, `.github/workflows/site-qa.yml`, `package.json` |
+| V3 | **F-77**: main's feed had regressed from `22:26:12Z` (14 alerts) to `17:42:16Z` (38 alerts) through the PR #75 merge — 5.5 h old, past the 45-min STALE limit. Corrected by dispatching the engine, not by editing data | done — feed `23:13:08Z`, v2 model, 1 executable high-ROI row | session-2ea8e33c | `data/live/feed.json` (via workflow), board |
+| V4 | Full QA battery, PR to `main`, merge, confirm Pages, record PR + deploy | done — see below | session-2ea8e33c | this board |

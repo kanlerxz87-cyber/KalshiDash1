@@ -177,7 +177,7 @@ async function main() {
   /* ...and the provenance list may not silently lose a row. The engine rebuilds the feed's `meta`
    * from `state.json` on every sample; the list was only ever written into `feed.json`, so the
    * next sample published an empty list while the re-scored rows still carried
-   * `original_highROI` (measured 2026-11-21T23:18Z, F-77). */
+   * `original_highROI` (measured 2026-11-21T23:18Z, F-79). */
   const legacyIds = new Set((feed.meta?.legacy_unfillable_high_roi || []).map((x) => x.id));
   for (const a of feed.alerts || []) {
     if (a.model && a.model.original_highROI === true && a.model.highROI !== true && !legacyIds.has(a.id)) {

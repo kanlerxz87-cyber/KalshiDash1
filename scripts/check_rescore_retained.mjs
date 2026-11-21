@@ -176,7 +176,7 @@ ok(again.meta.rescored_by_current_model === 0, 'a second sample must not re-scor
 ok(fingerprint(again) === fingerprint(next), 'the second sample must leave the rows untouched');
 
 /* ---- 6. a re-scored row's provenance may not be dropped ------------------------------------ */
-/* Measured on the published feed 2026-11-21T23:18Z (F-77): the engine rebuilds feed.json from
+/* Measured on the published feed 2026-11-21T23:18Z (F-79): the engine rebuilds feed.json from
  * state.json every sample, and the legacy list had only ever been written to the feed, so the
  * next sample published an empty list while the row still carried original_highROI. */
 const prov = structuredClone(state);

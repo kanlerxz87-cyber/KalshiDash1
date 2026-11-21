@@ -549,7 +549,7 @@ export function rescoreAlerts(alerts) {
 
 /* Derive the published provenance list from the rows themselves.
  *
- * WHY (measured 2026-11-21T23:18Z, F-77): the list used to be written only into the derived
+ * WHY (measured 2026-11-21T23:18Z, F-79): the list used to be written only into the derived
  * `feed.json`, which the engine rebuilds from `state.json` on every sample — so the next sample
  * published an empty list while the rows still carried `original_highROI`. Deriving it here means
  * the record travels with the data and cannot be lost by a rebuild. Entries for rows that are no
@@ -1948,7 +1948,7 @@ export async function selftest() {
     `a row already doubled must be restored to its published penalised score (got ${doubled[0].model.score}, want ${penal.score})`);
   ok(rescored.alerts[0].to === s3.alerts[0].to && rescored.alerts[0].ts === s3.alerts[0].ts && rescored.alerts[0].from === s3.alerts[0].from,
     're-scoring never changes a price, an arrow or a timestamp');
-  /* The provenance list is derived from the rows, so a rebuild cannot silently drop it (F-77). */
+  /* The provenance list is derived from the rows, so a rebuild cannot silently drop it (F-79). */
   ok((rescored.meta.legacy_unfillable_high_roi || []).some((x) => x.id === rescored.alerts[0].id),
     'a row re-scored out of high-ROI is listed in meta.legacy_unfillable_high_roi automatically');
 

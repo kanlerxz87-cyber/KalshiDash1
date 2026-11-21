@@ -70,7 +70,7 @@ for (const file of targets) {
   const versionChanged = previousVersion !== MODEL_VERSION;
   if (versionChanged && previousVersion) next.meta.model_version_previous = previousVersion;
   next.meta.model_version = MODEL_VERSION;
-  /* The provenance list travels with the rows (F-77): state.json is what the engine copies forward,
+  /* The provenance list travels with the rows (F-79): state.json is what the engine copies forward,
    * so it has to be here as well as in feed.json or the next sample would drop it. */
   next.meta.legacy_unfillable_high_roi = deriveLegacyUnfillable(next.alerts, next.meta.legacy_unfillable_high_roi);
 
