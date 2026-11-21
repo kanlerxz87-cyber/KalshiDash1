@@ -2039,7 +2039,7 @@ inferred — anything unconfirmed stays blank and is published on `flagged.html`
 | W2 | Replace the false “zero real alerts” statement with the current, feed-scoped observation. The latest committed feed has 23 rows (21 trade, 2 candle), 1 model high-ROI flag, 0 feed resolutions, across crypto/elections only. | done | session-717aa2fe | `templates/flagged.tpl`, generated `flagged.html`, `docs/ALERTS.md` |
 | W3 | Fix the lab-checker false error for absent optional `data/dash-quality.json` by ignoring only that exact `ENOENT`; mark prior F-59 resolved. | done | session-717aa2fe | `scripts/check_lab.mjs`, `templates/flagged.tpl`, generated `flagged.html` |
 | W4 | Re-check published API claims against official OpenAPI docs; reclassify the unsupported `/series` and `/events?category=` requests; correct F-L4-01 and publish the non-owned-file handoff. | done | session-717aa2fe | `templates/flagged.tpl`, generated `flagged.html`, new `verification/2026-11-21-717aa2fe.md`, this board |
-| W5 | Open PR to `main`, merge, verify Pages deployment, and record PR/merge result. | in progress — rebased onto main `b6cc469`; full QA passes. Refreshed head/checks, merge, and Pages verification pending. | session-717aa2fe | this board / PR #52 via `gh` |
+| W5 | Open PR to `main`, merge, verify Pages deployment, and record PR/merge result. | done — PR #52 merged 2026-11-21T07:02:39Z as `03d5e373`; Pages deployment built successfully for that commit at 07:03:01Z. | session-717aa2fe | this board / PR #52 / Pages run 44878370715 |
 
 ### Corrections and open review items
 
@@ -2072,3 +2072,8 @@ Please remove or qualify the `/events?category=` “unreliable filter” stateme
 - `git diff --check` and full conflict-marker scan — PASS.
 - `node tools/freshness_check.mjs` — PASS: age 5.9 minutes at 2026-11-21T07:00:59Z (warn/stale thresholds 20/45 minutes).
 - Full source and test log: `verification/2026-11-21-717aa2fe.md`.
+
+### PR, merge and deployment record (W5)
+
+- **PR #52:** [Correct Flagged API claims and refresh verification](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/52) merged at `2026-11-21T07:02:39Z` as merge commit [`03d5e3737abfcf20075132bb1f7ed066ea3d4eaa`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/03d5e3737abfcf20075132bb1f7ed066ea3d4eaa). Before merge, GitHub reported `mergeable=true`, `mergeStateStatus=clean`; all six PR checks (alerts, build, both QA jobs, refresh, sample) passed.
+- **GitHub Pages:** deployment run [44878370715](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44878370715) completed successfully. Pages API reports status `built`, commit `03d5e3737abfcf20075132bb1f7ed066ea3d4eaa`, no build error, updated `2026-11-21T07:03:01Z`.
