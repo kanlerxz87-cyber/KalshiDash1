@@ -81,9 +81,17 @@
       <thead><tr><th style="width:300px">Question</th><th>Why it matters</th><th style="width:300px">How to find out</th></tr></thead>
       <tbody>
         <tr><td>Can a browser call the demo API directly?</td>
-          <td>If the exchange does not send permissive CORS headers, every visitor sees the committed snapshot instead of live data.</td>
-          <td>Open the dashboard in a browser on a network that allows <code>external-api.demo.kalshi.co</code> and read the
-          data-mode badge in the header. The site reports <em>LIVE</em> or <em>SNAPSHOT</em> either way.</td></tr>
+          <td><strong>Answered by measurement on 2026-11-21 — yes for public reads, no for signed requests.</strong>
+          The demo host echoes the page origin in <code>Access-Control-Allow-Origin</code> (with
+          <code>allow-credentials: true</code>) on every public endpoint the site uses, so the live tables and charts work
+          from the browser. Its preflight does <em>not</em> allow the <code>KALSHI-ACCESS-KEY</code> /
+          <code>-SIGNATURE</code> / <code>-TIMESTAMP</code> headers, so a portfolio read or an order must run server-side
+          (here: GitHub Actions with repository secrets).</td>
+          <td>Raw response headers: <a href="data/cors-probe.json">data/cors-probe.json</a> (re-runnable:
+          <code>tools/cors_probe.mjs</code>, workflow <code>cors-probe</code>). Method and both runs:
+          <a href="verification/2026-11-21-c85ee474.md">verification record</a>. Spec:
+          <a href="https://fetch.spec.whatwg.org/#http-cors-protocol" target="_blank" rel="noopener">WHATWG Fetch</a>.
+          Per-visitor networks can still block the host; the pages report that at runtime.</td></tr>
         <tr><td>What does a real demo order cost in fees?</td>
           <td>It changes the expected value of every strategy, so the simulator's P&amp;L is currently an upper bound.</td>
           <td>Read the fee schedule for your account and the <code>fee_type</code> on the series

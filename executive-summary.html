@@ -131,7 +131,9 @@
       <li><strong>Sub-minute history from the API.</strong> Candlestick periods are 1, 60 or 1440 minutes; seconds resolution exists
       only while a page is open.</li>
       <li><strong>A real portfolio without a key.</strong> No credential is committed, so the tracked portfolio is simulated; the
-      demo-account page can read your own account if you paste your own key.</li>
+      demo-account page shows the demo-account snapshot that a GitHub Actions job produces from repository secrets. A browser
+      cannot read the account itself: the demo host’s CORS preflight does not allow the <code>KALSHI-ACCESS-*</code>
+      headers a signed request needs (measured 2026-11-21 — <a href="flagged.html#F-66">F-66</a>).</li>
       <li><strong>Anything outside the five topics.</strong> The demo exchange lists many more categories; they are out of scope by
       the brief, and the full taxonomy is linked from <a href="api.html">API reference</a>.</li>
     </ul>

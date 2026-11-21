@@ -36,7 +36,7 @@ Everything below is reachable from the navigation on every page.
 | [`strategies.html`](strategies.html) | The exact rule behind every strategy and behind the ROI score, with the sources for the exchange mechanics each rule uses. |
 | [`catalyst.html`](catalyst.html) | Swing catalysts: every ≥ $0.10 move with the official event link and the settlement sources the API names, plus clearly-labelled discovery links for a possible cause. |
 | [`strategylab.html`](strategylab.html) | Trade categorisation and strategy-rule synthesis from the recorded trades. |
-| [`demo-account.html`](demo-account.html) | Demo-account connector: signs requests in your browser from a key you paste. The key is never stored and never leaves your browser. |
+| [`demo-account.html`](demo-account.html) | Demo-account snapshot: balance, positions, fills and settlements captured by a GitHub Actions job from repository secrets. The browser only reads `data/account.json` — it cannot sign requests itself (measured CORS limitation, [F-66](flagged.html#F-66)). |
 | [`categories/gas.html`](categories/gas.html) · [`elections`](categories/elections.html) · [`culture`](categories/culture.html) · [`crypto`](categories/crypto.html) · [`golf`](categories/golf.html) | One page per focus topic: the series, the open markets, the liquidity and the resolved events for that topic only. Topics stay separate; events inside a topic stay grouped together. |
 | [`sources.html`](sources.html) | Source register — every table row on the site points at one of these. |
 | [`flagged.html`](flagged.html) | **Flagged for review** — every unverified value, limitation and irregularity, with the source to check it against. |
@@ -113,8 +113,10 @@ build sandbox they may not — in that case the committed snapshot is used and t
 - **Data freshness.** `.github/workflows/refresh-data.yml` re-captures `data/snapshot.json` from the official demo
   API and regenerates the site, so the committed fallback never drifts from the published pages.
 - **What it will not do.** Place orders or read a portfolio on its own. Those endpoints need a request signed with
-  the account holder's key; this repository holds no credentials and never asks for them. The demo-account page
-  signs requests locally in your browser from a key you paste.
+  the account holder's key; this repository holds no credentials and never asks for them. It cannot be done from the
+  browser either: the demo host's CORS preflight does not allow the `KALSHI-ACCESS-*` headers a signed request needs
+  (measured 2026-11-21, [F-66](flagged.html#F-66)). Signed reads and order placement run in GitHub Actions with
+  repository secrets, and the browser only reads the resulting `data/account.json`.
 
 ---
 
