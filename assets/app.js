@@ -752,6 +752,7 @@
 
   /* ================================================================== pages */
   var pages = {};
+  var drawMarketChart = null;   // set by the market page, driven by startUniverseRefresh()
 
   function currentPage() {
     var attr = document.body.getAttribute('data-page');
@@ -1202,6 +1203,7 @@
     function drawChart() {
       var m = state.markets[ticker];
       if (!m) return;
+      // shared with startUniverseRefresh() so the chart can follow the poller while the tab is open
       var pts = (state.history[ticker] || []).slice();
       var snapCandles = state.snapshot && state.snapshot.candlesticks && state.snapshot.candlesticks[ticker];
       if (snapCandles) {
@@ -1336,6 +1338,16 @@
       if (m) { title(m); drawChart(); drawBook(); }
     });
     loadMarket();
+
+    /* Hand the chart drawer to the shared 5-second timer (startUniverseRefresh) so the price
+     * chart keeps up with the poller while this tab is open, instead of only redrawing on a click. */
+    drawMarketChart = function () {
+      var m = state.markets[ticker];
+      if (!m) return;
+      title(m);
+      drawChart();
+      drawBook();
+    };
   };
 
   /* --------------------------------------------------------- portfolio page */
@@ -1471,6 +1483,20 @@
 
   function startUniverseRefresh() {
     state.universeTimer = setInterval(function () { refreshUniverse(); }, 10 * 60 * 1000);
+
+    /* Chart accumulation while the tab is open. detectSwing() records one [time, price] point per
+     * market per poll, but the market page only redrew the chart after an explicit action (window
+     * button, ticker change, resize). A trader watching a market therefore saw a chart that did
+     * not move even though the poller was collecting points behind it. This redraws the chart and
+     * the book ~5 times a second at most, only when this is the market page and only if it exists,
+     * and it never re-renders the tables (which would fight the reader's own scrolling). */
+    if (currentPage() === 'market') {
+      state.chartTimer = setInterval(function () {
+        try {
+          if (drawMarketChart && document.getElementById('price-chart')) drawMarketChart();
+        } catch (e) { /* a redraw must never take the page down */ }
+      }, 5000);
+    }
   }
 
   function init() {
