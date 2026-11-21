@@ -2401,7 +2401,13 @@ session's `awaiting` key was regenerated from the committed `state.json` by its 
 | A4 | Confirm GitHub Pages live: `status: built`, HTTPS enforced, source `main` | done | session-a2706f31 | none |
 | A5 | Verify requirements coverage: all 19 brief requirements mapped to implementation | done | session-a2706f31 | `verification/2026-11-21-a2706f31.md` (new) |
 | A6 | Record session verification record | done | session-a2706f31 | `verification/2026-11-21-a2706f31.md` (new) |
-| A7 | PR to `main` and merge | not required — branch == `main`, working tree clean, no changes to merge | session-a2706f31 | n/a |
+| A7 | PR to `main` and merge | done — PR #74 (`arena/a2706f31-kalshidash1` → `main`), merged via `gh pr merge 74 --merge` | session-a2706f31 | COORDINATION.md, verification/2026-11-21-a2706f31.md |
+
+### PR, merge & deploy record — session-a2706f31
+
+- **PR:** [#74](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/74) — "Final end-to-end verification (session-a2706f31)" — `arena/a2706f31-kalshidash1` → `main`.
+- **Merge:** `gh pr merge 74 --merge` — success. Merge commit `6e33abe` on `main`.
+- **Pages:** build for merge commit `6e33abe` — `status: built`, `error.message: null`, URL `https://kanlerxz87-cyber.github.io/KalshiDash1/`, source branch `main`, HTTPS enforced. Deploy confirmed successful.
 
 ### Results — session-a2706f31 (2026-11-21 ~22:30 UTC)
 
@@ -2410,7 +2416,7 @@ session's `awaiting` key was regenerated from the committed `state.json` by its 
 - `node scripts/check-html-ids.mjs`: **PASS** — 89 HTML files, 561 ids, 0 duplicates.
 - GitHub Pages: **LIVE** — `https://kanlerxz87-cyber.github.io/KalshiDash1/`, status `built`, error `null`, HTTPS enforced.
 - Data: `data/live/feed.json` generated `2026-11-21T22:26:12.000Z` (14 alerts: 9 crypto, 5 elections; 0 high-ROI; 0 resolutions). `data/snapshot.json` captured `2026-11-21T16:02:38.983Z`.
-- **No changes committed:** working tree clean, branch == `main` at `b81f9f2`. No PR or merge required.
+- Changes committed: `6e33abe` — session-a2706f31 verification record + COORDINATION.md entry. Pushed to `arena/a2706f31-kalshidash1`, merged to `main` via PR #74.
 - Flagged irregularities (pre-existing, unchanged): F-02 (demo-account key required), F-03 (derived dollar-volume estimate), F-07 (portfolio blocked without key), F-66 (browser cannot sign requests), plus F-01, F-04–F-06, F-08–F-65, F-67–F-70 as documented on `flagged.html`. None block the site.
 
 ---
