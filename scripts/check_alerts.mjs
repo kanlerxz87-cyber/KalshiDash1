@@ -193,15 +193,18 @@ async function main() {
    * it was appended after `process.exit(1)`, so its finding was recorded in `problems` and
    * never read — a dead check that printed "OK" on a flooded feed (flagged as F-63).
    *
-   * The invariant comes from the engine's own dedupe window: collapseDuplicates keeps at most
-   * one alert per ticker per 15 minutes, so a healthy feed can hold at most 4 alerts from one
-   * contract in any rolling hour (5 with boundary skew). More than that means the detector
-   * re-published the same flapping contract, which is what made the live chat unreadable on
-   * 2026-11-20 (99 of 99 rows from KXPRESNOMD-28-AKLO). Threshold: 6/hour — one row of slack
-   * above the theoretical maximum, still far below the 37/hour measured on the broken feed.
+   * The invariant is derived from the engine's own dedupe rule. collapseDuplicates keeps one
+   * alert per ticker per 15 minutes within a detector, and merges different detectors of the same
+   * ticker only inside 3 minutes, so the engine can legitimately publish at most
+   * 3 detectors × 4 quarter-hour windows = 12 alerts from one contract per rolling hour.
+   * Measured on the broken feed before PR #39: 22 and 30 rows from one ticker inside one hour
+   * (99 of 173 rows overall), which is what made the live chat unreadable. The cap is therefore
+   * 12/hour: exactly the engine's documented capacity, and roughly half the observed flood.
+   * A first version used 6/hour, which was below the engine's real capacity — it failed a live
+   * sample in CI on 2026-11-21 06:38 UTC before this derivation was written down.
    */
   {
-    const MAX_PER_HOUR = 6;
+    const MAX_PER_HOUR = 12;
     const byTicker = {};
     for (const a of feed.alerts || []) {
       const ts = Date.parse(a.ts) || 0;

@@ -52,7 +52,7 @@ const check = (cond, label) => {
 const a = run(base, 'clean');
 check(a.status === 0, `committed feed passes the checker (exit ${a.status})`);
 
-// B. one ticker with 8 alerts inside 45 minutes must be rejected
+// B. one ticker with 14 alerts inside 45 minutes must be rejected
 // The oldest row is used as the seed so every synthetic timestamp stays in the recent past
 // (the checker rejects a timestamp in the future, which is an unrelated assertion).
 const seed = [...base.alerts].sort((x, y) => Date.parse(x.ts) - Date.parse(y.ts))[0];
@@ -61,23 +61,23 @@ const flood = {
   ...base,
   alerts: [
     ...base.alerts,
-    ...Array.from({ length: 8 }, (_, i) => ({
+    ...Array.from({ length: 14 }, (_, i) => ({
       ...seed,
       id: `${seed.id}#flood-test-${i}`,
-      // 8 rows inside 45 minutes: a flood the engine's 15-minute rule cannot produce
-      ts: new Date(t0 + 2 * 60 * 1000 + i * 6 * 60 * 1000).toISOString(),
+      // 14 rows inside 42 minutes: more than the engine's 3 detectors x 4 quarter-hour windows
+      ts: new Date(t0 + 2 * 60 * 1000 + i * 3 * 60 * 1000).toISOString(),
     })),
   ],
 };
 const b = run(flood, 'flood');
 check(b.status === 1, `flooded feed fails the checker (exit ${b.status})`);
 check(/chat readability/.test(b.out), 'failure names the chat-readability guard');
-check(/limit 6/.test(b.out), 'failure states the per-hour limit');
+check(/limit 12/.test(b.out), 'failure states the per-hour limit');
 
 // C. the same count spread one per hour is not a flood: the cap is a rolling window, not a total
 const gentler = {
   ...base,
-  alerts: Array.from({ length: 8 }, (_, i) => ({
+  alerts: Array.from({ length: 12 }, (_, i) => ({
     ...seed,
     id: `${seed.id}#spread-test-${i}`,
     ts: new Date(t0 - i * 60 * 60 * 1000).toISOString(),
