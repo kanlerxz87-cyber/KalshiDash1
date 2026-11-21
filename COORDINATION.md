@@ -19,7 +19,7 @@
 | I2 | Integrate stale PR #72, reproduce/fix its failed check, re-verify model/alert outputs without inventing data. | done (integrated main; 17 retained-score checks) | session-135bb43a (final integration) | PR #72's existing files via merge; targeted QA fixes as evidenced |
 | I3 | Fix canonical browser simulator only where defects are reproduced: executable YES/NO asks and quantities, no stale/snapshot assumed fills, verifiable performance accounting and final settlement; add offline regression tests. | done (53 paper / 31 DOM; live fills unverified) | session-135bb43a | `assets/app.js`, new `assets/paper.js`, new `scripts/check-paper.mjs`, `package.json`, `.github/workflows/site-qa.yml`, `templates/{market,portfolio,analysis,strategies,executive-summary,flagged}.tpl` |
 | I4 | Verify graph time/source semantics and event links; fix demonstrated issues, not infer news causation. | done (31 DOM; causes stay unverified) | session-135bb43a | `assets/chart.js`, `assets/app.js`, new `scripts/check-market-chart.mjs`, `templates/market.tpl` |
-| I5 | Full requirement/source audit, source-linked report, canonical site build, per-row official-source checks, internal-link checks, integration PR to main, merge and Pages confirmation. | in progress | session-135bb43a (final integration) | new `verification/2026-11-21-135bb43a.md`, `README.md`, this board; generated root/category HTML through `scripts/build-site.mjs` only |
+| I5 | Full requirement/source audit, source-linked report, canonical site build, per-row official-source checks, internal-link checks, integration PR to main, merge and Pages confirmation. | QA done; PR #91 merge/Pages pending | session-135bb43a (final integration) | new `verification/2026-11-21-135bb43a.md`, `README.md`, this board; generated root/category HTML through `scripts/build-site.mjs` only |
 
 ### Integration conflict and handoff log
 
@@ -158,6 +158,18 @@
   side's count is unknown, while the explicitly project-authored liquidity component scores
   missing evidence zero. The existing missing-touch regression now pins both distinctions.
 - No feed/state/snapshot change is introduced by this merge. Full combined tests are rerun.
+
+### PR #91 release candidate
+
+- Created [PR #91](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/91) from the assigned branch;
+  first head `7e13f39` passed build/site/suite/alerts/live-sample checks. Real Chromium 31-case
+  desktop/mobile fallback suite also passed after PR #84 integration.
+- Merged main's newer official engine commit `557421e` cleanly before release: feed/state
+  `2026-11-21T23:43:29.000Z` verbatim, still 40 alerts / 3 model-selected high-ROI / 0 resolutions /
+  4 awaiting / 60 markets / 8 books. Snapshot remains `2026-11-21T23:21:00.999Z`.
+- Full `npm test`, read-only build, freshness 81, workflow syntax 9, concurrency 31, keepalive 27
+  pass again; 1,018 publisher-linked static rows / zero missing; 2,198 internal links / zero
+  broken; 336 external URLs listed (not fetched). I5 awaits actual own merge/deployment evidence.
 
 ### Initial evidence and limits
 
