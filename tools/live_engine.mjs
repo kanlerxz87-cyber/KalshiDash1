@@ -905,11 +905,84 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
 /**
  * For every tracked market that is no longer open, read its settled state.
  * Uses GET /markets?series_ticker=..&status=settled (S4) and GET /markets/{ticker} (S5).
+/**
+ * For every tracked market that is no longer open, read its settled state.
+ * Uses GET /markets?series_ticker=..&status=settled (S4) and GET /markets/{ticker} (S5).
+ *
+ * Two lookup paths, because one alone is not enough:
+ *
+ * 1. **Per-ticker** (`GET /markets/{ticker}`) for every followed market whose close time has
+ *    passed. This is the authoritative source for that one contract: it returns `result`,
+ *    `settlement_value_dollars` and `settlement_ts` directly. It is bounded by the number of
+ *    followed contracts that have closed, so it costs one request each and always finds its
+ *    market.
+ * 2. **Per-series** (`GET /markets?series_ticker=..&status=settled`) as a safety net for a
+ *    settlement the engine did not predict — a contract that closed early, or one whose close
+ *    time it never learned. This path is paginated, because a single page is not enough:
+ *    `KXPGATOUR` alone has thousands of settled markets, and without a cursor the followed
+ *    market is simply not in the first page.
  */
-export async function collectResolutions(client, state, { maxSeries = 12, log = () => {} } = {}) {
-  // Query the series of every market the engine follows — not only the ones that are still
-  // open. A market that has settled has already left `state.markets`, so a series whose
-  // markets have all closed would otherwise never be asked for its results.
+export async function collectResolutions(client, state, { maxSeries = 12, maxSeriesPages = 5, maxTickerLookups = 60, nowSeconds = null, log = () => {} } = {}) {
+  const now = nowSeconds ?? Math.floor(Date.now() / 1000);
+  const out = [];
+  const seen = new Set();
+
+  // The topic of a market that has settled is no longer in `state.markets` — it left when the
+  // market closed — so it is read from the `followed` registry, which keeps it for ever.
+  const metaOf = (ticker) => state.markets?.[ticker] || state.followed?.[ticker] || {};
+
+  const push = (m, seriesTicker, sourceUrl) => {
+    if (!m || !m.ticker) return;
+    if (m.result !== 'yes' && m.result !== 'no' && m.result !== 'scalar') return;
+    if (seen.has(m.ticker)) return;
+    seen.add(m.ticker);
+    const meta = metaOf(m.ticker);
+    out.push({
+      ticker: m.ticker,
+      event_ticker: m.event_ticker || null,
+      series_ticker: seriesTicker || m.series_ticker || meta.series_ticker || null,
+      topic: meta.topic || null,
+      title: m.title || meta.title || null,
+      result: m.result,
+      status: m.status || null,
+      settlement_value_dollars: m.settlement_value_dollars ?? null,
+      settlement_ts: m.settlement_ts ?? null,
+      last_price_dollars: m.last_price_dollars ?? null,
+      volume_fp: m.volume_fp ?? null,
+      close_time: m.close_time ?? null,
+      rules_primary: m.rules_primary ?? null,
+      contract_terms_url: meta.contract_terms_url || null,
+      source_url: sourceUrl,
+    });
+    log(`  resolved: ${m.ticker} -> ${m.result}`);
+  };
+
+  // ---- 1. per-ticker lookups for followed markets whose close time has passed -------------
+  const closedTickers = Object.entries(state.followed || {})
+    .filter(([, f]) => {
+      if (!f || !f.close_time) return false;
+      const t = Date.parse(f.close_time);
+      return Number.isFinite(t) && Math.floor(t / 1000) <= now;
+    })
+    .map(([ticker]) => ticker)
+    .sort();
+  for (const ticker of closedTickers.slice(0, maxTickerLookups)) {
+    const path = `/markets/${encodeURIComponent(ticker)}`;
+    let data;
+    try {
+      data = await client.getJson(path);
+    } catch (e) {
+      log(`  settled lookup failed for ${ticker}: ${e.message}`);
+      continue;
+    }
+    const m = data && data.market ? data.market : data;
+    push(m, metaOf(ticker).series_ticker, client.base + path);
+  }
+  if (closedTickers.length > maxTickerLookups) {
+    log(`  ${closedTickers.length - maxTickerLookups} closed followed market(s) not looked up this run (cap ${maxTickerLookups})`);
+  }
+
+  // ---- 2. per-series safety net, paginated -----------------------------------------------
   const trackedSeries = new Set();
   for (const m of Object.values(state.markets || {})) {
     if (m && m.series_ticker) trackedSeries.add(m.series_ticker);
@@ -917,37 +990,21 @@ export async function collectResolutions(client, state, { maxSeries = 12, log = 
   for (const f of Object.values(state.followed || {})) {
     if (f && f.series_ticker) trackedSeries.add(f.series_ticker);
   }
-  const out = [];
   const list = [...trackedSeries].slice(0, maxSeries);
   for (const st of list) {
-    const path = marketsQueryUrl(st, { status: 'settled', limit: 100 });
-    let data;
-    try {
-      data = await client.getJson(path);
-    } catch (e) {
-      log(`  settled lookup failed for ${st}: ${e.message}`);
-      continue;
-    }
-    for (const m of data.markets || []) {
-      if (m.result !== 'yes' && m.result !== 'no' && m.result !== 'scalar') continue;
-      out.push({
-        ticker: m.ticker,
-        event_ticker: m.event_ticker || null,
-        series_ticker: st,
-        topic: (state.markets?.[m.ticker] || {}).topic || null,
-        title: m.title || null,
-        result: m.result,
-        status: m.status || null,
-        settlement_value_dollars: m.settlement_value_dollars ?? null,
-        settlement_ts: m.settlement_ts || null,
-        last_price_dollars: m.last_price_dollars ?? null,
-        volume_fp: m.volume_fp ?? null,
-        close_time: m.close_time || null,
-        rules_primary: m.rules_primary || null,
-        contract_terms_url: (state.markets?.[m.ticker] || {}).contract_terms_url || null,
-        source_url: client.base + path,
-      });
-      log(`  resolved: ${m.ticker} -> ${m.result}`);
+    let cursor = null;
+    for (let page = 0; page < maxSeriesPages; page++) {
+      const path = marketsQueryUrl(st, { status: 'settled', limit: 100, cursor });
+      let data;
+      try {
+        data = await client.getJson(path);
+      } catch (e) {
+        log(`  settled lookup failed for ${st}: ${e.message}`);
+        break;
+      }
+      for (const m of data.markets || []) push(m, st, client.base + path);
+      cursor = data.cursor || null;
+      if (!cursor) break;
     }
   }
   return out;
@@ -1444,7 +1501,7 @@ export function slimHistory(state, limit = 12) {
  * Offline check of the pure logic. No network. Exits non-zero on any failed assertion,
  * so CI catches a regression in threshold handling or scoring.
  */
-export function selftest() {
+export async function selftest() {
   const fails = [];
   const ok = (cond, msg) => { if (!cond) fails.push(msg); };
 
@@ -1563,6 +1620,88 @@ export function selftest() {
   ok(s9.resolutions.length === 1,
     'a resolution for a market the engine never followed is still counted out, not stored');
 
+  // ---- collectResolutions: the lookup itself, against a stubbed client -------------------
+  //
+  // The live run exposed a second, deeper defect in the same feature. `collectResolutions`
+  // asked only for the settled markets of a *series* (`GET /markets?series_ticker=..`), capped
+  // at the first 100 rows. `KXPGATOUR` alone has thousands of settled markets, so the
+  // followed market was simply not in that page — and the engine never called
+  // `GET /markets/{ticker}`, the endpoint that returns one contract's `result` directly,
+  // even though its own docstring said it did. The resolution table could therefore stay
+  // empty even with the `followed` registry in place.
+  //
+  // These assertions use a stub client so the behaviour is proved without network access.
+  {
+    const closedAt = '2026-11-20T00:00:00Z';
+    const st = {
+      markets: {},
+      followed: {
+        'CLOSED-1': { series_ticker: 'SER', topic: 'golf', title: 'A closed contract', close_time: closedAt },
+        'OPEN-1': { series_ticker: 'SER', topic: 'golf', title: 'A still-open contract', close_time: '2099-01-01T00:00:00Z' },
+      },
+    };
+    const asked = [];
+    const stub = {
+      base: 'https://example.invalid/trade-api/v2',
+      getJson: async (path) => {
+        asked.push(path);
+        if (path === '/markets/CLOSED-1') {
+          return { market: { ticker: 'CLOSED-1', result: 'no', status: 'finalized', settlement_value_dollars: '0.0000', settlement_ts: closedAt, title: 'A closed contract', series_ticker: 'SER' } };
+        }
+        if (path.startsWith('/markets?')) {
+          // The series page does NOT contain the followed market — the exact live situation.
+          return { markets: [{ ticker: 'SOMEONE-ELSE', result: 'yes' }], cursor: 'MORE' };
+        }
+        throw new Error('unexpected path ' + path);
+      },
+    };
+    const found = await collectResolutions(stub, st, { nowSeconds: Math.floor(Date.parse(closedAt) / 1000), log: () => {} });
+    const mine = found.filter((r) => r.ticker === 'CLOSED-1');
+    ok(mine.length === 1,
+      'a followed market that has closed is resolved by asking for that ticker directly');
+    ok(mine[0] && mine[0].result === 'no' && mine[0].settlement_value_dollars === '0.0000',
+      'the resolution carries the official yes/no result and the official settlement value');
+    ok(mine[0] && mine[0].topic === 'golf' && mine[0].title === 'A closed contract',
+      'the resolution keeps the topic and title even though the market has left the open set');
+    ok(asked.includes('/markets/CLOSED-1'),
+      'the per-ticker endpoint GET /markets/{ticker} is actually used');
+    ok(!asked.includes('/markets/OPEN-1'),
+      'a followed market that is still open is not looked up as settled');
+    ok(mine[0] && mine[0].source_url === 'https://example.invalid/trade-api/v2/markets/CLOSED-1',
+      'the resolution links to the API row it was read from');
+
+    // The series safety net may return markets the engine never followed. Those are NOT
+    // stored — applySample() counts them out as untracked — which is the contract that keeps
+    // the resolution table to the events this dashboard actually followed.
+    ok(found.some((r) => r.ticker === 'SOMEONE-ELSE'),
+      'the series safety net still reports settled markets the engine did not follow');
+    const applied = applySample({ ...EMPTY_STATE, ...st, meta: { ...EMPTY_STATE.meta }, resolutions: [] }, {
+      nowSeconds: Math.floor(Date.parse(closedAt) / 1000), markets: [], resolutions: found, runId: 'r1',
+    });
+    ok(applied.resolutions.length === 1 && applied.resolutions[0].ticker === 'CLOSED-1',
+      'a settled market the engine never followed is not stored as one of ours');
+    ok((applied.run.untracked_settled_seen || 0) >= 1,
+      'a settled market the engine never followed is counted out, not silently dropped');
+  }
+
+  // The series safety net must follow the cursor: the followed market may be on any page.
+  {
+    const st2 = { markets: {}, followed: { 'F1': { series_ticker: 'SER', topic: 'golf', close_time: null } } };
+    let call = 0;
+    const stub2 = {
+      base: 'https://example.invalid/trade-api/v2',
+      getJson: async (path) => {
+        call += 1;
+        if (call === 1) return { markets: [], cursor: 'PAGE2' };
+        return { markets: [{ ticker: 'F1', result: 'yes', settlement_value_dollars: '1.0000' }], cursor: null };
+      },
+    };
+    const found2 = await collectResolutions(stub2, st2, { nowSeconds: 1000, maxSeries: 1, maxSeriesPages: 3, log: () => {} });
+    ok(call === 2, 'the settled series query follows the cursor to the next page');
+    ok(found2.length === 1 && found2[0].ticker === 'F1' && found2[0].result === 'yes',
+      'a followed market found on a later page of the settled series is still recorded');
+  }
+
   // ladder
   const ladder = buildLadder({ orderbook_fp: { yes_dollars: [['0.0100', '200.00'], ['0.4200', '13.00']], no_dollars: [['0.5600', '17.00']] } });
   ok(ladder.best_yes_bid === 0.42, 'best yes bid is the LAST element (documented ascending order)');
@@ -1666,7 +1805,7 @@ export function selftest() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const args = process.argv.slice(2);
   if (args.includes('--selftest')) {
-    process.exit(selftest());
+    process.exit(await selftest());
   }
   const maxSeriesArg = args.indexOf('--max-series');
   const maxSeries = maxSeriesArg >= 0 ? parseInt(args[maxSeriesArg + 1], 10) : 12;
