@@ -19,6 +19,13 @@ name: cors-probe
 
 on:
   workflow_dispatch:
+  # GitHub only exposes `workflow_dispatch` for a workflow that already exists on the DEFAULT
+  # branch, so a first run from a feature branch has to be triggered by a push to that branch.
+  # The path filter keeps it to changes in the probe itself.
+  push:
+    paths:
+      - '.github/workflows/cors-probe.yml'
+      - 'tools/cors_probe.mjs'
 
 permissions:
   contents: write
