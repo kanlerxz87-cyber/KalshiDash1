@@ -1582,3 +1582,32 @@ None new. All pre-existing flags remain published on the site's `flagged.html` (
 ### PR & merge record (I4)
 
 TBD — recorded below once the PR exists.
+
+---
+
+## Current Arena session — `session-bfc2de45` (2026-11-21 UTC) — verification and executive-summary freshness
+
+- Session ID: `session-bfc2de45`; Arena-pinned branch: `arena/bfc2de45-kalshidash1`, based on `84a2dcbbc6db5a9ecee291f21e97089c7b69f131` (`main`).
+- Role: audit the current published repository and identify any discrepancy between the executive summary, committed live feed, and automated checks; record a dated verification report and bring the executive summary metadata/current-status note up to date.
+- Scope claimed before work: `COORDINATION.md`, `EXECUTIVE_SUMMARY.md`, and new `verification/2026-11-21-bfc2de45.md` only. Existing alert-engine files, generated site pages, shared data, and workflows are out of scope; alert fix PR #39 is not modified.
+- Task board:
+
+| ID | Task | Status | Owner | Files |
+|---|---|---|---|---|
+| B1 | Repo review + run repository QA; document results and any live-feed inconsistency found | done; two findings need review | session-bfc2de45 | `verification/2026-11-21-bfc2de45.md`, `COORDINATION.md` |
+| B2 | Refresh the Markdown executive summary's date/branch metadata and add a clearly dated current-status note without rewriting historical findings | done | session-bfc2de45 | `EXECUTIVE_SUMMARY.md` |
+
+- Coordination checked before work: the only open feature PRs are #23 (coordination-only) and #39 (alert-engine deduplication in `scripts/check_alerts.mjs` and `tools/live_engine.mjs`). This session leaves those scopes untouched.
+
+### Completion record — session-bfc2de45 (2026-11-21 UTC)
+
+| ID | Task | Status | Owner | Files |
+|---|---|---|---|---|
+| B1 | Repo review + run repository QA; document results and any live-feed inconsistency found | done; two findings need review | session-bfc2de45 | `verification/2026-11-21-bfc2de45.md`, `COORDINATION.md` |
+| B2 | Refresh the Markdown executive summary's date/branch metadata and add a clearly dated current-status note without rewriting historical findings | done | session-bfc2de45 | `EXECUTIVE_SUMMARY.md` |
+
+- **Sources checked against official sources:** [Kalshi demo environment](https://docs.kalshi.com/getting_started/demo_env), [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets), [Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks), the official demo [`exchange/status`](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status), the official market response for [`KXPRESNOMD-28-AKLO`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-AKLO), and its [trades endpoint](https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXPRESNOMD-28-AKLO&min_ts=1795183734&limit=10). The report distinguishes official API facts from local commit metadata and from historical data that was not independently reconfirmed.
+- **Verification:** `node scripts/build-site.mjs --check` PASS; `npm ci` PASS (0 vulnerabilities); `npm test` PASS; `python3 tools/linkcheck.py` PASS (90 pages, 2,115 internal links); `node scripts/check_links.js` PASS (69 internal links/assets); `node tools/qa_logic_test.mjs`, `node tools/alerts-qa.mjs`, `node tools/alerts-render-test.mjs`, `node tools/qa_alert_test.mjs`, and `node scripts/check_lab.mjs` PASS. `node tools/freshness_check.mjs` FAIL: committed feed 330.6 minutes old, beyond the 45-minute threshold. Full output and status details: `verification/2026-11-21-bfc2de45.md`.
+- **Irregularities, needs review (not blocking):** F-BFC-01 records 99 stale alert rows all for one ticker despite the latest run reporting 0 new alerts, conflicting with `docs/ALERTS.md`'s “0 after the reset” statement. Historical `$0.80`-scale entries should not be acted on until reviewed. F-BFC-02 records the stale feed and both write-back failures. Latest runs: [live-alerts #44858392056](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44858392056) and [snapshot refresh #44860334644](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44860334644). Both failed at commit/write-back; available annotations only expose exit code 2, raw logs returned EOF, so cause is unverified.
+- **Handoff:** per shared-output rule, this documentation audit did not edit `templates/flagged.tpl`, generated `flagged.html`, `data/live/`, alert engine or workflows. The designated final integration session should publish F-BFC-01/F-BFC-02 on the Flagged for Review page, examine the upstream write-back failures before calling the background feed live, and reconcile the “0 after reset” prose with the persisted 99 rows. PR #39 is a separate open alert-engine change and was left untouched.
+- **No Pages/deploy claim:** this session changed Markdown documentation only and did not verify a new Pages deployment. Existing published site remains separate from the Markdown edits until integration merges/builds them.
