@@ -203,9 +203,9 @@ re-reading the single-market endpoint after an alert looked implausible, not by 
 Alerts so far: the latest sample (2026-11-21T06:28:52Z) created **0 new trade alerts** and added 60 candle
 alerts (242 duplicates collapsed). The persisted feed deliberately retains its rows across the retained range
 — it currently holds 173 rows (99 for `KXPRESNOMD-28-AKLO` and 74 for `KXBTCY-27JAN0100-B97500`), many of which
-are historical and must not be acted on without review. The one-ticker flood is addressed by open PR #39;
-the exact count and the 0-new-alerts reading disagree with the persisted rows only because the feed retains
-the full detected window — nothing was seeded to make the page look busy. See F-53 and F-BFC-01/F-BFC-02.
+are historical and must not be acted on without review. The one-swing-per-ticker flood fix (PR #39) has since
+merged; the exact count and the 0-new-alerts reading disagree with the persisted rows only because the feed
+retains the full detected window — nothing was seeded to make the page look busy. See F-53 and F-BFC-01/F-BFC-03.
 
 ---
 
@@ -217,7 +217,7 @@ the full detected window — nothing was seeded to make the page look busy. See 
 | Real portfolio/P&L from the demo account | same signing requirement | same |
 | WebSocket streaming | authenticated handshake (S10) | a server-side proxy holding a key |
 | A committed auto-trader | "automate simulated trades" is served by the simulator on `portfolio.html`; shipping an unattended bot that writes trades with no signed account would be simulated data pretending to be real | owner decision, plus keys |
-| Back-tested model | would require a sufficient alert sample; the current feed holds 173 rows (mostly one ticker) that are historical and are not validated ROI performance, so fitting a model to this sample would be fabrication — PR #39 is addressing the flood first | wait for real, deduplicated swings, then fit and validate out-of-sample |
+| Back-tested model | would require a sufficient alert sample; the current feed holds 173 rows (mostly one ticker) that are historical and are not validated ROI performance, so fitting a model to this sample would be fabrication — PR #39 has merged the swing-per-ticker flood fix, so the deduplicated history is now the honest read | wait for real, deduplicated swings, then fit and validate out-of-sample |
 
 ---
 
@@ -232,7 +232,7 @@ Full list with links: [Flagged for review](../flagged.html#F-50). Alert-specific
 | F-03 (existing) | No traded-dollar field exists; ranking is `volume_fp × price`, labelled as an estimate |
 | F-53 | The high-ROI model is a documented heuristic, not a back-tested model |
 | F-05 (existing) | "Gas prices" excludes crude oil that shares the `Oil & Gas` tag — a judgement call, stated openly |
-| F-57 / F-BFC-01 | History vs current state: no contract has moved the full $0.10 threshold in the LATEST sample (0 new trade alerts), but the persisted feed holds 173 historical rows on two tickers — these must not be acted on as real events; nothing is seeded to make the page look busy |
+| F-57 / F-BFC-01 / F-BFC-03 | History vs current state: no contract has moved the full $0.10 threshold in the LATEST sample (0 new trade alerts), but the persisted feed holds 173 historical rows on two tickers — these must not be acted on as real events (the 74 BTC rows are also extreme oscillations, see F-BFC-03); nothing is seeded to make the page look busy |
 | F-51 | No streaming: schedule + polling only, because the WS handshake needs a key |
 | F-24 (existing) | Demo-account portfolio sync still needs the owner's key |
 
