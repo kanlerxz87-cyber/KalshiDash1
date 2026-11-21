@@ -36,6 +36,12 @@ jobs:
       - name: Chat-readability guard test (flood must be rejected)
         run: node tools/check_alerts_guard_test.mjs
 
+      # F-66: "track until it resolves" broke silently twice — a followed market evicted before
+      # its result was published, and a settled lookup that only read page 1 while the documented
+      # settlement-time filter went unused. Both are pinned here, offline.
+      - name: Resolution logic test (retention + documented settled query)
+        run: node tools/check_resolution_logic_test.mjs
+
       - name: Render the alert page in jsdom and assert its behaviour
         run: node scripts/check_alerts_page.mjs
 
