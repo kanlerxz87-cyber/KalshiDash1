@@ -115,12 +115,16 @@ async function timed(fn) {
   }
 }
 
+const ATTEMPTS = 3;
+const TIMEOUT_MS = 15000;
+
 async function get(url, origin) {
   return timed(async () => {
     const res = await fetch(url, {
       method: 'GET',
       headers: { Origin: origin, Accept: 'application/json' },
       redirect: 'follow',
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
     // Read the body so the connection is measured end to end; the body is not published.
     const text = await res.text();
@@ -148,6 +152,7 @@ async function preflight(spec, origin) {
         'Access-Control-Request-Headers': spec.headers,
       },
       redirect: 'manual',
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
     return { status: res.status, headers: pick(res.headers) };
   });
@@ -179,9 +184,18 @@ async function main() {
   };
 
   for (const spec of GETS) {
-    const r = await get(spec.url, SITE_ORIGIN);
-    const verdict = r.error ? { allowed: null, why: 'request failed' } : readable(r.headers);
-    report.results.push({ name: spec.name, url: spec.url, ...r, readable_from_browser: verdict });
+    /* A single failed request is not a finding: the demo host is rate-limited and one request in
+     * the first probe timed out while its neighbours answered in ~300 ms. Retry before concluding
+     * anything, and record how many attempts it took either way. */
+    let r = await get(spec.url, SITE_ORIGIN);
+    let attempts = 1;
+    while (r.error && attempts < ATTEMPTS) {
+      attempts++;
+      await new Promise((res) => setTimeout(res, 1500 * attempts));
+      r = await get(spec.url, SITE_ORIGIN);
+    }
+    const verdict = r.error ? { allowed: null, why: `request failed after ${attempts} attempts` } : readable(r.headers);
+    report.results.push({ name: spec.name, url: spec.url, attempts, ...r, readable_from_browser: verdict });
     console.log(`${spec.name.padEnd(24)} ${r.error ? 'ERROR ' + r.error : 'HTTP ' + r.status} ` +
       `acaO=${r.headers ? r.headers['access-control-allow-origin'] ?? '(none)' : '(n/a)'} ` +
       `-> ${verdict.allowed === null ? 'unknown' : verdict.allowed ? 'READABLE' : 'BLOCKED'}`);
