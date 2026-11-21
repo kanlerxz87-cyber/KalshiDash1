@@ -2499,3 +2499,15 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 | V2 | **F-76**: every ~10-minute data commit made all 22 pages "stale" (as-of clock vs byte comparison); the Pages gate would fail the next push. Fix + regression test, negative-checked | done | session-2ea8e33c | `scripts/build-site.mjs`, `scripts/check_build_staleness.mjs`, `.github/workflows/pages.yml`, `.github/workflows/site-qa.yml`, `package.json` |
 | V3 | **F-77**: main's feed had regressed from `22:26:12Z` (14 alerts) to `17:42:16Z` (38 alerts) through the PR #75 merge — 5.5 h old, past the 45-min STALE limit. Corrected by dispatching the engine, not by editing data | done — feed `23:13:08Z`, v2 model, 1 executable high-ROI row | session-2ea8e33c | `data/live/feed.json` (via workflow), board |
 | V4 | Full QA battery, PR to `main`, merge, confirm Pages, record PR + deploy | done — see below | session-2ea8e33c | this board |
+
+### PR, merge & deploy record — session-2ea8e33c (2026-11-21 23:20 UTC)
+
+- **PR:** [#79](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/79) — "Final integration: fix the stale-site gate (F-76), restore a live feed, publish F-76–F-77" — **merged** 2026-11-21T23:20:45Z as merge commit [`172fd9838387494d8b4aca42d850b3fe9b1cc641`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/172fd9838387494d8b4aca42d850b3fe9b1cc641).
+- **Checks on the PR head:** `alerts` pass, `build` (Site build check, now running the read-only `--check`) pass, `site-qa` pass, `suite-qa` pass, `refresh` pass — 5/5.
+- **Rebase history:** the branch was rebased twice as other sessions merged. The only conflicts were `COORDINATION.md`, `package.json` and `scripts/check_rescore_retained.mjs`; each was resolved by keeping **both** sessions' work. `4b5ddd87`'s independent fix for the same re-score flake was kept and this session's duplicate dropped (see the overlap note above); no other session's file was rewritten.
+- **Pages:** `pages/builds/latest` for the merge commit → status **`built`**, `error.message` **`null`**, created 2026-11-21T23:20:47Z, updated 23:21:16Z.
+- **Live-site spot checks after deploy:**
+  - `https://kanlerxz87-cyber.github.io/KalshiDash1/data/live/feed.json` serves `meta.generated_at 2026-11-21T23:18:26Z`, `model_version heuristic-v2` (fresh, not the 17:42 sample).
+  - `https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-2ea8e33c.md` is served (this session's record).
+  - `https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html` is served with the F-7x block.
+- **Irregularities:** none new beyond F-76/F-77, both published on `flagged.html`. The sandbox cannot `curl` `*.kalshi.co` (TLS EOF), so live values were read through the platform page fetcher and the engine was exercised by dispatching `live-alerts` in GitHub Actions.
