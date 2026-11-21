@@ -945,6 +945,46 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
   // ---- merge alerts: newest first, de-duplicated by id
   const known = new Set(next.alerts.map((a) => a.id));
   for (const a of newAlerts) if (!known.has(a.id)) next.alerts.push(a);
+
+  /* RE-SCORE EVERY RETAINED ROW WITH THE CURRENT MODEL.
+   *
+   * WHY (measured 2026-11-21, CI run 44947818572): alerts persist across runs, so a row scored by
+   * an older model keeps its old verdict forever. After the follow-through gate landed, the
+   * retained rows still said `highROI: true`, and the strict validator added in the same change
+   * then (correctly) refused to publish the whole sample — a push-triggered `live-alerts` run
+   * only failed at "Validate the feed", with three `KXPRESNOMD`-class rows named. Re-scoring here
+   * makes the published label always the CURRENT model's verdict, which is what the validator,
+   * the chat filter and the reader all assume.
+   *
+   * The original v1 verdict is preserved on the row the first time this changes it. Prices,
+   * arrows, timestamps and ids are never touched. `quote_sampled_at` is kept because it says when
+   * the quote was read, not when the row was scored. */
+  next.meta = next.meta || {};
+  next.meta.rescored_by_current_model = 0;
+  for (const a of next.alerts) {
+      if (!a.model || a.model.score === null || a.model.score === undefined) continue;
+      const v = modelScore({
+        from: a.from, delta: a.delta, direction: a.direction, to: a.to,
+        bid: num(a.yes_bid_dollars), ask: num(a.yes_ask_dollars),
+        volume24h: num(a.volume_24h_fp),
+        sampleAgeSeconds: 0,
+      });
+      if (v.score !== a.model.score || v.highROI !== a.model.highROI) {
+        if (a.model.original_score === undefined || a.model.original_score === null) {
+          a.model.original_score = a.model.score;
+          a.model.original_highROI = a.model.highROI;
+          a.model.original_model_version = a.model.relabelled_by ? 'heuristic-v1' : (next.meta.model_version_previous || 'heuristic-v1');
+        }
+        a.model.score = v.score;
+        a.model.highROI = v.highROI;
+        a.model.tradeable = v.tradeable;
+        a.model.reasons = v.reasons;
+        next.meta.rescored_by_current_model += 1;
+      } else if (a.model.tradeable === undefined) {
+        a.model.tradeable = v.tradeable;
+      }
+  }
+
   next.alerts.sort((a, b) => String(b.ts).localeCompare(String(a.ts)));
   next.alerts = next.alerts.slice(0, MAX_ALERTS);
   next.run.alerts_created = (carry.alerts_created || 0) + newAlerts.length;
@@ -1790,6 +1830,24 @@ export async function selftest() {
   const withSize = s3.alerts[0] || {};
   ok(withSize.yes_bid_size_fp === '100.00' && withSize.yes_ask_size_fp === '100.00',
     'a swing keeps the contract counts behind each quote (got ' + withSize.yes_bid_size_fp + '/' + withSize.yes_ask_size_fp + ')');
+
+  /* A retained row scored by the OLD model must be re-scored on the next run. This is the defect
+   * that failed CI run 44947818572: persisted rows kept a stale highROI label, so the strict
+   * validator refused to publish the whole fresh sample. */
+  const staleState = structuredClone(s3);
+  staleState.alerts[0].model = { score: 0.79, highROI: true, reasons: ['v1: one-sided book scored as tight'] };
+  /* The persisted book is the shape that actually failed CI: the stored row says the swing landed
+   * at $0.41 while its own quote is a $0.00 bid / $0.01 ask. */
+  staleState.alerts[0].yes_bid_dollars = '0.0000';
+  staleState.alerts[0].yes_ask_dollars = '0.0100';
+  const rescored = applySample(staleState, { nowSeconds: 3100, markets: [mk('T1', 0.41, 1000)] });
+  ok(rescored.alerts[0].model.highROI === false, 'a retained row labelled highROI by the old model is corrected on the next run');
+  ok(rescored.alerts[0].model.tradeable === false, 'the corrected row is marked not tradeable');
+  ok(rescored.alerts[0].model.score <= 0.3, 'the corrected row is capped, got ' + rescored.alerts[0].model.score);
+  ok(rescored.alerts[0].model.original_score === 0.79 && rescored.alerts[0].model.original_highROI === true,
+    'the old verdict is preserved for audit, not overwritten');
+  ok(rescored.alerts[0].to === s3.alerts[0].to && rescored.alerts[0].ts === s3.alerts[0].ts && rescored.alerts[0].from === s3.alerts[0].from,
+    're-scoring never changes a price, an arrow or a timestamp');
 
   // resolutions
   const s6 = applySample(s5, {
