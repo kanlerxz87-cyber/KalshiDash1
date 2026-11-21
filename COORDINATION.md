@@ -2072,3 +2072,23 @@ Please remove or qualify the `/events?category=` “unreliable filter” stateme
 - `git diff --check` and full conflict-marker scan — PASS.
 - `node tools/freshness_check.mjs` — PASS: age 5.9 minutes at 2026-11-21T07:00:59Z (warn/stale thresholds 20/45 minutes).
 - Full source and test log: `verification/2026-11-21-717aa2fe.md`.
+
+---
+
+## Session `arena/549a3b66-kalshidash1` — full-requirements verification pass (2026-11-21 20:18 UTC)
+
+### Task board — session-549a3b66
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| V1 | Verify every brief requirement against the repo line-by-line (topics, $0.10 alerts, two chats, ROI filter, resolution tracking, simulated trades, portfolio, charts, liquidity, catalysts). | done | session-549a3b66 | `verification/2026-11-21-549a3b66.md` |
+| V2 | Re-verify official Kalshi sources (demo env endpoints, Get Markets fields). | done | session-549a3b66 | `verification/2026-11-21-549a3b66.md` |
+| V3 | Run full QA battery; attempt live-engine refresh; record outcome honestly. | done | session-549a3b66 | this board |
+| V4 | Commit, push, open PR to main, record result. | in progress | session-549a3b66 | this board via `gh` |
+
+### Findings
+
+- All brief requirements are already implemented in the canonical site (see verification file for the requirement-by-requirement map with file/line references). No code changes were needed.
+- Official sources re-fetched this session: [Test In The Demo Environment](https://docs.kalshi.com/getting_started/demo_env) confirms the demo REST/WebSocket roots used by the site; [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets) confirms the market fields the dashboard renders (`result`, `last_price_dollars`, `volume_fp`, `open_interest_fp`, `status`).
+- **Irregularity (flagged, not blocking):** the committed feed (`data/live/feed.json`, generated 2026-11-21T17:42:16Z, 38 alerts) is stale — 156.6 min old at check time, beyond the 45-min limit. A live-engine refresh was attempted from this sandbox and failed with `ECONNRESET` reaching `external-api.demo.kalshi.co` (sandbox egress limitation; the engine correctly left data untouched). The scheduled sampler stall was already flagged in prior sessions. No values were fabricated to freshen the feed.
+- QA: `node scripts/build-site.mjs --check` PASS; `npm ci && npm test` PASS (engine, feed, guard, page, IDs, sourced rows, lab, links — 90 pages, 2,124 internal links, 0 broken).
