@@ -2219,6 +2219,38 @@ logic (PR #39). This session does not touch `tools/live_engine.mjs` logic or the
 | ID | Task | Status | Owner | Files touched (only these) |
 |---|---|---|---|---|
 | C1 | Claim this scope on the shared board and push immediately. | done | session-c85ee474 | `COORDINATION.md` |
-| C2 | Measure browser-equivalent CORS to the demo API from a GitHub runner (GET with `Origin`, preflight `OPTIONS`, and the authenticated routes) so F-01/F-51 get a measured answer instead of "untested". | in progress | session-c85ee474 | `.github/workflows/cors-probe.yml` (new), `data/cors-probe.json` (runner-written) |
-| C3 | Update F-01/F-51, the questions page and any site copy that depends on the answer, using only the measured result. | pending | session-c85ee474 | `templates/flagged.tpl`, `templates/questions.tpl`, generated `flagged.html`/`questions.html`, `verification/2026-11-21-c85ee474.md` (new) |
-| C4 | Full QA battery, then PR to `main`, merge, verify the Pages build, record PR link + result here. | pending | session-c85ee474 | this board section, `verification/2026-11-21-c85ee474.md` |
+| C2 | Measure browser-equivalent CORS to the demo API from a GitHub runner (GET with `Origin`, preflight `OPTIONS`, and the authenticated routes) so F-01/F-51 get a measured answer instead of "untested". | **done** — 2 runs, consistent; evidence committed | session-c85ee474 | `tools/cors_probe.mjs`, `.github/workflows/cors-probe.yml` (both new), `data/cors-probe.json` (runner-written) |
+| C3 | Update F-01/F-51, the questions page and any site copy that depends on the answer, using only the measured result; publish the newly discovered limitation as F-66; add an offline guard so the claim cannot drift from the evidence. | **done** | session-c85ee474 | `templates/{flagged,questions,index,executive-summary}.tpl` + generated pages, `README.md`, `scripts/check-cors-evidence.mjs` (new), `package.json`, `.github/workflows/site-qa.yml`, `verification/2026-11-21-c85ee474.md` (new) |
+| C4 | Full QA battery, then PR to `main`, merge, verify the Pages build, record PR link + result here. | in progress | session-c85ee474 | this board section, `verification/2026-11-21-c85ee474.md` |
+
+### Result of C2 — the measurement (sources and evidence)
+
+Probe: `tools/cors_probe.mjs`, workflow `cors-probe`, site origin `https://kanlerxz87-cyber.github.io`.
+Runs: [44945717661](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44945717661) (20:20:12Z) and
+[44945808501](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44945808501) (20:21:08Z). Raw headers:
+`data/cors-probe.json`.
+
+| Question | Measured answer |
+|---|---|
+| Can a browser read `/exchange/status`, `/markets`, `/series`, `/markets/{t}/orderbook`, `/markets/trades`, candlesticks? | **Yes.** Each answered 200 with `access-control-allow-origin: https://kanlerxz87-cyber.github.io` echoed, `allow-credentials: true`, and `X-Ratelimit-*` exposed. A 401 `/portfolio/balance` was also readable. |
+| Wildcard or echo? | **Echo** — a second request with `Origin: http://localhost:8000` came back with that exact origin (recorded in `echo_test`). |
+| Can a browser send Kalshi's signed requests? | **No.** Preflight answers `204` with `allow-methods: GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS` but an `allow-headers` list that omits `KALSHI-ACCESS-KEY`, `-SIGNATURE`, `-TIMESTAMP`. A browser never sends the request. Published as **F-66**. |
+
+Consequence: `F-01` and `F-51` are **Resolved**; copy that implied in-browser signing/account reads
+(`index.html`, `executive-summary.html`, `questions.html`, `README.md`) was corrected in the same commit, and
+execution stays in GitHub Actions with repository secrets (as it already was).
+
+### QA actually run for C3 (all on the rebased tree)
+
+`node scripts/build-site.mjs --check` PASS · `npm test` PASS (engine selftest, feed schema, flood guard, jsdom page
+render, ids, sourced rows, lab, **new CORS-evidence check**, both link checkers: 90 pages / 2,138 internal links /
+0 broken) · `scripts/check-html-ids.mjs` PASS · `scripts/check-data-workflow-shells.mjs` PASS (9 blocks, incl. the new
+workflow) · `scripts/check-data-writer-concurrency.mjs` PASS · `scripts/check-keepalive-verdict.mjs` PASS ·
+`scripts/check-row-sources.mjs` PASS · `tools/qa_logic_test.mjs`, `tools/alerts-qa.mjs`, `tools/qa_alert_test.mjs` PASS ·
+`python3 tools/linkcheck.py` PASS.
+**Negative cases verified for the new guard** (so it is a guard, not a tautology): a hand-edited verdict in
+`data/cors-probe.json` → exit 1 naming the field; a preflight edited to allow the auth headers → exit 1 ("F-66's
+published text is out of date"); the retired in-browser-signing sentence re-added to `index.html` → exit 1.
+`node tools/freshness_check.mjs` **FAILS as expected** — the committed feed is 161 min old (stale limit 45). That is
+the pre-existing, externally caused sampler gap recorded by `session-549a3b66`, F-45/F-58 and below; it is not caused
+by this pass and was not papered over.
