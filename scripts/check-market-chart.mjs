@@ -18,7 +18,8 @@ const snapshot = { meta: { captured_at: new Date(NOW - 3600000).toISOString() },
 const source = (file) => readFileSync(file, 'utf8');
 const pause = () => new Promise((resolve) => setTimeout(resolve, 30));
 
-async function boot(page, live) {
+async function boot(page, live, fixture = {}) {
+  let currentMarket = { ...raw };
   const errors = [], requests = [], intervals = [], draws = [], labels = [];
   const vc = new VirtualConsole();
   vc.on('jsdomError', (e) => errors.push(e.message));
@@ -37,7 +38,7 @@ async function boot(page, live) {
   w.fetch = async (url) => {
     url = String(url); requests.push(url);
     let data;
-    if (url.includes('data/snapshot.json')) data = structuredClone(snapshot);
+    if (url.includes('data/snapshot.json')) data = structuredClone(fixture.snapshot || snapshot);
     else if (!live) throw new Error('TEST OFFLINE');
     else if (url.includes('/exchange/status')) data = { exchange_active: true, trading_active: true };
     else if (url.includes('/candlesticks?')) data = { candlesticks: [
@@ -47,8 +48,8 @@ async function boot(page, live) {
     ] };
     else if (url.includes('/orderbook?')) data = { orderbook_fp: { yes_dollars: [['0.6000', '12.00']], no_dollars: [['0.3800', '7.00']] } };
     else if (url.includes('/series?')) data = { series: url.includes('category=Crypto') ? [{ ticker: 'TESTSERIES', title: 'TEST', volume_fp: '1000.00' }] : [] };
-    else if (url.includes('/markets?')) data = { markets: [{ ...raw }] };
-    else if (url.endsWith('/markets/FIXTURE')) data = { market: { ...raw } };
+    else if (url.includes('/markets?')) data = { markets: [{ ...currentMarket }] };
+    else if (url.endsWith('/markets/FIXTURE')) data = { market: { ...currentMarket } };
     else throw new Error('Unexpected test request: ' + url);
     return { ok: true, status: 200, json: async () => data };
   };
@@ -58,7 +59,7 @@ async function boot(page, live) {
   w.KDChart.line = (canvas, points, options) => { draws.push({ canvas: canvas.id, points, options }); draw(canvas, points, options); };
   w.eval(source('assets/app.js'));
   await pause(); await pause();
-  return { dom, w, errors, requests, intervals, draws, labels, setLive(value) { live = value; } };
+  return { dom, w, errors, requests, intervals, draws, labels, setLive(value) { live = value; }, setMarket(patch) { currentMarket = { ...raw, ...patch }; } };
 }
 
 const offline = await boot('market', false);
@@ -164,9 +165,41 @@ try {
     assert.ok(w.document.querySelector('#book-body a[href*="/orderbook?depth=20"]'));
     assert.match(w.document.querySelector('#book-total').textContent, /API book observed/);
   });
+  online.setMarket({ last_price_dollars: null });
+  intervals.find((i) => i.ms === 600000).fn();
+  await pause(); await pause();
+  check('missing discovery prices remain blank, never copied from an older observation', () => assert.equal(w.KD.state.markets.FIXTURE.last_price_dollars, null));
+  check('browser score measures the last interval and cannot rank empty/missing touches as eligible', () => {
+    const m = { ...w.KD.state.markets.FIXTURE, status: 'active', last_price_dollars: 0.5 };
+    w.KD.state.history.FIXTURE = [{ t: NOW / 1000 - 5, v: 0.4 }, { t: NOW / 1000, v: 0.5 }];
+    assert.ok(w.KD.roi(m).parts.volatility > 0.33);
+    assert.equal(w.KD.roi({ ...m, yes_bid_size_fp: null }).eligible, false);
+    assert.equal(w.KD.roi({ ...m, yes_ask_dollars: null }).parts.tightness, 0);
+    assert.ok(w.KD.roi({ ...m, yes_ask_dollars: null }).score <= 30);
+  });
   check('market redraw and quote polling both run at five-second cadence', () => assert.ok(intervals.filter((i) => i.ms === 5000).length >= 2));
   check('online canonical market renderer has no unexpected script errors', () => assert.deepEqual(online.errors, []));
 } finally { online.dom.window.close(); }
+
+
+const replay = await boot('dashboard', false, { snapshot: { ...snapshot, candlesticks: { FIXTURE: { m1: {
+  source_url: BASE + '/series/TESTSERIES/markets/FIXTURE/candlesticks?period_interval=1',
+  candles: [[NOW / 1000 - 3600, null], [NOW / 1000 - 3540, 0.2], [NOW / 1000 - 3480, 0.3], [NOW / 1000 - 3420, 0.2]],
+} } } } });
+try {
+  check('snapshot replay skips missing closes and retains exact 10-cent changes in both directions', () => {
+    const alerts = replay.w.KD.state.alerts;
+    assert.equal(alerts.length, 2);
+    assert.ok(alerts.every((a) => a.from > 0 && a.to > 0 && a.roi === null));
+    assert.match(replay.w.document.querySelector('#chat-all .log').textContent, /snapshot replay/);
+    assert.ok(!replay.w.document.querySelector('#chat-roi .log .msg'));
+  });
+  check('browser ranking rows have an official API link, not just an internal market link', () => {
+    const rows = [...replay.w.document.querySelectorAll('#roi-table tr')];
+    assert.ok(rows.length > 0 && rows.every((r) => r.querySelector('a[href^="' + BASE + '"]')));
+  });
+  check('canonical dashboard has no unexpected script errors', () => assert.deepEqual(replay.errors, []));
+} finally { replay.dom.window.close(); }
 
 for (const page of ['portfolio', 'analysis']) {
   const view = await boot(page, false);

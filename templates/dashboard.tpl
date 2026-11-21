@@ -92,7 +92,7 @@
   weights are published on <a href="strategies.html">Strategies</a>. It is a heuristic ranking aid, not a recommendation.</p>
   <div class="table-wrap">
     <table class="compact">
-      <thead><tr><th>Market</th><th>Topic</th><th class="num">Score</th><th class="num">Liquidity</th><th class="num">Depth</th><th class="num">Tightness</th><th class="num">Volume</th><th class="num">Volatility</th><th class="num">Spread</th><th class="num">Contracts at touch</th></tr></thead>
+      <thead><tr><th>Market</th><th>Topic</th><th class="num">Score</th><th class="num">Liquidity</th><th class="num">Depth</th><th class="num">Tightness</th><th class="num">Volume</th><th class="num">Volatility</th><th class="num">Spread</th><th class="num">Contracts at touch</th><th>Official source fields</th></tr></thead>
       <tbody id="roi-table"></tbody>
     </table>
   </div>

@@ -187,7 +187,7 @@
   /* ================================================================== alerts */
   var ALERTS_KEY = 'kalshidash:v1:alerts';
   function getAlerts() {
-    try { return JSON.parse(localStorage.getItem(ALERTS_KEY) || '[]'); } catch (e) { return []; }
+    try { var rows = JSON.parse(localStorage.getItem(ALERTS_KEY) || '[]'); return Array.isArray(rows) ? rows.filter(function (a) { return a && typeof a === 'object'; }) : []; } catch (e) { return []; }
   }
   function setAlerts(a) {
     if (a.length > 400) a = a.slice(a.length - 400);
@@ -343,17 +343,17 @@
       var m = state.markets[ticker];
       var candles = (snap.candlesticks[ticker].m1 || {}).candles || [];
       for (var i = 1; i < candles.length; i++) {
-        var from = Number(candles[i - 1][1]), to = Number(candles[i][1]);
-        if (!isFinite(from) || !isFinite(to)) continue;
+        var from = nullableNumber(candles[i - 1][1]), to = nullableNumber(candles[i][1]);
+        if (from === null || to === null || from < 0 || from > 1 || to < 0 || to > 1) continue;
         var delta = to - from;
-        if (Math.abs(delta) < s.threshold) continue;
+        if (Math.round(Math.abs(delta) * 10000) < Math.round(s.threshold * 10000)) continue;
         seeded.push({
           id: 'seed-' + ticker + '-' + i,
           type: 'swing', ts: Number(candles[i][0]),
           ticker: ticker, topic: m ? m.topic : null,
           title: m ? m.title : ticker,
           from: from, to: to, delta: delta,
-          roi: m ? roiOf(m).score : null,
+          roi: null, // no bid/ask/size evidence at this historical candle time; never backfill today's score
           roiParts: null,
           links: m ? candidateLinks(m) : [],
           source_url: (snap.candlesticks[ticker].m1 || {}).source_url || null,
@@ -405,11 +405,7 @@
     });
     return chain.then(function () {
       all.forEach(function (m) {
-        var old = state.markets[m.ticker];
         state.markets[m.ticker] = m;
-        if (old && old.last_price_dollars !== null && m.last_price_dollars === null) {
-          m.last_price_dollars = old.last_price_dollars;
-        }
         if (state.lastRef[m.ticker] === undefined && m.last_price_dollars !== null) {
           state.lastRef[m.ticker] = m.last_price_dollars;
         }
@@ -533,19 +529,25 @@
     var touchSize = (m.yes_bid_size_fp || 0) + (m.yes_ask_size_fp || 0);
     var depth = bookDepth(m.ticker);
     var ref = refPrice(m);
-    var prev = state.lastRef[m.ticker];
-    var vol = Math.abs((prev !== undefined && ref !== null) ? (ref - prev) : 0);
+    var hist = state.history[m.ticker] || [];
+    var vol = hist.length >= 2 ? Math.abs(hist[hist.length - 1].v - hist[hist.length - 2].v) : 0;
 
     var parts = {
       liquidity: clamp01(touchSize / 300),
       depth: depth === null ? 0 : clamp01(depth / 1200),
-      tightness: spread === null ? 0.25 : clamp01(1 - spread / 0.10),
+      tightness: spread === null ? 0 : clamp01(1 - spread / 0.10),
       volume: clamp01((m.volume_24h_fp || 0) / 20000),
       volatility: clamp01(vol / 0.30)
     };
     var score = 0;
     Object.keys(w).forEach(function (k) { score += w[k] * parts[k]; });
-    return { score: Math.round(score * 100), parts: parts, spread: spread, touchSize: touchSize, depth: depth, ref: ref };
+    // Project eligibility gate: an unconfirmed, one-sided or contradictory touch is not high ROI.
+    var eligible = m.status === 'active' && m.yes_bid_dollars > 0 && m.yes_ask_dollars < 1
+      && spread !== null && spread >= 0 && m.yes_bid_size_fp > 0 && m.yes_ask_size_fp > 0
+      && (m.no_bid_dollars === null || Math.abs(m.yes_ask_dollars + m.no_bid_dollars - 1) <= 0.00010001)
+      && (m.no_ask_dollars === null || Math.abs(m.yes_bid_dollars + m.no_ask_dollars - 1) <= 0.00010001);
+    return { score: eligible ? Math.round(score * 100) : Math.min(30, Math.round(score * 100)),
+      eligible: eligible, parts: parts, spread: spread, touchSize: touchSize, depth: depth, ref: ref };
   }
 
   /* ============================================================== alert feed */
@@ -574,6 +576,7 @@
       result: s.result || null,
       roi: roi.score,
       roiParts: roi.parts,
+      roiEligible: roi.eligible,
       links: candidateLinks(m),
       source_url: m.source_url || null
     };
@@ -877,7 +880,7 @@
       var head = '<div class="m-head"><span class="m-time">' + clock(a.ts) + ' UTC</span>' +
         (a.topic ? '<span class="tag ' + esc(t.id) + '">' + esc(t.label) + '</span>' : '') +
         (a.replay ? '<span class="badge info">snapshot replay</span>' : '') +
-        (a.roi !== undefined && a.roi !== null ? '<span class="badge neutral">ROI ' + a.roi + '</span>' : '') + '</div>';
+        (a.roiEligible !== undefined && a.roi !== null ? '<span class="badge neutral">research score ' + a.roi + (a.roiEligible ? '' : ' · ineligible') + '</span>' : '<span class="badge warn">historical score unverified</span>') + '</div>';
       var body;
       if (a.type === 'resolve') {
         body = '<div class="m-title"><a href="' + rootHref('market.html?ticker=') + encodeURIComponent(a.ticker) + '">' + esc(a.title) + '</a> resolved <b class="' + (a.result === 'yes' ? 'up' : 'down') + '">' + esc(a.result).toUpperCase() + '</b></div>' +
@@ -901,7 +904,8 @@
         if (feedState.dir === 'up' && a.delta <= 0) return false;
         if (feedState.dir === 'down' && a.delta >= 0) return false;
       }
-      if (useRoi && a.type === 'swing' && (a.roi === undefined || a.roi === null || a.roi < feedState.roiCut)) return false;
+      if (a.type === 'swing' && (nullableNumber(a.delta) === null || Math.round(Math.abs(a.delta) * 10000) < Math.round(feedState.minSwing * 10000))) return false;
+      if (useRoi && a.type === 'swing' && (a.replay || a.roiEligible !== true || a.roi === undefined || a.roi === null || a.roi < feedState.roiCut)) return false;
       return true;
     }
 
@@ -940,8 +944,8 @@
             '<td class="num">' + Math.round(p.volume * 100) + '</td>' +
             '<td class="num">' + Math.round(p.volatility * 100) + '</td>' +
             '<td class="num">' + (x.r.spread === null ? '—' : cents(x.r.spread)) + '</td>' +
-            '<td class="num">' + num(x.r.touchSize) + '</td></tr>';
-        }).join('') : '<tr><td colspan="10" class="muted">No rows yet.</td></tr>';
+            '<td class="num">' + num(x.r.touchSize, 2) + '</td><td class="src"><a href="' + esc(x.m.source_url || CFG.docs.market) + '" target="_blank" rel="noopener">API fields</a></td></tr>';
+        }).join('') : '<tr><td colspan="11" class="muted">No rows yet.</td></tr>';
       }
     }
 
@@ -1231,7 +1235,8 @@
       }
       var live = state.charts[ticker + '|' + (windowSec <= 3600 ? 1 : 60)] || {};
       pts = KDChart.preparePoints(pts.concat(live.points || [], state.history[ticker] || []));
-      var anchor = state.mode === 'snapshot' ? Date.parse(captured) / 1000 : Math.floor(Date.now() / 1000);
+      var snapshotView = m.data_mode !== 'live';
+      var anchor = snapshotView ? Date.parse(captured) / 1000 : Math.floor(Date.now() / 1000);
       if (!Number.isFinite(anchor)) anchor = pts.length ? pts[pts.length - 1].t : Math.floor(Date.now() / 1000);
       var events = KDChart.jumps(pts, 0.10).filter(function (ev) { return ev.t >= anchor - windowSec && ev.t <= anchor; });
       KDChart.line($('#price-chart'), pts, { now: anchor, windowSeconds: windowSec, zoom: false, color: '#00dd94', events: events,
@@ -1240,7 +1245,7 @@
           if (row) { row.focus(); if (row.scrollIntoView) row.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
         } });
       var note = $('#chart-status');
-      if (note) note.textContent = (state.mode === 'snapshot' ? 'SNAPSHOT VIEW — axis ends at capture ' + (captured || 'time unverified') :
+      if (note) note.textContent = (snapshotView ? 'SNAPSHOT VIEW — axis ends at capture ' + (captured || 'time unverified') :
         'REST observations — seconds are browser observation times, not exchange trade timestamps') +
         '. Historical candles are at least 1 minute. ' + (live.error ? 'Live candles unavailable; timestamped captured history is retained.' : 'Hover for values; click a gold marker for its sourced row.');
       var jumpBody = $('#price-events');
@@ -1273,10 +1278,13 @@
         el.innerHTML = '<tr><td colspan="8" class="muted">Order book not loaded; quantities unverified.</td></tr>';
         return;
       }
-      var yes = (ob.yes_dollars || []).map(function (l) { return [Number(l[0]), Number(l[1])]; })
-        .sort(function (a, b) { return b[0] - a[0]; });
-      var no = (ob.no_dollars || []).map(function (l) { return [Number(l[0]), Number(l[1])]; })
-        .sort(function (a, b) { return b[0] - a[0]; });
+      function levels(input) {
+        return (input || []).filter(Array.isArray).map(function (l) { return [nullableNumber(l[0]), nullableNumber(l[1])]; })
+          .filter(function (l) { return l[0] !== null && l[0] > 0 && l[0] < 1 && l[1] !== null && l[1] > 0; })
+          .sort(function (a, b) { return b[0] - a[0]; });
+      }
+      var yes = levels(ob.yes_dollars), no = levels(ob.no_dollars);
+      var invalidLevels = (ob.yes_dollars || []).length + (ob.no_dollars || []).length - yes.length - no.length;
       var bestYesBid = yes.length ? yes[0] : null;
       var bestNoBid = no.length ? no[0] : null;
       var yesAsk = bestNoBid ? [Math.round((1 - bestNoBid[0]) * 10000) / 10000, bestNoBid[1]] : null;
@@ -1286,9 +1294,9 @@
       for (var i = 0; i < Math.min(n, 12); i++) {
         var y = yes[i], d = no[i];
         rows.push('<tr class="ask">' +
-          '<td class="p">' + (y ? y[0].toFixed(4) : '—') + '</td><td class="num">' + (y ? num(y[1]) : '—') + '</td>' +
+          '<td class="p">' + (y ? y[0].toFixed(4) : '—') + '</td><td class="num">' + (y ? num(y[1], 2) : '—') + '</td>' +
           '<td class="p">' + (y ? (1 - y[0]).toFixed(4) : '—') + '</td>' +
-          '<td class="p">' + (d ? d[0].toFixed(4) : '—') + '</td><td class="num">' + (d ? num(d[1]) : '—') + '</td>' +
+          '<td class="p">' + (d ? d[0].toFixed(4) : '—') + '</td><td class="num">' + (d ? num(d[1], 2) : '—') + '</td>' +
           '<td class="p">' + (d ? (1 - d[0]).toFixed(4) : '—') + '</td>' +
           '<td class="bar"><i style="width:' + (d ? Math.round((d[1] / max) * 100) : 0) + '%"></i></td>' +
           '<td class="src"><a href="' + esc(ob.source_url || CFG.docs.orderbook) + '" target="_blank" rel="noopener">book</a></td></tr>');
@@ -1298,7 +1306,7 @@
       var totEl = $('#book-total');
       if (totEl) {
         totEl.innerHTML = (ob.data_mode === 'live' ? 'API book observed ' : 'SNAPSHOT book captured ') +
-          (ob.observed_at ? dt(new Date(ob.observed_at).toISOString()) : 'time unverified') + '. ' + num(tot, 2) + ' contracts across ' + (yes.length + no.length) + ' price levels. ' +
+          (ob.observed_at ? dt(new Date(ob.observed_at).toISOString()) : 'time unverified') + '. ' + (invalidLevels ? invalidLevels + ' malformed level(s) omitted; values unverified. ' : '') + num(tot, 2) + ' contracts across ' + (yes.length + no.length) + ' price levels. ' +
           'Best YES bid <b>' + (bestYesBid ? '$' + bestYesBid[0].toFixed(2) + ' × ' + num(bestYesBid[1]) : 'none') + '</b> · ' +
           'Best YES ask <b>' + (yesAsk ? '$' + yesAsk[0].toFixed(2) + ' × ' + num(yesAsk[1]) + ' (from the NO bid)' : 'none') + '</b>. ' +
           (yesAsk ? '' : '<span class="warn">No YES offer is visible in this captured book; execution is unverified.</span>');

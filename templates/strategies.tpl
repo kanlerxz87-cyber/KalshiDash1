@@ -58,7 +58,8 @@
   </div>
   <p class="small muted">The <strong>project-authored paper model</strong> buys at the observed YES ask or NO ask, never at a bid or an assumed last price. It requires enough published quantity for the whole order and a local observation no older than 15 seconds. NO ask quantity equals the complementary YES bid quantity. Missing, stale, inactive or contradictory quotes cannot create a fill. Position size defaults to 10 contracts; project caps are 50 open positions and $1,000 open entry cost, not an account balance. All strategies hold to <code>finalized</code>. Gross results ignore trading fees, queue position, impact and latency; none of these rules has a validated ROI estimate. <a href="https://docs.kalshi.com/getting_started/orderbook_responses">Official price/size semantics</a> · <a href="flagged.html#F-PAPER-01">Limitations and legacy results</a>.</p>
 
-  <h2>The ROI score</h2>
+  <h2>Browser research score (0–100)</h2>
+  <p class="small muted">This section documents the <a href="dashboard.html">browser dashboard</a> and paper-strategy ranking. The background <a href="alerts/index.html">Live alerts console</a> uses a separate 0–1 heuristic (<a href="docs/ALERTS.md">documented there</a>). Neither estimates an investment return; their numbers are not interchangeable.</p>
   <div class="panel">
     <p>The score used by the right-hand chat pane is a weighted sum of five normalised components. Every component is between
     0 and 1 and is derived from fields the Kalshi API returns, so any reader can recompute it.</p>
@@ -68,14 +69,14 @@
         <tbody>
           <tr><td><strong>Liquidity</strong></td><td class="num">0.26</td><td><code>min(1, (yes_bid_size_fp + yes_ask_size_fp) / 300)</code> — contracts resting at the best prices.</td><td><code>yes_bid_size_fp</code>, <code>yes_ask_size_fp</code></td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
           <tr><td><strong>Depth</strong></td><td class="num">0.16</td><td><code>min(1, total_contracts_in_book / 1200)</code> across both sides of the order book.</td><td><code>GET /markets/{ticker}/orderbook</code></td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">API definitions</a></td></tr>
-          <tr><td><strong>Tightness</strong></td><td class="num">0.22</td><td><code>1 − min(1, spread / 0.10)</code> where spread is <code>yes_ask − yes_bid</code>; a missing touch scores 0.25.</td><td><code>yes_bid_dollars</code>, <code>yes_ask_dollars</code></td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
+          <tr><td><strong>Tightness</strong></td><td class="num">0.22</td><td><code>1 − min(1, spread / 0.10)</code> where spread is <code>yes_ask − yes_bid</code>; a missing touch scores 0, not an assumed tight spread.</td><td><code>yes_bid_dollars</code>, <code>yes_ask_dollars</code></td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
           <tr><td><strong>Volume</strong></td><td class="num">0.14</td><td><code>min(1, volume_24h_fp / 20000)</code> — contracts traded in 24 hours.</td><td><code>volume_24h_fp</code></td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
           <tr><td><strong>Volatility</strong></td><td class="num">0.22</td><td><code>min(1, |Δprice| / 0.30)</code> over the last observed interval.</td><td>consecutive <code>last_price_dollars</code> observations</td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
         </tbody>
       </table>
     </div>
     <p><strong>Score</strong> = 100 × (0.26·liquidity + 0.16·depth + 0.22·tightness + 0.14·volume + 0.22·volatility).</p>
-    <p>The high-ROI chat pane posts a move when this score is at least the filter value shown on the dashboard toolbar
+    <p>Project eligibility gate: inactive, one-sided, crossed, quantity-missing or contradictory reciprocal quotes are capped at 30 and cannot enter the filtered chat. Captured candle replays have no historical score evidence and are excluded from that pane; old browser scores are not recertified. The filtered chat posts an eligible live observation when its score is at least the filter value shown on the dashboard toolbar
     (default 55). The score is a <strong>ranking heuristic, not a recommendation</strong>: it measures how tradable a contract
     looks right now, not whether it will pay off.</p>
   </div>
