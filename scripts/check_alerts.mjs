@@ -195,7 +195,22 @@ async function main() {
     for (const p of problems) console.error('  ✗ ' + p);
     process.exit(1);
   }
-  console.log('OK: every alert, market, resolution and orderbook row passed the source and threshold checks.');
+  
+/* Chat readability regression guard. Observed on the live feed 2026-11-20: a single market
+ * flipping $0.80 <-> $0.00 produced 99 of 99 rows, so the "scrolling chat" carried one event.
+ * A feed where more than half of all alerts come from one ticker is a detector bug, not news. */
+{
+  const rows = feed.alerts || [];
+  const byTicker = {};
+  for (const a of rows) byTicker[a.ticker] = (byTicker[a.ticker] || 0) + 1;
+  const worst = Object.entries(byTicker).sort((x, y) => y[1] - x[1])[0];
+  if (rows.length >= 10 && worst && worst[1] > rows.length / 2) {
+    fail(`chat readability: ${worst[1]} of ${rows.length} alerts come from one ticker (${worst[0]}); `
+      + 'collapseDuplicates should have merged the repeated swings');
+  }
+}
+
+console.log('OK: every alert, market, resolution and orderbook row passed the source and threshold checks.');
 }
 
 main().catch((e) => { console.error('checker crashed:', e); process.exit(1); });
