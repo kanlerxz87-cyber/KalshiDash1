@@ -200,9 +200,12 @@ and whose `previous_price_dollars` was `0.0030`. That is a $0.80 jump from $0.00
 version of the rule before the final one would have published it as a real alert. It was caught by
 re-reading the single-market endpoint after an alert looked implausible, not by code review.
 
-Alerts so far: **0 after the reset**, and that is the honest result. The demo exchange is quiet — repeated samples
-of the top contracts returned identical prices (0.99, 0.94, 0.98) across runs. The feeds say so;
-nothing was seeded to make the page look busy. See F-53.
+Alerts so far: the latest sample (2026-11-21T06:28:52Z) created **0 new trade alerts** and added 60 candle
+alerts (242 duplicates collapsed). The persisted feed deliberately retains its rows across the retained range
+— it currently holds 173 rows (99 for `KXPRESNOMD-28-AKLO` and 74 for `KXBTCY-27JAN0100-B97500`), many of which
+are historical and must not be acted on without review. The one-ticker flood is addressed by open PR #39;
+the exact count and the 0-new-alerts reading disagree with the persisted rows only because the feed retains
+the full detected window — nothing was seeded to make the page look busy. See F-53 and F-BFC-01/F-BFC-02.
 
 ---
 
@@ -214,7 +217,7 @@ nothing was seeded to make the page look busy. See F-53.
 | Real portfolio/P&L from the demo account | same signing requirement | same |
 | WebSocket streaming | authenticated handshake (S10) | a server-side proxy holding a key |
 | A committed auto-trader | "automate simulated trades" is served by the simulator on `portfolio.html`; shipping an unattended bot that writes trades with no signed account would be simulated data pretending to be real | owner decision, plus keys |
-| Back-tested model | would require a sufficient alert sample; there are 0 real alerts so far, and fitting a model to 0 points would be fabrication | wait for real swings, then fit and validate out-of-sample |
+| Back-tested model | would require a sufficient alert sample; the current feed holds 173 rows (mostly one ticker) that are historical and are not validated ROI performance, so fitting a model to this sample would be fabrication — PR #39 is addressing the flood first | wait for real, deduplicated swings, then fit and validate out-of-sample |
 
 ---
 
@@ -229,7 +232,7 @@ Full list with links: [Flagged for review](../flagged.html#F-50). Alert-specific
 | F-03 (existing) | No traded-dollar field exists; ranking is `volume_fp × price`, labelled as an estimate |
 | F-53 | The high-ROI model is a documented heuristic, not a back-tested model |
 | F-05 (existing) | "Gas prices" excludes crude oil that shares the `Oil & Gas` tag — a judgement call, stated openly |
-| F-57 | Zero alerts so far because the demo is quiet; nothing is seeded |
+| F-57 / F-BFC-01 | History vs current state: no contract has moved the full $0.10 threshold in the LATEST sample (0 new trade alerts), but the persisted feed holds 173 historical rows on two tickers — these must not be acted on as real events; nothing is seeded to make the page look busy |
 | F-51 | No streaming: schedule + polling only, because the WS handshake needs a key |
 | F-24 (existing) | Demo-account portfolio sync still needs the owner's key |
 
