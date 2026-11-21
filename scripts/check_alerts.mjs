@@ -229,7 +229,13 @@ async function main() {
   // whether the feed is publishable. Keeping this gate last makes every collected violation fatal.
   if (problems.length) {
     console.error(`\nFAILED — ${problems.length} violation(s):`);
-    for (const p of problems) console.error('  ✗ ' + p);
+    for (const p of problems) {
+      console.error('  ✗ ' + p);
+      /* The raw job log is not always downloadable (measured 2026-11-21: the Actions log endpoint
+       * returned EOF in this environment). Workflow annotations are readable through the API, so
+       * every violation is also emitted as one — a failing gate has to be diagnosable. */
+      if (process.env.GITHUB_ACTIONS === 'true') console.error(`::error title=feed validation::${p}`);
+    }
     process.exit(1);
   }
   console.log('OK: every alert, market, resolution and orderbook row passed the source and threshold checks.');

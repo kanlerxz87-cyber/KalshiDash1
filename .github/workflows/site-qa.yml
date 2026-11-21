@@ -31,6 +31,15 @@ jobs:
       - name: Root-site link and template check (project checker)
         run: node scripts/check-links.mjs
 
+      # The brief's rule: every published data row carries a source link. Measured, not assumed.
+      - name: Every enforced data row has a source link
+        run: node scripts/check-row-sources.mjs
+
+      # Duplicate element ids are invalid HTML and break in-page anchors. Three copies reached
+      # production before this check existed (F-64).
+      - name: No duplicate element ids in published HTML
+        run: node scripts/check-html-ids.mjs
+
       - name: Check JavaScript syntax
         run: |
           set -e

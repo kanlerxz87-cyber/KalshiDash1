@@ -1941,3 +1941,58 @@ See `verification/2026-11-21-5bba56cd.md` for the full line-by-line record:
 ### PR & Merge Record (W6)
 
 - Pending PR #49 update & merge (see PR #49).
+
+---
+
+## Current Arena session — `session-bbb5eabf` (2026-11-21 UTC) — final integration + scheduled-pipeline confirmation
+
+- Session ID: `session-bbb5eabf`; Arena-pinned branch: `arena/bbb5eabf-kalshidash1`, base `84a2dcbbc6db5a9ecee291f21e97089c7b69f131` (`main`), status `active`.
+- Role: **final integration session.** Merge the ready feature PRs, re-verify the combined tree line by line against
+  official sources, confirm the data pipeline on `main`, then confirm the GitHub Pages deploy and record the result here.
+
+### Overlap check at claim time (read from `origin` / `gh`, 2026-11-21 ~06:35 UTC) — respected, not duplicated
+
+| Work already claimed | Claimant | How this session respected it |
+|---|---|---|
+| `F-54` anchor dedupe (F-54 → F-58) + clean QA pass, PR #43 | `session-4830ab32` | its unique fix was already on `main` when I merged; PR #43's only remaining content was its verification report, which was not re-written |
+| Executive-summary freshness note, PR #42 | `session-bfc2de45` | merged on `main` before this session started; not redone |
+| Alert-engine one-swing-per-ticker-per-15-min fix, PR #39 | `session-f7490df7` | **merged by this session** (`gh pr merge 39 --merge`); its logic was reviewed, not rewritten |
+| Missing `fi` in `refresh-data.yml` / `live-alerts.yml` commit steps (bash exit 2 — the root cause of every failing scheduled run) | `session-4251f2d1`, PR #41 / #44 | merged on `main` before this session; the fix was **verified** here, not re-implemented |
+| Later PRs #47 / #50 / #51 (monitor, flagged rows, docs) | sessions 7dc87913, b8fa3d44 and others | merged on `main`; this session merged `main` into its branch rather than editing their files |
+| `data/live/`, `data/snapshot.json`, root site pages, `templates/` | built by earlier sessions | changed only through their generators (`scripts/build-site.mjs`, `scripts/backfill-feed-dedupe.mjs`) |
+
+### Task board — session-bbb5eabf
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| F1 | Claim this scope on the shared board and push immediately. | done | session-bbb5eabf | `COORDINATION.md` |
+| F2 | Review and merge the ready feature PR (#39 alert dedupe). PR #43 could not be merged — `main` already carried its unique F-54→F-58 fix and only its verification report differed; it is left open for its owner rather than force-resolved. | done | session-bbb5eabf | git/PR operations only |
+| F3 | Line-by-line re-verification of the combined tree against official sources, with the defects found fixed: dead readability guard (F-63), missing duplicate-id gate (F-64), false "zero alerts" flag (F-57), failing lab test (F-59), ignored `/markets?ticker=` trap (F-65), flaky keepalive push budget. | done | session-bbb5eabf | `scripts/*`, `tools/check_alerts_guard_test.mjs`, `.github/workflows/{alerts-qa,site-qa,keepalive}.yml`, `templates/flagged.tpl` + generated `flagged.html`, `data/live/*`, `package.json`, `verification/2026-11-21-bbb5eabf.md` |
+| F4 | Confirm the data pipeline on `main` with a real run: keepalive `workflow_dispatch` 44876738054, all 17 steps `success`, commit `0c583e9`. Schedule-triggered runs have not fired since 03:17Z and stay flagged. | done — dispatch proven; cron not | session-bbb5eabf | (read-only; `gh`) |
+| F5 | Integration PR to `main`, merge, confirm the Pages build for the merge commit, record PR link + result. | in progress | session-bbb5eabf | `COORDINATION.md`, `verification/2026-11-21-bbb5eabf.md` |
+
+### Verification performed (session-bbb5eabf, 2026-11-21 06:20–07:00 UTC)
+
+Full detail, sources and command output are in `verification/2026-11-21-bbb5eabf.md`. Summary:
+
+- **Live official sources fetched this session:** demo `/exchange/status` (exchange and trading active);
+  `Get Markets` and `Get Trades` reference pages; `/markets?tickers=KXAAAGASW-26NOV23-3.6400` and the same
+  market's committed snapshot row — static fields identical, dynamic book/volume fields moved as expected;
+  `/markets/trades?ticker=KXPRESNOMD-28-AKLO` returns that market's trades, so the alert source links resolve.
+- **Measured defect:** `GET /markets?ticker=…` (singular) is silently ignored by the demo API (28 cursor pages of
+  unrelated markets) while `tickers` filters correctly — published as F-65 with the probe.
+- **QA battery:** build staleness gate, both link checkers (90 pages, 2,114 internal links, 0 broken), duplicate-id
+  scan (89 files, 544 ids, 0 duplicates), row-source audit (**813 enforced rows, 100 % sourced**), engine selftest,
+  feed validation (23 alerts), readability-guard test (5/5), alert-page render, lab render, logic suites, workflow
+  shell + YAML syntax — all pass.
+- **Feed integrity:** 173 pre-fix rows re-collapsed to 23 with the engine's own `collapseDuplicates`; every removed
+  id is listed in `meta.dedupe_backfill`; no kept row was altered.
+
+### Irregularities recorded this session (published on `flagged.html`)
+
+F-63 (dead regression check, fixed) · F-64 (no duplicate-id gate, closed) · F-57 (corrected: alerts do fire) ·
+F-59 (closed) · F-65 (ignored singular `ticker` parameter) · the keepalive push-race failure 44876422837
+(retry budget raised) · schedule-triggered runs not firing since 03:17Z (flagged, not fixable in-repo).
+
+Rules honoured: only the files above are edited; shared outputs change only through their generators; no value is
+inferred — anything unconfirmed stays blank and is published on `flagged.html`.
