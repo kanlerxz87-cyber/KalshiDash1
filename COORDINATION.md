@@ -2188,3 +2188,37 @@ Post-merge state at 20:29 UTC: `main` = `7b4b4d1`; `npm test` exit 0; `build-sit
 - **Feed freshness at merge time:** FRESHNESS OK — commit `25885b9` (engine sample 2026-11-21T20:24:59Z), age ~1.3 min at check time against the 45-minute limit. Earlier 156.8-min staleness (F-45/F-58) cleared when the scheduled sampler resumed.
 - **Irregularities:** stale-feed limit, BTC `$0.97`/`$0.01` flap (F-BFC-03), sandbox-blocked external fetches and 60-day schedule auto-disable — all retained as published on flagged.html; no unverified value was fabricated.
 - **Parallel-session note:** fd481e62 (PR #58), 93edc454 (PR #59), 549a3b66 (PR #57) record their own integration passes; c85ee474 (PR #62) is open. Their records were retained; one COORDINATION.md conflict was resolved by keeping both sections; the rebasing never discarded the other sessions' work.
+
+
+---
+
+## Session `arena/c85ee474-kalshidash1` — browser-CORS determination pass (2026-11-21 UTC)
+
+**Session ID:** `session-c85ee474`. Branch: `arena/c85ee474-kalshidash1` (Arena-managed; commits and pushes here only).
+**Base:** rebased onto `main` @ `4f5f69e` (PR #57 merge) at start of work. No open PRs on the repository at claim time
+(`gh pr list --state open` → empty), so nothing in flight is being raced.
+
+### Why this scope, and what it deliberately does not redo
+
+`F-01` / `F-51` — *"can a visitor's browser actually read the Kalshi demo API directly?"* — is the oldest
+unresolved item on the Flagged page (open since 2026-11-20, restated in F-51 and in the questions page). Every live
+feature on the canonical site (dashboard, category pages, catalyst discovery, the alerts console's live mode)
+degrades to the committed snapshot if the answer is no, so the answer changes how the whole site should be described.
+
+Previous sessions could not answer it because the build sandbox has no egress to `external-api.demo.kalshi.co`
+(`curl` → `SSL_ERROR_SYSCALL`; `ECONNRESET` recorded by `session-549a3b66`). A GitHub Actions runner **does** have
+egress to that host — the alert engine has been sampling it successfully all day — so this session measures CORS from
+a runner instead of guessing. CORS is decided by response headers, which a runner can read exactly.
+
+Not redone here (already owned/closed): the scheduled-workflow repairs (PR #41/#47/#53/#55), the requirement-by-requirement
+map and stale-feed flag from `session-549a3b66` (PR #57), the F-62 catalyst correction handoff, and the alert-engine dedupe
+logic (PR #39). This session does not touch `tools/live_engine.mjs` logic or the engines' detection rules.
+
+### Task board — session-c85ee474
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| C1 | Claim this scope on the shared board and push immediately. | done | session-c85ee474 | `COORDINATION.md` |
+| C2 | Measure browser-equivalent CORS to the demo API from a GitHub runner (GET with `Origin`, preflight `OPTIONS`, and the authenticated routes) so F-01/F-51 get a measured answer instead of "untested". | in progress | session-c85ee474 | `.github/workflows/cors-probe.yml` (new), `data/cors-probe.json` (runner-written) |
+| C3 | Update F-01/F-51, the questions page and any site copy that depends on the answer, using only the measured result. | pending | session-c85ee474 | `templates/flagged.tpl`, `templates/questions.tpl`, generated `flagged.html`/`questions.html`, `verification/2026-11-21-c85ee474.md` (new) |
+| C4 | Full QA battery, then PR to `main`, merge, verify the Pages build, record PR link + result here. | pending | session-c85ee474 | this board section, `verification/2026-11-21-c85ee474.md` |
