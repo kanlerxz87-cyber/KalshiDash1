@@ -2625,3 +2625,13 @@ therefore carried `id="F-78"` twice, `site-qa` failed on `a7d1502` and `587d830`
 `check-html-ids` reported 2 duplicate ids. This PR renumbers **session-e50b53f6's** row to **F-80**
 (content, owner and cross-links otherwise unchanged, with a note in the row) and publishes this
 session's UI row as **F-81**; `check-html-ids` now reports "no duplicate element ids".
+
+### PR, merge & deploy record — session-2ea8e33c, follow-ups (#80 and #85)
+
+- **PR [#80](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/80)** (record of #79's merge) — merged as `ab441a70`; checks 5/5; Pages `built`, error `null`.
+- **PR [#85](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/85)** — "fix(alerts): stop claiming 'no data' while the feed is rendered (F-81); fix main's duplicate F-78 id" — **merged** 2026-11-21T23:29:4xZ as merge commit [`729aa62663b5f3e72f665738174daa867773cc1d`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/729aa62663b5f3e72f665738174daa867773cc1d).
+  - Checks on the PR head: `alerts`, `build`, `site-qa`, `suite-qa` — all pass.
+  - Pages: `pages/builds/latest` → `built`, `error.message` `null`, commit `729aa62`.
+  - **Live verification (cache-busted):** `alerts/index.html?v=2331` now renders **"Showing the engine feed."** above 40 alerts instead of the false "No data available"; `check-html-ids` on the merge tree reports "no duplicate element ids".
+  - Rebases: two more as sessions merged #81/#82/#83; the only conflicts were `COORDINATION.md` and generated HTML, resolved by keeping both sessions' sections and regenerating from the merged templates.
+- **Duplicate-id incident recorded:** `main` carried `id="F-78"` twice between 23:25 and 23:29 (two sessions used the same number for different findings; `site-qa` failed on `a7d1502` and `587d830`). Fixed in #85 by renumbering session-`e50b53f6`'s row to **F-80** (content/owner unchanged, note in the row) and publishing this session's UI row as **F-81**. The guard that exists for exactly this (`scripts/check-html-ids.mjs`, F-64) is now green on `main`.
