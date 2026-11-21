@@ -18082,7 +18082,8 @@
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
      "NOT tradeable at the swing price: YES bid is $0.00 — there is no bid to sell into -> 0.00",
      "capped at 0.30 because the swing was not executable at the recorded price"
-    ]
+    ],
+    "age_penalised": false
    },
    "corroboration": {
     "by": "previous_price_dollars",
@@ -18135,7 +18136,8 @@
      "24h volume 9196.71 contracts -> liquidity 1.00",
      "spread $0.01 -> 0.90",
      "quote follows the swing: bid (the price you would receive) $0.03 vs swing price $0.04 (gap $0.01) -> 1.00"
-    ]
+    ],
+    "age_penalised": false
    },
    "corroboration": {
     "by": "previous_price_dollars",
@@ -18179,7 +18181,8 @@
      "24h volume 16292.22 contracts -> liquidity 1.00",
      "spread $0.98 -> 0.00",
      "quote follows the swing: ask (the price you would pay) $0.99 vs swing price $0.99 (gap $0.00) -> 1.00"
-    ]
+    ],
+    "age_penalised": false
    },
    "est_traded_dollars": 57873418.72,
    "volume_24h_fp": "16292.22",
@@ -18226,7 +18229,8 @@
      "24h volume 58092.75 contracts -> liquidity 1.00",
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
      "quote follows the swing: ask (the price you would pay) $0.80 vs swing price $0.80 (gap $0.00) -> 1.00"
-    ]
+    ],
+    "age_penalised": false
    },
    "est_traded_dollars": 407221045.55,
    "volume_24h_fp": "58092.75",
@@ -18273,7 +18277,8 @@
      "24h volume 16292.22 contracts -> liquidity 1.00",
      "spread $0.98 -> 0.00",
      "quote follows the swing: bid (the price you would receive) $0.01 vs swing price $0.02 (gap $0.01) -> 1.00"
-    ]
+    ],
+    "age_penalised": false
    },
    "est_traded_dollars": 57873418.72,
    "volume_24h_fp": "16292.22",
@@ -18321,7 +18326,8 @@
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
      "NOT tradeable at the swing price: YES bid is $0.00 — there is no bid to sell into -> 0.00",
      "capped at 0.30 because the swing was not executable at the recorded price"
-    ]
+    ],
+    "age_penalised": false
    },
    "est_traded_dollars": 407221045.55,
    "volume_24h_fp": "58092.75",
@@ -18368,7 +18374,8 @@
      "24h volume 16292.22 contracts -> liquidity 1.00",
      "spread $0.98 -> 0.00",
      "quote follows the swing: ask (the price you would pay) $0.99 vs swing price $0.99 (gap $0.00) -> 1.00"
-    ]
+    ],
+    "age_penalised": false
    },
    "est_traded_dollars": 57873418.72,
    "volume_24h_fp": "16292.22",
@@ -18417,7 +18424,8 @@
      "24h volume 58092.75 contracts -> liquidity 1.00",
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
      "quote follows the swing: ask (the price you would pay) $0.80 vs swing price $0.80 (gap $0.00) -> 1.00"
-    ]
+    ],
+    "age_penalised": false
    },
    "est_traded_dollars": 407221045.55,
    "volume_24h_fp": "58092.75",
@@ -18464,7 +18472,8 @@
      "24h volume 16292.22 contracts -> liquidity 1.00",
      "spread $0.98 -> 0.00",
      "quote follows the swing: bid (the price you would receive) $0.01 vs swing price $0.02 (gap $0.01) -> 1.00"
-    ]
+    ],
+    "age_penalised": false
    },
    "est_traded_dollars": 57873418.72,
    "volume_24h_fp": "16292.22",
@@ -18514,7 +18523,8 @@
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
      "quote follows the swing: ask (the price you would pay) $0.80 vs swing price $0.80 (gap $0.00) -> 1.00",
      "sample older than 1h -> score halved (REST reads lag, S10)"
-    ]
+    ],
+    "age_penalised": true
    },
    "est_traded_dollars": 407221045.55,
    "volume_24h_fp": "58092.75",
@@ -18552,7 +18562,7 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B87500&min_ts=1795293145&limit=1000",
    "model": {
-    "score": 0.558,
+    "score": 0.279,
     "highROI": false,
     "tradeable": true,
     "reasons": [
@@ -18560,11 +18570,13 @@
      "move 100% of a $0.50 move",
      "24h volume 16292.22 contracts -> liquidity 1.00",
      "spread $0.98 -> 0.00",
-     "quote follows the swing: ask (the price you would pay) $0.99 vs swing price $0.99 (gap $0.00) -> 1.00"
+     "quote follows the swing: ask (the price you would pay) $0.99 vs swing price $0.99 (gap $0.00) -> 1.00",
+     "sample older than 1h -> score halved (REST reads lag, S10)"
     ],
     "original_score": 0.279,
     "original_highROI": false,
-    "original_model_version": "heuristic-v1"
+    "original_model_version": "heuristic-v1",
+    "age_penalised": true
    },
    "est_traded_dollars": 57873418.72,
    "volume_24h_fp": "16292.22",
@@ -18602,7 +18614,7 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B87500&min_ts=1795293145&limit=1000",
    "model": {
-    "score": 0.558,
+    "score": 0.279,
     "highROI": false,
     "tradeable": true,
     "reasons": [
@@ -18610,11 +18622,13 @@
      "move 100% of a $0.50 move",
      "24h volume 16292.22 contracts -> liquidity 1.00",
      "spread $0.98 -> 0.00",
-     "quote follows the swing: ask (the price you would pay) $0.99 vs swing price $0.99 (gap $0.00) -> 1.00"
+     "quote follows the swing: ask (the price you would pay) $0.99 vs swing price $0.99 (gap $0.00) -> 1.00",
+     "sample older than 1h -> score halved (REST reads lag, S10)"
     ],
     "original_score": 0.279,
     "original_highROI": false,
-    "original_model_version": "heuristic-v1"
+    "original_model_version": "heuristic-v1",
+    "age_penalised": true
    },
    "est_traded_dollars": 57873418.72,
    "volume_24h_fp": "16292.22",
@@ -18664,7 +18678,8 @@
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
      "quote follows the swing: ask (the price you would pay) $0.80 vs swing price $0.80 (gap $0.00) -> 1.00",
      "sample older than 1h -> score halved (REST reads lag, S10)"
-    ]
+    ],
+    "age_penalised": true
    },
    "est_traded_dollars": 407221045.55,
    "volume_24h_fp": "58092.75",
@@ -18702,7 +18717,7 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B87500&min_ts=1795293145&limit=1000",
    "model": {
-    "score": 0.558,
+    "score": 0.279,
     "highROI": false,
     "tradeable": true,
     "reasons": [
@@ -18710,11 +18725,13 @@
      "move 100% of a $0.50 move",
      "24h volume 16292.22 contracts -> liquidity 1.00",
      "spread $0.98 -> 0.00",
-     "quote follows the swing: ask (the price you would pay) $0.99 vs swing price $0.99 (gap $0.00) -> 1.00"
+     "quote follows the swing: ask (the price you would pay) $0.99 vs swing price $0.99 (gap $0.00) -> 1.00",
+     "sample older than 1h -> score halved (REST reads lag, S10)"
     ],
     "original_score": 0.279,
     "original_highROI": false,
-    "original_model_version": "heuristic-v1"
+    "original_model_version": "heuristic-v1",
+    "age_penalised": true
    },
    "est_traded_dollars": 57873418.72,
    "volume_24h_fp": "16292.22",
@@ -18765,7 +18782,8 @@
      "NOT tradeable at the swing price: YES bid is $0.00 — there is no bid to sell into -> 0.00",
      "sample older than 1h -> score halved (REST reads lag, S10)",
      "capped at 0.30 because the swing was not executable at the recorded price"
-    ]
+    ],
+    "age_penalised": false
    },
    "est_traded_dollars": 407221045.55,
    "volume_24h_fp": "58092.75",
@@ -18803,7 +18821,7 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B87500&min_ts=1795293145&limit=1000",
    "model": {
-    "score": 0.554,
+    "score": 0.277,
     "highROI": false,
     "tradeable": true,
     "reasons": [
@@ -18811,11 +18829,13 @@
      "move 100% of a $0.50 move",
      "24h volume 16292.22 contracts -> liquidity 1.00",
      "spread $0.98 -> 0.00",
-     "quote follows the swing: bid (the price you would receive) $0.01 vs swing price $0.02 (gap $0.01) -> 1.00"
+     "quote follows the swing: bid (the price you would receive) $0.01 vs swing price $0.02 (gap $0.01) -> 1.00",
+     "sample older than 1h -> score halved (REST reads lag, S10)"
     ],
     "original_score": 0.277,
     "original_highROI": false,
-    "original_model_version": "heuristic-v1"
+    "original_model_version": "heuristic-v1",
+    "age_penalised": true
    },
    "est_traded_dollars": 57873418.72,
    "volume_24h_fp": "16292.22",
@@ -18866,7 +18886,8 @@
      "NOT tradeable at the swing price: YES bid is $0.00 — there is no bid to sell into -> 0.00",
      "sample older than 1h -> score halved (REST reads lag, S10)",
      "capped at 0.30 because the swing was not executable at the recorded price"
-    ]
+    ],
+    "age_penalised": false
    },
    "est_traded_dollars": 407221045.55,
    "volume_24h_fp": "58092.75",
@@ -18916,7 +18937,8 @@
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
      "quote follows the swing: ask (the price you would pay) $0.80 vs swing price $0.80 (gap $0.00) -> 1.00",
      "sample older than 1h -> score halved (REST reads lag, S10)"
-    ]
+    ],
+    "age_penalised": true
    },
    "est_traded_dollars": 407221045.55,
    "volume_24h_fp": "58092.75",
@@ -18967,7 +18989,8 @@
      "NOT tradeable at the swing price: YES bid is $0.00 — there is no bid to sell into -> 0.00",
      "sample older than 1h -> score halved (REST reads lag, S10)",
      "capped at 0.30 because the swing was not executable at the recorded price"
-    ]
+    ],
+    "age_penalised": false
    },
    "est_traded_dollars": 407221045.55,
    "volume_24h_fp": "58092.75",
@@ -19018,7 +19041,8 @@
     "original_score": 0.6292,
     "original_highROI": true,
     "original_model_version": "heuristic-v1",
-    "tradeable": false
+    "tradeable": false,
+    "age_penalised": false
    },
    "est_traded_dollars": 407220132.53,
    "volume_24h_fp": "58068.31",
@@ -19061,7 +19085,8 @@
      "24h volume 58068.31 contracts -> liquidity 1.00",
      "spread $0.80 -> 0.00"
     ],
-    "tradeable": true
+    "tradeable": true,
+    "age_penalised": false
    },
    "est_traded_dollars": 407220132.53,
    "volume_24h_fp": "58068.31",
@@ -19109,7 +19134,8 @@
     "original_score": 0.6292,
     "original_highROI": true,
     "original_model_version": "heuristic-v1",
-    "tradeable": false
+    "tradeable": false,
+    "age_penalised": false
    },
    "est_traded_dollars": 407220132.53,
    "volume_24h_fp": "58068.31",
@@ -19157,7 +19183,8 @@
     "original_score": 0.6292,
     "original_highROI": true,
     "original_model_version": "heuristic-v1",
-    "tradeable": false
+    "tradeable": false,
+    "age_penalised": false
    },
    "est_traded_dollars": 407220132.53,
    "volume_24h_fp": "58068.31",
@@ -19200,7 +19227,8 @@
      "24h volume 39556.54 contracts -> liquidity 1.00",
      "spread $0.97 -> 0.00"
     ],
-    "tradeable": true
+    "tradeable": true,
+    "age_penalised": false
    },
    "est_traded_dollars": 70154942.45,
    "volume_24h_fp": "39556.54",
@@ -19235,19 +19263,21 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESPERSON.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXPRESPERSON-28-VRAM&min_ts=1795282336&limit=1000",
    "model": {
-    "score": 0.5512,
+    "score": 0.2756,
     "highROI": false,
     "reasons": [
      "headroom 0.01 (price was $0.00)",
      "move 100% of a $0.50 move",
      "24h volume 58068.31 contracts -> liquidity 1.00",
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
-     "quote follows the swing: ask (the price you would pay) $0.80 vs swing price $0.80 (gap $0.00) -> 1.00"
+     "quote follows the swing: ask (the price you would pay) $0.80 vs swing price $0.80 (gap $0.00) -> 1.00",
+     "sample older than 1h -> score halved (REST reads lag, S10)"
     ],
     "original_score": 0.2756,
     "original_highROI": false,
     "original_model_version": "heuristic-v1",
-    "tradeable": true
+    "tradeable": true,
+    "age_penalised": true
    },
    "est_traded_dollars": 407220132.53,
    "volume_24h_fp": "58068.31",
@@ -19282,19 +19312,21 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B97500&min_ts=1795282336&limit=1000",
    "model": {
-    "score": 0.554,
+    "score": 0.277,
     "highROI": false,
     "reasons": [
      "headroom 0.02 (price was $0.01)",
      "move 100% of a $0.50 move",
      "24h volume 39556.54 contracts -> liquidity 1.00",
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
-     "quote follows the swing: ask (the price you would pay) $0.97 vs swing price $0.97 (gap $0.00) -> 1.00"
+     "quote follows the swing: ask (the price you would pay) $0.97 vs swing price $0.97 (gap $0.00) -> 1.00",
+     "sample older than 1h -> score halved (REST reads lag, S10)"
     ],
     "original_score": 0.277,
     "original_highROI": false,
     "original_model_version": "heuristic-v1",
-    "tradeable": true
+    "tradeable": true,
+    "age_penalised": true
    },
    "est_traded_dollars": 70154942.45,
    "volume_24h_fp": "39556.54",
@@ -19329,19 +19361,21 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B97500&min_ts=1795282336&limit=1000",
    "model": {
-    "score": 0.554,
+    "score": 0.277,
     "highROI": false,
     "reasons": [
      "headroom 0.02 (price was $0.01)",
      "move 100% of a $0.50 move",
      "24h volume 39556.54 contracts -> liquidity 1.00",
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
-     "quote follows the swing: ask (the price you would pay) $0.97 vs swing price $0.97 (gap $0.00) -> 1.00"
+     "quote follows the swing: ask (the price you would pay) $0.97 vs swing price $0.97 (gap $0.00) -> 1.00",
+     "sample older than 1h -> score halved (REST reads lag, S10)"
     ],
     "original_score": 0.277,
     "original_highROI": false,
     "original_model_version": "heuristic-v1",
-    "tradeable": true
+    "tradeable": true,
+    "age_penalised": true
    },
    "est_traded_dollars": 70154942.45,
    "volume_24h_fp": "39556.54",
@@ -19376,19 +19410,21 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B97500&min_ts=1795282336&limit=1000",
    "model": {
-    "score": 0.554,
+    "score": 0.277,
     "highROI": false,
     "reasons": [
      "headroom 0.02 (price was $0.01)",
      "move 100% of a $0.50 move",
      "24h volume 39556.54 contracts -> liquidity 1.00",
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
-     "quote follows the swing: ask (the price you would pay) $0.97 vs swing price $0.97 (gap $0.00) -> 1.00"
+     "quote follows the swing: ask (the price you would pay) $0.97 vs swing price $0.97 (gap $0.00) -> 1.00",
+     "sample older than 1h -> score halved (REST reads lag, S10)"
     ],
     "original_score": 0.277,
     "original_highROI": false,
     "original_model_version": "heuristic-v1",
-    "tradeable": true
+    "tradeable": true,
+    "age_penalised": true
    },
    "est_traded_dollars": 70154942.45,
    "volume_24h_fp": "39556.54",
@@ -19423,19 +19459,21 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B97500&min_ts=1795282336&limit=1000",
    "model": {
-    "score": 0.554,
+    "score": 0.277,
     "highROI": false,
     "reasons": [
      "headroom 0.02 (price was $0.01)",
      "move 100% of a $0.50 move",
      "24h volume 39556.54 contracts -> liquidity 1.00",
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
-     "quote follows the swing: ask (the price you would pay) $0.97 vs swing price $0.97 (gap $0.00) -> 1.00"
+     "quote follows the swing: ask (the price you would pay) $0.97 vs swing price $0.97 (gap $0.00) -> 1.00",
+     "sample older than 1h -> score halved (REST reads lag, S10)"
     ],
     "original_score": 0.277,
     "original_highROI": false,
     "original_model_version": "heuristic-v1",
-    "tradeable": true
+    "tradeable": true,
+    "age_penalised": true
    },
    "est_traded_dollars": 70154942.45,
    "volume_24h_fp": "39556.54",
@@ -19470,7 +19508,7 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B97500&min_ts=1795282336&limit=1000",
    "model": {
-    "score": 0.3,
+    "score": 0.281,
     "highROI": false,
     "reasons": [
      "headroom 0.06 (price was $0.97)",
@@ -19478,12 +19516,14 @@
      "24h volume 39556.54 contracts -> liquidity 1.00",
      "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
      "NOT tradeable at the swing price: YES bid is $0.00 — there is no bid to sell into -> 0.00",
+     "sample older than 1h -> score halved (REST reads lag, S10)",
      "capped at 0.30 because the swing was not executable at the recorded price"
     ],
     "original_score": 0.281,
     "original_highROI": false,
     "original_model_version": "heuristic-v1",
-    "tradeable": false
+    "tradeable": false,
+    "age_penalised": true
    },
    "est_traded_dollars": 70154942.45,
    "volume_24h_fp": "39556.54",
@@ -19533,7 +19573,8 @@
     "original_score": 0.3935,
     "original_highROI": false,
     "original_model_version": "heuristic-v1",
-    "tradeable": false
+    "tradeable": false,
+    "age_penalised": false
    },
    "est_traded_dollars": 70154942.45,
    "volume_24h_fp": "39458.87",

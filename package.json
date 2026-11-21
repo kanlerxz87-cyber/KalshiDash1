@@ -6,16 +6,17 @@
   "scripts": {
     "test:engine": "node tools/live_engine.mjs --selftest",
     "test:feed": "node scripts/check_alerts.mjs",
-    "test:page": "node scripts/check_alerts_page.mjs",
-    "test:links": "node scripts/check-links.mjs && python3 tools/linkcheck.py",
-    "test": "npm run test:engine && npm run test:feed && npm run test:guard && npm run test:resolution && npm run test:page && npm run test:ids && npm run test:rows && npm run test:lab && npm run test:cors && npm run test:links",
-    "test:guard": "node tools/check_alerts_guard_test.mjs",
+    "test:feed-current": "node scripts/rescore-feed.mjs --check",
     "test:rescore": "node scripts/check_rescore_retained.mjs",
+    "test:guard": "node tools/check_alerts_guard_test.mjs",
     "test:resolution": "node tools/check_resolution_logic_test.mjs",
+    "test:page": "node scripts/check_alerts_page.mjs",
     "test:ids": "node scripts/check-html-ids.mjs",
     "test:rows": "node scripts/check-row-sources.mjs",
     "test:lab": "node scripts/check_lab.mjs",
-    "test:cors": "node scripts/check-cors-evidence.mjs"
+    "test:cors": "node scripts/check-cors-evidence.mjs",
+    "test:links": "node scripts/check-links.mjs && python3 tools/linkcheck.py",
+    "test": "npm run test:engine && npm run test:feed && npm run test:feed-current && npm run test:rescore && npm run test:guard && npm run test:resolution && npm run test:page && npm run test:ids && npm run test:rows && npm run test:lab && npm run test:cors && npm run test:links"
   },
   "devDependencies": {
     "jsdom": "^25.0.1"

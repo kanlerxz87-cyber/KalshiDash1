@@ -413,7 +413,7 @@ export function followThrough({ direction, to, bid, ask }) {
 export function modelScore({ from, delta, direction = null, to = null, bid, ask, volume24h, sampleAgeSeconds = 0 }) {
   const reasons = [];
   if (from === null || from === undefined) {
-    return { score: null, highROI: false, tradeable: null, reasons: ['no baseline price — unverified'] };
+    return { score: null, highROI: false, tradeable: null, age_penalised: false, reasons: ['no baseline price — unverified'] };
   }
 
   // 0. REALITY GATE. If the row records which way the price moved and where it landed, the
@@ -462,7 +462,8 @@ export function modelScore({ from, delta, direction = null, to = null, bid, ask,
   let score = 0.20 * headroom + 0.20 * size + 0.35 * liq + 0.25 * spreadScore;
   score = round(score, 4);
 
-  if (sampleAgeSeconds > 3600) {
+  const agePenalised = sampleAgeSeconds > 3600;
+  if (agePenalised) {
     score = round(score * 0.5, 4);
     reasons.push('sample older than 1h -> score halved (REST reads lag, S10)');
   }
@@ -473,7 +474,77 @@ export function modelScore({ from, delta, direction = null, to = null, bid, ask,
     reasons.push('capped at 0.30 because the swing was not executable at the recorded price');
   }
   score = round(Math.max(0, Math.min(1, score)), 4);
-  return { score, highROI: score >= HIGH_ROI_THRESHOLD, tradeable: ft.ok, reasons };
+  return { score, highROI: score >= HIGH_ROI_THRESHOLD, tradeable: ft.ok, age_penalised: agePenalised, reasons };
+}
+
+/* RE-SCORE RETAINED ROWS WITH THE CURRENT MODEL.
+ *
+ * WHY: alerts persist across runs in `data/live/state.json`, so a row scored by an older model kept
+ * its old verdict forever — measured in CI run 44947818572, where rows labelled `highROI` by
+ * heuristic-v1 survived into a heuristic-v2 sample and the validator (correctly) refused to publish
+ * the whole run (F-74).
+ *
+ * The age penalty is part of the verdict, not noise. `modelScore()` halves a score when the quote
+ * it is scoring is more than an hour old, and several published rows were scored that way (a 0.554
+ * base published as 0.277). Re-scoring those rows with a fresh-sample assumption would double the
+ * published score even though the stored quote is still the same old one — that is why
+ * `modelScore()` now returns `age_penalised`, and why this function re-applies it. Rows scored
+ * before that field existed are reconstructed exactly: the only two possible verdicts are computed
+ * and a stored score matching the halved one within rounding is treated as penalised. No score is
+ * guessed: anything that matches neither candidate is re-scored from a fresh assumption, and its
+ * original verdict is preserved as `model.original_score`.
+ *
+ * Prices, arrows, deltas, timestamps and ids are never touched. `original_score`/`original_highROI`
+ * are written once, the first time the verdict actually changes. Returns the number of rows whose
+ * score or label changed.
+ */
+export function rescoreAlerts(alerts) {
+  let changed = 0;
+  for (const a of alerts || []) {
+    if (!a.model || a.model.score === null || a.model.score === undefined) continue;
+    const inputs = {
+      from: a.from, delta: a.delta, direction: a.direction, to: a.to,
+      bid: num(a.yes_bid_dollars), ask: num(a.yes_ask_dollars),
+      volume24h: num(a.volume_24h_fp),
+    };
+    let sampleAgeSeconds = 0;
+    if (a.model.age_penalised === true) {
+      sampleAgeSeconds = 3601;
+    } else if (a.model.age_penalised === undefined || a.model.age_penalised === null) {
+      const fresh = modelScore({ ...inputs, sampleAgeSeconds: 0 });
+      const stale = modelScore({ ...inputs, sampleAgeSeconds: 3601 });
+      const near = (x, y) => typeof x === 'number' && Math.abs(x - y) <= 1e-4;
+      if (near(a.model.score, stale.score) && !near(a.model.score, fresh.score)) {
+        sampleAgeSeconds = 3601;
+      } else if (near(a.model.score, fresh.score) && near(a.model.original_score, stale.score)
+        && !near(a.model.original_score, fresh.score)) {
+        /* A re-score with the fresh-sample assumption already ran and doubled this row (observed
+         * on `main`'s 23:13Z sample: score 0.558 / original_score 0.279). The preserved original
+         * is the published verdict and is the halved one, so the penalty is restored. */
+        sampleAgeSeconds = 3601;
+      }
+    }
+    const v = modelScore({ ...inputs, sampleAgeSeconds });
+    const verdictChanged = v.score !== a.model.score || v.highROI !== a.model.highROI;
+    if (verdictChanged) {
+      if (a.model.original_score === undefined || a.model.original_score === null) {
+        a.model.original_score = a.model.score;
+        a.model.original_highROI = a.model.highROI;
+        a.model.original_model_version = a.model.relabelled_by ? 'heuristic-v1' : (a.model.original_model_version || 'heuristic-v1');
+      }
+      a.model.score = v.score;
+      a.model.highROI = v.highROI;
+      a.model.tradeable = v.tradeable;
+      a.model.reasons = v.reasons;
+      changed += 1;
+    } else if (a.model.tradeable === undefined) {
+      /* A field added by the model is filled in even when the verdict is unchanged. It does not
+       * count as a re-score: the score and the label a reader saw are identical. */
+      a.model.tradeable = v.tradeable;
+    }
+    if (a.model.age_penalised === undefined || a.model.age_penalised === null) a.model.age_penalised = v.age_penalised;
+  }
+  return changed;
 }
 
 /* ------------------------------------------------------------------ http */
@@ -946,44 +1017,13 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
   const known = new Set(next.alerts.map((a) => a.id));
   for (const a of newAlerts) if (!known.has(a.id)) next.alerts.push(a);
 
-  /* RE-SCORE EVERY RETAINED ROW WITH THE CURRENT MODEL.
-   *
-   * WHY (measured 2026-11-21, CI run 44947818572): alerts persist across runs, so a row scored by
-   * an older model keeps its old verdict forever. After the follow-through gate landed, the
-   * retained rows still said `highROI: true`, and the strict validator added in the same change
-   * then (correctly) refused to publish the whole sample — a push-triggered `live-alerts` run
-   * only failed at "Validate the feed", with three `KXPRESNOMD`-class rows named. Re-scoring here
-   * makes the published label always the CURRENT model's verdict, which is what the validator,
-   * the chat filter and the reader all assume.
-   *
-   * The original v1 verdict is preserved on the row the first time this changes it. Prices,
-   * arrows, timestamps and ids are never touched. `quote_sampled_at` is kept because it says when
-   * the quote was read, not when the row was scored. */
+  /* Every retained row is re-scored with the current model (F-74), via the exported helper so
+   * `scripts/rescore-feed.mjs` applies exactly the same rule to the committed feed. The helper
+   * preserves the age penalty that was part of the published verdict and keeps the old verdict as
+   * `model.original_score`/`original_highROI`. Prices, arrows, timestamps and ids are untouched. */
   next.meta = next.meta || {};
-  next.meta.rescored_by_current_model = 0;
-  for (const a of next.alerts) {
-      if (!a.model || a.model.score === null || a.model.score === undefined) continue;
-      const v = modelScore({
-        from: a.from, delta: a.delta, direction: a.direction, to: a.to,
-        bid: num(a.yes_bid_dollars), ask: num(a.yes_ask_dollars),
-        volume24h: num(a.volume_24h_fp),
-        sampleAgeSeconds: 0,
-      });
-      if (v.score !== a.model.score || v.highROI !== a.model.highROI) {
-        if (a.model.original_score === undefined || a.model.original_score === null) {
-          a.model.original_score = a.model.score;
-          a.model.original_highROI = a.model.highROI;
-          a.model.original_model_version = a.model.relabelled_by ? 'heuristic-v1' : (next.meta.model_version_previous || 'heuristic-v1');
-        }
-        a.model.score = v.score;
-        a.model.highROI = v.highROI;
-        a.model.tradeable = v.tradeable;
-        a.model.reasons = v.reasons;
-        next.meta.rescored_by_current_model += 1;
-      } else if (a.model.tradeable === undefined) {
-        a.model.tradeable = v.tradeable;
-      }
-  }
+  next.meta.rescored_by_current_model = rescoreAlerts(next.alerts);
+  next.meta.model_version = MODEL_VERSION;
 
   next.alerts.sort((a, b) => String(b.ts).localeCompare(String(a.ts)));
   next.alerts = next.alerts.slice(0, MAX_ALERTS);
@@ -1846,6 +1886,30 @@ export async function selftest() {
   ok(rescored.alerts[0].model.score <= 0.3, 'the corrected row is capped, got ' + rescored.alerts[0].model.score);
   ok(rescored.alerts[0].model.original_score === 0.79 && rescored.alerts[0].model.original_highROI === true,
     'the old verdict is preserved for audit, not overwritten');
+
+  /* ...and a re-score must not discard the published AGE PENALTY (F-75). The model halves a score
+   * when the quote being scored was more than an hour old; re-scoring with a fresh-sample
+   * assumption doubled six published rows (0.277 -> 0.554) although their quote was unchanged. */
+  const penal = modelScore({ from: 0.80, delta: 0.10, direction: 'down', to: 0.70, bid: 0.69, ask: 0.71, volume24h: 500, sampleAgeSeconds: 7200 });
+  const freshSame = modelScore({ from: 0.80, delta: 0.10, direction: 'down', to: 0.70, bid: 0.69, ask: 0.71, volume24h: 500, sampleAgeSeconds: 0 });
+  ok(penal.age_penalised === true && freshSame.age_penalised === false,
+    'modelScore reports whether the 1h age penalty was applied');
+  ok(Math.abs(penal.score - freshSame.score / 2) <= 1e-4,
+    `the 1h age penalty halves the score (${freshSame.score} -> ${penal.score})`);
+  const legacyPenal = [{ id: 'trade:P@1', ticker: 'P-1', ts: '2026-11-21T12:00:00Z', direction: 'down', from: 0.80, to: 0.70, delta: -0.10,
+    yes_bid_dollars: '0.6900', yes_ask_dollars: '0.7100', volume_24h_fp: '500.00',
+    model: { score: penal.score, highROI: penal.highROI, reasons: ['v1 incl. 1h penalty'] } }];
+  ok(rescoreAlerts(legacyPenal) === 0 && legacyPenal[0].model.score === penal.score,
+    `a legacy row published with the 1h penalty keeps its score through a re-score (got ${legacyPenal[0].model.score})`);
+  ok(legacyPenal[0].model.age_penalised === true, 'the reconstructed penalty is recorded on the row');
+  /* The shape actually observed on `main` after the buggy pass: the current score is the doubled
+   * one and the published (halved) verdict survives in original_score. It must be restored. */
+  const doubled = [{ ...structuredClone(legacyPenal[0]), model: {
+    score: freshSame.score, highROI: freshSame.highROI, tradeable: true,
+    original_score: penal.score, original_highROI: penal.highROI, reasons: ['doubled by the fresh-sample re-score'],
+  } }];
+  ok(rescoreAlerts(doubled) === 1 && doubled[0].model.score === penal.score,
+    `a row already doubled must be restored to its published penalised score (got ${doubled[0].model.score}, want ${penal.score})`);
   ok(rescored.alerts[0].to === s3.alerts[0].to && rescored.alerts[0].ts === s3.alerts[0].ts && rescored.alerts[0].from === s3.alerts[0].from,
     're-scoring never changes a price, an arrow or a timestamp');
 

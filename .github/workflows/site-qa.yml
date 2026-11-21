@@ -83,6 +83,12 @@ jobs:
       - name: Retained alerts are re-scored with the current model
         run: node scripts/check_rescore_retained.mjs
 
+      # session-4b5ddd87: the feed is what the published site reads. If MODEL_VERSION moves and the
+      # scheduled engine does not run (F-55/F-58), the site would keep publishing old verdicts under
+      # a new version label. This re-scores the committed files offline and fails on any drift.
+      - name: Committed alert data carries the current model verdict
+        run: node scripts/rescore-feed.mjs --check
+
       - name: CORS evidence matches the published claim
         run: node scripts/check-cors-evidence.mjs
 
