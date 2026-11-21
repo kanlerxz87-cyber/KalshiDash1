@@ -1845,3 +1845,33 @@ Rules honoured: only files in scope are edited; no other session's file is modif
 - **PR #39:** merged on main 2026-11-21T06:29:04Z (alert deduplication); its files were not edited by this PR.
 - **R1–R3 verdict:** line-by-line review and QA on the merged tree are recorded above; the site is publishable and live.
 
+---
+
+## Session 5bba56cd — Post-integration audit, workflow repair & defect fixes (2026-11-21)
+
+- **Session ID**: `session-5bba56cd`
+- **Branch**: `arena/5bba56cd-kalshidash1` (rebased onto `main` at `042e146`)
+- **Claimed scope**: `.github/workflows/{refresh-data,live-alerts}.yml`, `scripts/{build-site.mjs,check-links.mjs,check_alerts.mjs}`, `tools/live_engine.mjs`, `alerts/js/alerts-live.js`, `assets/app.js`, `templates/{index,dashboard,markets,market,portfolio,analysis,flagged}.tpl`, regenerated HTML + `data/dash-quality.json`, `data/live/{feed,state}.json`, `verification/2026-11-21-5bba56cd.md`, and `COORDINATION.md`.
+
+### Task Board
+
+| ID | Task | Status | Owner | Scope |
+|---|---|---|---|---|
+| W1 | Align `refresh-data.yml` and `live-alerts.yml` concurrency group to `writer-${{ github.ref }}` with `keepalive.yml` (bash `fi` fix already landed on `main` via PR #41) | done | session-5bba56cd | `.github/workflows/{refresh-data,live-alerts}.yml` |
+| W2 | Emit and check `data/dash-quality.json` in `scripts/build-site.mjs` so `check_lab.mjs` passes (resolves `F-59`) and browsers have zero 404 XHRs | done | session-5bba56cd | `scripts/build-site.mjs`, `data/dash-quality.json` |
+| W3 | Close 3–14 min cross-detector collapse leak in `live_engine.mjs` + `alerts-live.js`, add spacing guard in `check_alerts.mjs`, and re-collapse `data/live/{feed,state}.json` (`31 -> 22`, stopping `KXBTCY-27JAN0100-B97500` 19/31 >50% failure) | done | session-5bba56cd | `tools/live_engine.mjs`, `alerts/js/alerts-live.js`, `scripts/check_alerts.mjs`, `data/live/{feed,state}.json` |
+| W4 | Fix `data-page="..."` routing across `templates/*.tpl` + `assets/app.js` `currentPage()` fallback, plus `pages.market` default ticker / snapshot fallback / `#m-roi2` and `colspan` fixes (`5` / `11`) | done | session-5bba56cd | `templates/{index,dashboard,markets,market,portfolio,analysis}.tpl`, `assets/app.js` |
+| W5 | Update `F-57`/`F-59`, add `F-60` in `templates/flagged.tpl`, and add duplicate-`id` check to `scripts/check-links.mjs` | done | session-5bba56cd | `templates/flagged.tpl`, `scripts/check-links.mjs`, `flagged.html` |
+| W6 | Re-verify official Kalshi docs, live demo API endpoints & live GitHub Pages site (`verification/2026-11-21-5bba56cd.md`), run full QA suite, open & merge PR to `main`, verify deploy & workflows on `main` | in progress | session-5bba56cd | `verification/2026-11-21-5bba56cd.md`, `COORDINATION.md`, PR |
+
+### Sources Verified (2026-11-21)
+
+See `verification/2026-11-21-5bba56cd.md` for the full line-by-line record:
+- `https://docs.kalshi.com/getting_started/{demo_env,market_settlement,quick_start_market_data,orderbook_responses}`
+- `https://external-api.demo.kalshi.co/trade-api/v2/exchange/status`
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-AKLO` and `/orderbook`
+- `https://kanlerxz87-cyber.github.io/KalshiDash1/`
+
+### PR & Merge Record (W6)
+
+- Pending PR #49 update & merge (see PR #49).

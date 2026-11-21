@@ -182,6 +182,24 @@ async function main() {
     }
   }
 
+  // 8. chat readability / flap-suppression guard: no ticker may appear twice within 15 minutes
+  {
+    const byTicker = {};
+    for (const a of feed.alerts || []) {
+      if (!a.ticker || !a.ts) continue;
+      (byTicker[a.ticker] = byTicker[a.ticker] || []).push(Date.parse(a.ts));
+    }
+    for (const [ticker, times] of Object.entries(byTicker)) {
+      times.sort((x, y) => x - y);
+      for (let i = 1; i < times.length; i++) {
+        if (times[i] - times[i - 1] <= 15 * 60 * 1000) {
+          fail(`chat readability: ${ticker} has two alerts ${Math.round((times[i] - times[i - 1]) / 1000)}s apart (must be > 15 min)`);
+          break;
+        }
+      }
+    }
+  }
+
   // report
   const nA = (feed.alerts || []).length;
   const nR = (feed.resolutions || []).length;
