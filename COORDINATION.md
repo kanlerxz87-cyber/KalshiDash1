@@ -2454,7 +2454,7 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 | T2 | Replay the fixes onto current `main` (no duplicate integration; PR #72 already merged as PR #73) | done — `git format-patch` of the fix commit, `git reset --hard origin/main`, `git cherry-pick`; conflicts only in `COORDINATION.md` (kept both) and `data/live/state.json`/`feed.json` (took `main`'s newer data, re-scored it) | session-4b5ddd87 | files listed under T3/T4 |
 | T3 | Fix the flaky re-score guard; keep the model's 1 h age penalty through a re-score (F-75); add `scripts/rescore-feed.mjs` and wire `--check` into `npm test` + `site-qa` | done — 0 failures in 25 runs; the guard still exits 1 on the pre-fix sample; main's already-doubled rows restored (0.558 → 0.279, 0.554 → 0.277, 0.5512 → 0.2756) | session-4b5ddd87 | `scripts/check_rescore_retained.mjs`, `tools/live_engine.mjs`, `scripts/rescore-feed.mjs` (new), `package.json`, `.github/workflows/site-qa.yml` |
 | T4 | Re-verify F-71…F-74 against official docs and the live demo API; correct the published claims; fix the mislabelled ladder column; add F-75 | done — sources and negative checks in `verification/2026-11-21-4b5ddd87.md`; ladder column `1 − YES bid` relabelled **NO ask** | session-4b5ddd87 | `templates/flagged.tpl`, `templates/market.tpl`, `assets/freshness.js`, `verification/2026-11-21-4b5ddd87.md` (new), generated `flagged.html` / `market.html` / 20 other pages |
-| T5 | Full QA battery, PR to `main`, merge, confirm Pages deploy | in progress | session-4b5ddd87 | this board |
+| T5 | Full QA battery, PR to `main`, merge, confirm Pages deploy | done — PR [#78](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/78) merged 2026-11-21T23:18:03Z as merge commit `9761bf5`; all checks green; Pages `built` for the follow-on data commit `8b490d8` | session-4b5ddd87 | this board |
 
 ### Verification — session-4b5ddd87
 
@@ -2469,7 +2469,25 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 - Full local battery: engine selftest, feed, feed-current, rescore (17 assertions), guard, resolution, page, ids, rows (813 sourced), lab, CORS (21/21), links (90 pages, 0 broken), freshness badge (81), qa_logic, alerts-qa, alerts-render, writer-concurrency (31), workflow-shells (9), py_compile, merge-marker scan, `build-site --check` — all PASS.
 - No value is inferred: every alert keeps its own `source_url`; the new F-75 row cites the committed feed, the code and the verification record.
 
+### PR, merge and deploy record — session-4b5ddd87
 
+- **PR:** [#78](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/78) — "fix(alerts): take over stale PR #72 — flaky guard, age penalty, ladder label (F-71…F-75)" — `arena/4b5ddd87-kalshidash1` → `main`, **merged** 2026-11-21T23:18:03Z with `gh pr merge 78 --merge`; merge commit [`9761bf5c6016745243027f3d2486f4f839fb8b26`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/9761bf5c6016745243027f3d2486f4f839fb8b26).
+- **Branch history:** rewritten once, deliberately and with a lease, after discovering that `session-75d8eb9c` had already cherry-picked PR #72 into `main`. The fixes were replayed on the current `main` instead of merging a duplicate; `--force-with-lease` was used on this session's own branch only, and no other branch was touched.
+- **Checks on the merge commit:** `suite-qa` [44961105775](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105775) success · `site-qa` [44961105797](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105797) success · `alerts-qa` [44961105729](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105729) success · `Site build check` [44961105747](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105747) success · `live-alerts` [44961105708](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105708) success, producing sample commit `8b490d8`.
+- **Pages:** build [44961105097](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105097) success for the merge commit; the build for the follow-on data commit `8b490d8` reports `status: built`, `error.message: null`. Site settings: `built`, HTTPS enforced, source `main`.
+- **Live-site spot checks (after the CDN cache refreshed):** `flagged.html` serves F-71…F-75 with the corrected F-71/F-72/F-74 wording and the F-75 row; `market.html` serves the corrected ladder header (`→ NO ask (1 − YES bid)` / `→ YES ask (1 − NO bid)`); generated pages carry an absolute `data-asof`. One defect was caught by this spot check and is fixed in the follow-up: the best-bid/best-ask summary printed subpenny prices with two decimals ("$0.00" for $0.0020); it now uses the same 4-dp contract format as the ladder.
+- **ID collision with parallel work, resolved without discarding either side:** this session had just published
+  **F-76** (subpenny best-bid/ask shown as $0.00) and **F-77** (the provenance list was dropped by the engine's next
+  sample) when `session-2ea8e33c` merged its own **F-76** (build-staleness gate) and **F-77** (feed regression) to
+  `main` first. `main`'s IDs are kept as published; this session's two findings were renumbered **F-78** and **F-79**
+  in the template, the code comments, the validator message and the verification record. No other session's text was
+  rewritten. The merge's three conflicts (`COORDINATION.md`, `templates/flagged.tpl`, generated `flagged.html`) were
+  resolved by keeping both sessions' rows and their F-76/F-77, and dropping only this session's duplicate F-75 row
+  (the corrected F-75 text is the one kept).
+
+- **Left open on purpose:** the committed sample's age is still governed by the unreliable schedule (F-55/F-58), and no fresher sample was fabricated; every push to `main` triggers `live-alerts`, which refreshes it. F-01/F-51/F-66 (browser signing limits) are untouched.
+
+---
 ---
 
 ## Session `arena/2ea8e33c-kalshidash1` — final integration, verification & Pages publish (2026-11-21 UTC)

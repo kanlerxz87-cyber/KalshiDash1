@@ -1264,8 +1264,11 @@
       var totEl = $('#book-total');
       if (totEl) {
         totEl.innerHTML = num(tot) + ' contracts across ' + (yes.length + no.length) + ' price levels. ' +
-          'Best YES bid <b>' + (bestYesBid ? '$' + bestYesBid[0].toFixed(2) + ' × ' + num(bestYesBid[1]) : 'none') + '</b> · ' +
-          'Best YES ask <b>' + (yesAsk ? '$' + yesAsk[0].toFixed(2) + ' × ' + num(yesAsk[1]) + ' (from the NO bid)' : 'none') + '</b>. ' +
+          /* Prices are subpenny on these contracts (0.0020), so 2-dp formatting displayed the best
+           * bid/ask as "$0.00" on the live page (observed 2026-11-21 on KXPRESNOMD-28-MSHE). Use the
+           * same 4-dp contract-price format as the ladder and the static Bid/Ask panel. */
+          'Best YES bid <b>' + (bestYesBid ? cents(bestYesBid[0]) + ' × ' + num(bestYesBid[1]) : 'none') + '</b> · ' +
+          'Best YES ask <b>' + (yesAsk ? cents(yesAsk[0]) + ' × ' + num(yesAsk[1]) + ' (from the NO bid)' : 'none') + '</b>. ' +
           (yesAsk ? '' : '<span class="warn">No YES offer exists, so a YES swing to a high price cannot be executed — the high-ROI model now scores that 0.</span>');
       }
     }

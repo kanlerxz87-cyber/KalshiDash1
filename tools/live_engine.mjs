@@ -547,6 +547,41 @@ export function rescoreAlerts(alerts) {
   return changed;
 }
 
+/* Derive the published provenance list from the rows themselves.
+ *
+ * WHY (measured 2026-11-21T23:18Z, F-79): the list used to be written only into the derived
+ * `feed.json`, which the engine rebuilds from `state.json` on every sample — so the next sample
+ * published an empty list while the rows still carried `original_highROI`. Deriving it here means
+ * the record travels with the data and cannot be lost by a rebuild. Entries for rows that are no
+ * longer in the feed are kept: they are history, not current claims.
+ */
+export function deriveLegacyUnfillable(alerts, existing = []) {
+  const byId = new Map((Array.isArray(existing) ? existing : []).filter((x) => x && x.id).map((x) => [x.id, x]));
+  for (const a of alerts || []) {
+    const m = a.model || {};
+    if (m.original_highROI !== true || m.highROI === true) continue;
+    const ft = followThrough({
+      direction: a.direction, to: a.to,
+      bid: num(a.yes_bid_dollars), ask: num(a.yes_ask_dollars),
+    });
+    if (!ft || ft.ok !== false) continue;
+    byId.set(a.id, {
+      id: a.id,
+      ticker: a.ticker,
+      ts: a.ts,
+      direction: a.direction,
+      from: a.from,
+      to: a.to,
+      yes_bid_dollars: a.yes_bid_dollars ?? null,
+      yes_ask_dollars: a.yes_ask_dollars ?? null,
+      published_score: m.original_score ?? null,
+      reason: ft.note,
+      detected_by: m.relabelled_by || 'model re-score (tools/live_engine.mjs)',
+    });
+  }
+  return [...byId.values()];
+}
+
 /* ------------------------------------------------------------------ http */
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1024,6 +1059,7 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
   next.meta = next.meta || {};
   next.meta.rescored_by_current_model = rescoreAlerts(next.alerts);
   next.meta.model_version = MODEL_VERSION;
+  next.meta.legacy_unfillable_high_roi = deriveLegacyUnfillable(next.alerts, next.meta.legacy_unfillable_high_roi);
 
   next.alerts.sort((a, b) => String(b.ts).localeCompare(String(a.ts)));
   next.alerts = next.alerts.slice(0, MAX_ALERTS);
@@ -1912,6 +1948,9 @@ export async function selftest() {
     `a row already doubled must be restored to its published penalised score (got ${doubled[0].model.score}, want ${penal.score})`);
   ok(rescored.alerts[0].to === s3.alerts[0].to && rescored.alerts[0].ts === s3.alerts[0].ts && rescored.alerts[0].from === s3.alerts[0].from,
     're-scoring never changes a price, an arrow or a timestamp');
+  /* The provenance list is derived from the rows, so a rebuild cannot silently drop it (F-79). */
+  ok((rescored.meta.legacy_unfillable_high_roi || []).some((x) => x.id === rescored.alerts[0].id),
+    'a row re-scored out of high-ROI is listed in meta.legacy_unfillable_high_roi automatically');
 
   // resolutions
   const s6 = applySample(s5, {
