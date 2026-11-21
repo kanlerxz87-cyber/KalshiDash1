@@ -2607,3 +2607,21 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 - **Full QA battery passed:** `npm test` (engine selftest, feed check, chat flood guard 5/5, resolution logic 16/16, page render, HTML IDs 89 files/0 dupes, row sources 813 enforced rows 100.0% sourced, lab 22/22, CORS evidence 21/21, internal links 90 pages/2,161 links/0 broken), `check_rescore_retained.mjs` (12/12), `check_freshness_badge.mjs` (81/81), `check-data-workflow-shells.mjs` (9 blocks), `check-data-writer-concurrency.mjs` (31/31), `check-keepalive-verdict.mjs` (27/27), `check_links.js` (69/69), `qa_logic_test.mjs`, `alerts-qa.mjs`, `alerts-render-test.mjs`, `qa_alert_test.mjs` — all PASS.
 - **Non-overlapping handoffs logged (not edited here):** `alerts/js/alerts-live.js:186–193` (`limit=200` on `/series`, owned by alerts scope); `templates/sources.tpl` historical `/series?...&limit=50` labels (shared template scope); `.github/workflows/live-alerts.yml` site regeneration on engine write-back (claimed by `session-08b1c207` Task A4).
 
+### Follow-up found while verifying the live deploy — F-79 (session-2ea8e33c)
+
+Reading the deployed alerts console at 2026-11-21T23:24Z showed **"No data available. Neither the
+engine feed nor the demo API could be read from this page"** printed above 32 rendered alerts and a
+"Last engine sample 5m ago" line. Cause: `alerts-page.js` grouped the initial `probing` state with
+`offline`, so a slow or blocked browser poll (8 series × 1 request) left the false outage notice in
+place over working data. Fixed with a neutral probing notice and an immediate promotion to `feed`
+when the feed loads; `scripts/check_alerts_page.mjs` gained a second DOM scenario whose API stub
+hangs, and the new assertions were verified to fail on the pre-fix page (2 failures). Published as **F-81** on `flagged.html` (renumbered from an initial F-79 to avoid
+session-`4b5ddd87`'s F-79, which merged at 23:25Z).
+
+**Duplicate-id defect found on `main` while rebasing (fixed here).** Two sessions published an
+`F-78` within minutes of each other: session-`4b5ddd87`'s subpenny row (PR #82) and
+session-`e50b53f6`'s engine-sample-staleness row (PR #83/merged 23:25Z). `flagged.html` on `main`
+therefore carried `id="F-78"` twice, `site-qa` failed on `a7d1502` and `587d830`, and
+`check-html-ids` reported 2 duplicate ids. This PR renumbers **session-e50b53f6's** row to **F-80**
+(content, owner and cross-links otherwise unchanged, with a note in the row) and publishes this
+session's UI row as **F-81**; `check-html-ids` now reports "no duplicate element ids".
