@@ -2091,7 +2091,6 @@ Please remove or qualify the `/events?category=` “unreliable filter” stateme
 
 ---
 
-<<<<<<< HEAD
 ## Session `arena/549a3b66-kalshidash1` — full-requirements verification pass (2026-11-21 20:18 UTC)
 
 ### Task board — session-549a3b66
@@ -2304,7 +2303,6 @@ Explicitly **not** edited (other scopes / observations only, recorded in the ver
 - QA: `npm ci && npm test` PASS (engine, feed 38 alerts/6 high-ROI, 813 enforced rows sourced, IDs, lab incl. catalyst+strategylab, links 90 pages/2,124 internal/0 broken); build staleness, freshness badge 53/53, alerts-qa, qa_logic, alerts-render, data-workflow shells (9), data-writer concurrency (31), keepalive verdict (27) — all PASS.
 - Observations left for a future scope (recorded in `verification/2026-11-21-c144ad6a.md`, files untouched): `alerts/js/alerts-live.js` and `scripts/fetch_snapshot.mjs` pass `limit=200`/`limit=50` to `/series` (undocumented); `dash/` and `docs/` retain the old F-01/quirk wording (superseded builds); dated K1 records keep the original wording.
 - The stale committed feed (17:42Z sample vs 45-min limit) remains flagged; sandbox egress to the demo API fails, so no fresh sample was fabricated or attempted beyond the confirmed `curl` failure.
-<<<<<<< HEAD
 
 ---
 

@@ -1,0 +1,13 @@
+import { readFile } from 'node:fs/promises';
+import { JSDOM, VirtualConsole } from 'jsdom';
+const html = await readFile('alerts/index.html','utf8');
+const vc = new VirtualConsole();
+const dom = new JSDOM(html,{url:'https://x.test/alerts/index.html',runScripts:'outside-only',pretendToBeVisual:true,virtualConsole:vc});
+const w=dom.window;
+const BASE='https://external-api.demo.kalshi.co/trade-api/v2';
+const feed={meta:{threshold:0.1,high_roi_threshold:0.62,generated_at:new Date(Date.now()-120000).toISOString(),model_version:'heuristic-v1',base_url:BASE,legacy_unfillable_high_roi:[{id:'PHANTOM@1'}]},run:{},alerts:[],resolutions:[],markets:[],history:{},orderbooks:{},by_topic:{},topics:{}};
+w.fetch=async(u)=>({ok:true,status:200,json:async()=>JSON.parse(JSON.stringify(feed)),text:async()=>JSON.stringify(feed)});
+for (const src of ['alerts/js/alerts-live.js','alerts/js/alerts-page.js']) w.eval(await readFile(src,'utf8'));
+await new Promise(r=>setTimeout(r,900));
+console.log('ROI HTML:', JSON.stringify(w.document.getElementById('log-roi').innerHTML));
+console.log('meta in state:', JSON.stringify(w.AL && w.AL.state.feed && w.AL.state.feed.meta));
