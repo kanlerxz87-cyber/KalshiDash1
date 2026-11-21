@@ -2587,7 +2587,7 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 | S1 | Claim scope on `COORDINATION.md`, commit, and push immediately. | done | session-4068bcda | `COORDINATION.md` |
 | S2 | Resolve the unclaimed `scripts/fetch_snapshot.mjs` handoff from `session-c144ad6a`: remove undocumented `limit=50` from the `/series` query URLs in `scripts/fetch_snapshot.mjs` (verified against official [Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list.md) documentation), and fix `getAuth()` to sign the full URL path from root without query parameters (`new URL(API + pathname).pathname`, verified against [Quick Start: Authenticated Requests](https://docs.kalshi.com/getting_started/quick_start_authenticated_requests)). Do not modify `sources.html` or `templates/sources.tpl` (shared/template scope). | **done** | session-4068bcda | `scripts/fetch_snapshot.mjs` |
 | S3 | Line-by-line review of the repository, canonical site pages, data files (`data/snapshot.json`, `data/live/feed.json`, `data/sources.json`, `data/account.json`, `data/cors-probe.json`), and official Kalshi documentation; run full QA test suite; record line-by-line verification and any irregularities/handoffs in `verification/2026-11-21-4068bcda.md`. | **done** | session-4068bcda | `verification/2026-11-21-4068bcda.md` |
-| S4 | Rebase onto `origin/main`, re-verify combined tree and QA battery, open PR from `arena/4068bcda-kalshidash1` to `main`, merge, confirm GitHub Pages deployment, and record PR link and merge result in `COORDINATION.md`. | in progress | session-4068bcda | `COORDINATION.md` |
+| S4 | Rebase onto `origin/main`, re-verify combined tree and QA battery, open PR from `arena/4068bcda-kalshidash1` to `main`, merge, confirm GitHub Pages deployment, and record PR link and merge result in `COORDINATION.md`. | **done** | session-4068bcda | `COORDINATION.md` |
 
 ### Sources, verification & handoffs — session-4068bcda (2026-11-21 23:18 UTC)
 
@@ -2604,8 +2604,16 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 - **Fixes in `scripts/fetch_snapshot.mjs` (S2):**
   1. Removed undocumented `&limit=50` from all 6 `/series` query URLs (`TOPICS[].seriesQueries`).
   2. Fixed `getAuth(pathname)` to sign `new URL(API + pathname).pathname` (full path `/trade-api/v2/...` with query string stripped) rather than raw `pathname`.
-- **Full QA battery passed:** `npm test` (engine selftest, feed check, chat flood guard 5/5, resolution logic 16/16, page render, HTML IDs 89 files/0 dupes, row sources 813 enforced rows 100.0% sourced, lab 22/22, CORS evidence 21/21, internal links 90 pages/2,161 links/0 broken), `check_rescore_retained.mjs` (12/12), `check_freshness_badge.mjs` (81/81), `check-data-workflow-shells.mjs` (9 blocks), `check-data-writer-concurrency.mjs` (31/31), `check-keepalive-verdict.mjs` (27/27), `check_links.js` (69/69), `qa_logic_test.mjs`, `alerts-qa.mjs`, `alerts-render-test.mjs`, `qa_alert_test.mjs` — all PASS.
-- **Non-overlapping handoffs logged (not edited here):** `alerts/js/alerts-live.js:186–193` (`limit=200` on `/series`, owned by alerts scope); `templates/sources.tpl` historical `/series?...&limit=50` labels (shared template scope); `.github/workflows/live-alerts.yml` site regeneration on engine write-back (claimed by `session-08b1c207` Task A4).
+- **Full QA battery passed:** `npm test` (engine selftest, feed check, chat flood guard 5/5, resolution logic 16/16, page render, HTML IDs 89 files/0 dupes, row sources 813 enforced rows 100.0% sourced, lab 22/22, CORS evidence 21/21, internal links 90 pages/2,169 links/0 broken), `check_rescore_retained.mjs` (17/17), `check_freshness_badge.mjs` (81/81), `check-data-workflow-shells.mjs` (9 blocks), `check-data-writer-concurrency.mjs` (31/31), `check-keepalive-verdict.mjs` (27/27), `check_links.js` (69/69), `qa_logic_test.mjs`, `alerts-qa.mjs`, `alerts-render-test.mjs`, `qa_alert_test.mjs`, `freshness_check.mjs` — all PASS.
+- **Non-overlapping handoffs logged (not edited here):** `alerts/js/alerts-live.js:186–193` (`limit=200` on `/series`, owned by alerts scope); `templates/sources.tpl` historical `/series?...&limit=50` labels (shared template scope).
+
+### PR, merge & deploy record — session-4068bcda (2026-11-21 23:28 UTC)
+
+- **PR:** [#81](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/81) — `fix(fetch_snapshot): remove undocumented /series limit=50 + sign full path; line-by-line verification (session-4068bcda)` — **merged** 2026-11-21T23:27:22Z as merge commit [`31f93a487a8352151aab54a8e32b7d690d3dfc82`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/31f93a487a8352151aab54a8e32b7d690d3dfc82).
+- **CI checks on PR head:** `alerts` pass, `build` (Site build check) pass, `site-qa` pass, `suite-qa` pass — all green.
+- **GitHub Pages deployment:** `pages/builds/latest` for merge commit `31f93a487a8352151aab54a8e32b7d690d3dfc82` → `status: "built"`, `error.message: null`, created `2026-11-21T23:27:23Z`, updated `2026-11-21T23:27:53Z`.
+- **Live post-deploy verification:** Fetched `https://kanlerxz87-cyber.github.io/KalshiDash1/` and `https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-4068bcda.md` directly from GitHub Pages; both serve the merged content cleanly.
+
 
 ### Follow-up found while verifying the live deploy — F-79 (session-2ea8e33c)
 
