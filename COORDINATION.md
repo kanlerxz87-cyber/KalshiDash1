@@ -2321,6 +2321,39 @@ Explicitly **not** edited (other scopes / observations only, recorded in the ver
 | ID | Task | Status | Owner | Files touched |
 |---|---|---|---|---|
 | E1 | Claim scope + push. | done | session-ef2c1184 | `COORDINATION.md` |
-| E2 | Verify published rows/tables against the official demo API and docs; record source links. | in progress | session-ef2c1184 | `verification/2026-11-21-ef2c1184.md` |
-| E3 | Verify the resolution path end to end (requirement: track until resolved yes/no) and the catalyst/news links for ≥$0.10 swings. | in progress | session-ef2c1184 | same + `templates/flagged.tpl` if a defect is found |
-| E4 | Full QA battery, integration PR, merge, confirm Pages deploy, record PR link/result. | pending | session-ef2c1184 | this board |
+| E2 | Verify published rows/tables against the official demo API and docs; record source links. | done — 9 sources fetched, table-by-table record in `verification/2026-11-21-ef2c1184.md` §2–§3 | session-ef2c1184 | `verification/2026-11-21-ef2c1184.md` |
+| E3 | Resolution path (brief: track until resolved yes/no). **Defect found and fixed: F-66.** Retention dropped results for markets the 300-row cap evicted; retrieval read one `status=settled` page ordered by creation time. Fixed in `tools/live_engine.mjs`, published on `flagged.html`. | done (live settlement still open, see below) | session-ef2c1184 | `tools/live_engine.mjs`, `data/live/feed.json`, `alerts/*`, `templates/market.tpl`, `templates/flagged.tpl`, `scripts/check_alerts.mjs`, `scripts/backfill-awaiting.mjs`, `docs/ALERTS.md` |
+| E4 | Full QA battery, integration PR, merge, confirm Pages deploy, record PR link/result. | in progress | session-ef2c1184 | this board |
+
+### Sources fetched — session-ef2c1184 (2026-11-21 20:20–20:45 UTC)
+
+- Official docs: [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets.md) (sort
+  order with `min_settled_ts`, `limit ≤ 1000`, `result` enum), [Quick Start:
+  WebSockets](https://docs.kalshi.com/getting_started/quick_start_websockets) and [WebSocket
+  Connection](https://docs.kalshi.com/websockets/websocket-connection) (the handshake is
+  authenticated, so a static page cannot stream), [docs index](https://docs.kalshi.com/llms.txt).
+- Live official demo API: `/exchange/status`, `/markets/KXPRESNOMR-28-MPEN`,
+  `/markets/KXLPGATOUR-CMEGTC26-PAJANA`, `/markets?series_ticker=KXBTCD&status=settled&limit=2`.
+- Published site: landing page, alerts console, market page.
+
+### Verification — session-ef2c1184
+
+- `node tools/live_engine.mjs --selftest` — PASS, **72 assertions** (48 before; 14 new for F-66).
+- `npm test` (engine, feed, guard 5/5, page, ids 89 files/557 ids, rows, lab, links 90 pages/2,126
+  internal links/0 broken) — PASS.
+- `node scripts/build-site.mjs --check` — PASS. `node tools/freshness_check.mjs` — PASS.
+- `node scripts/backfill-awaiting.mjs --check` — PASS (2 rows, derived from `data/live/state.json`).
+- Sandbox limit: direct `fetch`/`curl` to the demo API is blocked here (TLS reset), so the engine
+  could not be run end to end; **no sample was fabricated**. Values were read through the page
+  fetcher against the official host instead.
+- Still open: the two followed contracts resolve 2027-01-01 and 2029-11-07, so no live settlement
+  has flowed through the fixed path yet; F-01 (browser CORS) and F-58 (cron delays) are unchanged.
+
+### Overlap note
+
+Main advanced through 21 commits (PRs #57–#65, including other sessions' verification passes) while
+this work was in progress. The branch was rebased onto `300d0c7`; the only conflict was
+`COORDINATION.md`, resolved by keeping **both** sessions' sections. No other session's file was
+rewritten. `templates/catalyst.tpl` / `assets/catalyst.js` / `templates/strategylab.tpl` (the open
+F-62 handoff) were **not** touched. Other sessions' feed samples (`25885b9`) are preserved; this
+session's `awaiting` key was regenerated from the committed `state.json` by its generator.
