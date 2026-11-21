@@ -152,6 +152,30 @@ while two writers shared a group), and its first version depended on the `yaml` 
 failed `site-qa` (run 44876951050, `ERR_MODULE_NOT_FOUND`). Both are corrected; the test is now
 dependency-free and its negative case is verified.
 
+### Confirmed after the revert — the pipeline is healthy on `main`
+
+| Run | Workflow | Result |
+|---|---|---|
+| [44877691578](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44877691578) | keepalive (push to `main`) | **success** — steps: sample ✓ · validate ✓ · **"Commit and push (rebase, retry, and VERIFY the ref moved)"** ✓ · freshness gate ✓ |
+| 44877691619 / 44877685134 | Refresh demo data snapshot | success |
+| 44877715293 | live-alerts | success |
+
+- `keepalive` ran to completion instead of being `cancelled`, which is the direct proof that reverting
+  the shared concurrency group fixed the regression.
+- The published feed is **2 minutes old** (`meta.generated_at 2026-11-21T06:55:07Z`).
+- The three writers hold **distinct** groups (`writer-…`, `live-alerts`, `refresh-data-…`), and
+  `scripts/check-data-writer-concurrency.mjs` fails if any two ever share one.
+- GitHub Pages: `pages/builds/latest` → `built`, `error.message` `null`.
+
+### PR list for this session
+
+| PR | Purpose | Result |
+|---|---|---|
+| [#47](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/47) | Verify the scheduled-pipeline repair; fix the monitor that reported dead samplers as "fresh"; fix F-59 (`check_lab.mjs` on a clean checkout) | **merged** `ae02420`, Pages built |
+| [#51](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/51) | Record #47's merge + deploy result | **merged** `32c7712`, Pages built |
+| [#53](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/53) | Fix the write-back race (F-61) after it failed on `main` | **merged** `561808d` — but its shared concurrency group was a regression |
+| [#55](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/55) | Revert the shared group; fix the guard that missed it | **merged**, `keepalive` then succeeded |
+
 ### PR, merge and deployment record — session-7dc87913
 
 - **PR:** [#47](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/47) — `arena/7dc87913-kalshidash1` → `main`.
