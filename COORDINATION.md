@@ -2162,3 +2162,15 @@ Rules honoured: `git pull --rebase` before every push; small frequent commits; n
 - Scope explicitly excluded (owned elsewhere or shared): workflows, engine, feed/state/data generators, templates, generated HTML/CSS. No other files edited than those listed.
 
 **Refresh + closure addendum (20:25 UTC):** the stale-feed irregularity was cleared by dispatching the real sampler rather than editing data — `gh workflow run live-alerts.yml --ref main` → run 44946124127 `success`, commit `25885b9` (`data(live): engine sample 2026-11-21T20:24:59Z`). `tools/freshness_check.mjs` now reports **FRESHNESS OK**; `scripts/check_alerts.mjs` PASS (11 alerts, 3 high-ROI, 0 resolutions, 60 rows, 8 orderbooks, largest move $0.96); `npm test` exit 0; `build-site --check` PASS; Pages `built` for `25885b9`, `error: null`; live `dashboard.html` and `categories/golf.html` fetched post-deploy and render with source-linked rows. Remaining open items: PR #60 (session-96019ad5) and PR #62 (session-c85ee474) are other sessions' in-flight work — left for their owners, not merged here, and no shared file was edited by this session.
+
+**Final PR/merge ledger — session-93edc454 (all merged without waiting for review, per brief):**
+
+| PR | Branch | Title | Merged (UTC) | Merge commit | CI | Pages |
+|---|---|---|---|---|---|---|
+| [#59](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/59) | `arena/93edc454-kalshidash1` | final integration verification vs official sources | 2026-11-21T20:21:40Z | `85382a7` | alerts/build/qa all pass | `built`, `error: null` |
+| [#61](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/61) | `arena/93edc454-kalshidash1` | record #59 merge, Pages deploy, task closure | 2026-11-21T20:23:35Z | `ac88076` | alerts/build/qa all pass | `built`, `error: null` |
+| [#63](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/63) | `arena/93edc454-kalshidash1` | fresh live sample clears staleness; QA + Pages re-confirmed | 2026-11-21T20:28:10Z | `7b4b4d1` | alerts/build/qa all pass | `built`, `error: null` |
+
+Live-data fix during this session: `gh workflow run live-alerts.yml --ref main` → run 44946124127 `success` → commit `25885b9` (`data(live): engine sample 2026-11-21T20:24:59Z`); `freshness_check.mjs` now **FRESHNESS OK** (was FAIL at 158 min). No data was edited by hand.
+
+Post-merge state at 20:29 UTC: `main` = `7b4b4d1`; `npm test` exit 0; `build-site --check` PASS; `freshness_check` OK; `check_freshness_badge` 53/53; 90 pages / 2,124 internal links / 0 broken; live `index.html`, `dashboard.html`, `executive-summary.html`, `categories/golf.html`, `flagged.html` all fetched post-deploy and render with per-row source links. Two conflict incidents occurred (PR #59 claim vs #57/#58, PR #63 vs #60) and both were resolved by keeping **both** sessions' board sections — no other session's work was discarded. Open PRs #62 (session-c85ee474) and #64 (session-96019ad5) are other sessions' scopes and were deliberately not merged here.
