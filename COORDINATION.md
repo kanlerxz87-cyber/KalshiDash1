@@ -2110,3 +2110,17 @@ Please remove or qualify the `/events?category=` “unreliable filter” stateme
 - Official sources re-fetched this session: [Test In The Demo Environment](https://docs.kalshi.com/getting_started/demo_env) confirms the demo REST/WebSocket roots used by the site; [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets) confirms the market fields the dashboard renders (`result`, `last_price_dollars`, `volume_fp`, `open_interest_fp`, `status`).
 - **Irregularity (flagged, not blocking):** the committed feed (`data/live/feed.json`, generated 2026-11-21T17:42:16Z, 38 alerts) is stale — 156.6 min old at check time, beyond the 45-min limit. A live-engine refresh was attempted from this sandbox and failed with `ECONNRESET` reaching `external-api.demo.kalshi.co` (sandbox egress limitation; the engine correctly left data untouched). The scheduled sampler stall was already flagged in prior sessions. No values were fabricated to freshen the feed.
 - QA: `node scripts/build-site.mjs --check` PASS; `npm ci && npm test` PASS (engine, feed, guard, page, IDs, sourced rows, lab, links — 90 pages, 2,124 internal links, 0 broken).
+## Claim — session-93edc454 (branch `arena/93edc454-kalshidash1`, base `f52ad08`, 2026-11-21)
+
+- Session ID: `session-93edc454`. Branch: `arena/93edc454-kalshidash1` (Arena-managed; works, commits and pushes only here).
+- Role: **final integration + verification pass** for the full brief (executive summary, live dashboard with two ≥ $0.10 swing chats, five-topic tracking to resolution, simulated trading + portfolio + strategy analysis, price/liquidity charts, catalyst links, GitHub Pages site, line-by-line source verification, PR + merge + Pages confirmation). No other session has claimed this scope on this branch.
+- Scope (files this session touches): `COORDINATION.md` (this board only), `verification/2026-11-21-93edc454.md` (new), and — only if a defect is found — the specific defect file(s) named in the verification report. No other session's files are edited. Shared outputs change only through their generators (`scripts/build-site.mjs`, `tools/live_engine.mjs`).
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| V1 | Line-by-line repo review vs the brief; verify every site claim against official Kalshi sources (docs + live demo API) | in progress | session-93edc454 | `verification/2026-11-21-93edc454.md` |
+| V2 | QA battery: build check, engine selftest, feed/guard/page/ids/rows/lab/links, workflow shells, concurrency, keepalive verdict | in progress | session-93edc454 | (read-only) |
+| V3 | Refresh data (`live_engine` + `fetch-snapshot` + `build-site`) and re-verify freshness | in progress | session-93edc454 | `data/`, generated HTML via generators only |
+| V4 | PR → merge → Pages confirmation + board record | unclaimed | session-93edc454 | `COORDINATION.md` |
+
+Rules honoured: `git pull --rebase` before every push; small frequent commits; no value inferred — anything unconfirmed stays blank and is flagged; never mark anything verified without an official source link.
