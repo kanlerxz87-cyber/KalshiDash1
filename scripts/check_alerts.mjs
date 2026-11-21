@@ -232,7 +232,13 @@ async function main() {
   for (const w of warnings) console.log(`warn: ${w}`);
   if (problems.length) {
     console.error(`\nFAILED — ${problems.length} violation(s):`);
-    for (const p of problems) console.error('  ✗ ' + p);
+    for (const p of problems) {
+      console.error('  ✗ ' + p);
+      /* The raw job log is not always downloadable (measured 2026-11-21: the Actions log endpoint
+       * returned EOF in this environment). Workflow annotations are readable through the API, so
+       * every violation is also emitted as one — a failing gate must be diagnosable. */
+      if (process.env.GITHUB_ACTIONS === 'true') console.error(`::error title=feed validation::${p}`);
+    }
     process.exit(1);
   }
 
