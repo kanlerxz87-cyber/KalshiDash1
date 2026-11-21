@@ -94,6 +94,18 @@ jobs:
             # data/live/ is REGENERATED every run, so it must never be text-merged: on conflict,
             # discard the commit, fast-forward, re-run the engine, and commit again. The push is
             # then verified against the remote tip instead of trusted.
+            #
+            # FIXED (session-e50b53f6, F-78): every generated page embeds the feed's generated_at
+            # in its "Data as of" header, but this step used to commit data/live/ WITHOUT rebuilding
+            # the site, so every engine sample left main stale for `scripts/build-site.mjs --check`
+            # (measured on main at 14bfb12, sample 2026-11-21T23:13:19Z: 22 pages stale; the
+            # staleness checker inside scripts/check-links.mjs then failed site-qa step 6 on every
+            # branch that picked up the new feed, e.g. run 44960909852). keepalive.yml and
+            # refresh-data.yml already rebuild before committing; do the same here so each sample
+            # commit is self-consistent with the staleness gate in pages.yml.
+            node scripts/build-site.mjs >/dev/null 2>&1 || \
+              echo "::warning::site rebuild failed; committing the sample without regenerated pages"
+            git add data/ '*.html' assets categories
             PUSHED=false
             for attempt in 1 2 3 4 5; do
               STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -123,7 +135,10 @@ jobs:
               echo "regenerating on top of $(git rev-parse --short HEAD)"
               node tools/live_engine.mjs --max-series 12 --candle-markets 6 >/dev/null 2>&1 || \
                 echo "::warning::attempt $attempt: engine rerun failed; reusing committed data"
-              git add data/live/
+              # F-78 (session-e50b53f6): rebuild the pages on the new tip too, so the regenerated
+              # sample commit is self-consistent exactly like the first-pass commit above.
+              node scripts/build-site.mjs >/dev/null 2>&1 || true
+              git add data/ '*.html' assets categories
               if git diff --cached --quiet -- data/live/; then
                 echo "Nothing to publish after regenerating — the branch already has this data."
                 PUSHED=true
