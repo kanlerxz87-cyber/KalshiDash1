@@ -2322,7 +2322,7 @@ Explicitly **not** edited (other scopes / observations only, recorded in the ver
 |---|---|---|---|---|
 | E1 | Claim scope + push. | done | session-ef2c1184 | `COORDINATION.md` |
 | E2 | Verify published rows/tables against the official demo API and docs; record source links. | done — 9 sources fetched, table-by-table record in `verification/2026-11-21-ef2c1184.md` §2–§3 | session-ef2c1184 | `verification/2026-11-21-ef2c1184.md` |
-| E3 | Resolution path (brief: track until resolved yes/no). **Defect found and fixed: F-66.** Retention dropped results for markets the 300-row cap evicted; retrieval read one `status=settled` page ordered by creation time. Fixed in `tools/live_engine.mjs`, published on `flagged.html`. | done (live settlement still open, see below) | session-ef2c1184 | `tools/live_engine.mjs`, `data/live/feed.json`, `alerts/*`, `templates/market.tpl`, `templates/flagged.tpl`, `scripts/check_alerts.mjs`, `scripts/backfill-awaiting.mjs`, `docs/ALERTS.md` |
+| E3 | Resolution path (brief: track until resolved yes/no). **Defect found and fixed: F-70.** Retention dropped results for markets the 300-row cap evicted; retrieval read one `status=settled` page ordered by creation time. Fixed in `tools/live_engine.mjs`, published on `flagged.html`. | done (live settlement still open, see below) | session-ef2c1184 | `tools/live_engine.mjs`, `data/live/feed.json`, `alerts/*`, `templates/market.tpl`, `templates/flagged.tpl`, `scripts/check_alerts.mjs`, `scripts/backfill-awaiting.mjs`, `docs/ALERTS.md` |
 | E5 | Live-update audit of the two chats. **Defect found and fixed: F-67** (the page read the engine feed once, so new alerts never appeared without a reload; now refreshed every 60 s). **F-68:** the executive summary over-claimed resolution tracking and now states exactly what is tracked. | done | session-ef2c1184 | `alerts/js/alerts-page.js`, `templates/executive-summary.tpl`, `templates/flagged.tpl` |
 | E6 | Chart liveness. **Defect found and fixed: F-69** — the market chart only redrew on an explicit click, so it stayed still while the poller collected points. Now redrawn every 5 s on the market page. | done | session-ef2c1184 | `assets/app.js`, `templates/flagged.tpl` |
 | E4 | Full QA battery, integration PR, merge, confirm Pages deploy, record PR link/result. | in progress | session-ef2c1184 | this board |
@@ -2340,7 +2340,7 @@ Explicitly **not** edited (other scopes / observations only, recorded in the ver
 
 ### Verification — session-ef2c1184
 
-- `node tools/live_engine.mjs --selftest` — PASS, **72 assertions** (48 before; 14 new for F-66).
+- `node tools/live_engine.mjs --selftest` — PASS, **72 assertions** (48 before; 14 new for F-70).
 - `npm test` (engine, feed, guard 5/5, page, ids 89 files/557 ids, rows, lab, links 90 pages/2,126
   internal links/0 broken) — PASS.
 - `node scripts/build-site.mjs --check` — PASS. `node tools/freshness_check.mjs` — PASS.

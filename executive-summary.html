@@ -49,8 +49,11 @@
       an order-book ladder that answers "how many contracts are available at this price".</li>
       <li><strong>Simulated trading.</strong> Five published strategies trade automatically against live prices, settle on
       resolution, and are analysed by strategy and by topic so a new strategy can be judged on results.</li>
-      <li><strong>Your demo account, read-only.</strong> Paste your own demo API key and the site reads your balance, positions,
-      fills and settlements. The key is held in memory only, and the site has no order-placement button.</li>
+      <li><strong>Your demo account, read-only — and only from a scheduled job.</strong> A GitHub Actions job
+      (<code>tools/demo_trader.mjs</code>) signs the authenticated reads with repository secrets and writes
+      <code>data/account.json</code>; the page renders that file. The browser cannot do the signing itself: the demo API's
+      preflight does not allow the three <code>KALSHI-ACCESS-*</code> headers (measured, <a href="flagged.html#F-66">F-66</a>),
+      so a static page can never read a balance or place an order. No key is requested or stored in your browser.</li>
     </ul>
   </div>
 

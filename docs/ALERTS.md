@@ -134,7 +134,7 @@ publishes a `result` of `yes` / `no` / `scalar`, with `settlement_ts` and
 `settlement_value_dollars`. Markets this engine does not track are **counted**
 (`untracked_settled_seen`) rather than stored, so the tracked ones are not buried (S4, S7, S8).
 
-Four rules make that reliable, each added on 2026-11-21 after a defect was reproduced (**F-66**):
+Four rules make that reliable, each added on 2026-11-21 after a defect was reproduced (**F-70**):
 
 1. **Only pending markets are asked about.** A series whose alerted markets have all resolved is
    no longer polled, and series whose tracked markets closed most recently are polled first, so the
@@ -189,7 +189,7 @@ API key (S10), which this site does not hold and will not ask for. That is recor
 | V-04 | Natural-gas markets are reachable | `GET /series?category=Commodities&tags=Oil & Gas`, then `GET /markets?series_ticker=KXNATGASW` | **PASS** — strikes such as `KXNATGASW-26NOV2717-T5.899` |
 | V-05 | Culture category works despite the missing taxonomy key | `GET /series?category=Culture` | **PASS** — series `KXXBANNEDGROK` etc., `category: "Culture"` |
 | V-06 | Field names used by the engine exist | S5 read; live payloads contain every field used | **PASS** |
-| V-07 | Threshold logic, price rule, scoring, resolution merge, resolution paging/retention (F-66), ladder | `node tools/live_engine.mjs --selftest` | **PASS** — 72 assertions (2026-11-21) |
+| V-07 | Threshold logic, price rule, scoring, resolution merge, resolution paging/retention (F-70), ladder | `node tools/live_engine.mjs --selftest` | **PASS** — 72 assertions (2026-11-21) |
 | V-08 | Feed cannot contain a sub-threshold alert, an invented price, a non-official source or a false high-ROI flag | `node scripts/check_alerts.mjs` | **PASS**; and deliberately-corrupted input produced 8 expected failures |
 | V-09 | Page renders both feeds, filters correctly, never shows an invented price | `node scripts/check_alerts_page.mjs` (jsdom) | **PASS** — 14 assertions |
 | V-10 | Engine runs against the live demo API | GitHub Actions `live-alerts` runs | **PASS** — see §5 |
