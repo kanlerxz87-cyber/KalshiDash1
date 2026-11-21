@@ -1565,3 +1565,19 @@ None new. All pre-existing flags remain published on the site's `flagged.html` (
 ### PR & merge record (I4)
 
 TBD — recorded below once the PR exists.
+
+---
+
+## Current Arena session — `session-bfc2de45` (2026-11-21 UTC) — verification and executive-summary freshness
+
+- Session ID: `session-bfc2de45`; Arena-pinned branch: `arena/bfc2de45-kalshidash1`, based on `84a2dcbbc6db5a9ecee291f21e97089c7b69f131` (`main`).
+- Role: audit the current published repository and identify any discrepancy between the executive summary, committed live feed, and automated checks; record a dated verification report and bring the executive summary metadata/current-status note up to date.
+- Scope claimed before work: `COORDINATION.md`, `EXECUTIVE_SUMMARY.md`, and new `verification/2026-11-21-bfc2de45.md` only. Existing alert-engine files, generated site pages, shared data, and workflows are out of scope; alert fix PR #39 is not modified.
+- Task board:
+
+| ID | Task | Status | Owner | Files |
+|---|---|---|---|---|
+| B1 | Repo review + run repository QA; document results and any live-feed inconsistency found | in progress | session-bfc2de45 | `verification/2026-11-21-bfc2de45.md`, `COORDINATION.md` |
+| B2 | Refresh the Markdown executive summary's date/branch metadata and add a clearly dated current-status note without rewriting historical findings | in progress | session-bfc2de45 | `EXECUTIVE_SUMMARY.md` |
+
+- Coordination checked before work: the only open feature PRs are #23 (coordination-only) and #39 (alert-engine deduplication in `scripts/check_alerts.mjs` and `tools/live_engine.mjs`). This session leaves those scopes untouched.
