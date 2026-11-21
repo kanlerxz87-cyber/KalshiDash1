@@ -173,6 +173,21 @@
   </div>
   <p class="small muted" id="topic-note"></p>
 
+  <h2>Followed to resolution — still open, waiting on the exchange</h2>
+  <p class="small muted" style="margin-top:0">Every contract that produced at least one alert, until the
+    exchange publishes its <code>result</code>. This is the engine's follow list: rows move to the resolved
+    table below only when the API returns <code>yes</code>, <code>no</code> or <code>scalar</code> for them.
+    <span class="muted" id="awaiting-note"></span></p>
+  <div class="table-wrap">
+    <table id="await-table">
+      <thead><tr>
+        <th>Contract</th><th>Topic</th><th class="num">Last alert</th><th>Closes</th>
+        <th class="num">Last price</th><th>Waiting for</th><th>Source</th>
+      </tr></thead>
+      <tbody><tr><td colspan="7" class="empty">No followed contracts awaiting a result.</td></tr></tbody>
+    </table>
+  </div>
+
   <h2>Resolved events — how each one settled</h2>
   <p class="small muted" style="margin-top:0">Contracts stay tracked until they resolve. The
     <code>result</code> field is read from the API; a blank result means the exchange has not published a

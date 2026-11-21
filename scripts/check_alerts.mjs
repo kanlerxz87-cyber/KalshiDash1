@@ -155,6 +155,35 @@ async function main() {
     checkOfficialUrl(r.source_url, w);
   }
 
+  const resolvedTickers = new Set((feed.resolutions || []).map((r) => r.ticker));
+
+  // 6a. When the feed carries the awaiting list it must also be consistent with the alerts it
+  // was derived from: the same rule the engine applies (alert tickers minus resolved tickers).
+  if (feed.awaiting) {
+    const expected = [...new Set((feed.alerts || []).map((a) => a.ticker))]
+      .filter((t) => !resolvedTickers.has(t));
+    const listed = new Set(feed.awaiting.map((a) => a.ticker));
+    const missing = expected.filter((t) => !listed.has(t));
+    // The engine caps the list (40 rows), so only a shortfall beyond that cap is a failure.
+    if (missing.length > 0 && (feed.awaiting.length >= 40) === false) {
+      fail(`awaiting: ${missing.length} alerted ticker(s) missing from the list, e.g. ${missing.slice(0, 3).join(', ')}`);
+    }
+  }
+
+  // 6b. awaiting-resolution list (followed, not yet answered). Every row must be a real alert
+  // ticker with a source, and must NOT already appear as resolved — otherwise the page would
+  // claim something is pending after the exchange has answered it.
+  for (const a of feed.awaiting || []) {
+    const w = `awaiting ${a.ticker || '?'}`;
+    if (!a.ticker) fail(`${w}: no ticker`);
+    if (resolvedTickers.has(a.ticker)) fail(`${w}: already resolved, so it must not be listed as awaiting`);
+    // Deliberately NOT asserted: that the ticker appears in feed.alerts. That list is capped at
+    // the 200 newest rows by the engine, and a market can be alerted on, then settle, long before
+    // this list is published, so absence proves nothing. The property that matters — never
+    // presenting a resolved market as pending — is asserted above.
+    checkOfficialUrl(a.source_url, w);
+  }
+
   // 7. orderbooks (when present)
   const obs = (feed.orderbooks) || {};
   for (const [ticker, ob] of Object.entries(obs)) {
@@ -204,8 +233,9 @@ async function main() {
   const nA = (feed.alerts || []).length;
   const nR = (feed.resolutions || []).length;
   const nM = (feed.markets || []).length;
+  const nW = (feed.awaiting || []).length;
   const nH = (feed.alerts || []).filter((a) => a.model && a.model.highROI).length;
-  console.log(`feed: ${nA} alerts (${nH} high-ROI), ${nR} resolutions, ${nM} market rows, ${Object.keys(obs).length} orderbooks`);
+  console.log(`feed: ${nA} alerts (${nH} high-ROI), ${nR} resolutions, ${nW} awaiting resolution, ${nM} market rows, ${Object.keys(obs).length} orderbooks`);
   if (nA) console.log(`largest recorded move: $${maxDelta.toFixed(2)}`);
 
   for (const w of warnings) console.log(`warn: ${w}`);

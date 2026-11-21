@@ -752,6 +752,7 @@
 
   /* ================================================================== pages */
   var pages = {};
+  var drawMarketChart = null;   // set by the market page, driven by startUniverseRefresh()
 
   function currentPage() {
     var attr = document.body.getAttribute('data-page');
@@ -1153,6 +1154,28 @@
       $('#m-result').innerHTML = (m && m.result)
         ? '<span class="badge ' + (m.result === 'yes' ? 'good' : 'bad') + '">resolved ' + esc(m.result) + '</span>'
         : '<span class="muted">not resolved yet</span>';
+      /* Resolution block. Values come only from the API row (result, settlement_value_dollars,
+       * settlement_ts, rules_primary); a missing field stays an em dash, never a guess. */
+      var rc = $('#m-result-cell');
+      if (rc) {
+        rc.innerHTML = (m && m.result)
+          ? '<span class="badge ' + (m.result === 'yes' ? 'good' : (m.result === 'no' ? 'bad' : 'neutral')) + '">' + esc(m.result) + '</span>'
+          : '<span class="muted">not published by the exchange yet</span>';
+      }
+      var sv = $('#m-settle-value');
+      if (sv) sv.textContent = (m && m.settlement_value_dollars !== null && m.settlement_value_dollars !== undefined)
+        ? cents(m.settlement_value_dollars) : '—';
+      var st = $('#m-settle-ts');
+      if (st) st.textContent = (m && m.settlement_ts) ? m.settlement_ts : '—';
+      var rr = $('#m-rule-text');
+      if (rr) rr.textContent = (m && m.rules_primary) ? m.rules_primary : '—';
+      var ss = $('#m-settle-src');
+      if (ss) {
+        ss.innerHTML = (m && m.source_url)
+          ? '<a href="' + esc(m.source_url) + '" target="_blank" rel="noopener">API row</a>' +
+            (m.contract_terms_url ? ' · <a href="' + esc(m.contract_terms_url) + '" target="_blank" rel="noopener">contract terms</a>' : '')
+          : '—';
+      }
       $('#m-last').textContent = cents(m && m.last_price_dollars);
       $('#m-bid').textContent = cents(m && m.yes_bid_dollars);
       $('#m-ask').textContent = cents(m && m.yes_ask_dollars);
@@ -1180,6 +1203,7 @@
     function drawChart() {
       var m = state.markets[ticker];
       if (!m) return;
+      // shared with startUniverseRefresh() so the chart can follow the poller while the tab is open
       var pts = (state.history[ticker] || []).slice();
       var snapCandles = state.snapshot && state.snapshot.candlesticks && state.snapshot.candlesticks[ticker];
       if (snapCandles) {
@@ -1314,6 +1338,16 @@
       if (m) { title(m); drawChart(); drawBook(); }
     });
     loadMarket();
+
+    /* Hand the chart drawer to the shared 5-second timer (startUniverseRefresh) so the price
+     * chart keeps up with the poller while this tab is open, instead of only redrawing on a click. */
+    drawMarketChart = function () {
+      var m = state.markets[ticker];
+      if (!m) return;
+      title(m);
+      drawChart();
+      drawBook();
+    };
   };
 
   /* --------------------------------------------------------- portfolio page */
@@ -1449,6 +1483,20 @@
 
   function startUniverseRefresh() {
     state.universeTimer = setInterval(function () { refreshUniverse(); }, 10 * 60 * 1000);
+
+    /* Chart accumulation while the tab is open. detectSwing() records one [time, price] point per
+     * market per poll, but the market page only redrew the chart after an explicit action (window
+     * button, ticker change, resize). A trader watching a market therefore saw a chart that did
+     * not move even though the poller was collecting points behind it. This redraws the chart and
+     * the book ~5 times a second at most, only when this is the market page and only if it exists,
+     * and it never re-renders the tables (which would fight the reader's own scrolling). */
+    if (currentPage() === 'market') {
+      state.chartTimer = setInterval(function () {
+        try {
+          if (drawMarketChart && document.getElementById('price-chart')) drawMarketChart();
+        } catch (e) { /* a redraw must never take the page down */ }
+      }, 5000);
+    }
   }
 
   function init() {

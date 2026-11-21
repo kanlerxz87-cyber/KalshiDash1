@@ -78,8 +78,12 @@
     return n === null ? '—' : (n < 0 ? '-$' : '$') + Math.abs(n).toFixed(d === undefined ? 4 : d);
   }
   function clockT(iso) {
+    /* Full UTC date + time, not just the clock time. The feed keeps up to 120 swings, which can
+     * span more than one day, and a bare "14:05:00Z" made two different days look like the same
+     * moment — the one thing a trader must not misread on a chart of sharp moves. */
     var d = iso ? new Date(iso) : new Date();
-    return d.toISOString().slice(11, 19) + 'Z';
+    if (isNaN(d.getTime())) return '—';
+    return d.toISOString().slice(0, 10) + ' ' + d.toISOString().slice(11, 19) + 'Z';
   }
   function apiLink(url, label) {
     return '<a href="' + esc(url) + '" target="_blank" rel="noopener" title="Official Kalshi endpoint (source of this row)">' + esc(label || 'API') + ' ↗</a>';

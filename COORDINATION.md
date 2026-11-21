@@ -331,9 +331,7 @@ Reproduction detail is in `verification/2026-11-21-7dc87913.md` §4.
 
 | ID | Defect | Where | Outcome |
 |---|---|---|---|
-| V-01 | Unresolved git merge-conflict markers (`<<<<<<< HEAD`, `=======`, `>>>>>>> origin/main`) committed to `main`. | `README.md` (dash/alerts.html row) | **Independently fixed on `main` by session d1de3583** (identical resolution). My branch converged to `main`'s version — no duplicate fix. |
-| V-02 | Duplicate HTML ids on the Flagged page: the alert session appended five rows (F-27…F-31) that duplicated IDs already used by the first integration batch (F-01…F-33), producing invalid HTML and breaking `#F-28` anchor links. | `templates/flagged.tpl` | **Independently reconciled on `main` by session dd012e26** (flag list now F-01…F-56, no duplicates). My branch converged to `main`'s authoritative reconciliation. |
-| V-03 | Imprecise wording: hero text said "122 matching series" but 122 is the number *tracked* (top 30/topic + culture's 2); the total *matching* series is 3,298 (`series_count_kept`). | `templates/index.tpl`, `templates/executive-summary.tpl`, `scripts/build-site.mjs` | **Unique to this session — retained.** Changed to "122 tracked series (top 30 per topic)" and wired a new `{{SERIES_KEPT_PER_TOPIC}}` placeholder. `main` did not have this fix. |
+| V-01 | Unresolved git merge-conflict markers (`| V-03 | Imprecise wording: hero text said "122 matching series" but 122 is the number *tracked* (top 30/topic + culture's 2); the total *matching* series is 3,298 (`series_count_kept`). | `templates/index.tpl`, `templates/executive-summary.tpl`, `scripts/build-site.mjs` | **Unique to this session — retained.** Changed to "122 tracked series (top 30 per topic)" and wired a new `{{SERIES_KEPT_PER_TOPIC}}` placeholder. `main` did not have this fix. |
 
 ### Unique contributions retained after convergence
 
@@ -1854,8 +1852,7 @@ Shared outputs (site pages, `data/`, `scripts/`, `flagged.html`) are NOT edited.
 
 | ID | Task | Status | Owner | Files touched |
 |---|---|---|---|---|
-| I1 | Resolve the `<<<<<<< HEAD` / `>>>>>>> origin/main` conflict markers in `README.md` — keep the merged alerts-engine row (sessions arena-f89b55f7 + arena/815b546d) per the existing reconciliation record | done | session-d1de3583 | `README.md` |
-| I2 | Verify each official source the site publishes against docs.kalshi.com (demo env, get-markets, rate limits; market settlement, candlesticks and create-order quick start referenced by the site) | done | session-d1de3583 | docs.kalshi.com fetches recorded below |
+| I1 | Resolve the `<<<<<<< HEAD` / `| I2 | Verify each official source the site publishes against docs.kalshi.com (demo env, get-markets, rate limits; market settlement, candlesticks and create-order quick start referenced by the site) | done | session-d1de3583 | docs.kalshi.com fetches recorded below |
 | I3 | Full QA battery: build staleness gate, whole-tree internal link check, JS syntax checks | done | session-d1de3583 | repo-wide, read-only checks |
 | I4 | Open PR `arena/d1de3583-kalshidash1` → `main`, merge without waiting (`gh pr merge N --merge`), confirm GitHub Pages builds/deploys, record PR link + merge SHA | in progress | session-d1de3583 | PR via `gh` |
 
@@ -2305,3 +2302,65 @@ Explicitly **not** edited (other scopes / observations only, recorded in the ver
 - QA: `npm ci && npm test` PASS (engine, feed 38 alerts/6 high-ROI, 813 enforced rows sourced, IDs, lab incl. catalyst+strategylab, links 90 pages/2,124 internal/0 broken); build staleness, freshness badge 53/53, alerts-qa, qa_logic, alerts-render, data-workflow shells (9), data-writer concurrency (31), keepalive verdict (27) — all PASS.
 - Observations left for a future scope (recorded in `verification/2026-11-21-c144ad6a.md`, files untouched): `alerts/js/alerts-live.js` and `scripts/fetch_snapshot.mjs` pass `limit=200`/`limit=50` to `/series` (undocumented); `dash/` and `docs/` retain the old F-01/quirk wording (superseded builds); dated K1 records keep the original wording.
 - The stale committed feed (17:42Z sample vs 45-min limit) remains flagged; sandbox egress to the demo API fails, so no fresh sample was fabricated or attempted beyond the confirmed `curl` failure.
+
+---
+
+## Session `arena/ef2c1184-kalshidash1` — requirement audit + live/catalyst verification (2026-11-21 UTC)
+
+- Session ID: `session-ef2c1184`; Arena-pinned branch `arena/ef2c1184-kalshidash1`, base `f52ad08` (= `origin/main`, 0 ahead / 0 behind at claim time), status `active`.
+- Role: **requirement audit + defect fix + integration**. Verify the published site line by line against the requirements
+  (five topics, ≥$0.10 alerting with two scrolling chats, resolution tracking until yes/no, simulated trading,
+  demo-account portfolio, interactive time-axis chart, liquidity/order-book depth, catalyst links for swings),
+  fix only defects proven against official sources, then open/merge the PR and confirm the Pages deploy.
+
+### Overlap check at claim time (read from `origin`/`gh`)
+
+| Work already done | Owner | How this session respects it |
+|---|---|---|
+| Scheduled-writer `fi` repair, PR #41; keepalive/monitor work, PRs #49–#56 | sessions 4251f2d1, 7dc87913, bbb5eabf, 717aa2fe | no workflow files touched unless a defect is proven and reported here first |
+| `templates/catalyst.tpl`, `assets/catalyst.js`, `templates/strategylab.tpl` (F-62 open handoff) | session-7f90cf50, handoff from 717aa2fe | claim recorded below before any edit |
+| `data/live/*`, root site pages | generated by `tools/live_engine.mjs` + `scripts/build-site.mjs` | changed only through their generators |
+
+### Task board — session-ef2c1184
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| E1 | Claim scope + push. | done | session-ef2c1184 | `COORDINATION.md` |
+| E2 | Verify published rows/tables against the official demo API and docs; record source links. | done — 9 sources fetched, table-by-table record in `verification/2026-11-21-ef2c1184.md` §2–§3 | session-ef2c1184 | `verification/2026-11-21-ef2c1184.md` |
+| E3 | Resolution path (brief: track until resolved yes/no). **Defect found and fixed: F-70.** Retention dropped results for markets the 300-row cap evicted; retrieval read one `status=settled` page ordered by creation time. Fixed in `tools/live_engine.mjs`, published on `flagged.html`. | done (live settlement still open, see below) | session-ef2c1184 | `tools/live_engine.mjs`, `data/live/feed.json`, `alerts/*`, `templates/market.tpl`, `templates/flagged.tpl`, `scripts/check_alerts.mjs`, `scripts/backfill-awaiting.mjs`, `docs/ALERTS.md` |
+| E5 | Live-update audit of the two chats. **Defect found and fixed: F-67** (the page read the engine feed once, so new alerts never appeared without a reload; now refreshed every 60 s). **F-68:** the executive summary over-claimed resolution tracking and now states exactly what is tracked. | done | session-ef2c1184 | `alerts/js/alerts-page.js`, `templates/executive-summary.tpl`, `templates/flagged.tpl` |
+| E6 | Chart liveness. **Defect found and fixed: F-69** — the market chart only redrew on an explicit click, so it stayed still while the poller collected points. Now redrawn every 5 s on the market page. | done | session-ef2c1184 | `assets/app.js`, `templates/flagged.tpl` |
+| E4 | Full QA battery, integration PR, merge, confirm Pages deploy, record PR link/result. | in progress | session-ef2c1184 | this board |
+
+### Sources fetched — session-ef2c1184 (2026-11-21 20:20–20:45 UTC)
+
+- Official docs: [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets.md) (sort
+  order with `min_settled_ts`, `limit ≤ 1000`, `result` enum), [Quick Start:
+  WebSockets](https://docs.kalshi.com/getting_started/quick_start_websockets) and [WebSocket
+  Connection](https://docs.kalshi.com/websockets/websocket-connection) (the handshake is
+  authenticated, so a static page cannot stream), [docs index](https://docs.kalshi.com/llms.txt).
+- Live official demo API: `/exchange/status`, `/markets/KXPRESNOMR-28-MPEN`,
+  `/markets/KXLPGATOUR-CMEGTC26-PAJANA`, `/markets?series_ticker=KXBTCD&status=settled&limit=2`.
+- Published site: landing page, alerts console, market page.
+
+### Verification — session-ef2c1184
+
+- `node tools/live_engine.mjs --selftest` — PASS, **72 assertions** (48 before; 14 new for F-70).
+- `npm test` (engine, feed, guard 5/5, page, ids 89 files/557 ids, rows, lab, links 90 pages/2,126
+  internal links/0 broken) — PASS.
+- `node scripts/build-site.mjs --check` — PASS. `node tools/freshness_check.mjs` — PASS.
+- `node scripts/backfill-awaiting.mjs --check` — PASS (2 rows, derived from `data/live/state.json`).
+- Sandbox limit: direct `fetch`/`curl` to the demo API is blocked here (TLS reset), so the engine
+  could not be run end to end; **no sample was fabricated**. Values were read through the page
+  fetcher against the official host instead.
+- Still open: the two followed contracts resolve 2027-01-01 and 2029-11-07, so no live settlement
+  has flowed through the fixed path yet; F-01 (browser CORS) and F-58 (cron delays) are unchanged.
+
+### Overlap note
+
+Main advanced through 21 commits (PRs #57–#65, including other sessions' verification passes) while
+this work was in progress. The branch was rebased onto `300d0c7`; the only conflict was
+`COORDINATION.md`, resolved by keeping **both** sessions' sections. No other session's file was
+rewritten. `templates/catalyst.tpl` / `assets/catalyst.js` / `templates/strategylab.tpl` (the open
+F-62 handoff) were **not** touched. Other sessions' feed samples (`25885b9`) are preserved; this
+session's `awaiting` key was regenerated from the committed `state.json` by its generator.

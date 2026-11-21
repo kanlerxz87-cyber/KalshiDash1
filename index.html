@@ -58,10 +58,10 @@
       (<code>KALSHI-ACCESS-KEY</code>, <code>-TIMESTAMP</code>, <code>-SIGNATURE</code>;
       <code>timestamp + METHOD + path</code> signed with RSA-PSS/SHA-256 or Ed25519) —
       <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">Quick Start: Authenticated Requests</a>.
-      <strong>Not from this page, though:</strong> the demo host’s CORS preflight allows no
-      <code>KALSHI-ACCESS-*</code> header, so a browser cannot send a signed request at all (measured; see
-      <a href="flagged.html#F-66">F-66</a>). The <a href="demo-account.html">Demo account</a> page therefore reads a
-      snapshot that GitHub Actions produces with repository secrets — the key never reaches your browser.</li>
+      A static page therefore cannot read your portfolio or place an order, because the browser is not
+      allowed to send those signed headers (measured preflight, <a href="flagged.html#F-66">F-66</a>).
+      The <a href="demo-account.html">Demo account</a> page shows only what a GitHub Actions job wrote to
+      <code>data/account.json</code>; no key ever reaches your browser, and nothing here asks you to paste one.</li>
       <li>Markets resolve with <code>result</code> of <code>yes</code>, <code>no</code> or <code>scalar</code>, and the winning side is paid <strong>$1.00 per contract</strong>
       (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>,
       <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a>).

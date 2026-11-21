@@ -128,10 +128,35 @@ These rows are marked `candle` in the feed, so a reader can tell how each alert 
 prints its own term values so the ranking can be challenged.
 
 ### 3.5 Resolutions
-Every tracked market is re-read through `GET /markets?series_ticker=…&status=settled` and kept once
-the API publishes a `result` of `yes` / `no` / `scalar`, with `settlement_ts` and
+Every market this engine has alerted on is re-read through
+`GET /markets?series_ticker=…&status=settled&min_settled_ts=…&limit=1000` and kept once the API
+publishes a `result` of `yes` / `no` / `scalar`, with `settlement_ts` and
 `settlement_value_dollars`. Markets this engine does not track are **counted**
 (`untracked_settled_seen`) rather than stored, so the tracked ones are not buried (S4, S7, S8).
+
+Four rules make that reliable, each added on 2026-11-21 after a defect was reproduced (**F-70**):
+
+1. **Only pending markets are asked about.** A series whose alerted markets have all resolved is
+   no longer polled, and series whose tracked markets closed most recently are polled first, so the
+   per-run request budget is spent where a result can exist.
+2. **The query is sorted by settlement time.** S4 states that `min_settled_ts` / `max_settled_ts`
+   sort by settlement time, latest first, and are the filters compatible with `status=settled`
+   (`limit` is capped at 1000). Asking for `status=settled` alone sorts by creation time, so a busy
+   series could fill the whole page with newly created strikes and never show a market that
+   resolved this hour. `min_settled_ts` is set to one 15-minute overlap before the previous sample,
+   and the cursor is still followed within a two-page budget.
+3. **A followed market is not evicted before it resolves.** The 300-row market cap used to drop
+   small rows, and a market evicted before its result was published had that result discarded as
+   "untracked" — exactly the opposite of *track until it resolves*. Alerted markets now stay in the
+   map until answered (and for 7 days after), and `settled_markets` remembers every ticker this
+   engine has tracked.
+4. **The resolved row keeps its answer.** The market row retains `result`, `status`,
+   `settlement_ts` and `settlement_value_dollars`, so the market page can still show how it ended
+   after the market leaves the open boards, and the feed publishes an `awaiting` list (alerted but
+   unanswered) that the alerts page shows directly under the boards.
+
+Regression assertions for all four live in `--selftest`; `scripts/check_alerts.mjs` rejects a feed
+that lists an already-resolved market as awaiting.
 
 ### 3.6 Liquidity
 The orderbook is shown raw — price level and contract count — with the derived yes ask
@@ -164,7 +189,7 @@ API key (S10), which this site does not hold and will not ask for. That is recor
 | V-04 | Natural-gas markets are reachable | `GET /series?category=Commodities&tags=Oil & Gas`, then `GET /markets?series_ticker=KXNATGASW` | **PASS** — strikes such as `KXNATGASW-26NOV2717-T5.899` |
 | V-05 | Culture category works despite the missing taxonomy key | `GET /series?category=Culture` | **PASS** — series `KXXBANNEDGROK` etc., `category: "Culture"` |
 | V-06 | Field names used by the engine exist | S5 read; live payloads contain every field used | **PASS** |
-| V-07 | Threshold logic, price rule, scoring, resolution merge, ladder | `node tools/live_engine.mjs --selftest` | **PASS** — 30 assertions |
+| V-07 | Threshold logic, price rule, scoring, resolution merge, resolution paging/retention (F-70), ladder | `node tools/live_engine.mjs --selftest` | **PASS** — 72 assertions (2026-11-21) |
 | V-08 | Feed cannot contain a sub-threshold alert, an invented price, a non-official source or a false high-ROI flag | `node scripts/check_alerts.mjs` | **PASS**; and deliberately-corrupted input produced 8 expected failures |
 | V-09 | Page renders both feeds, filters correctly, never shows an invented price | `node scripts/check_alerts_page.mjs` (jsdom) | **PASS** — 14 assertions |
 | V-10 | Engine runs against the live demo API | GitHub Actions `live-alerts` runs | **PASS** — see §5 |

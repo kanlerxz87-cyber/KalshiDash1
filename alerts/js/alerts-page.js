@@ -278,6 +278,42 @@
     }).join('');
   }
 
+  /* ---------------- awaiting-resolution table ---------------- */
+
+  function renderAwaiting() {
+    var tb = document.querySelector('#await-table tbody');
+    if (!tb) return;
+    var rows = A.awaiting();
+    var note = document.getElementById('awaiting-note');
+    if (note) {
+      note.textContent = rows.length
+        ? rows.length + ' contract(s) followed and unresolved at the last engine sample '
+          + ((A.state.feed && A.state.feed.meta && A.state.feed.meta.generated_at) || '') + '.'
+        : 'No followed contract is unresolved at the last engine sample.';
+    }
+    if (!rows.length) {
+      tb.innerHTML = '<tr><td colspan="7" class="empty">No followed contracts awaiting a result. ' +
+        'A row appears here after this engine publishes an alert for that market.</td></tr>';
+      return;
+    }
+    tb.innerHTML = rows.map(function (r) {
+      var waiting = r.close_time ? 'close_time passed ' + r.close_time + '; awaiting settlement' : 'awaiting settlement';
+      if (r.close_time && Date.parse(r.close_time) > Date.now()) waiting = 'close_time ' + r.close_time;
+      return '<tr>' +
+        '<td>' + A.esc(r.title || r.ticker) + '<br><code class="small muted">' + A.esc(r.ticker) + '</code></td>' +
+        '<td>' + A.esc(A.topicLabel(r.topic)) + '</td>' +
+        '<td class="num small nowrap">' + (r.last_alert_delta === null || r.last_alert_delta === undefined ? '—'
+          // sign before the currency symbol: usd(-0.54) would render "$-0.54"
+          : (r.last_alert_delta > 0 ? '+' : (r.last_alert_delta < 0 ? '−' : '')) + A.usd(Math.abs(r.last_alert_delta), 2)) +
+          '<br>' + A.esc((r.last_alert_ts || '').replace('T', ' ').replace(/\.\d+Z$/, 'Z') || '—') + '</td>' +
+        '<td class="small nowrap">' + A.esc((r.close_time || '—').replace('T', ' ').replace(/\.\d+Z$/, 'Z')) + '</td>' +
+        '<td class="num">' + (r.last_price_dollars === null ? '—' : A.usd(A.num(r.last_price_dollars), 2)) + '</td>' +
+        '<td class="small">' + A.esc(waiting) + '</td>' +
+        '<td class="src">' + (r.source_url ? '<a href="' + A.esc(r.source_url) + '" target="_blank" rel="noopener">API</a>' : '—') + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
   /* ---------------- resolution table ---------------- */
 
   function renderResolutions() {
@@ -506,6 +542,7 @@
     renderStats();
     renderMarkets('markets-table');
     renderResolutions();
+    renderAwaiting();
     renderLadders();
     drawChart();
     setMode();
@@ -531,6 +568,20 @@
     setInterval(function () {
       A.pollLive({ maxSeries: 8 }).then(renderAll, setMode);
     }, 30000);
+
+    /* Re-read the committed engine feed as well. Without this the two chats only ever showed the
+     * sample that existed when the tab was opened: the 30 s loop above polls the API in this
+     * browser, but the history (and every alert found by the scheduled engine) lives in
+     * data/live/feed.json, which the page fetched exactly once at boot. A trader watching for a
+     * $0.10 swing would have to reload to see it. 60 s matches the engine's own 10-minute cadence
+     * with room to spare, and renderChats(false) keeps the scroll position and only highlights
+     * ids that were not on screen before. */
+    setInterval(function () {
+      A.loadFeed().then(function (f) {
+        if (!f) return;              // keep the current view; feedError surfaces in the badge
+        renderAll();
+      });
+    }, 60000);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
