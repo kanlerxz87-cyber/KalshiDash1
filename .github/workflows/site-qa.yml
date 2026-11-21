@@ -89,6 +89,9 @@ jobs:
       - name: Catalyst + strategy lab render tests (jsdom)
         run: node scripts/check_lab.mjs
 
+      - name: Canonical paper execution and chart provenance regressions (offline)
+        run: npm run test:paper && npm run test:chart
+
       - name: Python tool syntax
         run: python -m py_compile tools/*.py
 

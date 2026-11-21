@@ -1,11 +1,11 @@
 # KalshiDash1
 
-A read-only, live dashboard for the **Kalshi demo** exchange, published with GitHub Pages.
+A public-data dashboard with an explicitly hypothetical paper model for the **Kalshi demo** exchange, published with GitHub Pages.
 
 **Live site:** <https://kanlerxz87-cyber.github.io/KalshiDash1/>
 
 It tracks the highest-dollar live events in five focus topics — **gas prices, elections, culture, crypto and golf** —
-until each market resolves **yes** or **no**, turns every contract move of **$0.10 or more** into a live alert in two
+until each market resolves **yes** or **no**, records observed contract moves of **$0.10 or more** as alerts in two
 scrolling chats, and links every number on the page to the official Kalshi document or endpoint it came from.
 
 - Demo REST root: `https://external-api.demo.kalshi.co/trade-api/v2`
@@ -68,6 +68,17 @@ Their page-by-page index is at the end of this file, under *Earlier builds — p
 | `.github/workflows/` | Pages build check, scheduled data refresh, scheduled alert engine, demo-account snapshot, QA suites. |
 
 ---
+
+
+## Corrected paper model and chart provenance
+
+- The canonical `assets/paper.js` model buys **YES ask / NO ask**, never the bid or an assumed last price. It requires sufficient published quantity for the entire positive whole-number order and a local response observation no older than 15 seconds. NO ask quantity is the complementary YES bid quantity ([official mechanics](https://docs.kalshi.com/getting_started/orderbook_responses)).
+- Snapshot data is **view-only**. Project paper-risk caps (50 open positions, $1,000 entry cost) are model policies, not exchange limits or account cash. Trading fees, queue position, impact and latency are not modeled; gross paper P&L is not a forecast or actual account performance.
+- All five strategies hold to **finalized** binary outcomes; `determined` can still be disputed ([lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle)). Closed and stored open-position markets remain polled. Scalar/unknown outcomes are left unresolved by this binary simulator.
+- Earlier browser fills are retained as **legacy/unverified**, excluded from corrected Portfolio/Analysis totals. The separate Strategy Lab still ingests older/seeded stores for exploratory analysis; it is not verified performance.
+- Snapshot chart points retain capture time, not page-load time. Live public candles keep their exchange period-end times; seconds are local poll observation times. Gold markers and source-linked rows mark observed ≥$0.10 differences, **not proven news causes**. Equity supports negative and unbounded dollar P&L.
+- Run `npm run test:paper` (pure rules) and `npm run test:chart` (canonical DOM/chart/automatic-strategy tests). Fixtures are synthetic and never shipped as market data.
+- Current limitations and sources: [F-PAPER-01](https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html#F-PAPER-01), [F-PAPER-02](https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html#F-PAPER-02), [F-CHART-01](https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html#F-CHART-01).
 
 ## Build, refresh and check
 

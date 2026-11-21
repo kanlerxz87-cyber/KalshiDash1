@@ -100,6 +100,7 @@ browser CORS behaviour varies — if live reads fail the page says so and falls 
 </div></main>
 
 <footer class="site">{{FOOTER}}</footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/catalyst.js" defer></script>
 <script src="{{BASE}}assets/freshness.js"></script>

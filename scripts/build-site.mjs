@@ -369,6 +369,7 @@ const CATEGORY_PAGES = TOPICS.map((t) => ({
   </div>
 </div></main>
 <footer class="site">{{FOOTER}}</footer>
+<script src="{{BASE}}assets/paper.js"></script>
 <script src="{{BASE}}assets/app.js"></script>
 <script src="{{BASE}}assets/freshness.js"></script>
 </body>

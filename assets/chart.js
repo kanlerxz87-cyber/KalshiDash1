@@ -64,172 +64,133 @@
     return step * mag;
   }
 
+  /* Public helpers are shared by the chart and the source-linked jump table.
+   * Null is NOT zero. Sort once and let the last observation at a timestamp win. */
+  function preparePoints(points) {
+    var byTime = {};
+    (points || []).forEach(function (q) {
+      if (!q || q.t === null || q.t === undefined || q.v === null || q.v === undefined
+          || typeof q.t === 'boolean' || typeof q.v === 'boolean'
+          || (typeof q.t === 'string' && !q.t.trim()) || (typeof q.v === 'string' && !q.v.trim())) return;
+      var t = Number(q.t), v = Number(q.v);
+      if (!Number.isFinite(t) || !Number.isFinite(v)) return;
+      byTime[t] = Object.assign({}, q, { t: t, v: v });
+    });
+    return Object.keys(byTime).map(function (key) { return byTime[key]; }).sort(function (a, b) { return a.t - b.t; });
+  }
+  function jumps(points, threshold) {
+    var pts = preparePoints(points), result = [];
+    (pts || []).forEach(function (q, i) {
+      if (!i) return;
+      var delta = Math.round((q.v - pts[i - 1].v) * 10000) / 10000;
+      if (Math.round(Math.abs(delta) * 10000) < Math.round((threshold || 0.10) * 10000)) return;
+      result.push({ t: q.t, from: pts[i - 1].v, to: q.v, delta: delta,
+        source_url: q.source_url || null, baseline_source_url: pts[i - 1].source_url || null,
+        basis: q.basis || 'consecutive published observations' });
+    });
+    return result;
+  }
+
   /* ------------------------------------------------------------------ line */
   function line(canvas, points, opts) {
     if (!canvas) return;
     opts = opts || {};
-    var p = prep(canvas);
-    var ctx = p.ctx, W = p.w, H = p.h;
-    var padL = 54, padR = 16, padT = 12, padB = 26;
+    /* A redraw with no points must not leave a previous chart's hover/click active. */
+    canvas.onmousemove = canvas.onmouseleave = canvas.onclick = null;
+    var p = prep(canvas), ctx = p.ctx, W = p.w, H = p.h;
+    var padL = 64, padR = 16, padT = 18, padB = 28;
     var plotW = Math.max(10, W - padL - padR), plotH = Math.max(10, H - padT - padB);
-
-    var now = opts.now || Math.floor(Date.now() / 1000);
-    var win = opts.windowSeconds || 3600;
+    var now = Number.isFinite(opts.now) ? opts.now : Math.floor(Date.now() / 1000);
+    var win = opts.windowSeconds > 0 ? opts.windowSeconds : 3600;
     var tMin = now - win, tMax = now;
-
-    var pts = (points || []).filter(function (q) {
-      return q && q.v !== null && q.v !== undefined && isFinite(q.v) && q.t >= tMin && q.t <= tMax + 1;
-    });
-
-    ctx.font = '11px ' + (window.getComputedStyle(document.body).fontFamily || 'sans-serif');
-    ctx.textBaseline = 'middle';
-
-    /* y range */
+    var pts = preparePoints(points).filter(function (q) { return q.t >= tMin && q.t <= tMax; });
+    var binary = opts.binary !== false;
+    if (binary) pts = pts.filter(function (q) { return q.v >= 0 && q.v <= 1; });
     var yMin = opts.yMin, yMax = opts.yMax;
-    if (yMin === undefined || yMin === null) {
-      if (opts.zoom && pts.length) {
-        var vs = pts.map(function (q) { return q.v; });
-        var mn = Math.min.apply(null, vs), mx = Math.max.apply(null, vs);
-        var pad = Math.max(0.02, (mx - mn) * 0.2);
-        yMin = Math.max(0, mn - pad); yMax = Math.min(1, mx + pad);
+    if (!Number.isFinite(yMin) || !Number.isFinite(yMax)) {
+      if ((!binary || opts.zoom) && pts.length) {
+        var values = pts.map(function (q) { return q.v; });
+        if (!binary) values.push(0);
+        var low = Math.min.apply(null, values), high = Math.max.apply(null, values);
+        var padding = Math.max(0.02, (high - low) * 0.15);
+        yMin = binary ? Math.max(0, low - padding) : low - padding;
+        yMax = binary ? Math.min(1, high + padding) : high + padding;
       } else { yMin = 0; yMax = 1; }
     }
-    if (yMax - yMin < 0.02) { var mid = (yMin + yMax) / 2; yMin = Math.max(0, mid - 0.01); yMax = Math.min(1, mid + 0.01); }
+    if (yMax <= yMin) yMax = yMin + 0.02;
+    var xOf = function (t) { return padL + (t - tMin) / win * plotW; };
+    var yOf = function (v) { return padT + (1 - (v - yMin) / (yMax - yMin)) * plotH; };
+    var events = (opts.events || []).filter(function (ev) {
+      return Number.isFinite(ev.t) && Number.isFinite(ev.to) && ev.t >= tMin && ev.t <= tMax;
+    }).slice(-12);
+    var color = opts.color || PALETTE[0], hovered = null;
+    var font = '11px ' + (window.getComputedStyle(document.body).fontFamily || 'sans-serif');
 
-    var xOf = function (t) { return padL + ((t - tMin) / (tMax - tMin || 1)) * plotW; };
-    var yOf = function (v) { return padT + (1 - (v - yMin) / (yMax - yMin || 1)) * plotH; };
-
-    /* grid + axes */
-    ctx.strokeStyle = '#1e2836'; ctx.lineWidth = 1;
-    ctx.fillStyle = '#7b8a9c'; ctx.textAlign = 'right';
-    var yStep = niceStep(yMax - yMin, 5);
-    for (var v = Math.ceil(yMin / yStep) * yStep; v <= yMax + 1e-9; v += yStep) {
-      var y = yOf(v);
-      ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
-      ctx.fillText('$' + v.toFixed(2), padL - 6, y);
-    }
-    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    var xStep = niceStep(tMax - tMin, Math.max(2, Math.floor(plotW / 110)));
-    for (var t = Math.ceil(tMin / xStep) * xStep; t <= tMax; t += xStep) {
-      var x = xOf(t);
-      ctx.strokeStyle = '#161f2b';
-      ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + plotH); ctx.stroke();
-      ctx.fillStyle = '#7b8a9c';
-      ctx.fillText(fmtClock(t, win), x, padT + plotH + 6);
-    }
-
-    /* threshold line (swing alert level) */
-    if (opts.threshold) {
-      [opts.threshold, 1 - opts.threshold].forEach(function (lv) {
-        if (lv <= yMin || lv >= yMax) return;
-        var y = yOf(lv);
-        ctx.save();
-        ctx.setLineDash([4, 4]); ctx.strokeStyle = '#f5a524'; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
-        ctx.restore();
-      });
-    }
-
-    if (!pts.length) {
-      ctx.fillStyle = '#7b8a9c'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('No price points in this window yet.', padL + plotW / 2, padT + plotH / 2);
-      return;
-    }
-
-    /* area + line */
-    var color = opts.color || PALETTE[0];
-    ctx.beginPath();
-    ctx.moveTo(xOf(pts[0].t), yOf(pts[0].v));
-    for (var i = 1; i < pts.length; i++) ctx.lineTo(xOf(pts[i].t), yOf(pts[i].v));
-    if (opts.fill !== false) {
-      ctx.save();
-      ctx.lineTo(xOf(pts[pts.length - 1].t), padT + plotH);
-      ctx.lineTo(xOf(pts[0].t), padT + plotH);
-      ctx.closePath();
-      var grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
-      grad.addColorStop(0, color + '33');
-      grad.addColorStop(1, color + '00');
-      ctx.fillStyle = grad; ctx.fill();
-      ctx.restore();
-      ctx.beginPath();
-      ctx.moveTo(xOf(pts[0].t), yOf(pts[0].v));
-      for (var j = 1; j < pts.length; j++) ctx.lineTo(xOf(pts[j].t), yOf(pts[j].v));
-    }
-    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = 'round';
-    ctx.stroke();
-
-    /* last price marker */
-    var last = pts[pts.length - 1];
-    ctx.beginPath(); ctx.arc(xOf(last.t), yOf(last.v), 3.2, 0, Math.PI * 2);
-    ctx.fillStyle = color; ctx.fill();
-
-    /* hover crosshair */
-    if (opts.hover !== false && pts.length > 1) {
-      var hit = null;
-      canvas.onmousemove = function (ev) {
-        var rect = canvas.getBoundingClientRect();
-        var mx = ev.clientX - rect.left;
-        var best = null, bestD = Infinity;
-        pts.forEach(function (q) {
-          var dd = Math.abs(xOf(q.t) - mx);
-          if (dd < bestD) { bestD = dd; best = q; }
-        });
-        hit = best;
-        draw();
-        if (hit) {
-          ctx.strokeStyle = '#3b4a5e'; ctx.setLineDash([3, 3]);
-          ctx.beginPath(); ctx.moveTo(xOf(hit.t), padT); ctx.lineTo(xOf(hit.t), padT + plotH); ctx.stroke();
-          ctx.setLineDash([]);
-          ctx.beginPath(); ctx.arc(xOf(hit.t), yOf(hit.v), 4, 0, Math.PI * 2);
-          ctx.fillStyle = '#fff'; ctx.fill();
-          var txt = fmtClock(hit.t, win) + ' UTC  $' + hit.v.toFixed(2);
-          ctx.font = '11px ' + (window.getComputedStyle(document.body).fontFamily || 'sans-serif');
-          var tw = ctx.measureText(txt).width + 12;
-          var tx = Math.min(W - tw - 4, Math.max(padL, xOf(hit.t) - tw / 2));
-          ctx.fillStyle = 'rgba(10,14,20,.94)';
-          ctx.fillRect(tx, 2, tw, 18);
-          ctx.strokeStyle = '#2f3d50'; ctx.strokeRect(tx + .5, 2.5, tw - 1, 17);
-          ctx.fillStyle = '#e6edf3'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-          ctx.fillText(txt, tx + 6, 11);
-        }
-      };
-      canvas.onmouseleave = function () { hit = null; draw(); };
-    }
-
-    function draw() {
-      var q = prep(canvas);
-      var c2 = q.ctx;
-      c2.font = '11px ' + (window.getComputedStyle(document.body).fontFamily || 'sans-serif');
-      c2.textBaseline = 'middle';
-      c2.strokeStyle = '#1e2836'; c2.lineWidth = 1; c2.fillStyle = '#7b8a9c'; c2.textAlign = 'right';
+    function paint() {
+      ctx.clearRect(0, 0, W, H); ctx.setLineDash([]); ctx.font = font; ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#7b8a9c'; ctx.textAlign = 'right'; ctx.lineWidth = 1;
       var ys = niceStep(yMax - yMin, 5);
-      for (var vv = Math.ceil(yMin / ys) * ys; vv <= yMax + 1e-9; vv += ys) {
-        var yy = yOf(vv);
-        c2.beginPath(); c2.moveTo(padL, yy); c2.lineTo(padL + plotW, yy); c2.stroke();
-        c2.fillText('$' + vv.toFixed(2), padL - 6, yy);
+      for (var v = Math.ceil(yMin / ys) * ys; v <= yMax + 1e-9; v += ys) {
+        var y = yOf(v); ctx.strokeStyle = '#1e2836';
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
+        ctx.fillText((v < 0 ? '-$' : '$') + Math.abs(v).toFixed(2), padL - 7, y);
       }
-      c2.textAlign = 'center'; c2.textBaseline = 'top';
-      var xs = niceStep(tMax - tMin, Math.max(2, Math.floor(plotW / 110)));
-      for (var tt = Math.ceil(tMin / xs) * xs; tt <= tMax; tt += xs) {
-        var xx = xOf(tt);
-        c2.strokeStyle = '#161f2b';
-        c2.beginPath(); c2.moveTo(xx, padT); c2.lineTo(xx, padT + plotH); c2.stroke();
-        c2.fillStyle = '#7b8a9c';
-        c2.fillText(fmtClock(tt, win), xx, padT + plotH + 6);
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      var xs = niceStep(win, Math.max(2, Math.floor(plotW / 110)));
+      for (var t = Math.ceil(tMin / xs) * xs; t <= tMax; t += xs) {
+        var x = xOf(t); ctx.strokeStyle = '#161f2b';
+        ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + plotH); ctx.stroke();
+        ctx.fillText(fmtClock(t, win), x, padT + plotH + 7);
       }
-      c2.beginPath();
-      c2.moveTo(xOf(pts[0].t), yOf(pts[0].v));
-      for (var k = 1; k < pts.length; k++) c2.lineTo(xOf(pts[k].t), yOf(pts[k].v));
-      c2.strokeStyle = color; c2.lineWidth = 2; c2.stroke();
-      var lp = pts[pts.length - 1];
-      c2.beginPath(); c2.arc(xOf(lp.t), yOf(lp.v), 3.2, 0, Math.PI * 2);
-      c2.fillStyle = color; c2.fill();
-      if (hit) {
-        c2.strokeStyle = '#3b4a5e'; c2.setLineDash([3, 3]);
-        c2.beginPath(); c2.moveTo(xOf(hit.t), padT); c2.lineTo(xOf(hit.t), padT + plotH); c2.stroke();
-        c2.setLineDash([]);
+      if (!pts.length) {
+        ctx.textBaseline = 'middle';
+        ctx.fillText('No verified price points in this window.', padL + plotW / 2, padT + plotH / 2);
+        return;
+      }
+      function trace() {
+        ctx.beginPath(); ctx.moveTo(xOf(pts[0].t), yOf(pts[0].v));
+        pts.slice(1).forEach(function (q) { ctx.lineTo(xOf(q.t), yOf(q.v)); });
+      }
+      if (opts.fill !== false) {
+        trace(); ctx.lineTo(xOf(pts[pts.length - 1].t), padT + plotH); ctx.lineTo(xOf(pts[0].t), padT + plotH); ctx.closePath();
+        var gradient = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+        gradient.addColorStop(0, color + '33'); gradient.addColorStop(1, color + '00');
+        ctx.fillStyle = gradient; ctx.fill();
+      }
+      trace(); ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
+      var last = pts[pts.length - 1];
+      ctx.beginPath(); ctx.arc(xOf(last.t), yOf(last.v), 3.2, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+      /* A $0.10 CHANGE is not an absolute $0.10 price level. Actual sourced
+       * observations get markers; no misleading horizontal 10c/90c lines. */
+      events.forEach(function (ev) {
+        var x = xOf(ev.t), y = yOf(ev.to);
+        ctx.setLineDash([3, 4]); ctx.strokeStyle = '#f5a52466'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, padT + plotH); ctx.stroke(); ctx.setLineDash([]);
+        ctx.beginPath(); ctx.arc(x, y, 4.5, 0, Math.PI * 2); ctx.fillStyle = '#f5a524'; ctx.fill();
+      });
+      if (hovered) {
+        ctx.strokeStyle = '#5f7188'; ctx.setLineDash([3, 3]);
+        ctx.beginPath(); ctx.moveTo(xOf(hovered.t), padT); ctx.lineTo(xOf(hovered.t), padT + plotH); ctx.stroke(); ctx.setLineDash([]);
+        var text = fmtClock(hovered.t, win) + ' UTC  ' + (hovered.v < 0 ? '-$' : '$') + Math.abs(hovered.v).toFixed(4);
+        var tw = Math.min(W - 8, ctx.measureText(text).width + 16), tx = Math.max(4, Math.min(W - tw - 4, xOf(hovered.t) - tw / 2));
+        ctx.fillStyle = '#0a0e14'; ctx.fillRect(tx, 0, tw, 19);
+        ctx.fillStyle = '#e6edf3'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(text, tx + 8, 10);
       }
     }
+    paint();
+    if (opts.hover !== false && pts.length) {
+      canvas.onmousemove = function (ev) {
+        var mx = ev.clientX - canvas.getBoundingClientRect().left;
+        hovered = pts.reduce(function (best, q) { return !best || Math.abs(xOf(q.t) - mx) < Math.abs(xOf(best.t) - mx) ? q : best; }, null);
+        paint();
+      };
+      canvas.onmouseleave = function () { hovered = null; paint(); };
+    }
+    if (events.length && typeof opts.onEvent === 'function') canvas.onclick = function (ev) {
+      var mx = ev.clientX - canvas.getBoundingClientRect().left;
+      var nearest = events.reduce(function (best, q) { return !best || Math.abs(xOf(q.t) - mx) < Math.abs(xOf(best.t) - mx) ? q : best; }, null);
+      if (nearest && Math.abs(xOf(nearest.t) - mx) <= 14) opts.onEvent(nearest);
+    };
   }
 
   /* ----------------------------------------------------------------- spark */
@@ -277,5 +238,5 @@
     ctx.beginPath(); ctx.moveTo(0, H - padB + 0.5); ctx.lineTo(W, H - padB + 0.5); ctx.stroke();
   }
 
-  window.KDChart = { line: line, spark: spark, bars: bars, PALETTE: PALETTE };
+  window.KDChart = { line: line, spark: spark, bars: bars, preparePoints: preparePoints, jumps: jumps, PALETTE: PALETTE };
 })();

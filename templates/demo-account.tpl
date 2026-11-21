@@ -72,6 +72,7 @@ system — see the <a href="portfolio.html">Portfolio</a>, <a href="portfolio.ht
 </div></main>
 
 <footer class="site">{{FOOTER}}</footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/demo-account.js" type="module"></script>
 <script src="{{BASE}}assets/freshness.js"></script>

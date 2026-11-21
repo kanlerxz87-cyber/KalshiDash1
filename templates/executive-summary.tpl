@@ -32,8 +32,8 @@
   <h2>1 · What was built</h2>
   <div class="panel">
     <p>A single, static, dependency-free dashboard for Kalshi's official <strong>demo</strong> exchange, published on GitHub
-    Pages. It tracks the highest-dollar live events in exactly the five requested topics — gas prices, elections, culture, crypto
-    and golf — follows each market until it resolves <strong>yes</strong> or <strong>no</strong>, and turns price action into a
+    Pages. It ranks sampled live events in exactly the five requested topics — gas prices, elections, culture, crypto
+    and golf — follows alerted markets toward resolution and turns observed price action into a
     live alerting system.</p>
     <ul>
       <li><strong>Two scrolling chats.</strong> The left pane posts every tracked contract that moves at least $0.10 in either
@@ -43,12 +43,11 @@
       publishes <code>result</code> — <code>yes</code>, <code>no</code> or <code>scalar</code> — with its
       <code>settlement_ts</code> and <code>settlement_value_dollars</code>. Unanswered contracts are listed under
       <a href="alerts/index.html#await-table">Followed to resolution</a>; answered ones move to the resolved table and to the
-      resolution block on each market page. Both lists are read from the API, never inferred (see F-66 on
+      resolution block on each market page. Both lists are read from the API, never inferred (see F-70 on
       <a href="flagged.html">Flagged for Review</a> for the two retention/retrieval defects this replaced).</li>
-      <li><strong>Price and liquidity.</strong> A time-series chart with selectable 30-second to 24-hour windows, a price axis, and
+      <li><strong>Price and liquidity.</strong> Gold markers and source-linked rows identify observed ≥ $0.10 changes; missing news causes stay unverified. Snapshot times are never relabelled as current.  A time-series chart with selectable 30-second to 24-hour windows, a price axis, and
       an order-book ladder that answers "how many contracts are available at this price".</li>
-      <li><strong>Simulated trading.</strong> Five published strategies trade automatically against live prices, settle on
-      resolution, and are analysed by strategy and by topic so a new strategy can be judged on results.</li>
+      <li><strong>Simulated trading.</strong> Five project-authored strategies run automatically while a tab is open, using fresh observed asks with confirmed quantities. No fills are invented from a snapshot or a missing quote. They hold to final settlement and are grouped by strategy and topic. Gross P&amp;L excludes fees, impact and legacy/unverified fills; no profitable ROI is claimed. See <a href="flagged.html#F-PAPER-01">paper-model limits</a>.</li>
       <li><strong>Your demo account, read-only — and only from a scheduled job.</strong> A GitHub Actions job
       (<code>tools/demo_trader.mjs</code>) signs the authenticated reads with repository secrets and writes
       <code>data/account.json</code>; the page renders that file. The browser cannot do the signing itself: the demo API's
@@ -94,15 +93,13 @@
   <h2>4 · What it cannot show</h2>
   <div class="panel">
     <ul>
-      <li><strong>Why a contract moved.</strong> The Kalshi API publishes no news feed. The dashboard links the event's official
-      settlement source as a <em>candidate</em> explanation, and says so rather than implying a proven cause.</li>
+      <li><strong>Why a contract moved.</strong> The Kalshi API publishes no news feed. The chart links the published price observations, the event and separately labeled research sources. A settlement source is not evidence that it caused a move; verified causes stay blank.</li>
       <li><strong>Sub-minute history from the API.</strong> Candlestick periods are 1, 60 or 1440 minutes; seconds resolution exists
       only while a page is open.</li>
-      <li><strong>A real portfolio without a key.</strong> No credential is committed, so the tracked portfolio is simulated; the
+      <li><strong>A real portfolio without a key.</strong> The committed account snapshot says <code>connected: false</code> with no capture time; the
       demo-account page shows the demo-account snapshot that a GitHub Actions job produces from repository secrets. A browser
       cannot read the account itself: the demo host's CORS preflight does not allow the <code>KALSHI-ACCESS-*</code>
-      headers a signed request needs (measured 2026-11-21 &mdash; <a href="flagged.html#F-66">F-66</a>). No demo-account value
-      is published while the repository has no key: the portfolio figures are simulated and labelled as such, and
+      headers a signed request needs (measured 2026-11-21 &mdash; <a href="flagged.html#F-66">F-66</a>). Repository-secret configuration could not be enumerated by this integration token (403), so it is not asserted absent. In the current account snapshot no balance or account trade is verified: the portfolio figures are simulated and labelled as such, and
       <code>data/account.json</code> records <code>connected: false</code>.</li>
       <li><strong>A live order feed from the exchange.</strong> Kalshi's WebSocket handshake requires a signed API-key request
       (<a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">Quick Start:
@@ -121,7 +118,7 @@
       move in a contract you care about.</li>
       <li>Use the right-hand pane to cut the noise: it only shows the contracts with liquidity, a tight spread and real volume.</li>
       <li>Open the contract, check the chart, the ladder and the settlement rules, and confirm the official source that decides it.</li>
-      <li>Record the trade on the <a href="portfolio.html">portfolio</a> page; let the auto-trader run the published strategies and
+      <li>View the simulated trades on the <a href="portfolio.html">portfolio</a> page; let the auto-trader run the published strategies and
       read the outcome on <a href="analysis.html">analysis</a>.</li>
       <li>Check every number against the source link before acting. That is the point of the source column.</li>
     </ol>
@@ -135,12 +132,13 @@
       <li><a href="questions.html">Questions and gaps</a> — what is known, what is open and where to look.</li>
       <li><a href="strategies.html">Strategies</a> — the exact rules behind the auto-trader and the ROI score.</li>
       <li><a href="COORDINATION.md">COORDINATION.md</a> — the task board, the claims, the verification log and the merge record.</li>
-      <li><code>data/snapshot.json</code> — the raw captured payloads, for line-by-line checking.</li>
+      <li><code>data/snapshot.json</code> — the normalized captured API values and exact source URLs, for review (not the original raw HTTP bodies).</li>
     </ul>
   </div>
 </div></main>
 
 <footer class="site">{{FOOTER}}</footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="{{BASE}}assets/freshness.js"></script>
 </body>

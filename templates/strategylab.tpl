@@ -97,6 +97,7 @@ Blanks are allowed and are never filled in.</p>
 </div></main>
 
 <footer class="site">{{FOOTER}}</footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/strategylab.js" defer></script>
 <script src="{{BASE}}assets/freshness.js"></script>

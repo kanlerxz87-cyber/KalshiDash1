@@ -31,34 +31,32 @@
   <h2>Simulated trading strategies</h2>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Strategy</th><th>Exact rule</th><th>API fields it reads</th><th>Typical holding</th></tr></thead>
+      <thead><tr><th>Strategy</th><th>Exact rule</th><th>API fields it reads</th><th>Holding</th><th>Official field semantics (not the project rule)</th></tr></thead>
       <tbody>
         <tr><td><strong>Momentum</strong></td>
           <td>Go long YES when the reference price rose at least $0.05 across the last 3 observations; go long NO when it fell at least $0.05.</td>
           <td><code>last_price_dollars</code>, <code>yes_bid_dollars</code>, <code>yes_ask_dollars</code></td>
-          <td>Until the move reverses</td></tr>
+          <td>To final settlement</td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
         <tr><td><strong>Mean reversion</strong></td>
           <td>Buy YES when the price is at or below $0.25 and the last move was down; buy NO when the price is at or above $0.75 and the last move was up.</td>
           <td><code>last_price_dollars</code> and the previous observation</td>
-          <td>Until the price reverts or the market resolves</td></tr>
+          <td>To final settlement</td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
         <tr><td><strong>Favorite (liquidity)</strong></td>
           <td>Buy YES in the most liquid market of its topic when the ROI score is at least 70 and the price is at least $0.80.</td>
           <td><code>yes_bid_size_fp</code>, <code>yes_ask_size_fp</code>, <code>volume_24h_fp</code>, <code>last_price_dollars</code></td>
-          <td>To resolution</td></tr>
-        <tr><td><strong>Longshot</strong></td>
+          <td>To final settlement</td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
+        <tr><td><strong>Low-YES NO buyer</strong></td>
           <td>Buy NO in markets priced at or below $0.15 whose ROI score is at least 60.</td>
           <td><code>last_price_dollars</code> plus the ROI components</td>
-          <td>To resolution</td></tr>
+          <td>To final settlement</td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
         <tr><td><strong>Volume catalyst</strong></td>
           <td>Buy YES when 24-hour contract volume is at least 5× the total open interest and the ROI score is at least 60.</td>
           <td><code>volume_24h_fp</code>, <code>open_interest_fp</code> plus the ROI components</td>
-          <td>Until the move fades</td></tr>
+          <td>To final settlement</td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
       </tbody>
     </table>
   </div>
-  <p class="small muted">Fills are recorded at the current touch (the YES ask for a YES order, the NO bid for a NO order) and
-  fall back to the last traded price when the touch is empty. Position size defaults to 10 contracts and is configurable in
-  <code>assets/app.js</code>. Settlement follows the published rule: the winning side receives $1.00 per contract.</p>
+  <p class="small muted">The <strong>project-authored paper model</strong> buys at the observed YES ask or NO ask, never at a bid or an assumed last price. It requires enough published quantity for the whole order and a local observation no older than 15 seconds. NO ask quantity equals the complementary YES bid quantity. Missing, stale, inactive or contradictory quotes cannot create a fill. Position size defaults to 10 contracts; project caps are 50 open positions and $1,000 open entry cost, not an account balance. All strategies hold to <code>finalized</code>. Gross results ignore trading fees, queue position, impact and latency; none of these rules has a validated ROI estimate. <a href="https://docs.kalshi.com/getting_started/orderbook_responses">Official price/size semantics</a> · <a href="flagged.html#F-PAPER-01">Limitations and legacy results</a>.</p>
 
   <h2>The ROI score</h2>
   <div class="panel">
@@ -66,13 +64,13 @@
     0 and 1 and is derived from fields the Kalshi API returns, so any reader can recompute it.</p>
     <div class="table-wrap" style="margin:12px 0">
       <table class="compact">
-        <thead><tr><th>Component</th><th>Weight</th><th>Definition</th><th>Source fields</th></tr></thead>
+        <thead><tr><th>Component</th><th>Weight</th><th>Definition</th><th>Source fields</th><th>Official field semantics (not the weights)</th></tr></thead>
         <tbody>
-          <tr><td><strong>Liquidity</strong></td><td class="num">0.26</td><td><code>min(1, (yes_bid_size_fp + yes_ask_size_fp) / 300)</code> — contracts resting at the best prices.</td><td><code>yes_bid_size_fp</code>, <code>yes_ask_size_fp</code></td></tr>
-          <tr><td><strong>Depth</strong></td><td class="num">0.16</td><td><code>min(1, total_contracts_in_book / 1200)</code> across both sides of the order book.</td><td><code>GET /markets/{ticker}/orderbook</code></td></tr>
-          <tr><td><strong>Tightness</strong></td><td class="num">0.22</td><td><code>1 − min(1, spread / 0.10)</code> where spread is <code>yes_ask − yes_bid</code>; a missing touch scores 0.25.</td><td><code>yes_bid_dollars</code>, <code>yes_ask_dollars</code></td></tr>
-          <tr><td><strong>Volume</strong></td><td class="num">0.14</td><td><code>min(1, volume_24h_fp / 20000)</code> — contracts traded in 24 hours.</td><td><code>volume_24h_fp</code></td></tr>
-          <tr><td><strong>Volatility</strong></td><td class="num">0.22</td><td><code>min(1, |Δprice| / 0.30)</code> over the last observed interval.</td><td>consecutive <code>last_price_dollars</code> observations</td></tr>
+          <tr><td><strong>Liquidity</strong></td><td class="num">0.26</td><td><code>min(1, (yes_bid_size_fp + yes_ask_size_fp) / 300)</code> — contracts resting at the best prices.</td><td><code>yes_bid_size_fp</code>, <code>yes_ask_size_fp</code></td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
+          <tr><td><strong>Depth</strong></td><td class="num">0.16</td><td><code>min(1, total_contracts_in_book / 1200)</code> across both sides of the order book.</td><td><code>GET /markets/{ticker}/orderbook</code></td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">API definitions</a></td></tr>
+          <tr><td><strong>Tightness</strong></td><td class="num">0.22</td><td><code>1 − min(1, spread / 0.10)</code> where spread is <code>yes_ask − yes_bid</code>; a missing touch scores 0.25.</td><td><code>yes_bid_dollars</code>, <code>yes_ask_dollars</code></td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
+          <tr><td><strong>Volume</strong></td><td class="num">0.14</td><td><code>min(1, volume_24h_fp / 20000)</code> — contracts traded in 24 hours.</td><td><code>volume_24h_fp</code></td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
+          <tr><td><strong>Volatility</strong></td><td class="num">0.22</td><td><code>min(1, |Δprice| / 0.30)</code> over the last observed interval.</td><td>consecutive <code>last_price_dollars</code> observations</td><td class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">API definitions</a></td></tr>
         </tbody>
       </table>
     </div>
@@ -91,12 +89,13 @@
       <li>Let the auto-trader run it, then read its row on the <a href="analysis.html">analysis</a> page.</li>
       <li>Compare it against the other strategies on win rate, total P&amp;L and average trade, and keep or drop it.</li>
     </ol>
-    <p class="small muted">The simulator is honest about its limits: it fills at the touch it can see, ignores fees, and settles
-    only when the exchange publishes a result. Those limitations are listed on the <a href="flagged.html">Flagged for Review</a> page.</p>
+    <p class="small muted">The simulator is honest about its limits: it fills at the touch it can see, ignores trading fees, and settles
+    only at exchange finalization with a binary result. It cannot run after the tab closes. Those limitations are listed on the <a href="flagged.html">Flagged for Review</a> page.</p>
   </div>
 </div></main>
 
 <footer class="site">{{FOOTER}}</footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="{{BASE}}assets/freshness.js"></script>
 </body>

@@ -42,6 +42,24 @@
   `git pull --rebase` targets this session's own remote branch, not main, so the imported PR
   commits are not rewritten. Main is integrated by merge on this branch only.
 
+- I3 dependency scope addition: every canonical template's script list, category script list in
+  `scripts/build-site.mjs`, and `audit/index.html` load the new dependency-free paper rules
+  before `app.js`. No other page content is changed under that dependency-only scope. Source
+  audits and copy for the actual paper/market pages remain this session's integration scope.
+
+### Implementation verification checkpoint
+
+- Pure paper model: 53 offline regression cases pass. Canonical chart/paper DOM: 25 cases pass
+  with synthetic fixtures, including automatic strategy execution, snapshot rejection, quantity
+  sharing, final-only settlement, exact source URLs, candle reads, chart bounds and automatic
+  public-data recovery. Tests contain synthetic values only; no fixture is published as data.
+- New finding IDs use namespaces `F-PAPER-01`, `F-PAPER-02`, `F-CHART-01`, because the concurrent
+  PR #79 owns F-75–F-77. Those findings are appended with official source links, not renumbered.
+- PR #72 has meanwhile been integrated to main by other sessions (#73/#75/#76). This branch
+  preserves the same feature commits and will incorporate latest main rather than replacing its
+  newer official sample with our earlier offline model migration. PR #79's staleness-check and
+  retained-test repairs are the other owner's scope; this session does not recreate them.
+
 ### Initial evidence and limits
 
 - Official [demo environment](https://docs.kalshi.com/getting_started/demo_env) re-read: recommended
