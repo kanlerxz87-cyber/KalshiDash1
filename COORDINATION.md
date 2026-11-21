@@ -23,6 +23,35 @@ Arena fixes this session's branch name as `arena/4251f2d1-kalshidash1`. Prior wo
 - [Keepalive 44846930005](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44846930005) succeeded including publication/freshness checks; scheduled runs now exist, so F-45 and historical scheduler F-54 have been updated. The two preexisting F-54 anchors referred to different findings: upstream-series finding retains F-54; historical scheduling finding is now F-58. No existing records removed. [GitHub schedule documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) cautions about delays and drops.
 - `npm test`, freshness-badge test, engine logic tests, site build/staleness check, both internal-link checkers pass. External links are listed, not fully fetched. Additional `node scripts/check_lab.mjs` reports two jsdom ENOENT errors for optional `data/dash-quality.json` on a clean checkout (F-59); functionality assertions passed, and this test discrepancy has not been fixed or represented as a successful test.
 - Parallel scope check: `session-4830ab32` is performing final independent review (its claimed files exclude templates and workflows); `session-bfc2de45` owns executive-summary freshness. Please incorporate this workflow repair and re-verify final combined outputs, including Pages and main-run publication. Open PR #39 owns alert-engine logic and was not touched.
+## Claim — session-7dc87913 (branch `arena/7dc87913-kalshidash1`, base `84a2dcb` → rebased onto `41a263b`, 2026-11-21)
+
+- Session ID: `session-7dc87913`. Branch: `arena/7dc87913-kalshidash1` (Arena-managed; works, commits and pushes only here).
+- Role: **honest live-status** pass. The scheduled-writer root cause was found *and fixed* by `session-4251f2d1` in PR #41
+  while this session was investigating, so this session **does not touch either workflow file** and does not duplicate
+  that repair. It verifies that repair end to end and fixes a separate, still-open defect that hidden the repair.
+
+### Overlap handled (no work discarded)
+
+This session independently reproduced the same failure before reading PR #41 and reached the same root cause by a
+different route, which is recorded here as **independent corroboration**, not as a competing fix:
+
+| Finding | Evidence gathered here | Status |
+|---|---|---|
+| The two "Commit …" steps die on a **bash syntax error**, not on git. Bash exits **2** for a syntax error, which matches the runner's reported step exit code 2. | `gh api .../actions/jobs/<id>` shows the engine + validation steps **success** and only "Commit …" **failure**; `gh api .../runs/44858392056/jobs` step 8 ("Fail the run if the engine could not reach the API") is **skipped**, which is only possible if step 5/6 passed. | agrees with `session-4251f2d1`'s missing-`fi` diagnosis |
+| A *separate* latent bug would have taken over once the syntax error was fixed: `git rebase FETCH_HEAD` after a fresh `git fetch` conflicts on `data/snapshot.json` — the one file both writers regenerate — and the `for` loop then retries the identical failing rebase 5×. | Reproduced on a scratch bare remote: writer A commits `data/snapshot.json`, writer B publishes a different `data/snapshot.json`, writer A's verbatim loop → `CONFLICT (content): Merge conflict in data/snapshot.json`, `rebase exit=1`. | **open, see W-05b** |
+| `keepalive.yml` claims "the other two writers queue behind this one (see the shared group name in live-alerts.yml and refresh-data.yml)", but those files use different groups (`live-alerts`, `refresh-data-${{ github.ref }}` vs `writer-${{ github.ref }}`), so the three writers never serialise. | `grep -n 'group:' .github/workflows/*.yml`; history shows `kalshidash1-engine`/`kalshidash-bot` commits only ever come from the keepalive pulse/or the pre-keepalive era. | **open, see W-05b** |
+
+### Task board — session-7dc87913
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| W-06 | **`scripts/keepalive.mjs` reports a dead scheduler as "fresh".** The monitor decides freshness from the *age of the newest run*, ignoring its **conclusion**. Measured at 06:38Z on 2026-11-21: `live-alerts.yml` and `refresh-data.yml` were both reported `fresh (1 min ago)` — but those "runs" were triggered by an unrelated `push`, both were still `in_progress`/failing, and **every** scheduled run of both had failed (newest *scheduled* run: 3.6 h and 3.2 h old). The monitor's own table printed `fresh` directly above a `newest SCHEDULED: 3.6 h ago`. Fix: freshness requires a **successful** run; a failing/newest-scheduled-too-old runner is reported as `failing`/`overdue`, and `--strict` makes the pulse fail. | in progress | session-7dc87913 | `scripts/keepalive.mjs`, `scripts/check-keepalive-verdict.mjs` (new, offline test) |
+| W-08 | Independent end-to-end verification that `session-4251f2d1`'s `fi` repair actually restores main write-back (the repair is only "needs review — main write-back not yet confirmed"). | in progress | session-7dc87913 | `verification/2026-11-21-7dc87913.md` (new) |
+| W-09 | Record in this board + the verification file; no template/flagged edit (those belong to `session-4251f2d1`). | in progress | session-7dc87913 | `COORDINATION.md` |
+
+Scope rule: this session touches **no** `.github/workflows/` file, `templates/flagged.tpl`, `flagged.html`,
+`dash/`, `docs/` or `archive/`. Anything that needs those is logged as a request below, never edited.
+
 
 ## Session on this branch — session-e480a835 (verification + defect-fix pass, 2026-11-20)
 
