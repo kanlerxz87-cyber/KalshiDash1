@@ -2188,3 +2188,70 @@ Post-merge state at 20:29 UTC: `main` = `7b4b4d1`; `npm test` exit 0; `build-sit
 - **Feed freshness at merge time:** FRESHNESS OK — commit `25885b9` (engine sample 2026-11-21T20:24:59Z), age ~1.3 min at check time against the 45-minute limit. Earlier 156.8-min staleness (F-45/F-58) cleared when the scheduled sampler resumed.
 - **Irregularities:** stale-feed limit, BTC `$0.97`/`$0.01` flap (F-BFC-03), sandbox-blocked external fetches and 60-day schedule auto-disable — all retained as published on flagged.html; no unverified value was fabricated.
 - **Parallel-session note:** fd481e62 (PR #58), 93edc454 (PR #59), 549a3b66 (PR #57) record their own integration passes; c85ee474 (PR #62) is open. Their records were retained; one COORDINATION.md conflict was resolved by keeping both sections; the rebasing never discarded the other sessions' work.
+
+
+---
+
+## Session `arena/c85ee474-kalshidash1` — browser-CORS determination pass (2026-11-21 UTC)
+
+**Session ID:** `session-c85ee474`. Branch: `arena/c85ee474-kalshidash1` (Arena-managed; commits and pushes here only).
+**Base:** rebased onto `main` @ `4f5f69e` (PR #57 merge) at start of work. No open PRs on the repository at claim time
+(`gh pr list --state open` → empty), so nothing in flight is being raced.
+
+### Why this scope, and what it deliberately does not redo
+
+`F-01` / `F-51` — *"can a visitor's browser actually read the Kalshi demo API directly?"* — is the oldest
+unresolved item on the Flagged page (open since 2026-11-20, restated in F-51 and in the questions page). Every live
+feature on the canonical site (dashboard, category pages, catalyst discovery, the alerts console's live mode)
+degrades to the committed snapshot if the answer is no, so the answer changes how the whole site should be described.
+
+Previous sessions could not answer it because the build sandbox has no egress to `external-api.demo.kalshi.co`
+(`curl` → `SSL_ERROR_SYSCALL`; `ECONNRESET` recorded by `session-549a3b66`). A GitHub Actions runner **does** have
+egress to that host — the alert engine has been sampling it successfully all day — so this session measures CORS from
+a runner instead of guessing. CORS is decided by response headers, which a runner can read exactly.
+
+Not redone here (already owned/closed): the scheduled-workflow repairs (PR #41/#47/#53/#55), the requirement-by-requirement
+map and stale-feed flag from `session-549a3b66` (PR #57), the F-62 catalyst correction handoff, and the alert-engine dedupe
+logic (PR #39). This session does not touch `tools/live_engine.mjs` logic or the engines' detection rules.
+
+### Task board — session-c85ee474
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| C1 | Claim this scope on the shared board and push immediately. | done | session-c85ee474 | `COORDINATION.md` |
+| C2 | Measure browser-equivalent CORS to the demo API from a GitHub runner (GET with `Origin`, preflight `OPTIONS`, and the authenticated routes) so F-01/F-51 get a measured answer instead of "untested". | **done** — 2 runs, consistent; evidence committed | session-c85ee474 | `tools/cors_probe.mjs`, `.github/workflows/cors-probe.yml` (both new), `data/cors-probe.json` (runner-written) |
+| C3 | Update F-01/F-51, the questions page and any site copy that depends on the answer, using only the measured result; publish the newly discovered limitation as F-66; add an offline guard so the claim cannot drift from the evidence. | **done** | session-c85ee474 | `templates/{flagged,questions,index,executive-summary}.tpl` + generated pages, `README.md`, `scripts/check-cors-evidence.mjs` (new), `package.json`, `.github/workflows/site-qa.yml`, `verification/2026-11-21-c85ee474.md` (new) |
+| C4 | Full QA battery, then PR to `main`, merge, verify the Pages build, record PR link + result here. | in progress | session-c85ee474 | this board section, `verification/2026-11-21-c85ee474.md` |
+
+### Result of C2 — the measurement (sources and evidence)
+
+Probe: `tools/cors_probe.mjs`, workflow `cors-probe`, site origin `https://kanlerxz87-cyber.github.io`.
+Runs: [44945717661](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44945717661) (20:20:12Z),
+[44945808501](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44945808501) (20:21:08Z) and
+[44946148010](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44946148010) (20:24:59Z) — three runs, identical result. Raw headers:
+`data/cors-probe.json`.
+
+| Question | Measured answer |
+|---|---|
+| Can a browser read `/exchange/status`, `/markets`, `/series`, `/markets/{t}/orderbook`, `/markets/trades`, candlesticks? | **Yes.** Each answered 200 with `access-control-allow-origin: https://kanlerxz87-cyber.github.io` echoed, `allow-credentials: true`, and `X-Ratelimit-*` exposed. A 401 `/portfolio/balance` was also readable. |
+| Wildcard or echo? | **Echo** — a second request with `Origin: http://localhost:8000` came back with that exact origin (recorded in `echo_test`). |
+| Can a browser send Kalshi's signed requests? | **No.** Preflight answers `204` with `allow-methods: GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS` but an `allow-headers` list that omits `KALSHI-ACCESS-KEY`, `-SIGNATURE`, `-TIMESTAMP`. A browser never sends the request. Published as **F-66**. |
+
+Consequence: `F-01` and `F-51` are **Resolved**; copy that implied in-browser signing/account reads
+(`index.html`, `executive-summary.html`, `questions.html`, `README.md`) was corrected in the same commit, and
+execution stays in GitHub Actions with repository secrets (as it already was).
+
+### QA actually run for C3 (all on the rebased tree)
+
+`node scripts/build-site.mjs --check` PASS · `npm test` PASS (engine selftest, feed schema, flood guard, jsdom page
+render, ids, sourced rows, lab, **new CORS-evidence check**, both link checkers: 90 pages / 2,138 internal links /
+0 broken) · `scripts/check-html-ids.mjs` PASS · `scripts/check-data-workflow-shells.mjs` PASS (9 blocks, incl. the new
+workflow) · `scripts/check-data-writer-concurrency.mjs` PASS · `scripts/check-keepalive-verdict.mjs` PASS ·
+`scripts/check-row-sources.mjs` PASS · `tools/qa_logic_test.mjs`, `tools/alerts-qa.mjs`, `tools/qa_alert_test.mjs` PASS ·
+`python3 tools/linkcheck.py` PASS.
+**Negative cases verified for the new guard** (so it is a guard, not a tautology): a hand-edited verdict in
+`data/cors-probe.json` → exit 1 naming the field; a preflight edited to allow the auth headers → exit 1 ("F-66's
+published text is out of date"); the retired in-browser-signing sentence re-added to `index.html` → exit 1.
+`node tools/freshness_check.mjs` **FAILS as expected** — the committed feed is 161 min old (stale limit 45). That is
+the pre-existing, externally caused sampler gap recorded by `session-549a3b66`, F-45/F-58 and below; it is not caused
+by this pass and was not papered over.

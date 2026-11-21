@@ -1,0 +1,82 @@
+# Browser-CORS probe for the Kalshi demo Trade API.
+#
+# Why a workflow: the build sandbox used by the site's other checks has NO egress to
+# external-api.demo.kalshi.co (curl → SSL_ERROR_SYSCALL / ECONNRESET), which is why flag F-01 sat
+# "untested" on the Flagged for Review page. A GitHub runner does have egress — the alert engine
+# samples the same host every run — so the measurement is taken here, and the raw response headers
+# are committed to data/cors-probe.json so anyone can re-read the evidence.
+#
+# Manual only, on purpose: it writes a data file and there is no reason to run it on a schedule.
+# The probe needs no secrets. It never sends a key and never places an order: the authenticated
+# routes are probed WITHOUT credentials, because the question is whether the transport is readable
+# from a browser, not whether a demo account exists.
+#
+# Sources: https://docs.kalshi.com/getting_started/demo_env
+#          https://fetch.spec.whatwg.org/#http-cors-protocol
+#          https://docs.kalshi.com/getting_started/quick_start_authenticated_requests
+
+name: cors-probe
+
+on:
+  workflow_dispatch:
+  # GitHub only exposes `workflow_dispatch` for a workflow that already exists on the DEFAULT
+  # branch, so a first run from a feature branch has to be triggered by a push to that branch.
+  # The path filter keeps it to changes in the probe itself.
+  push:
+    paths:
+      - '.github/workflows/cors-probe.yml'
+      - 'tools/cors_probe.mjs'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cors-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check
+        run: node --check tools/cors_probe.mjs
+
+      - name: Probe CORS headers on the demo API
+        run: node tools/cors_probe.mjs --out data/cors-probe.json
+
+      - name: Show the measured verdict as a run annotation
+        if: always()
+        run: |
+          set -o pipefail
+          node -e '
+            const r = require("./data/cors-probe.json");
+            for (const x of r.results) {
+              const v = x.readable_from_browser || {};
+              console.log("::notice::" + x.name + " HTTP " + (x.status ?? "ERR") +
+                " acao=" + ((x.headers || {})["access-control-allow-origin"] || "(none)") +
+                " readable=" + String(v.allowed));
+            }
+            console.log("::notice::summary " + JSON.stringify(r.summary));
+          '
+
+      - name: Commit the raw header evidence
+        run: |
+          set -euo pipefail
+          git config user.name  "kalshidash1-engine"
+          git config user.email "engine@users.noreply.github.com"
+          git add data/cors-probe.json
+          if git diff --cached --quiet -- data/cors-probe.json; then
+            echo "No change in the measured headers — nothing to commit."
+          else
+            git commit -m "data(cors): browser-CORS probe $(date -u +%Y-%m-%dT%H:%M:%SZ) [skip ci]"
+            git push origin "HEAD:${{ github.ref_name }}"
+          fi

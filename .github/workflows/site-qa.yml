@@ -73,6 +73,12 @@ jobs:
       - name: Data workflow shell syntax (all three writers)
         run: node scripts/check-data-workflow-shells.mjs
 
+      # session-c85ee474: F-01/F-51 were closed by measurement and F-66 was opened from the same
+      # data. This re-derives every verdict from data/cors-probe.json and fails if the published
+      # claim and the recorded headers disagree, or if the retired in-browser-signing copy returns.
+      - name: CORS evidence matches the published claim
+        run: node scripts/check-cors-evidence.mjs
+
       - name: Catalyst + strategy lab render tests (jsdom)
         run: node scripts/check_lab.mjs
 
