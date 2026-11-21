@@ -73,6 +73,28 @@
   one-use integration script created here (`rescore-persisted-model.mjs`) is removed rather
   than publishing two competing migration methods. No other's file is removed.
 
+### Final audit scope extension (claimed before edits)
+
+- I5 now includes the canonical `templates/{dashboard,suggestions,questions,strategylab}.tpl`,
+  `scripts/check-row-sources.mjs`, and the shared generator's footer/navigation copy for documented
+  source/copy defects only. The source gate currently accepts **any** anchor (even an internal
+  market link) as an "official source" and leaves non-data rows report-only. The final integration
+  will distinguish official field definitions from project-authored rules, add real publisher
+  links where applicable, and flag genuinely unverifiable legacy/seed results rather than call
+  them validated. No archived or other active session's implementation is taken over.
+- I3/I4 follow-up evidence: discovery copies an older last price into a fresh row when the new
+  response has no last, and snapshot-alert replay still uses `Number(null)`; both violate the
+  blank/observation-time contract. Regression tests and minimal corrections are within the
+  already-claimed `assets/app.js` and canonical test scope.
+- New safety-only scope: `tools/demo_trader.mjs`, new `scripts/check-demo-safety.mjs`,
+  `docs/DEMO_ACCOUNT.md`, and package/CI test wiring. Code inspection shows `KALSHI_API_ROOT` can
+  currently route signed "demo" orders to production or any host and `--count 0` passes. This
+  violates the demo-only constraint. Enforce the two official demo roots before credentials or
+  network use; test with offline dry runs only. Also do not mark all failed authenticated reads
+  connected. No credential is requested and no exchange order is sent in these tests.
+- Latest open PR #77 is another session's board-only deployment ledger; that owner retains it.
+  PR #80 is merged. Shared source-table edits occur only in this final integration phase.
+
 ### Initial evidence and limits
 
 - Official [demo environment](https://docs.kalshi.com/getting_started/demo_env) re-read: recommended
