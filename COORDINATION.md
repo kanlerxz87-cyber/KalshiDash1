@@ -2401,3 +2401,13 @@ session's `awaiting` key was regenerated from the committed `state.json` by its 
 - Data: `data/live/feed.json` generated `2026-11-21T22:26:12.000Z` (14 alerts: 9 crypto, 5 elections; 0 high-ROI; 0 resolutions). `data/snapshot.json` captured `2026-11-21T16:02:38.983Z`.
 - **No changes committed:** working tree clean, branch == `main` at `b81f9f2`. No PR or merge required.
 - Flagged irregularities (pre-existing, unchanged): F-02 (demo-account key required), F-03 (derived dollar-volume estimate), F-07 (portfolio blocked without key), F-66 (browser cannot sign requests), plus F-01, F-04–F-06, F-08–F-65, F-67–F-70 as documented on `flagged.html`. None block the site.
+
+---
+
+## Claim — session-37562307 (2026-11-21 UTC)
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| R1 | Independent end-to-end repository audit of the canonical root GitHub Pages site: run the committed QA/build/link/source checks, inspect current published-work status and official-source claims, identify any unverified/irregular details without duplicating open PR #72's alert-scoring scope, and record evidence and limitations. | in progress | session-37562307 | `COORDINATION.md`, `verification/2026-11-21-37562307.md` |
+
+Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert model scoring, live-feed rendering, source templates, and generated pages. This audit does not edit its scope or any shared site/data/workflow files. It is report-only except for this board entry and the dated verification report.
