@@ -1565,3 +1565,35 @@ None new. All pre-existing flags remain published on the site's `flagged.html` (
 ### PR & merge record (I4)
 
 TBD — recorded below once the PR exists.
+
+---
+
+## Current Arena session — `session-bbb5eabf` (2026-11-21 UTC) — final integration + scheduled-pipeline confirmation
+
+- Session ID: `session-bbb5eabf`; Arena-pinned branch: `arena/bbb5eabf-kalshidash1`, base `84a2dcbbc6db5a9ecee291f21e97089c7b69f131` (`main`), status `active`.
+- Role: **final integration session.** Merge the ready feature PRs, re-verify the combined tree line by line against official
+  sources, confirm the scheduled data pipeline now succeeds on `main`, then confirm the GitHub Pages deploy and record
+  the result here.
+
+### Overlap check at claim time (read from `origin` / `gh`, 2026-11-21 ~06:35 UTC) — respected, not duplicated
+
+| Work already claimed | Claimant | How this session respects it |
+|---|---|---|
+| `F-54` anchor dedupe (F-54 → F-58) + clean QA pass, PR #43 | `session-4830ab32` | merged, not re-done |
+| Executive-summary freshness note, PR #42 | `session-bfc2de45` | merged, not re-done |
+| Alert-engine one-swing-per-ticker-per-15-min fix, PR #39 | `session-f7490df7` | merged, not re-done |
+| **Missing `fi` in `refresh-data.yml` / `live-alerts.yml` commit steps** (root cause of every failing scheduled run: bash exit 2 before the script ran) + `scripts/check-data-workflow-shells.mjs` | `session-4251f2d1` (branch `arena/4251f2d1-kalshidash1`, no PR open yet) | **not re-implemented**; integrated by merging that branch and verifying the fix in the combined tree |
+| `data/live/`, `data/snapshot.json`, root site pages, `templates/` | built by earlier sessions | **read-only** here; changed only through the generators |
+
+### Task board — session-bbb5eabf
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| F1 | Claim this scope on the shared board and push immediately. | done | session-bbb5eabf | `COORDINATION.md` |
+| F2 | Merge the ready feature PRs (#39, #42, #43) and the scheduled-workflow shell fix (`arena/4251f2d1-kalshidash1`) after reviewing their diffs; resolve conflicts without discarding any session's work. | in progress | session-bbb5eabf | git/PR operations only |
+| F3 | Re-verify the combined tree: build staleness gate, both link checkers, duplicate-id + conflict-marker scan, engine selftest, feed/page/lab tests, JS syntax, and a source-link scan over every published table row. | in progress | session-bbb5eabf | `verification/2026-11-21-bbb5eabf.md` (new) |
+| F4 | Confirm the scheduled data pipeline on `main` actually completes (a real run, not an assumption) and that `data/live/feed.json` advanced. | in progress | session-bbb5eabf | (read-only; `gh` dispatches) |
+| F5 | Open the integration PR to `main`, merge it, confirm the Pages build for the merge commit, and record the PR link + result. | in progress | session-bbb5eabf | `COORDINATION.md`, `verification/2026-11-21-bbb5eabf.md` |
+
+Rules honoured: only the files above are edited; shared outputs change only through their generators; no value is
+inferred — anything unconfirmed stays blank and is published on `flagged.html`.
