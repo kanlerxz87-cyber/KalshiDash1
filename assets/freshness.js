@@ -55,6 +55,7 @@
   }
 
   function paint(stamp, state) {
+    paintAsOf(stamp, state);
     /* One badge, reused: the generator puts `<span id="feed-freshness">` in the header of every
      * page. It is deliberately a separate element from the API-mode badge so that "the API
      * answered my browser just now" and "the alert engine sampled recently" cannot be confused. */
@@ -89,6 +90,47 @@
     el.title = title;
     el.setAttribute('data-age-minutes', stamp && stamp.min !== null ? String(stamp.min) : '');
     el.setAttribute('data-state', state);
+  }
+
+  /* AS-OF LINE (added 2026-11-21).
+   *
+   * A badge that ages in the browser is correct for a live visitor and useless everywhere else:
+   * in a screenshot, a printed page, a PDF, or an archived snapshot, "engine 3 min ago" stays
+   * frozen while the data behind it keeps getting older. On 2026-11-21 the committed feed was
+   * ~3 h old while the page still rendered a healthy-looking header. So every page ALSO prints
+   * the absolute sample time and, on the first paint, the age measured at load. The age word is
+   * refreshed on the same 30-second tick as the badge; the timestamp never changes.
+   *
+   * The element is optional: if a template does not carry it, nothing breaks. */
+  function paintAsOf(stamp, state) {
+    var el = document.getElementById('feed-asof');
+    if (!el) return;
+    var iso = stamp && stamp.iso ? String(stamp.iso) : null;
+    if (state === 'loading') {
+      el.textContent = 'Data as of …';
+      return;
+    }
+    if (state === 'error' || !iso) {
+      el.textContent = 'Data as of: unknown — the committed feed could not be read. Do not assume it is current.';
+      el.setAttribute('data-state', 'error');
+      return;
+    }
+    var when = iso.replace('T', ' ').replace(/\.\d+Z$/, 'Z');
+    var age = human(stamp.min);
+    el.innerHTML = 'Alert engine sampled <b>' + esc(when) + '</b> — that is <b>' + esc(age) + '</b>.'
+      + (state === 'stale'
+        ? ' <span class="warn"><b>STALE</b>: beyond the ' + STALE_MIN + '-minute limit, so the feeds on this page are historical, not live.</span>'
+        : state === 'warn'
+          ? ' <span class="warn">Late: past the ' + WARN_MIN + '-minute target; the scheduled sampler may not be running.</span>'
+          : '');
+    el.setAttribute('data-state', state);
+    el.setAttribute('data-asof', iso);
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
   }
 
   function classify(min) {
@@ -163,6 +205,9 @@
     }, 250);
   }
 
+  var lastStamp = null;
+  var lastState = 'loading';
+
   function init() {
     var base = root();
     paint(null, 'loading');
@@ -171,7 +216,36 @@
       loadFeed(base, function (feed) {
         var iso = feed && feed.meta && feed.meta.generated_at ? feed.meta.generated_at : null;
         var min = ageMinutes(iso);
-        paint({ min: min, iso: iso || 'missing from feed.json' }, classify(min));
+        lastStamp = { min: min, iso: iso || 'missing from feed.json' };
+        lastState = classify(min);
+        paint(lastStamp, lastState);
+        /* Keep the measured age honest while a visitor has the page open. The SOURCE of every
+         * tick is the visitor's own clock and the committed timestamp — no network call, no
+         * third party. Re-classifying means a page left open for an hour starts saying STALE on
+         * its own, instead of staying green forever. */
+        var ticker = setInterval(function () {
+          if (!lastStamp) return;
+          var next = { min: ageMinutes(lastStamp.iso), iso: lastStamp.iso };
+          if (next.min === null) return;
+          lastStamp = next;
+          lastState = classify(next.min);
+          paint(next, lastState);
+        }, 30 * 1000);
+        /* Stop the tick as soon as the page is hidden or torn down: nothing on screen needs it,
+         * and an abandoned timer is what keeps an automated harness (jsdom) alive. A real browser
+         * tab also gets the battery saving from not repainting a hidden page. */
+        var stop = function () { if (ticker) { clearInterval(ticker); ticker = null; } };
+        window.addEventListener('pagehide', stop);
+        document.addEventListener('visibilitychange', function () {
+          if (document.visibilityState === 'hidden') stop();
+          else if (!ticker) {
+            ticker = setInterval(function () { /* re-armed below */ }, 0);
+            stop();
+            /* Re-arm on return: simplest correct behaviour is a fresh measurement right away. */
+            var next = { min: ageMinutes(lastStamp.iso), iso: lastStamp.iso };
+            if (next.min !== null) { lastStamp = next; lastState = classify(next.min); paint(next, lastState); }
+          }
+        });
       });
     });
     applyTopicFilter();

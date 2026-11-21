@@ -13,14 +13,17 @@
  *     must be within [0,1] for a binary contract.
  *  4. Every market row keeps its source_url.
  *  5. Every resolution has result in {yes,no,scalar} and a source_url.
- *  6. The high-ROI flag is consistent with the model score and the threshold.
+ *  6. The high-ROI flag is consistent with the model score and the threshold, AND the swing it
+ *     labels was executable at the recorded price according to the published bid/ask
+ *     (followThrough gate, added 2026-11-21 after the pane was measured to be topped by
+ *     unfillable $0.01 -> $0.97 prints).
  *  7. Every sample timestamp is a real ISO date in the past.
  *
  * Exit code 1 on any violation, so a bad sample can never be committed.
  */
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { collapseDuplicates } from '../tools/live_engine.mjs';
+import { collapseDuplicates, followThrough, modelScore, MODEL_VERSION, HIGH_ROI_THRESHOLD } from '../tools/live_engine.mjs';
 
 const FEED = process.env.ALERTS_FEED || 'data/live/feed.json';
 const OFFICIAL_HOSTS = ['external-api.demo.kalshi.co', 'demo-api.kalshi.co'];
@@ -28,6 +31,8 @@ const THRESHOLD = 0.10;
 const EPS = 1e-9;
 
 const problems = [];
+const unfillableHighROI = [];
+const num = (v) => (v === null || v === undefined || v === '' ? null : (Number.isFinite(Number(v)) ? Number(v) : null));
 const warnings = [];
 const fail = (m) => problems.push(m);
 const warn = (m) => warnings.push(m);
@@ -129,8 +134,43 @@ async function main() {
       } else if (a.model.highROI) {
         fail(`${w}: highROI is true with no score`);
       }
+      /* 6b. Follow-through. A high-ROI label on a swing that the published book says was not
+       * reachable is the exact defect measured on 2026-11-21 (the pane was topped by
+       * "$0.01 -> $0.97" rows whose YES ask was $0.01). This is now a hard failure, so such a
+       * row can never be committed again. Rows already in the feed from before the fix are
+       * reported as warnings with the count, and named in meta.legacy_unfillable_high_roi. */
+      const ft = followThrough({ direction: a.direction, to: a.to, bid: num(a.yes_bid_dollars), ask: num(a.yes_ask_dollars) });
+      if (a.model.tradeable !== undefined && a.model.tradeable !== null) {
+        if ((a.model.tradeable === true) !== (ft.ok === true) && ft.ok !== null) {
+          fail(`${w}: model.tradeable=${a.model.tradeable} disagrees with the published quote (${ft.note})`);
+        }
+      }
+      if (a.model.highROI && ft.ok === false) {
+        unfillableHighROI.push({ id: a.id, ticker: a.ticker, ts: a.ts, note: ft.note });
+      }
     } else {
       warn(`${w}: no model block (row will not reach the high-ROI feed)`);
+    }
+  }
+
+  // 6c. Every alert that can reach the high-ROI pane must have been executed at its price...
+  for (const u of unfillableHighROI) {
+    if (feed.meta?.model_version === MODEL_VERSION && !(feed.meta?.legacy_unfillable_high_roi || []).some((x) => x.id === u.id)) {
+      fail(`alert ${u.id || u.ticker}: labelled high-ROI but NOT executable at the swing price (${u.note}). ` +
+        'The model must cap these at 0.30 — see followThrough() in tools/live_engine.mjs.');
+    } else {
+      warn(`alert ${u.id || u.ticker}: historical high-ROI row not executable at its swing price (${u.note}); ` +
+        'recorded in meta.legacy_unfillable_high_roi, not re-labelled.');
+    }
+  }
+  /* ...and a legacy exemption list may only contain rows that really are unfillable, so it can
+   * never be used to whitelist a row that a later run would have scored as tradeable. */
+  for (const x of feed.meta?.legacy_unfillable_high_roi || []) {
+    const row = (feed.alerts || []).find((a) => a.id === x.id);
+    if (row) {
+      const ft = followThrough({ direction: row.direction, to: row.to, bid: num(row.yes_bid_dollars), ask: num(row.yes_ask_dollars) });
+      if (ft.ok !== false) fail(`meta.legacy_unfillable_high_roi lists ${x.id} but its book does corroborate the swing (${ft.note})`);
+      if (row.model && row.model.highROI) fail(`meta.legacy_unfillable_high_roi lists ${x.id} but the row is still labelled highROI`);
     }
   }
 
