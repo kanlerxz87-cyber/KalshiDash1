@@ -33,11 +33,22 @@ name: keepalive
 #   1. sample the demo API with tools/live_engine.mjs      → data/live/feed.json  (the alert feeds)
 #   2. refresh the snapshot with scripts/fetch-snapshot.mjs → data/snapshot.json  (static fallback)
 #   3. rebuild the static site so both files are consistent
-#   4. commit and push with a rebase-and-retry loop (other bots push here too)
+#   4. commit and push with scripts/publish-data.sh
 #   5. verify the freshness of what was just published and FAIL the run if it is beyond the limit
 #
 # No secret is required or stored. Public, unauthenticated demo endpoints only:
 # https://docs.kalshi.com/getting_started/quick_start_market_data
+#
+# RELATIONSHIP TO THE OTHER WRITERS (corrected 2026-11-21, session-9bee7c49)
+# -----------------------------------------------------------------------
+# An earlier version of this file said: "The other two writers queue behind this one instead of
+# racing it (see the shared group name in live-alerts.yml and refresh-data.yml)." That was false:
+# the three workflows used three different `concurrency` groups, so they did race.
+#
+# They no longer need to share one group, because publishing no longer merges (see
+# scripts/publish-data.sh and flag F-58). Each writer stages only the files it generates and
+# commits on top of the fetched remote tip, so a concurrent writer cannot make it conflict and
+# cannot make it revert a file it did not generate. tools/test_publish.sh proves both properties.
 
 on:
   schedule:
@@ -50,13 +61,12 @@ on:
     paths:
       - 'scripts/keepalive.mjs'
       - 'tools/freshness_check.mjs'
+      - 'scripts/publish-data.sh'
       - '.github/workflows/keepalive.yml'
 
 permissions:
   contents: write
 
-# The other two writers queue behind this one instead of racing it (see the shared group name in
-# live-alerts.yml and refresh-data.yml).
 concurrency:
   group: writer-${{ github.ref }}
   cancel-in-progress: false
@@ -68,6 +78,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -90,6 +101,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/keepalive.mjs --stale-minutes 20 || true
 
+      # Start from the real branch tip: the checkout can be a few minutes behind, and the
+      # sample must be produced by the code that is actually on the branch.
+      - name: Sync the working tree to the remote tip
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.ref_name }}"
+          git reset --hard FETCH_HEAD
+
       - name: Sample the demo API (the alert engine)
         id: engine
         # A failed sample must not skip the snapshot refresh or the commit below: a partial but
@@ -110,31 +129,22 @@ jobs:
       - name: Check internal links before publishing anything
         run: node scripts/check-links.mjs
 
-      - name: Commit and push (rebase-and-retry)
-        id: push
+      - name: Commit and push
+        # scripts/publish-data.sh never merges: it moves HEAD onto the fetched remote tip,
+        # stages only the pathspecs below, commits and fast-forwards. The pathspecs are
+        # exact — `data/` would also stage the hand-written data/sources.json and the
+        # demo-account's data/account.json, and `'*.html'` would stage all 90 HTML files
+        # in the tree including the archived copy.
         run: |
           set -euo pipefail
-          git config user.name  'kalshidash1-engine'
-          git config user.email 'engine@users.noreply.github.com'
-          git add data/ '*.html' assets categories
-          if git diff --cached --quiet; then
-            echo 'Nothing changed in this pulse.'
-            exit 0
-          fi
-          STAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          git commit -m "data(live): keepalive pulse ${STAMP}"
-          BRANCH="${GITHUB_REF_NAME}"
-          for attempt in 1 2 3; do
-            echo "push attempt ${attempt}/3 to ${BRANCH}"
-            if git pull --rebase --autostash origin "$BRANCH" && git push origin "HEAD:${BRANCH}"; then
-              echo "pushed on attempt ${attempt}"
-              exit 0
-            fi
-            git rebase --abort 2>/dev/null || true
-            sleep $((attempt * 10))
-          done
-          echo '::error::could not push after 3 attempts'
-          exit 1
+          bash scripts/publish-data.sh \
+            "${{ github.ref_name }}" \
+            "data(live): keepalive pulse $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            ':(top)data/live/feed.json' \
+            ':(top)data/live/state.json' \
+            ':(top)data/snapshot.json' \
+            ':(top,glob)*.html' \
+            ':(top,glob)categories/*.html'
 
       # The gate that makes the live claim checkable. It reads the *published* feed (via the API,
       # at the branch tip) rather than the working tree, so it cannot pass on a locally fresh file

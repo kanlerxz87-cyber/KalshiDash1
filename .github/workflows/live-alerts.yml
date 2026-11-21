@@ -7,6 +7,20 @@ name: live-alerts
 #
 # Sources for everything the engine does: see the header of tools/live_engine.mjs and
 # docs/ALERTS.md.
+#
+# PUBLISHING (rewritten 2026-11-21, session-9bee7c49)
+# ----------------------------------------------------
+# This workflow used to publish with `git rebase FETCH_HEAD` + `git push`, and every
+# scheduled run failed at that step: see the "Commit the new sample" step history and
+# flag F-58 on the site's Flagged for Review page. The publish now goes through
+# scripts/publish-data.sh, which never merges and never rebases — it moves HEAD onto the
+# fetched remote tip, stages only the two files this workflow owns, commits and fast-forwards.
+# The helper's behaviour is proved by tools/test_publish.sh, which runs in CI.
+#
+# The three writers (this one, refresh-data.yml and keepalive.yml) publish disjoint
+# pathspecs, and because publishing is a move and never a merge, two of them running at
+# the same time can no longer corrupt each other. keepalive.yml additionally owns the
+# freshness gate that fails the build if the published feed goes stale.
 
 on:
   # IMPORTANT: GitHub only fires `schedule` for the repository's DEFAULT branch. Once this is
@@ -21,6 +35,7 @@ on:
       - 'tools/live_engine.mjs'
       - '.github/workflows/live-alerts.yml'
       - 'scripts/check_alerts.mjs'
+      - 'scripts/publish-data.sh'
 
 permissions:
   contents: write
@@ -44,6 +59,14 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Sync the working tree to the remote tip
+        # The checkout can be a few minutes behind the branch. Starting from the real tip
+        # means the sample is produced by the code that is actually on the branch.
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.ref_name }}"
+          git reset --hard FETCH_HEAD
+
       - name: Offline logic selftest (no network)
         run: node tools/live_engine.mjs --selftest
 
@@ -57,49 +80,19 @@ jobs:
       - name: Validate the feed
         run: node scripts/check_alerts.mjs
 
-      - name: Commit the new sample
+      - name: Publish the new sample
         # Feature branches exercise the engine/validation but do not write data; only main is durable.
         if: github.ref == 'refs/heads/main' && steps.sample.outcome == 'success'
-        # Runs whenever a sample was produced and validated, even if a later step fails, so a
-        # partial problem never loses real, verified market data.
-        # The rebase is no longer allowed to fail silently: the old `|| true` turned a
-        # conflicting remote into an opaque push failure (session-dd012e26, F-39).
+        # Only the two files this workflow owns are published. scripts/publish-data.sh commits
+        # on top of the fetched remote tip and fast-forwards, so this can never conflict with
+        # another writer and can never revert a file it did not generate.
         run: |
           set -euo pipefail
-          git config user.name  "kalshidash1-engine"
-          git config user.email "engine@users.noreply.github.com"
-          git add data/live/
-          if git diff --cached --quiet -- data/live/; then
-            echo "No market change in this run — nothing to commit."
-          elif [ "$TARGET_BRANCH" != "main" ]; then
-            echo "Sample validated on $TARGET_BRANCH; write-back is intentionally restricted to main."
-          else
-            STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-            git commit -m "data(live): engine sample ${STAMP}"
-            PUSHED=false
-            for attempt in 1 2 3 4 5; do
-              if ! git fetch origin "$TARGET_BRANCH"; then
-                echo "::error::could not fetch origin/$TARGET_BRANCH"
-                exit 1
-              fi
-              if ! git rebase FETCH_HEAD; then
-                git rebase --abort || true
-                echo "::error::could not rebase the engine sample onto origin/$TARGET_BRANCH"
-                exit 1
-              fi
-              if git push origin "HEAD:$TARGET_BRANCH"; then
-                echo "Pushed the engine sample to origin/$TARGET_BRANCH on attempt $attempt."
-                PUSHED=true
-                break
-              fi
-              echo "Push attempt $attempt lost a concurrent-update race; retrying after fetch/rebase."
-            done
-            if [ "$PUSHED" != true ]; then
-              echo "::error::could not push the engine sample to origin/$TARGET_BRANCH after 5 attempts"
-              exit 1
-            fi
-        env:
-          TARGET_BRANCH: ${{ github.ref_name }}
+          bash scripts/publish-data.sh \
+            "${{ github.ref_name }}" \
+            "data(live): engine sample $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            ':(top)data/live/feed.json' \
+            ':(top)data/live/state.json'
 
       - name: Fail the run if the engine could not reach the API
         if: steps.sample.outcome != 'success'

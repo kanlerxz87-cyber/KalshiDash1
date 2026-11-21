@@ -55,6 +55,21 @@ jobs:
       - name: Python tool syntax
         run: python -m py_compile tools/*.py
 
+      # The data publishers (keepalive.yml, live-alerts.yml, refresh-data.yml, demo-account.yml)
+      # all publish through scripts/publish-data.sh. This test proves, against a scratch bare
+      # repository, that publishing is a fast-forward, never a merge, never reverts a concurrent
+      # commit and never stages a file outside its pathspec. Without it, a change to the
+      # publishing logic could silently reintroduce the merge/rebase that broke every
+      # scheduled run on 2026-11-21 (flag F-58).
+      - name: "Publishing helper: shell syntax"
+        run: |
+          set -e
+          bash -n scripts/publish-data.sh
+          bash -n tools/test_publish.sh
+
+      - name: "Publishing helper: fast-forward, no merge, no revert (scratch repo)"
+        run: bash tools/test_publish.sh
+
       # A stale conflict can be auto-merged as text and published (it happened to README.md
       # twice in this repo). Fail the build if a marker survives into a published file.
       - name: No unresolved merge markers in published files

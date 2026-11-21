@@ -8,6 +8,19 @@ name: Refresh demo data snapshot
 # committed fallback used when the browser cannot reach the demo API.
 #
 # Docs: https://docs.kalshi.com/getting_started/demo_env
+#
+# PUBLISHING (rewritten 2026-11-21, session-9bee7c49)
+# ----------------------------------------------------
+# This workflow used to publish with `git rebase FETCH_HEAD` + `git push`, and every
+# scheduled run failed at that step: see the "Commit refreshed data" step history and
+# flag F-58 on the site's Flagged for Review page. The publish now goes through
+# scripts/publish-data.sh, which never merges and never rebases.
+#
+# The pathspecs below are exact on purpose. `git add -- '*.html'` (the old form) matches
+# all 90 HTML files in the tree in git pathspec terms, including the hand-written `archive/`
+# copy and `alerts/index.html`, neither of which this build regenerates. `:(top,glob)` is
+# anchored at the repository root, so only the 17 root pages and the 5 category pages that
+# scripts/build-site.mjs actually writes are staged.
 
 on:
   workflow_dispatch:
@@ -20,6 +33,7 @@ on:
     paths:
       - 'scripts/fetch-snapshot.mjs'
       - 'scripts/build-site.mjs'
+      - 'scripts/publish-data.sh'
       - '.github/workflows/refresh-data.yml'
 
 permissions:
@@ -42,6 +56,12 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Sync the working tree to the remote tip
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.ref_name }}"
+          git reset --hard FETCH_HEAD
+
       - name: Capture snapshot from the official demo API
         run: node scripts/fetch-snapshot.mjs
 
@@ -53,45 +73,19 @@ jobs:
         run: |
           if [ -f scripts/check-links.mjs ]; then node scripts/check-links.mjs; fi
 
-      - name: Commit refreshed data (only when something changed)
+      - name: Publish the refreshed snapshot
         # Feature branches exercise capture/build/link validation without write-back;
         # only main is the durable publisher of snapshot and generated HTML.
         if: github.ref == 'refs/heads/main'
-        # Fixed 2026-11-20 (session-dd012e26). This step used to fail on `main`:
-        #   1. `git rev-parse --abbrev-ref HEAD` returns the literal string "HEAD" on
-        #      the detached checkout that actions/checkout leaves behind, so the push
-        #      target was the invalid refspec "HEAD:HEAD";
-        #   2. the push had no rebase, so it lost the race against the concurrent
-        #      `live-alerts` job, which pushes data/live/ to the same branch.
-        # Both are fixed below: the target branch comes from the event, and the
-        # commit is rebased onto the remote branch first.
+        # scripts/publish-data.sh commits on top of the fetched remote tip and fast-forwards.
+        # It creates no merge commit, so it cannot conflict with the other writers, and it
+        # stages only the pathspecs below — so a file another author changed on the branch
+        # while this job ran is never reverted.
         run: |
           set -euo pipefail
-          echo "Preparing snapshot push: event=$GITHUB_EVENT_NAME ref=$GITHUB_REF target=$TARGET_BRANCH"
-          git status --short
-          git config user.name  'kalshidash-bot'
-          git config user.email 'kalshidash-bot@users.noreply.github.com'
-          git add data/snapshot.json
-          if [ -f scripts/build-site.mjs ]; then git add -- '*.html' assets categories; fi
-          if git diff --cached --quiet; then
-            echo 'No data change — nothing to commit.'
-          elif [ "$TARGET_BRANCH" != "main" ]; then
-            echo "Snapshot checked on $TARGET_BRANCH; write-back is intentionally restricted to main."
-          else
-            git commit -m 'chore(data): refresh demo snapshot from the official Kalshi demo API'
-            # A fetch/rebase/push loop closes the race where live-alerts commits
-            # between our rebase and push. Failed pushes are retried only after a
-            # fresh rebase; other errors fail after the bounded retry count.
-            for attempt in 1 2 3 4 5; do
-              git fetch origin "$TARGET_BRANCH"
-              git rebase FETCH_HEAD
-              if git push origin "HEAD:$TARGET_BRANCH"; then
-                echo "Pushed the refreshed snapshot to origin/$TARGET_BRANCH on attempt $attempt."
-                exit 0
-              fi
-              echo "Push attempt $attempt lost a concurrent-update race; retrying after fetch/rebase."
-            done
-            echo "::error::could not push refreshed snapshot to origin/$TARGET_BRANCH after 5 attempts"
-            exit 1
-        env:
-          TARGET_BRANCH: ${{ github.ref_name }}
+          bash scripts/publish-data.sh \
+            "${{ github.ref_name }}" \
+            "chore(data): refresh demo snapshot from the official Kalshi demo API" \
+            ':(top)data/snapshot.json' \
+            ':(top,glob)*.html' \
+            ':(top,glob)categories/*.html'

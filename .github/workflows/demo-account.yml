@@ -22,6 +22,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -37,13 +40,12 @@ jobs:
         run: node tools/demo_trader.mjs account --ci
 
       - name: Commit data/account.json if changed
+        # Published through scripts/publish-data.sh, which never merges: it commits on top of
+        # the fetched remote tip and fast-forwards, so this job cannot conflict with the other
+        # writers on `main` and cannot revert a file it did not generate.
         run: |
-          git add data/account.json 2>/dev/null || true
-          if git diff --cached --quiet; then
-            echo "data/account.json unchanged"
-          else
-            git config user.name "kalshidash-bot"
-            git config user.email "actions@users.noreply.github.com"
-            git commit -m "demo-account: refresh data/account.json [skip ci]"
-            git push
-          fi
+          set -euo pipefail
+          bash scripts/publish-data.sh \
+            "${GITHUB_REF_NAME:-main}" \
+            "demo-account: refresh data/account.json [skip ci]" \
+            ':(top)data/account.json'
