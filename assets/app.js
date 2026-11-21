@@ -1226,31 +1226,48 @@
       $('#m-liquidity').textContent = num(roi.touchSize) + ' contracts at the touch';
     }
 
+    /* The exchange quotes a YES bid and a NO bid; a YES ask is 1 - (best NO bid). The old
+     * ladder showed only the raw yes_dollars/no_dollars arrays side by side, which HID the
+     * side a trader actually has to hit: on KXBTCY-27JAN0100-B97500 the yes_dollars array is
+     * empty while no_dollars holds 2,991,498.81 contracts at $0.0300 — i.e. a $0.97 YES ask
+     * with real size behind it (measured 2026-11-21 through the official orderbook endpoint).
+     * So both executable sides are now derived and shown, and the raw levels are labelled. */
     function drawBook() {
       var ob = state.orderbooks[ticker];
       var el = $('#book-body');
       if (!el) return;
       if (!ob) {
-        el.innerHTML = '<tr><td colspan="5" class="muted">Order book not loaded yet.</td></tr>';
+        el.innerHTML = '<tr><td colspan="6" class="muted">Order book not loaded yet.</td></tr>';
         return;
       }
       var yes = (ob.yes_dollars || []).map(function (l) { return [Number(l[0]), Number(l[1])]; })
         .sort(function (a, b) { return b[0] - a[0]; });
       var no = (ob.no_dollars || []).map(function (l) { return [Number(l[0]), Number(l[1])]; })
         .sort(function (a, b) { return b[0] - a[0]; });
+      var bestYesBid = yes.length ? yes[0] : null;
+      var bestNoBid = no.length ? no[0] : null;
+      var yesAsk = bestNoBid ? [Math.round((1 - bestNoBid[0]) * 10000) / 10000, bestNoBid[1]] : null;
       var max = Math.max(1, Math.max.apply(null, yes.concat(no).map(function (l) { return l[1]; }).concat([1])));
       var rows = [];
       var n = Math.max(yes.length, no.length);
       for (var i = 0; i < Math.min(n, 12); i++) {
         var y = yes[i], d = no[i];
-        rows.push('<tr class="ask"><td class="p">' + (d ? d[0].toFixed(4) : '') + '</td><td class="num">' + (d ? num(d[1]) : '') + '</td>' +
-          '<td class="p">' + (y ? y[0].toFixed(4) : '') + '</td><td class="num">' + (y ? num(y[1]) : '') + '</td>' +
+        rows.push('<tr class="ask">' +
+          '<td class="p">' + (y ? y[0].toFixed(4) : '—') + '</td><td class="num">' + (y ? num(y[1]) : '—') + '</td>' +
+          '<td class="p">' + (y ? (1 - y[0]).toFixed(4) : '—') + '</td>' +
+          '<td class="p">' + (d ? d[0].toFixed(4) : '—') + '</td><td class="num">' + (d ? num(d[1]) : '—') + '</td>' +
+          '<td class="p">' + (d ? (1 - d[0]).toFixed(4) : '—') + '</td>' +
           '<td class="bar"><i style="width:' + (d ? Math.round((d[1] / max) * 100) : 0) + '%"></i></td></tr>');
       }
-      el.innerHTML = rows.join('') || '<tr><td colspan="5" class="muted">Order book is empty for this market.</td></tr>';
+      el.innerHTML = rows.join('') || '<tr><td colspan="7" class="muted">The exchange returned no resting orders for this market. That is a real, reportable state: there is nothing to trade against right now.</td></tr>';
       var tot = yes.concat(no).reduce(function (s, l) { return s + l[1]; }, 0);
       var totEl = $('#book-total');
-      if (totEl) totEl.textContent = num(tot) + ' contracts across ' + (yes.length + no.length) + ' price levels';
+      if (totEl) {
+        totEl.innerHTML = num(tot) + ' contracts across ' + (yes.length + no.length) + ' price levels. ' +
+          'Best YES bid <b>' + (bestYesBid ? '$' + bestYesBid[0].toFixed(2) + ' × ' + num(bestYesBid[1]) : 'none') + '</b> · ' +
+          'Best YES ask <b>' + (yesAsk ? '$' + yesAsk[0].toFixed(2) + ' × ' + num(yesAsk[1]) + ' (from the NO bid)' : 'none') + '</b>. ' +
+          (yesAsk ? '' : '<span class="warn">No YES offer exists, so a YES swing to a high price cannot be executed — the high-ROI model now scores that 0.</span>');
+      }
     }
 
     function loadMarket() {

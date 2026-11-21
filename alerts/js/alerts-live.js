@@ -118,9 +118,29 @@
    * must be able to score a swing it detects itself, and keeping the formula in one shape
    * on both sides makes them comparable. Weights documented on the page. */
   var HIGH_ROI_THRESHOLD = 0.62;
+  var FOLLOW_TOLERANCE = 0.02;
+
+  /* Follow-through gate — identical in meaning to tools/live_engine.mjs followThrough().
+   * A swing only earns a score when the published quote still sits at the price the swing
+   * ended at: |ask - to| for an "up" move, |bid - to| for a "down" move, within $0.02. A side
+   * priced at $0.00 means there is no offer/bid, so the move was not executable. */
+  function followThrough(direction, to, bid, ask) {
+    if (to === null || to === undefined) return { ok: null, note: 'swing price missing — unverified' };
+    if (direction !== 'up' && direction !== 'down') return { ok: null, note: 'direction unknown — unverified' };
+    var ref = direction === 'up' ? ask : bid;
+    var side = direction === 'up' ? 'ask' : 'bid';
+    if (ref === null || ref === undefined) return { ok: null, note: 'no YES ' + side + ' published — unverified' };
+    if (ref <= 0) return { ok: false, gap: round(to - ref, 4), note: 'YES ' + side + ' is $0.00 — nothing to ' + (direction === 'up' ? 'buy' : 'sell into') };
+    var gap = round(Math.abs(ref - to), 4);
+    return { ok: gap <= FOLLOW_TOLERANCE + 1e-9, gap: gap, note: side + ' ' + usd(ref) + ' vs swing ' + usd(to) + ' (gap ' + usd(gap) + ')' };
+  }
+
   function modelScore(o) {
-    if (o.from === null || o.from === undefined) return { score: null, highROI: false, reasons: ['no baseline price — unverified'] };
+    if (o.from === null || o.from === undefined) return { score: null, highROI: false, tradeable: null, reasons: ['no baseline price — unverified'] };
     var reasons = [];
+    var ft = (o.direction && o.to !== null && o.to !== undefined)
+      ? followThrough(o.direction, o.to, o.bid, o.ask)
+      : { ok: null, note: 'direction/price not supplied' };
     var headroom = round(Math.max(0, Math.min(o.from, 1 - o.from) / 0.5), 4);
     reasons.push('headroom ' + headroom.toFixed(2));
     var size = round(Math.min(1, Math.abs(o.delta) / 0.5), 4);
@@ -129,17 +149,24 @@
     var liq = round(Math.min(1, v / 1000), 4);
     reasons.push('24h vol ' + v + ' -> liq ' + liq.toFixed(2));
     var spreadScore = 0;
-    if (o.bid !== null && o.bid !== undefined && o.ask !== null && o.ask !== undefined && o.ask >= o.bid && o.ask > 0) {
+    /* A missing or zero YES bid is a ONE-SIDED book: there is no buyer to exit into, so this
+     * term must be 0. Scoring it as a tight spread is the defect fixed on 2026-11-21. */
+    if (o.bid !== null && o.bid !== undefined && o.ask !== null && o.ask !== undefined && o.bid > 0 && o.ask > 0 && o.ask >= o.bid) {
       var spread = round(o.ask - o.bid, 4);
       spreadScore = round(Math.max(0, 1 - spread * 10), 4);
       reasons.push('spread ' + usd(spread) + ' -> ' + spreadScore.toFixed(2));
     } else {
-      reasons.push('spread unknown -> 0.00');
+      reasons.push('book is one-sided or unpriced -> 0.00');
     }
+    reasons.push(ft.ok === true ? 'quote follows the swing: ' + ft.note + ' -> 1.00'
+      : ft.ok === false ? 'NOT tradeable at the swing price: ' + ft.note + ' -> 0.00'
+        : 'follow-through unverified (' + ft.note + ') -> 0.00');
     var score = 0.20 * headroom + 0.20 * size + 0.35 * liq + 0.25 * spreadScore;
     if (o.sampleAgeSeconds > 3600) { score *= 0.5; reasons.push('sample > 1h old -> halved'); }
+    score = round(score, 4);
+    if (ft.ok === false) { score = Math.min(score, 0.3); reasons.push('capped at 0.30: not executable at the recorded price'); }
     score = round(Math.max(0, Math.min(1, score)), 4);
-    return { score: score, highROI: score >= HIGH_ROI_THRESHOLD, reasons: reasons };
+    return { score: score, highROI: score >= HIGH_ROI_THRESHOLD, tradeable: ft.ok, reasons: reasons };
   }
 
   /* ---------------- engine feed ---------------- */
@@ -321,7 +348,7 @@
         volume_24h_fp: m.volume_24h_fp, volume_fp: m.volume_fp, open_interest_fp: m.open_interest_fp,
         est_traded_dollars: (num(m.volume_fp) !== null && tp.price !== null) ? round(num(m.volume_fp) * tp.price, 2) : null,
         close_time: m.close_time, rules_primary: m.rules_primary,
-        model: modelScore({ from: round(baseline, 4), delta: delta, bid: bid, ask: ask, volume24h: vol24, sampleAgeSeconds: 0 }),
+        model: modelScore({ from: round(baseline, 4), delta: delta, direction: delta > 0 ? 'up' : 'down', to: round(tp.price, 4), bid: bid, ask: ask, volume24h: vol24, sampleAgeSeconds: 0 }),
         source_url: e.source_url
       });
     });

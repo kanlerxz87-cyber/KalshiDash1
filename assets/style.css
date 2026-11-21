@@ -257,6 +257,12 @@ canvas.short { height: 120px; }
 .ladder tr.bid .bar i { background: var(--up); }
 .ladder tr.ask .bar i { background: var(--down); }
 
+/* as-of line under the engine badge (added 2026-11-21): visible, non-JS, absolute */
+.asof-wrap { display: block; margin-top: 2px; max-width: 520px; line-height: 1.35; }
+.asof-wrap #feed-asof { color: var(--muted, #8b9bb0); }
+.asof-wrap #feed-asof[data-state="stale"] { color: #ffb4b4; }
+.asof-wrap #feed-asof[data-state="warn"] { color: #ffd27a; }
+
 /* ---------- misc ---------- */
 .kv { display: grid; grid-template-columns: minmax(140px, auto) 1fr; gap: 3px 14px; font-size: 13px; }
 .kv dt { color: var(--muted); }

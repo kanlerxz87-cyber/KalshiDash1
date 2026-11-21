@@ -2091,7 +2091,62 @@
     "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOVAK-26-NDAH/orderbook",
     "sampled_at": "2026-11-21T22:26:21.337Z"
    }
-  }
+  },
+  "legacy_unfillable_high_roi": [
+   {
+    "id": "KXBTCY-27JAN0100-B97500@1795296910",
+    "ticker": "KXBTCY-27JAN0100-B97500",
+    "ts": "2026-11-21T21:35:10.000Z",
+    "direction": "down",
+    "from": 0.97,
+    "to": 0.01,
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "0.0100",
+    "published_score": 0.787,
+    "reason": "YES bid is $0.00 — there is no bid to sell into",
+    "detected_by": "scripts/annotate-legacy-unfillable.mjs"
+   },
+   {
+    "id": "trade:KXPRESPERSON-28-VRAM@1795292123",
+    "ticker": "KXPRESPERSON-28-VRAM",
+    "ts": "2026-11-21T20:15:23.601Z",
+    "direction": "down",
+    "from": 0.802,
+    "to": 0.003,
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "0.8020",
+    "published_score": 0.6292,
+    "reason": "YES bid is $0.00 — there is no bid to sell into",
+    "detected_by": "scripts/annotate-legacy-unfillable.mjs"
+   },
+   {
+    "id": "trade:KXPRESPERSON-28-VRAM@1795290320",
+    "ticker": "KXPRESPERSON-28-VRAM",
+    "ts": "2026-11-21T19:45:20.401Z",
+    "direction": "down",
+    "from": 0.802,
+    "to": 0.003,
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "0.8020",
+    "published_score": 0.6292,
+    "reason": "YES bid is $0.00 — there is no bid to sell into",
+    "detected_by": "scripts/annotate-legacy-unfillable.mjs"
+   },
+   {
+    "id": "trade:KXPRESPERSON-28-VRAM@1795289416",
+    "ticker": "KXPRESPERSON-28-VRAM",
+    "ts": "2026-11-21T19:30:16.291Z",
+    "direction": "down",
+    "from": 0.802,
+    "to": 0.003,
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "0.8020",
+    "published_score": 0.6292,
+    "reason": "YES bid is $0.00 — there is no bid to sell into",
+    "detected_by": "scripts/annotate-legacy-unfillable.mjs"
+   }
+  ],
+  "legacy_unfillable_note": "High-ROI rows published by model heuristic-v1 before the follow-through gate existed. The published bid/ask at detection did not corroborate the swing price, so these rows are kept as recorded history but are marked \"not tradeable\" on the page and excluded from the live high-ROI ranking. Their score is the ORIGINAL v1 score and is labelled as such."
  },
  "run": {
   "run_id": "2026-11-21T22:26:12.000Z",
@@ -2137,14 +2192,21 @@
     }
    ],
    "model": {
-    "score": 0.787,
-    "highROI": true,
+    "score": 0.3,
+    "highROI": false,
     "reasons": [
      "headroom 0.06 (price was $0.97)",
      "move 100% of a $0.50 move",
      "24h volume 8765.33 contracts -> liquidity 1.00",
-     "spread $0.01 -> 0.90"
-    ]
+     "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
+     "NOT tradeable at the swing price: YES bid is $0.00 — there is no bid to sell into -> 0.00",
+     "capped at 0.30 because the swing was not executable at the recorded price"
+    ],
+    "original_highROI": true,
+    "original_score": 0.787,
+    "original_model_version": "heuristic-v1",
+    "tradeable": false,
+    "relabelled_by": "scripts/annotate-legacy-unfillable.mjs (2026-11-21)"
    },
    "corroboration": {
     "by": "previous_price_dollars",
@@ -2230,14 +2292,21 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESPERSON.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXPRESPERSON-28-VRAM&min_ts=1795282336&limit=1000",
    "model": {
-    "score": 0.6292,
-    "highROI": true,
+    "score": 0.3,
+    "highROI": false,
     "reasons": [
      "headroom 0.40 (price was $0.80)",
      "move 100% of a $0.50 move",
      "24h volume 58068.31 contracts -> liquidity 1.00",
-     "spread $0.80 -> 0.00"
-    ]
+     "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
+     "NOT tradeable at the swing price: YES bid is $0.00 — there is no bid to sell into -> 0.00",
+     "capped at 0.30 because the swing was not executable at the recorded price"
+    ],
+    "original_highROI": true,
+    "original_score": 0.6292,
+    "original_model_version": "heuristic-v1",
+    "tradeable": false,
+    "relabelled_by": "scripts/annotate-legacy-unfillable.mjs (2026-11-21)"
    },
    "est_traded_dollars": 407220132.53,
    "volume_24h_fp": "58068.31",
@@ -2314,14 +2383,21 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESPERSON.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXPRESPERSON-28-VRAM&min_ts=1795282336&limit=1000",
    "model": {
-    "score": 0.6292,
-    "highROI": true,
+    "score": 0.3,
+    "highROI": false,
     "reasons": [
      "headroom 0.40 (price was $0.80)",
      "move 100% of a $0.50 move",
      "24h volume 58068.31 contracts -> liquidity 1.00",
-     "spread $0.80 -> 0.00"
-    ]
+     "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
+     "NOT tradeable at the swing price: YES bid is $0.00 — there is no bid to sell into -> 0.00",
+     "capped at 0.30 because the swing was not executable at the recorded price"
+    ],
+    "original_highROI": true,
+    "original_score": 0.6292,
+    "original_model_version": "heuristic-v1",
+    "tradeable": false,
+    "relabelled_by": "scripts/annotate-legacy-unfillable.mjs (2026-11-21)"
    },
    "est_traded_dollars": 407220132.53,
    "volume_24h_fp": "58068.31",
@@ -2356,14 +2432,21 @@
    "contract_terms_url": "https://assets.kalshi.com/contract_terms/PRESPERSON.pdf",
    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXPRESPERSON-28-VRAM&min_ts=1795282336&limit=1000",
    "model": {
-    "score": 0.6292,
-    "highROI": true,
+    "score": 0.3,
+    "highROI": false,
     "reasons": [
      "headroom 0.40 (price was $0.80)",
      "move 100% of a $0.50 move",
      "24h volume 58068.31 contracts -> liquidity 1.00",
-     "spread $0.80 -> 0.00"
-    ]
+     "book is one-sided or unpriced (no YES bid and ask) -> 0.00",
+     "NOT tradeable at the swing price: YES bid is $0.00 — there is no bid to sell into -> 0.00",
+     "capped at 0.30 because the swing was not executable at the recorded price"
+    ],
+    "original_highROI": true,
+    "original_score": 0.6292,
+    "original_model_version": "heuristic-v1",
+    "tradeable": false,
+    "relabelled_by": "scripts/annotate-legacy-unfillable.mjs (2026-11-21)"
    },
    "est_traded_dollars": 407220132.53,
    "volume_24h_fp": "58068.31",
