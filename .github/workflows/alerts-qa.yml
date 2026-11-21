@@ -43,7 +43,7 @@ jobs:
         run: |
           set -e
           for f in alerts/js/*.js assets/freshness.js tools/live_engine.mjs \
-                   tools/freshness_check.mjs tools/recollapse_feed.mjs \
+                   tools/freshness_check.mjs tools/rebuild_live_view.mjs \
                    scripts/keepalive.mjs \
                    scripts/check_alerts.mjs scripts/check_alerts_page.mjs \
                    scripts/check_freshness_badge.mjs; do

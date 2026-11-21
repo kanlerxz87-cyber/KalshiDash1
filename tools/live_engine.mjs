@@ -91,6 +91,7 @@ export const MAX_SAMPLES_PER_MARKET = 720;    // 5 days at a 10-minute cadence
 export const MAX_HISTORY_MARKETS = 4;         // the biggest contracts PER TOPIC keep a series
 export const MAX_ALERTS = 600;
 export const MAX_RESOLUTIONS = 400;
+export const MAX_FOLLOWED = 800;       // tickers the engine has ever seen, for resolution tracking
 
 /**
  * Topic rules.
@@ -608,6 +609,7 @@ export const EMPTY_STATE = {
   },
   markets: {},      // ticker -> latest sample
   history: {},      // ticker -> [{t,p,bid,ask,vol24}]
+  followed: {},     // ticker -> {first_seen,last_seen,series_ticker,topic,title}
   alerts: [],       // newest first
   resolutions: [],  // newest first
   topics: {},       // topic id -> series rows found this run
@@ -638,6 +640,7 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
   next.history = next.history || {};
   next.markets = next.markets || {};
   next.resolutions = next.resolutions || [];
+  next.followed = next.followed || {};
 
   // Merged, not reset: runOnce() calls applySample() twice (samples, then resolutions) and a
   // reset would report "0 markets sampled" for a run that sampled dozens.
@@ -715,6 +718,22 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
 
     next.markets[ticker] = row;
     next.run.markets_sampled += 1;
+
+    // ---- followed registry
+    // The brief asks the dashboard to "track live events until the events have resolved" and
+    // to show how each one resolved (yes or no). A market can only be sampled while it is
+    // still open, so by the time it settles it has already left `markets` — which meant that
+    // every resolution was dropped as "untracked" and the Resolved-events table stayed empty
+    // (measured: 500 settled markets seen, 0 recorded). This registry remembers every ticker
+    // the engine has ever followed, so the resolution of a market we followed IS recorded.
+    const followedEntry = next.followed[ticker] || { first_seen: nowSeconds };
+    followedEntry.first_seen = Math.min(followedEntry.first_seen ?? nowSeconds, nowSeconds);
+    followedEntry.last_seen = nowSeconds;
+    followedEntry.series_ticker = row.series_ticker;
+    followedEntry.topic = row.topic;
+    followedEntry.title = row.title;
+    followedEntry.close_time = row.close_time;
+    next.followed[ticker] = followedEntry;
     if (price === null) {
       next.run.markets_without_price += 1;
       continue; // never guess a price (see trackedPrice)
@@ -800,22 +819,37 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
 
   // ---- resolutions (result is "yes" | "no" | "scalar"; S7/S8)
   //
-  // Only markets this engine actually tracks are kept, because that is what the brief asks
+  // Only markets this engine actually follows are kept, because that is what the brief asks
   // to follow ("track live events until the events have resolved"). A settled series can
-  // return thousands of historical strikes; storing all of them would bury the tracked ones
+  // return thousands of historical strikes; storing all of them would bury the followed ones
   // and bloat the file. Everything else is counted, not dropped silently.
+  //
+  // "Followed" means the ticker is in `markets` (still open, sampled this run) OR in
+  // `followed` (seen by this engine at any earlier point). The second half is what makes the
+  // feature work at all: a market leaves `markets` the moment it settles, so checking
+  // `markets` alone meant NO resolution could ever be recorded.
   const tracked = new Set(Object.keys(next.markets || {}));
+  const followed = next.followed || {};
   let untracked = 0;
   for (const r of resolutions) {
     if (!r || !r.ticker) continue;
     if (r.result !== 'yes' && r.result !== 'no' && r.result !== 'scalar') continue;
-    if (!tracked.has(r.ticker)) { untracked += 1; continue; }
+    if (!tracked.has(r.ticker) && !followed[r.ticker]) { untracked += 1; continue; }
     if (next.resolutions.some((x) => x.ticker === r.ticker)) continue;
     next.resolutions.push(r);
   }
   next.run.untracked_settled_seen = (next.run.untracked_settled_seen || 0) + untracked;
   next.resolutions.sort((a, b) => String(b.settlement_ts || '').localeCompare(String(a.settlement_ts || '')));
   next.resolutions = next.resolutions.slice(0, MAX_RESOLUTIONS);
+
+  // ---- bound the followed registry (drop the least recently seen first)
+  {
+    const entries = Object.entries(next.followed);
+    if (entries.length > MAX_FOLLOWED) {
+      entries.sort((a, b) => (b[1].last_seen || 0) - (a[1].last_seen || 0));
+      for (const [t] of entries.slice(MAX_FOLLOWED)) delete next.followed[t];
+    }
+  }
 
   // ---- merge alerts: newest first, de-duplicated by id
   const known = new Set(next.alerts.map((a) => a.id));
@@ -873,9 +907,15 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
  * Uses GET /markets?series_ticker=..&status=settled (S4) and GET /markets/{ticker} (S5).
  */
 export async function collectResolutions(client, state, { maxSeries = 12, log = () => {} } = {}) {
+  // Query the series of every market the engine follows — not only the ones that are still
+  // open. A market that has settled has already left `state.markets`, so a series whose
+  // markets have all closed would otherwise never be asked for its results.
   const trackedSeries = new Set();
   for (const m of Object.values(state.markets || {})) {
     if (m && m.series_ticker) trackedSeries.add(m.series_ticker);
+  }
+  for (const f of Object.values(state.followed || {})) {
+    if (f && f.series_ticker) trackedSeries.add(f.series_ticker);
   }
   const out = [];
   const list = [...trackedSeries].slice(0, maxSeries);
@@ -1501,6 +1541,27 @@ export function selftest() {
   ok(s6.resolutions.length === 1 && s6.resolutions[0].result === 'yes', 'a resolution is recorded with its yes/no result');
   const s7 = applySample(s6, { nowSeconds: 14000, markets: [], resolutions: [{ ticker: 'T1', result: 'yes' }, { ticker: 'BAD', result: '' }] });
   ok(s7.resolutions.length === 1, 'resolutions de-duplicate and never store an empty result');
+
+  // The case that the live run actually hit: a market that has settled has already left the
+  // OPEN set, so it is no longer in `markets` — but it was followed, and the brief asks the
+  // dashboard to follow an event until it resolves. Before the `followed` registry existed,
+  // every such resolution was dropped as "untracked" and the Resolved-events table stayed
+  // empty (measured on the live feed: 500 settled markets seen, 0 recorded).
+  const closed = structuredClone(s7);
+  delete closed.markets.T1;                    // the market closed: it is no longer open
+  closed.resolutions = [];                     // its outcome was not known yet
+  const s8 = applySample(closed, {
+    nowSeconds: 15000, markets: [],
+    resolutions: [{ ticker: 'T1', result: 'no', settlement_ts: '2026-11-20T01:00:00Z', settlement_value_dollars: '0.0000' }],
+  });
+  ok(s8.resolutions.length === 1 && s8.resolutions[0].result === 'no',
+    'the resolution of a followed market that has left the open set is still recorded');
+  const s9 = applySample(s8, {
+    nowSeconds: 16000, markets: [],
+    resolutions: [{ ticker: 'NEVER-FOLLOWED', result: 'yes', settlement_ts: '2026-11-20T02:00:00Z' }],
+  });
+  ok(s9.resolutions.length === 1,
+    'a resolution for a market the engine never followed is still counted out, not stored');
 
   // ladder
   const ladder = buildLadder({ orderbook_fp: { yes_dollars: [['0.0100', '200.00'], ['0.4200', '13.00']], no_dollars: [['0.5600', '17.00']] } });
