@@ -2139,8 +2139,8 @@ Rules honoured: `git pull --rebase` before every push; small frequent commits; n
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
 | I1 | Claim this scope on the shared board and push immediately. | in progress | session-96019ad5 | `COORDINATION.md` |
-| I2 | Line-by-line verification of the combined tree: QA battery, build/staleness check, Pages build/deploy status for `main`, feed + snapshot freshness via official records, exec-summary claims vs committed data. | in progress | session-96019ad5 | NEW `verification/2026-11-21-96019ad5.md` (read-only otherwise) |
-| I3 | Refresh the stale "Current operational status" section of `EXECUTIVE_SUMMARY.md` with today's verified numbers (non-destructive; historical findings preserved verbatim). | pending | session-96019ad5 | `EXECUTIVE_SUMMARY.md` |
+| I2 | Line-by-line verification of the combined tree: QA battery, build/staleness check, Pages build/deploy status for `main`, feed + snapshot freshness via official records, exec-summary claims vs committed data. | done | session-96019ad5 | NEW `verification/2026-11-21-96019ad5.md` (read-only otherwise) |
+| I3 | Refresh the stale "Current operational status" section of `EXECUTIVE_SUMMARY.md` with today's verified numbers (non-destructive; historical findings preserved verbatim). | done | session-96019ad5 | `EXECUTIVE_SUMMARY.md` |
 | I4 | Open PR to `main`, merge, confirm the Pages build for the merge commit, record PR/merge result on this board. | pending | session-96019ad5 | `COORDINATION.md` / PR |
 
 ### Overlap check at claim time (2026-11-21, 20:18 UTC)
