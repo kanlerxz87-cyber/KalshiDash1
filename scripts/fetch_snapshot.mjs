@@ -43,7 +43,8 @@ async function getAuth(pathname) {
   if (!keyId || !keyPath) throw new Error('--portfolio needs KALSHI_KEY_ID and KALSHI_PRIVATE_KEY_PATH');
   const key = crypto.createPrivateKey(fs.readFileSync(keyPath));
   const ts = String(Date.now());
-  const signature = sign(key, ts, 'GET', pathname);
+  const signPath = new URL(API + pathname).pathname;
+  const signature = sign(key, ts, 'GET', signPath);
   const res = await fetch(API + pathname, {
     headers: {
       'KALSHI-ACCESS-KEY': keyId,
@@ -55,22 +56,24 @@ async function getAuth(pathname) {
   return res.json();
 }
 
-/* ---- public snapshot pipeline (mirrors docs/js/data.js) ---- */
+/* ---- public snapshot pipeline (mirrors docs/js/data.js) ----
+ * Get Series List documents category, tags, include_product_metadata, include_volume,
+ * and min_updated_ts (no limit parameter): https://docs.kalshi.com/api-reference/market/get-series-list.md */
 const TOPICS = [
   { id: 'gas', label: 'Gas Prices',
-    seriesQueries: ['/series?category=Economics&tags=Oil%20and%20energy&include_volume=true&limit=50', '/series?category=Economics&limit=50'],
+    seriesQueries: ['/series?category=Economics&tags=Oil%20and%20energy&include_volume=true', '/series?category=Economics'],
     match: (s) => /\bgas\b|gasoline|fuel price|SPR\b/i.test(s.title || '') || /GAS|SPR/.test(s.ticker || '') },
   { id: 'elections', label: 'Elections',
-    seriesQueries: ['/series?category=Elections&include_volume=true&limit=50'],
+    seriesQueries: ['/series?category=Elections&include_volume=true'],
     match: (s) => /elect|senate|house|president|mayor|governor|speaker|vote|pope|nato|primary/i.test(s.title || '') },
   { id: 'culture', label: 'Culture',
-    seriesQueries: ['/series?category=Culture&limit=50'],
+    seriesQueries: ['/series?category=Culture'],
     match: () => true },
   { id: 'crypto', label: 'Crypto',
-    seriesQueries: ['/series?category=Crypto&include_volume=true&limit=50'],
+    seriesQueries: ['/series?category=Crypto&include_volume=true'],
     match: () => true },
   { id: 'golf', label: 'Golf',
-    seriesQueries: ['/series?category=Sports&tags=Golf&include_volume=true&limit=50'],
+    seriesQueries: ['/series?category=Sports&tags=Golf&include_volume=true'],
     match: () => true }
 ];
 

@@ -2408,6 +2408,8 @@ session's `awaiting` key was regenerated from the committed `state.json` by its 
 
 ---
 
+---
+
 ## Session `arena/a2706f31-kalshidash1` — final end-to-end verification, no changes required (2026-11-21)
 
 - Session ID: `session-a2706f31`. Branch: `arena/a2706f31-kalshidash1` (Arena-managed; commit/push only here; branched from `b81f9f2731a12fd90e0287cd1d77ded58c35d79e` = `origin/main`, 0 ahead / 0 behind). Status: **active → complete**.
@@ -2568,3 +2570,40 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 - During rebase, `COORDINATION.md` conflicted with session-a2706f31's concurrent verification record (merged as PR #74). Both sections were retained; no other session's files were discarded. Main subsequently advanced through other sessions' PRs and scheduled data writes; this audit's scope remains documentation only.
 - Pages deployment containing PR #73 completed successfully in run [44960595512](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44960595512) on main commit `017bd6343fff754d9085c05a3a7cf831368ba532`. Later scheduled snapshot commit `c39c52f18d4ba29ece39eaa9804762b3406a72c7` also deployed successfully in run [44960678737](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44960678737); Pages API latest completed build for subsequent main commit `14bfb12543a3f6204dd67a6496f33c17682d8a07` was `built`, error `null` ([run 44960717658](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44960717658)). The report is served at [verification/2026-11-21-37562307.md](https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-37562307.md).
 - **Follow-up verification limitation (updated after the audit):** An early PR #77 run failed its alert/link and root-site checks because `build-site --check` reported 22 pages stale while the alert sample timestamp had advanced (HTML at `2026-11-21T17:42:16Z`, feed at `23:13:08Z`). The final integrator corrected the staleness gate in PR #79; the main Site build check then passed (run [44961105747](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105747)). PR #72 was closed unmerged, but its model fix landed through [PR #75](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/75), followed by [PR #78](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/78); both are merged. The first PR #77 branch has not yet been rebased onto those integration commits; rerun its checks after rebase and do not merge unless they pass.
+
+---
+
+## Session `arena/4068bcda-kalshidash1` — `scripts/fetch_snapshot.mjs` `/series` `limit=50` handoff + full line-by-line repo & official-source verification (2026-11-21 23:11 UTC)
+
+- Session ID: `session-4068bcda`. Branch: `arena/4068bcda-kalshidash1` (Arena-managed; branched from `b81f9f2731a12fd90e0287cd1d77ded58c35d79e` on `main`, rebased onto `017bd63`, `172fd98`, `ab441a7`, and `89549ea`; commits and pushes only here).
+- **Rebase conflict log (23:11, 23:19, 23:22 & 23:23 UTC):** `origin/main` advanced from `b81f9f2` to `89549ea` (merging PRs #73–#82). Resolved each `COORDINATION.md` tail conflict by preserving all concurrent sessions' sections (`session-a2706f31`, `session-37562307`, `session-4b5ddd87`, `session-2ea8e33c`) in full alongside this session's claim.
+- **Non-overlapping scope check at claim time:**
+  - Open PR [#72](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/72) (`arena/e7260519-kalshidash1`) and active sibling branches (`arena/4b5ddd87-kalshidash1`, `arena/135bb43a-kalshidash1`, `arena/75d8eb9c-kalshidash1`, `arena/37562307-kalshidash1`) claim alert-model/PR #72 integration, browser paper-trading/chart files (`assets/app.js`, `assets/paper.js`, `assets/chart.js`, `templates/*`), or independent audit reports (`verification/2026-11-21-*`).
+  - None of those sessions claim `scripts/fetch_snapshot.mjs` (left as an open handoff by `session-c144ad6a` above: removing undocumented `limit=50` from `/series` query URLs in `scripts/fetch_snapshot.mjs` to match `scripts/fetch-snapshot.mjs` and the official [Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list.md) parameter list) or `verification/2026-11-21-4068bcda.md`.
+  - Any observation touching files owned by another active session is logged here as a handoff rather than edited directly.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| S1 | Claim scope on `COORDINATION.md`, commit, and push immediately. | done | session-4068bcda | `COORDINATION.md` |
+| S2 | Resolve the unclaimed `scripts/fetch_snapshot.mjs` handoff from `session-c144ad6a`: remove undocumented `limit=50` from the `/series` query URLs in `scripts/fetch_snapshot.mjs` (verified against official [Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list.md) documentation), and fix `getAuth()` to sign the full URL path from root without query parameters (`new URL(API + pathname).pathname`, verified against [Quick Start: Authenticated Requests](https://docs.kalshi.com/getting_started/quick_start_authenticated_requests)). Do not modify `sources.html` or `templates/sources.tpl` (shared/template scope). | **done** | session-4068bcda | `scripts/fetch_snapshot.mjs` |
+| S3 | Line-by-line review of the repository, canonical site pages, data files (`data/snapshot.json`, `data/live/feed.json`, `data/sources.json`, `data/account.json`, `data/cors-probe.json`), and official Kalshi documentation; run full QA test suite; record line-by-line verification and any irregularities/handoffs in `verification/2026-11-21-4068bcda.md`. | **done** | session-4068bcda | `verification/2026-11-21-4068bcda.md` |
+| S4 | Rebase onto `origin/main`, re-verify combined tree and QA battery, open PR from `arena/4068bcda-kalshidash1` to `main`, merge, confirm GitHub Pages deployment, and record PR link and merge result in `COORDINATION.md`. | in progress | session-4068bcda | `COORDINATION.md` |
+
+### Sources, verification & handoffs — session-4068bcda (2026-11-21 23:18 UTC)
+
+- **Official Kalshi documentation re-fetched and verified (`verification/2026-11-21-4068bcda.md` §1):**
+  - [Test In The Demo Environment](https://docs.kalshi.com/getting_started/demo_env) — REST `https://external-api.demo.kalshi.co/trade-api/v2` (`https://demo-api.kalshi.co/trade-api/v2`), WebSocket `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (`wss://demo-api.kalshi.co/trade-api/ws/v2`), mock funds and demo-price caveat.
+  - [API Environments and Endpoints](https://docs.kalshi.com/getting_started/api_environments) — REST/WS roots and request signing path rule (`/trade-api/v2/...` without query string).
+  - [Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list.md) — OpenAPI 3.0.0 (v3.37.0) documents `category`, `tags`, `include_product_metadata`, `include_volume`, `min_updated_ts` (no `limit` parameter).
+  - [Get Events](https://docs.kalshi.com/api-reference/events/get-events.md) — OpenAPI 3.0.0 documents `limit`, `cursor`, `with_nested_markets`, `with_milestones`, `status`, `series_ticker`, `tickers`, `min_close_ts`, `min_updated_ts` (no `category` parameter).
+  - [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets.md) — OpenAPI 3.0.0 confirms `Market` fields (`result`, `last_price_dollars`, `yes_bid_dollars`, `yes_ask_dollars`, `yes_bid_size_fp`, `yes_ask_size_fp`, `volume_fp`, `volume_24h_fp`, `open_interest_fp`, `notional_value_dollars`, `settlement_value_dollars`, `settlement_ts`).
+  - [Orderbook Responses](https://docs.kalshi.com/getting_started/orderbook_responses) — `orderbook_fp.yes_dollars` / `no_dollars` ascending bid arrays (`[price_dollars, count_fp]`) and binary reciprocity (`YES ASK = 1.00 - NO BID`, `NO ASK = 1.00 - YES BID`).
+  - [Market Settlement](https://docs.kalshi.com/getting_started/market_settlement) — $1.00 per winning contract (`yes` / `no`).
+  - [Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md) — `period_interval` `1 | 60 | 1440` minutes, max 5,000 periods.
+  - [Quick Start: Authenticated Requests](https://docs.kalshi.com/getting_started/quick_start_authenticated_requests) & [Quick Start: WebSockets](https://docs.kalshi.com/getting_started/quick_start_websockets) — `KALSHI-ACCESS-KEY`, `KALSHI-ACCESS-TIMESTAMP` (ms), `KALSHI-ACCESS-SIGNATURE` (RSA-PSS SHA-256 / Ed25519 over `timestamp + METHOD + path_without_query`).
+- **Fixes in `scripts/fetch_snapshot.mjs` (S2):**
+  1. Removed undocumented `&limit=50` from all 6 `/series` query URLs (`TOPICS[].seriesQueries`).
+  2. Fixed `getAuth(pathname)` to sign `new URL(API + pathname).pathname` (full path `/trade-api/v2/...` with query string stripped) rather than raw `pathname`.
+- **Full QA battery passed:** `npm test` (engine selftest, feed check, chat flood guard 5/5, resolution logic 16/16, page render, HTML IDs 89 files/0 dupes, row sources 813 enforced rows 100.0% sourced, lab 22/22, CORS evidence 21/21, internal links 90 pages/2,161 links/0 broken), `check_rescore_retained.mjs` (12/12), `check_freshness_badge.mjs` (81/81), `check-data-workflow-shells.mjs` (9 blocks), `check-data-writer-concurrency.mjs` (31/31), `check-keepalive-verdict.mjs` (27/27), `check_links.js` (69/69), `qa_logic_test.mjs`, `alerts-qa.mjs`, `alerts-render-test.mjs`, `qa_alert_test.mjs` — all PASS.
+- **Non-overlapping handoffs logged (not edited here):** `alerts/js/alerts-live.js:186–193` (`limit=200` on `/series`, owned by alerts scope); `templates/sources.tpl` historical `/series?...&limit=50` labels (shared template scope); `.github/workflows/live-alerts.yml` site regeneration on engine write-back (claimed by `session-08b1c207` Task A4).
+
