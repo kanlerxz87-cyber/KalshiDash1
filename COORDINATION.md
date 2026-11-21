@@ -1,5 +1,15 @@
 # COORDINATION.md — shared task board
 
+## Session session-75d8eb9c — final integration: verify PR #72, merge, confirm Pages (2026-11-21)
+
+Branch: `arena/75d8eb9c-kalshidash1` (base `b81f9f2` on `main`).
+
+| Task | Status | Owner | File scope |
+|---|---|---|---|
+| Verify PR #72 (F-71/F-72/F-73 high-ROI tradeability fix) checks, merge to `main`, confirm GitHub Pages deploy, record result | in progress | session-75d8eb9c | `COORDINATION.md` only |
+
+- PR #72 `qa` check (run 44948084471, step 15 `check_rescore_retained.mjs`) failed once; the same script passes locally on the PR head (12 assertions) and a `--failed` re-run of that job succeeded — transient, not a code defect. Owner session `session-e7260519` is not active; no files of that session are touched here.
+
 ## Session session-fd481e62 — final verification, integration audit & Pages check (2026-11-21)
 
 Branch: `arena/fd481e62-kalshidash1` (base `f52ad08` on `main`).
