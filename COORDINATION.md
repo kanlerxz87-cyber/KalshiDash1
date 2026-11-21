@@ -1,5 +1,23 @@
 # COORDINATION.md — shared task board
 
+## Session session-fd481e62 — final verification, integration audit & Pages check (2026-11-21)
+
+Branch: `arena/fd481e62-kalshidash1` (base `f52ad08` on `main`).
+
+| Task | Status | Owner | File scope |
+|---|---|---|---|
+| Full test suite (`npm test`), `build-site.mjs --check`, official Kalshi docs verification (`demo_env`, `api_environments`), PR to `main`, merge, and GitHub Pages deployment confirmation | done | session-fd481e62 | `COORDINATION.md` |
+
+### Verification & Sources — session-fd481e62
+- `npm test` (with `jsdom` installed via `npm ci`): all checks passed (`test:engine`, `test:feed`, `test:guard`, `test:page`, `test:ids`, `test:rows` 813 enforced rows 100% sourced, `test:lab`, `test:links` 90 pages / 2,124 internal links 0 broken).
+- `node scripts/build-site.mjs --check`: passed ("Committed site matches the templates and data.").
+- Official Kalshi documentation verified via `fetch_page`:
+  - `https://docs.kalshi.com/getting_started/demo_env` — Demo REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`), Demo WebSocket `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/trade-api/ws/v2`).
+  - `https://docs.kalshi.com/getting_started/api_environments` — Production and Demo REST/WebSocket endpoints and request signing rules confirmed.
+- Note: Direct `curl` from this sandbox to `external-api.demo.kalshi.co` and `docs.kalshi.com` is blocked by sandbox outbound network policy (TLS EOF); `data/live/feed.json` (generated `2026-11-21T17:42:16Z`) and `data/snapshot.json` (captured `2026-11-21T16:02:38.983Z`) are committed on `main`.
+
+---
+
 ## Session session-4251f2d1 — scheduled data pipeline investigation (2026-11-21)
 
 Arena fixes this session's branch name as `arena/4251f2d1-kalshidash1`. Prior workflow investigation R1 was marked needs review on 2026-11-20; no current activity was found on that scope. This session takes over the unresolved investigation, without disturbing earlier records or open PR #39's alert-deduplication scope.
