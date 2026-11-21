@@ -114,7 +114,7 @@
     those rows: a <strong>follow-through gate</strong> (the quote has to sit where the swing ended, or the row is scored 0 and capped
     at 0.30) and <strong>contract counts beside every quote</strong> (a $0.97 ask &times; 0 contracts is not an offer). Both are
     checked by tests that were verified to fail on the old code. Details and every source link are in
-    <a href="flagged.html#F-68">F-68</a>.</p>
+    <a href="flagged.html#F-71">F-71</a>.</p>
     <p class="small">Recommended next, in the order that would most change what a trader can decide:</p>
     <ol class="small" style="padding-left:20px">
       <li><strong>Show the executable size on the chart.</strong> A price line says nothing about whether $0.10 of movement can be
