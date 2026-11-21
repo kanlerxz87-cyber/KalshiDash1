@@ -23,14 +23,19 @@ const feedText = await readFile(FEED, 'utf8');
 const feed = JSON.parse(feedText);
 
 const awaiting = awaitingResolutions(state, 40);
-const next = { ...feed };
-// Keep key order stable so the diff is readable: insert `awaiting` right after resolutions.
+// Keep key order stable so the diff is readable: `awaiting` sits right after `resolutions`.
+// (A key is written at most once here: assigning it inside the copy loop would let a later
+// `awaiting` key from the old feed overwrite the freshly computed list.)
 const rebuilt = {};
-for (const [k, v] of Object.entries(feed)) {
-  rebuilt[k] = v;
-  if (k === 'resolutions') rebuilt.awaiting = awaiting;
+if ('awaiting' in feed) {
+  for (const [k, v] of Object.entries(feed)) rebuilt[k] = k === 'awaiting' ? awaiting : v;
+} else {
+  for (const [k, v] of Object.entries(feed)) {
+    rebuilt[k] = v;
+    if (k === 'resolutions') rebuilt.awaiting = awaiting;
+  }
+  if (!('awaiting' in rebuilt)) rebuilt.awaiting = awaiting;
 }
-if (!('awaiting' in rebuilt)) rebuilt.awaiting = awaiting;
 
 const out = JSON.stringify(rebuilt, null, 1) + '\n';
 if (checkOnly) {
@@ -38,6 +43,7 @@ if (checkOnly) {
   console.log(same ? `awaiting: up to date (${awaiting.length} rows)` : 'awaiting: STALE (feed differs from state)');
   process.exit(same ? 0 : 1);
 }
+
 await writeFile(FEED, out);
 console.log(`awaiting: wrote ${awaiting.length} row(s) derived from ${STATE}`);
 for (const a of awaiting) console.log(`  ${a.ticker} closes ${a.close_time || '—'}`);
