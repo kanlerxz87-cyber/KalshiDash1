@@ -1,5 +1,38 @@
 # COORDINATION.md — shared task board
 
+## Current Arena session — `session-9bee7c49` (2026-11-21 UTC) — FINAL INTEGRATION
+
+- Session ID: `session-9bee7c49`
+- Branch: `arena/9bee7c49-kalshidash1` (base `84a2dcb` = `main` at claim time).
+- Role: **final integration session.** Line-by-line review of the combined tree, repair of the two
+  workflows that fail on every scheduled run, take-over of the two stale open PRs, re-verification
+  of the combined data against official sources, then PR → `main` → merge → confirm the Pages deploy.
+
+### Overlap check at claim time (read from `origin`, 2026-11-21 ~06:25 UTC) — respected, not duplicated
+
+| Item | Owner | State at claim | Outcome |
+|---|---|---|---|
+| PR **#39** "one swing per ticker per 15 min — stop a flapping market flooding both chat feeds" | `arena/f7490df7-kalshidash1` | open, **last updated 2026-11-20T19:36:20Z (~10.8 h before claim), no commits since** | **Taken over** (session crashed / stale > 60 min, per board rule). The change is reviewed, re-based onto current `main` and carried here. Logged below. |
+| PR **#23** "COORDINATION: record PR #16 merge and Pages result" | `arena/7d6d2fcb-kalshidash1` | open, **last updated 2026-11-20T14:10:07Z (~16 h before claim), record-only** | **Closed** as superseded — the same record already exists on `main` in this board (the `session-7d6d2fcb` block). Nothing is lost by closing; the board history is preserved in git. |
+| `live-alerts` + `Refresh demo data snapshot` scheduled runs | `.github/workflows/` (shared output) | **failing on every scheduled run** since 2026-11-20T21:52Z | Repaired here (task N2). |
+| Everything else on `main` (site, templates, `data/`, `scripts/`, `tools/`, `flagged.html`) | earlier sessions, all merged | merged | re-verified, not rewritten. |
+
+### Task board — session-9bee7c49
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| N1 | **Take over PR #39** (alert flood fix: one swing per ticker per 15 min, direction-independent; plus a feed guard that fails when >50 % of alerts come from one ticker). Review, re-base onto current `main`, re-verify, carry it here. | in progress | session-9bee7c49 | `tools/live_engine.mjs`, `scripts/check_alerts.mjs` |
+| N2 | **Repair the two workflows that fail on every scheduled run.** Root cause established by measurement, not guesswork: (a) the three writer workflows use **three different `concurrency` groups** while `keepalive.yml`'s own comment claims they share one — so they race; (b) each publishes with `git rebase FETCH_HEAD`, and all three commit the *same* generated files (`data/live/feed.json`, `data/live/state.json`) → the rebase conflicts; (c) the failure was never diagnosable because the raw Actions log host is unreachable from the sandbox. Fix = one shared, conflict-free publish helper + one shared concurrency group + `::error::` annotations at every failure point. | in progress | session-9bee7c49 | `.github/workflows/live-alerts.yml`, `.github/workflows/refresh-data.yml`, `.github/workflows/keepalive.yml`, `scripts/publish-data.sh` (new) |
+| N3 | **Line-by-line review of the combined tree** against official sources; record every check, every source link and every irregularity. | in progress | session-9bee7c49 | `verification/2026-11-21-9bee7c49.md` (new), `VERIFICATION.md` |
+| N4 | **Publish the new irregularities** on the site's Flagged for Review page with source links (the two failing workflows; the false "shared concurrency group" comment; the stale PRs; any value that could not be confirmed from an official source). | in progress | session-9bee7c49 | `templates/flagged.tpl`, `flagged.html` (generated) |
+| N5 | **Close the superseded record-only PR #23** and record why. | in progress | session-9bee7c49 | (no file) — `gh pr close 23` |
+| N6 | **PR → `main`, merge without waiting, confirm GitHub Pages deploys**, and record the PR link + merge result here. | in progress | session-9bee7c49 | `COORDINATION.md` (this section only) |
+
+**Non-overlap note.** No other session holds an active claim: every other branch in this repo belongs to a
+session whose last commit is more than 60 minutes old, and both open PRs are covered by rows above.
+The shared outputs (`data/`, `templates/`, generated `*.html`) are taken over by this integration
+session, as the board's rules require.
+
 ## Session on this branch — session-e480a835 (verification + defect-fix pass, 2026-11-20)
 
 - Session ID: `session-e480a835`
