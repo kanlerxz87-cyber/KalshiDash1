@@ -19,7 +19,7 @@
 | I2 | Integrate stale PR #72, reproduce/fix its failed check, re-verify model/alert outputs without inventing data. | done (integrated main; 17 retained-score checks) | session-135bb43a (final integration) | PR #72's existing files via merge; targeted QA fixes as evidenced |
 | I3 | Fix canonical browser simulator only where defects are reproduced: executable YES/NO asks and quantities, no stale/snapshot assumed fills, verifiable performance accounting and final settlement; add offline regression tests. | done (53 paper / 31 DOM; live fills unverified) | session-135bb43a | `assets/app.js`, new `assets/paper.js`, new `scripts/check-paper.mjs`, `package.json`, `.github/workflows/site-qa.yml`, `templates/{market,portfolio,analysis,strategies,executive-summary,flagged}.tpl` |
 | I4 | Verify graph time/source semantics and event links; fix demonstrated issues, not infer news causation. | done (31 DOM; causes stay unverified) | session-135bb43a | `assets/chart.js`, `assets/app.js`, new `scripts/check-market-chart.mjs`, `templates/market.tpl` |
-| I5 | Full requirement/source audit, source-linked report, canonical site build, per-row official-source checks, internal-link checks, integration PR to main, merge and Pages confirmation. | QA done; PR #91 merge/Pages pending | session-135bb43a (final integration) | new `verification/2026-11-21-135bb43a.md`, `README.md`, this board; generated root/category HTML through `scripts/build-site.mjs` only |
+| I5 | Full requirement/source audit, source-linked report, canonical site build, per-row official-source checks, internal-link checks, integration PR to main, merge and Pages confirmation. | done — PR #91 merged; Pages and live assets confirmed | session-135bb43a (final integration) | new `verification/2026-11-21-135bb43a.md`, `README.md`, this board; generated root/category HTML through `scripts/build-site.mjs` only |
 
 ### Integration conflict and handoff log
 
@@ -170,6 +170,38 @@
 - Full `npm test`, read-only build, freshness 81, workflow syntax 9, concurrency 31, keepalive 27
   pass again; 1,018 publisher-linked static rows / zero missing; 2,198 internal links / zero
   broken; 336 external URLs listed (not fetched). I5 awaits actual own merge/deployment evidence.
+
+### Final delivery — DONE (PR #91, 2026-11-21T23:46:58Z)
+
+- [PR #91](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/91) explicitly merged to `main`
+  as **`73c0b8c03e4c00aa613fb3c7ef78af7c60fa4dd5`**, after all PR checks passed. Post-merge
+  [site build 44963457917](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44963457917),
+  [site QA 44963457816](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44963457816),
+  [suite QA 44963457764](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44963457764)
+  and [alerts QA 44963457827](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44963457827)
+  all **success**.
+- [Actual Pages deployment 44963456985](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44963456985)
+  for that merge **success**. [Public market page](https://kanlerxz87-cyber.github.io/KalshiDash1/market.html),
+  [published paper.js](https://kanlerxz87-cyber.github.io/KalshiDash1/assets/paper.js) and
+  [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html) were fetched after
+  deployment: corrected source-linked book/chart copy, `observed-ask-v2` and all new namespaced
+  findings are actually published. The page fetch showed a recent public book observation at
+  23:48:07 UTC; this is not an authenticated account test.
+- Merge-triggered [official snapshot refresh 44963457909](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44963457909)
+  **success**, publishing `d071d6c` with capture **2026-11-21T23:47:07.055Z**. Its own
+  [Pages deployment 44963525141](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44963525141)
+  is **success**; Pages API reports **built**, no error, updated **23:48:09Z**.
+- Fast-forwarded this assigned branch to that post-merge main and reran full `npm test`, read-only
+  build, freshness/writer/shell/keepalive checks and **31 real Chromium desktop/mobile fallback
+  cases**: all pass. 1,018 static publisher-linked rows; 2,198 internal links / zero broken;
+  336 external URLs listed, not fetched by the link gate. No generated browser binaries or
+  screenshots are committed. Source/limits/report: `verification/2026-11-21-135bb43a.md`.
+- **Unverified by design, not hidden:** actual demo authentication/orders/account profit,
+  news causes, strategy ROI/net returns, tick-complete monitoring and an exchange-wide ranking.
+  Account remains `connected:false`, capture null. No credentials requested and no authenticated
+  exchange request/order made. All task claims I1–I5 are complete within these published limits.
+- This closing ledger-only update records the completed release; it does not start another
+  feature/integration chain or rewrite another session's historical records.
 
 ### Initial evidence and limits
 
