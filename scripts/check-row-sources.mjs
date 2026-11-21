@@ -91,9 +91,15 @@ function checkSourceParameterUsage() {
   for (const f of [...REQUIRED, ...REPORT_ONLY, 'data/live/feed.json', 'data/snapshot.json']) {
     if (!existsSync(f)) continue;
     const text = readFileSync(f, 'utf8');
-    for (const re of patterns) {
-      const m = text.match(re);
-      if (m) bad.push(`${f}: ${m[0].slice(0, 90)}`);
+    /* Only real link/URL values count. The Flagged page quotes the ignored parameter inside <code>
+     * as documentation of F-65; that is prose, not a source link, and must not trip the gate. */
+    const urls = f.endsWith('.json')
+      ? [...text.matchAll(/"(https?:[^"]+)"/g)].map((m) => m[1])
+      : [...text.matchAll(/href="([^"]+)"/g)].map((m) => m[1]).map((u) => u.replace(/&amp;/g, '&'));
+    for (const u of urls) {
+      for (const re of patterns) {
+        if (re.test(u)) bad.push(`${f}: ${u.slice(0, 90)}`);
+      }
     }
   }
   if (bad.length) {
