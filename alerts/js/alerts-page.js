@@ -100,7 +100,7 @@
         (isTrade ? '<span class="badge neutral" title="Detected between two consecutive trades — the sharpest public price view">trade</span>' : '') +
         (isCandle ? '<span class="badge neutral" title="Detected from 1-minute candlesticks, not from two samples">candle</span>' : '') +
         (a.book_inconsistent ? '<span class="badge warn" title="The API row for this contract contradicted itself (yes_ask + no_bid != $1); the price came from the other side of the book. See F-49.">quotes inconsistent</span>' : '') +
-        (model.tradeable === false ? '<span class="badge bad" title="At detection the published YES ' + (up ? 'ask' : 'bid') + ' was not at the swing price (' + A.esc((model.reasons || []).filter(function (r) { return /tradeable at the swing price/.test(r); }).join('') || 'see model terms') + '), so this move could not have been executed. It is shown because it is real recorded data, but it is not an opportunity. See F-66.">not tradeable</span>' : '') +
+        (model.tradeable === false ? '<span class="badge bad" title="At detection the published YES ' + (up ? 'ask' : 'bid') + ' was not at the swing price (' + A.esc((model.reasons || []).filter(function (r) { return /tradeable at the swing price/.test(r); }).join('') || 'see model terms') + '), so this move could not have been executed. It is shown because it is real recorded data, but it is not an opportunity. See F-68.">not tradeable</span>' : '') +
         (model.legacy_unfillable ? '<span class="badge warn" title="This row was published before the follow-through check existed. Its v1 score is preserved in model.original_score; the live score is the corrected one.">re-scored (v1 → v2)</span>' : '') +
         (model.highROI ? '<span class="badge accent">model ' + Number(model.score).toFixed(2) + '</span>' : '') +
         '<span class="when" title="' + A.esc(a.ts || '') + '">' + timeAgo(a.ts) + '</span>' +
@@ -175,7 +175,7 @@
         'Their published bid/ask did not corroborate the swing price (for example a “$0.01 → $0.97” print ' +
         'whose YES ask was $0.01), so they could not have been traded at the recorded price. They remain ' +
         'visible in the all-events chat, labelled “not tradeable”, and are listed in ' +
-        '<code>meta.legacy_unfillable_high_roi</code> in the feed. See <a href="../flagged.html#F-66">F-66</a>.' +
+        '<code>meta.legacy_unfillable_high_roi</code> in the feed. See <a href="../flagged.html#F-68">F-68</a>.' +
         '</div>'
       : '';
     var roiHtml = (roi.length
