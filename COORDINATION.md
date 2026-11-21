@@ -2125,6 +2125,21 @@ Please remove or qualify the `/events?category=` “unreliable filter” stateme
 
 Rules honoured: `git pull --rebase` before every push; small frequent commits; no value inferred — anything unconfirmed stays blank and is flagged; never mark anything verified without an official source link.
 
+### Session-93edc454 — completion record (2026-11-21 20:22 UTC)
+
+| ID | Task | Status | Owner | Notes |
+|---|---|---|---|---|
+| V1 | Line-by-line repo review vs brief + official-source verification | **done** | session-93edc454 | `verification/2026-11-21-93edc454.md` — 16-row requirement map, each row traced to file/page |
+| V2 | QA battery | **done** | session-93edc454 | build `--check`, `npm test` (engine/feed/guard/page/ids/rows/lab/links), workflow shells, writer concurrency 31, keepalive 27, freshness badge 53, alerts QA/render/logic — all PASS |
+| V3 | Refresh + freshness re-verify | **blocked (flagged, non-blocking)** | session-93edc454 | live engine from this sandbox fails `ECONNRESET` (no egress to the demo API); data left untouched, nothing fabricated; refresh owned by scheduled `live-alerts` on `main` |
+| V4 | PR → merge → Pages confirmation | **done** | session-93edc454 | PR #59 merged `85382a7`; Pages `built`, `error: null`; live pages fetched post-deploy |
+
+**Sources re-fetched this session:** [demo_env](https://docs.kalshi.com/getting_started/demo_env) · [market_settlement](https://docs.kalshi.com/getting_started/market_settlement) · [quick_start_market_data](https://docs.kalshi.com/getting_started/quick_start_market_data) · [get-market-candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) · [create-order-v2](https://docs.kalshi.com/api-reference/orders/create-order-v2) · live [exchange/status](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status) · live [KXAAAGASW-26NOV23-3.6400](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASW-26NOV23-3.6400).
+
+**Irregularities (unchanged, all published on `flagged.html`, non-blocking):** stale committed feed / scheduler stall (F-58 class) — no values backfilled; culture topic 0 open markets at capture; demo BTC flapping alerts preserved verbatim; real demo-account portfolio blank without the holder's keys (F-24/F-02 class).
+
+**PR:** https://github.com/kanlerxz87-cyber/KalshiDash1/pull/59 — merged 2026-11-21T20:21:40Z as `85382a7`, CI `alerts`/`build`/`qa` all pass, Pages `built`, no deploy error. **No other session's work was discarded**; the branch was rebased onto `main` `84f7a38` (PRs #57/#58 records retained) and one `COORDINATION.md` conflict was resolved by keeping both sessions' sections.
+
 ---
 
 ## Claim — session-96019ad5 (branch `arena/96019ad5-kalshidash1`, base `f52ad08`, 2026-11-21)
