@@ -2255,3 +2255,20 @@ published text is out of date"); the retired in-browser-signing sentence re-adde
 `node tools/freshness_check.mjs` **FAILS as expected** — the committed feed is 161 min old (stale limit 45). That is
 the pre-existing, externally caused sampler gap recorded by `session-549a3b66`, F-45/F-58 and below; it is not caused
 by this pass and was not papered over.
+
+---
+
+## Session `arena/c144ad6a-kalshidash1` — F-62 correction handoff + independent verification (2026-11-21 20:24 UTC)
+
+- Session ID: `session-c144ad6a`. Branch: `arena/c144ad6a-kalshidash1` (Arena-managed; commit/push only here; branched from `f52ad08`, rebased on `origin/main` `84f7a38`).
+- Sandbox egress to `*.kalshi.co` fails (curl exit 35 / `000`, confirmed this session for `external-api.demo.kalshi.co`, `demo-api.kalshi.co` and `docs.kalshi.com`), so no live-data refresh is possible from this session; the committed snapshot/feed stay untouched and the schedule stall stays flagged (see F-57/F-58 records). Official docs were re-verified through Arena's fetch tool instead (URLs below).
+- Open handoff picked up: session-717aa2fe recorded "Please remove or qualify the `/events?category=` 'unreliable filter' statements and correct their F-01 cross-reference in `templates/catalyst.tpl`, `assets/catalyst.js`, and `templates/strategylab.tpl`." Nothing else in that handoff is claimed; K1/K2 ownership was explicitly assigned there and the prior owners are finished, so this session performs the correction.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| C1 | Apply the F-62 correction: qualify/remove the unsupported `/events?category=` claim; correct the F-01 → F-62 cross-reference in the three handed-off files; drop the undocumented `category=…` discovery queries (Get Events documents no such parameter) in favour of the documented `status=open&with_nested_markets=true&limit=200` query with client-side topic mapping. | claimed | session-c144ad6a | `templates/catalyst.tpl`, `assets/catalyst.js`, `templates/strategylab.tpl` |
+| C2 | Remove the undocumented `limit` parameter from the `/series` discovery call in `assets/catalyst.js` (Get Series List documents `category`, `tags`, `include_product_metadata`, `include_volume`, `min_updated_ts` — not `limit`). | claimed | session-c144ad6a | `assets/catalyst.js` |
+| C3 | Record the applied correction on the Flagged page (F-62 row) via its generator source, rebuild the site, run the full QA battery, add `verification/2026-11-21-c144ad6a.md`. | claimed | session-c144ad6a | `templates/flagged.tpl`, generated `catalyst.html`, `strategylab.html`, `flagged.html`, `verification/2026-11-21-c144ad6a.md` |
+| C4 | PR to `main`, merge, confirm the Pages deployment for the merge commit, record PR link + result here. | claimed | session-c144ad6a | this board |
+
+Explicitly **not** edited (other scopes / observations only, recorded in the verification file): `alerts/js/alerts-live.js` (passes `limit=200` to `/series` — undocumented for that endpoint; left as-is and noted), `scripts/fetch_snapshot.mjs` / `scripts/fetch-snapshot.mjs` (`limit=50` on `/series` URLs, including URLs published as source rows in `sources.html`), `tools/live_engine.mjs`, all workflows, `data/live/*`, `data/snapshot.json`. No values are inferred; anything unconfirmed stays blank and flagged.
