@@ -28,6 +28,12 @@ jobs:
       - name: Check internal links across the whole published tree (root, docs/, archive/)
         run: python tools/linkcheck.py
 
+      # session-2ea8e33c (F-75): the generator's --check ignores only the alert sample clock.
+      # Pinned offline: a new feed timestamp passes, a template edit and a changed published
+      # table value still fail. Verified to fail against the pre-fix generator.
+      - name: Staleness check ignores the sample clock and nothing else
+        run: node scripts/check_build_staleness.mjs
+
       - name: Root-site link and template check (project checker)
         run: node scripts/check-links.mjs
 

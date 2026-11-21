@@ -27,15 +27,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Regenerate site, check links, check JS syntax
+      # The staleness check lives inside build-site.mjs (F-75, session-2ea8e33c). It used to be
+      # "regenerate, then fail if git status is dirty", which meant every scheduled data commit
+      # (which rewrites the feed's sample timestamp every ~10 minutes without rebuilding the HTML)
+      # turned the next push red. `--check` compares the committed HTML with a fresh render byte
+      # for byte EXCEPT the #feed-asof sample timestamp, which the page repaints at load. A real
+      # template or table change that was not rebuilt still fails, and --check writes nothing.
+      - name: Committed site is up to date with templates and data
         run: |
-          node scripts/build-site.mjs
+          node scripts/build-site.mjs --check
           node scripts/check-links.mjs
           node --check assets/app.js
-      - name: Fail if the committed site is stale
-        run: |
-          if [ -n "$(git status --porcelain -- '*.html' assets categories data)" ]; then
-            git status --porcelain -- '*.html' assets categories data
-            echo "Generated site is stale: run node scripts/build-site.mjs and commit the result."
+          test -z "$(git status --porcelain)" || {
+            git status --porcelain
+            echo "::error::the build check wrote files; it must be read-only"
             exit 1
-          fi
+          }
