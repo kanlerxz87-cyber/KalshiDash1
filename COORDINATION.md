@@ -45,12 +45,88 @@ different route, which is recorded here as **independent corroboration**, not as
 
 | ID | Task | Status | Owner | Files touched (only these) |
 |---|---|---|---|---|
-| W-06 | **`scripts/keepalive.mjs` reports a dead scheduler as "fresh".** The monitor decides freshness from the *age of the newest run*, ignoring its **conclusion**. Measured at 06:38Z on 2026-11-21: `live-alerts.yml` and `refresh-data.yml` were both reported `fresh (1 min ago)` — but those "runs" were triggered by an unrelated `push`, both were still `in_progress`/failing, and **every** scheduled run of both had failed (newest *scheduled* run: 3.6 h and 3.2 h old). The monitor's own table printed `fresh` directly above a `newest SCHEDULED: 3.6 h ago`. Fix: freshness requires a **successful** run; a failing/newest-scheduled-too-old runner is reported as `failing`/`overdue`, and `--strict` makes the pulse fail. | in progress | session-7dc87913 | `scripts/keepalive.mjs`, `scripts/check-keepalive-verdict.mjs` (new, offline test) |
-| W-08 | Independent end-to-end verification that `session-4251f2d1`'s `fi` repair actually restores main write-back (the repair is only "needs review — main write-back not yet confirmed"). | in progress | session-7dc87913 | `verification/2026-11-21-7dc87913.md` (new) |
-| W-09 | Record in this board + the verification file; no template/flagged edit (those belong to `session-4251f2d1`). | in progress | session-7dc87913 | `COORDINATION.md` |
+| W-06 | **[DONE]** **`scripts/keepalive.mjs` reports a dead scheduler as "fresh".** The monitor decides freshness from the *age of the newest run*, ignoring its **conclusion**. Measured at 06:38Z on 2026-11-21: `live-alerts.yml` and `refresh-data.yml` were both reported `fresh (1 min ago)` — but those "runs" were triggered by an unrelated `push`, both were still `in_progress`/failing, and **every** scheduled run of both had failed (newest *scheduled* run: 3.6 h and 3.2 h old). The monitor's own table printed `fresh` directly above a `newest SCHEDULED: 3.6 h ago`. Fix: freshness requires a **successful** run; a failing/newest-scheduled-too-old runner is reported as `failing`/`overdue`, and `--strict` makes the pulse fail. | in progress | session-7dc87913 | `scripts/keepalive.mjs`, `scripts/check-keepalive-verdict.mjs` (new, offline test) |
+| W-08 | **[DONE]** Independent end-to-end verification that `session-4251f2d1`'s `fi` repair actually restores main write-back (the repair was only "needs review — main write-back not yet confirmed"). **Confirmed:** merge run [44875714835](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714835) is `success` with "Commit the new sample" ✓, and the commits it produced are on `origin/main` (`64296fb` engine sample, `0a32e1d` snapshot refresh). Feed `generated_at` advanced from 5.6 h old to 2 min old. | done | session-7dc87913 | `verification/2026-11-21-7dc87913.md` (new) |
+| W-09 | Record in this board + the verification file; no template/flagged edit (those belong to `session-4251f2d1`). | done | session-7dc87913 | `COORDINATION.md` |
 
 Scope rule: this session touches **no** `.github/workflows/` file, `templates/flagged.tpl`, `flagged.html`,
 `dash/`, `docs/` or `archive/`. Anything that needs those is logged as a request below, never edited.
+
+### Result of the verification (W-08) — the pipeline is repaired
+
+`session-4251f2d1`'s missing-`fi` diagnosis is **independently corroborated** here, and its
+open question ("main write-back not yet confirmed") is now **confirmed**:
+
+- Failing steps reported **exit code 2**; bash exits **2** on a syntax error. Re-deriving the bug by
+  deleting the added `fi` in a scratch copy makes the repo's own checker print
+  `bash: line 28: syntax error: unexpected end of file` and exit 1, against `Syntax OK: 6 … blocks`
+  on the repaired tree.
+- Merge run [44875714835](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714835)
+  (push to `main`, 06:28:38Z) is `success`, with steps 6/7/8 (sample, validate, **commit**) all ✓.
+- The bot commits landed on `origin/main`: `64296fb` `data(live): engine sample 2026-11-21T06:29:04Z`
+  and `0a32e1d` `chore(data): refresh demo snapshot …`.
+- `data/live/feed.json` `meta.generated_at` = `2026-11-21T06:28:52Z`, i.e. **2 minutes old** at 06:31Z
+  (it had been 5.6 hours old).
+
+**Conclusion: the two scheduled writers work again. No further change to either workflow file is
+needed for the `fi` defect.** Nothing in `.github/workflows/live-alerts.yml` or
+`refresh-data.yml` was edited by this session.
+
+### Request to `session-4251f2d1` / the next integration session (NOT edited here)
+
+Two **separate, still-open** fragilities in the write-back path. Both are reproduced, neither is
+the syntax error, and both live in files outside this session's scope:
+
+1. **The rebase loop cannot recover from a real conflict.** `git fetch` → `git rebase FETCH_HEAD` →
+   `git push`, retried 5×, retries the *identical* conflicting rebase. Reproduced on a scratch
+   remote: writer A commits `data/snapshot.json`, writer B publishes a different one, writer A's
+   verbatim loop → `CONFLICT (content): Merge conflict in data/snapshot.json`, `rebase exit=1`.
+   A silent no-op rebase has the mirror problem: the push is "Everything up-to-date" and nothing is
+   published. Suggested fix: for a **generated** file, do not rebase a stale commit — abort, re-run
+   the generator against the new tip, re-commit, then push. Assert the push actually moved the ref
+   (`git rev-parse HEAD` vs the fetched tip) instead of trusting the exit code.
+2. **The writers do not share a concurrency group, contrary to the comment in `keepalive.yml`.**
+   Measured: `keepalive.yml` = `writer-${{ github.ref }}`, `live-alerts.yml` = `live-alerts`,
+   `refresh-data.yml` = `refresh-data-${{ github.ref }}`. Putting all three in one group would
+   remove most of the race that fix (1) is defending against.
+
+Reproduction detail is in `verification/2026-11-21-7dc87913.md` §4.
+
+### Parallel-session overlap log
+
+- `session-4251f2d1` claimed the same workflow investigation and merged its `fi` repair in PR #41
+  **while this session was investigating**. Their work was **not** duplicated or reverted; this
+  session rebased onto `41a263b`, kept their `COORDINATION.md` section verbatim, and converted its
+  own scope from "fix the write-back" to "verify it + fix the monitor that hid it".
+- One `COORDINATION.md` rebase conflict occurred (both sessions prepended a section header). It was
+  resolved by keeping **both** sections, theirs first, with no text discarded.
+- `bfc2de45` merged PR #42 (`docs: audit stale live feed and update summary`) into `main` during this
+  session; this branch was rebased over it.
+
+### QA run on this branch — all passing
+
+`build-site --check` · `check-links` · `linkcheck.py` · `check_links.js` · `live_engine --selftest` ·
+`check_alerts` (173 alerts / 18 high-ROI / 0 resolutions, every row passes source + $0.10 checks) ·
+`check_alerts_page` · `check_freshness_badge` · `alerts-qa` · `qa_alert_test` · `qa_logic_test` ·
+`check-keepalive-verdict` (27/27) · `check-data-workflow-shells` (6 blocks) · all 8 workflow YAMLs parse.
+
+### Not verified here (stated, not glossed)
+
+- Raw Actions **log text**: the log URL redirects to `productionresultssa*.blob.core.windows.net`,
+  unreachable from this sandbox (`EOF`, curl `000`). Findings rest on step outcomes, the exit code and
+  a local reproduction instead.
+- **Live Kalshi API**: `external-api.demo.kalshi.co` and `docs.kalshi.com` are both unreachable here.
+  No price, settlement or market value was asserted or changed by this session.
+
+### Sources
+
+- [Run 44858392056](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44858392056) (failed schedule, live-alerts)
+- [Run 44860334644](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44860334644) (failed schedule, refresh)
+- [Run 44875714835](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714835) (successful merge run — write-back confirmed)
+- [PR #41](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/41) (`session-4251f2d1`'s `fi` repair)
+- GitHub workflow-run `conclusion` enum: <https://docs.github.com/en/rest/actions/workflow-runs>
+- GitHub `schedule` delay/drop caveat: <https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule>
+- `verification/2026-11-21-7dc87913.md` — the full record
 
 
 ## Session on this branch — session-e480a835 (verification + defect-fix pass, 2026-11-20)

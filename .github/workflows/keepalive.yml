@@ -49,6 +49,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/keepalive.mjs'
+      - 'scripts/keepalive-verdict.mjs'
+      - 'scripts/check-keepalive-verdict.mjs'
       - 'tools/freshness_check.mjs'
       - '.github/workflows/keepalive.yml'
 
@@ -76,19 +78,32 @@ jobs:
       - name: Syntax check
         run: |
           node --check scripts/keepalive.mjs
+          node --check scripts/keepalive-verdict.mjs
+          node --check scripts/check-keepalive-verdict.mjs
           node --check tools/freshness_check.mjs
           node --check tools/live_engine.mjs
 
       # Offline assertions first: if the engine's logic is broken, no network call is worth making.
+      - name: Monitor verdict logic test (offline)
+        run: node scripts/check-keepalive-verdict.mjs
+
       - name: Engine logic selftest
         run: node tools/live_engine.mjs --selftest
 
-      # Records, before this pulse does anything, how long ago each sampler last actually ran —
-      # including the "scheduled run: never" fact that motivated this workflow.
-      - name: When did the samplers last run?
+      # Records, before this pulse does anything, when each sampler last actually SUCCEEDED —
+      # not merely when it last ran. The distinction is measured, not theoretical: on
+      # 2026-11-21 this monitor called two dead workflows "fresh (1 min ago)" because it looked
+      # only at run age, and their newest *run* was an unrelated push.
+      # Non-fatal on purpose: GitHub's schedule is documented to delay and drop runs
+      # (https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule),
+      # so a dropped cron is a known, flagged limitation (F-58) and must not mask the fact that
+      # this pulse itself just sampled, committed and published successfully. The freshness gate
+      # at the end of the job remains the single hard failure.
+      - name: When did the samplers last SUCCEED?
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/keepalive.mjs --stale-minutes 20 || true
+          KEEPALIVE_SELF: keepalive.yml
+        run: node scripts/keepalive.mjs --stale-minutes 20 --exclude-self || true
 
       - name: Sample the demo API (the alert engine)
         id: engine
