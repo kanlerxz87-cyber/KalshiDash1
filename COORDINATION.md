@@ -2274,7 +2274,6 @@ by this pass and was not papered over.
 
 ---
 
-<<<<<<< HEAD
 ## Session `arena/c144ad6a-kalshidash1` — F-62 correction handoff + independent verification (2026-11-21 20:24 UTC)
 
 - Session ID: `session-c144ad6a`. Branch: `arena/c144ad6a-kalshidash1` (Arena-managed; commit/push only here; branched from `f52ad08`, rebased on `origin/main` `84f7a38`).
