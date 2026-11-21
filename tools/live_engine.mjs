@@ -1261,6 +1261,12 @@ export function mergeCandleAlerts(state, candleAlerts) {
     a.volume_fp = m.volume_fp ?? null;
     a.yes_bid_dollars = m.yes_bid_dollars ?? null;
     a.yes_ask_dollars = m.yes_ask_dollars ?? null;
+    /* Carried so the chat can answer "how many contracts are at this price" (brief requirement).
+     * Measured 2026-11-21: 37 of 38 published rows had no size at all because these two fields
+     * were never copied here, even when the sampled market row had them. */
+    a.yes_bid_size_fp = m.yes_bid_size_fp ?? null;
+    a.yes_ask_size_fp = m.yes_ask_size_fp ?? null;
+    a.open_interest_fp = m.open_interest_fp ?? null;
     a.close_time = m.close_time ?? null;
     a.rules_primary = m.rules_primary ?? null;
     next.alerts.push(a);
@@ -1779,6 +1785,11 @@ export async function selftest() {
   ok(s4.alerts.length === 1, 'no duplicate alert when the price is unchanged after an alert');
   const s5 = applySample(s4, { nowSeconds: 12000, markets: [mk('T1', 0.41, 1000)] });
   ok(s5.alerts.length === 1, 'cooldown expiry alone does not re-alert without another move');
+
+  // sizes are carried onto an alert (they were silently dropped before 2026-11-21)
+  const withSize = s3.alerts[0] || {};
+  ok(withSize.yes_bid_size_fp === '100.00' && withSize.yes_ask_size_fp === '100.00',
+    'a swing keeps the contract counts behind each quote (got ' + withSize.yes_bid_size_fp + '/' + withSize.yes_ask_size_fp + ')');
 
   // resolutions
   const s6 = applySample(s5, {

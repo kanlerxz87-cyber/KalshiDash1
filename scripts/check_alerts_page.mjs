@@ -55,6 +55,7 @@ const feed = {
       direction: 'up', from: 0.01, to: 0.97, delta: 0.96, abs_delta: 0.96, threshold: THRESHOLD,
       baseline_kind: 'previous trade within 30 min', detection: 'trade',
       yes_bid_dollars: '0.0000', yes_ask_dollars: '0.0100',
+      yes_bid_size_fp: '0.00', yes_ask_size_fp: '0.00',
       volume_24h_fp: '69487.15', volume_fp: '72323803.03', est_traded_dollars: 70154088.94,
       source_url: BASE + '/markets/trades?ticker=KXPHANTOM-1&limit=1000',
       model: {
@@ -220,6 +221,11 @@ check(logAll.includes('re-scored (v1'), 'the phantom swing is labelled as re-sco
 check(logAll.includes('0.78'), 'the original v1 score is still visible for audit');
 check(!logRoi.includes('KXPHANTOM-1'), 'the phantom swing can never appear in the high-ROI chat');
 check(!logRoi.includes('0.779'), 'the withdrawn high-ROI score is not shown as current');
+
+/* Contracts available at the quoted price must be visible per alert (brief requirement). */
+const logAllText = doc.getElementById('log-all').textContent;
+check(/×\s*[\d,]+/.test(logAllText), 'each quote shows how many contracts sit behind it, got: ' + logAllText.slice(0, 200));
+check(/× 0/.test(logAllText), 'a zero-size quote is called out rather than looking tradeable');
 
 // threshold discipline: every rendered alert is >= $0.10
 const rendered = [...doc.querySelectorAll('#log-all .msg')];
