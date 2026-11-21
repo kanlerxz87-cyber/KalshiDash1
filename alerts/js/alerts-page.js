@@ -278,6 +278,42 @@
     }).join('');
   }
 
+  /* ---------------- awaiting-resolution table ---------------- */
+
+  function renderAwaiting() {
+    var tb = document.querySelector('#await-table tbody');
+    if (!tb) return;
+    var rows = A.awaiting();
+    var note = document.getElementById('awaiting-note');
+    if (note) {
+      note.textContent = rows.length
+        ? rows.length + ' contract(s) followed and unresolved at the last engine sample '
+          + ((A.state.feed && A.state.feed.meta && A.state.feed.meta.generated_at) || '') + '.'
+        : 'No followed contract is unresolved at the last engine sample.';
+    }
+    if (!rows.length) {
+      tb.innerHTML = '<tr><td colspan="7" class="empty">No followed contracts awaiting a result. ' +
+        'A row appears here after this engine publishes an alert for that market.</td></tr>';
+      return;
+    }
+    tb.innerHTML = rows.map(function (r) {
+      var waiting = r.close_time ? 'close_time passed ' + r.close_time + '; awaiting settlement' : 'awaiting settlement';
+      if (r.close_time && Date.parse(r.close_time) > Date.now()) waiting = 'close_time ' + r.close_time;
+      return '<tr>' +
+        '<td>' + A.esc(r.title || r.ticker) + '<br><code class="small muted">' + A.esc(r.ticker) + '</code></td>' +
+        '<td>' + A.esc(A.topicLabel(r.topic)) + '</td>' +
+        '<td class="num small nowrap">' + (r.last_alert_delta === null || r.last_alert_delta === undefined ? '—'
+          // sign before the currency symbol: usd(-0.54) would render "$-0.54"
+          : (r.last_alert_delta > 0 ? '+' : (r.last_alert_delta < 0 ? '−' : '')) + A.usd(Math.abs(r.last_alert_delta), 2)) +
+          '<br>' + A.esc((r.last_alert_ts || '').replace('T', ' ').replace(/\.\d+Z$/, 'Z') || '—') + '</td>' +
+        '<td class="small nowrap">' + A.esc((r.close_time || '—').replace('T', ' ').replace(/\.\d+Z$/, 'Z')) + '</td>' +
+        '<td class="num">' + (r.last_price_dollars === null ? '—' : A.usd(A.num(r.last_price_dollars), 2)) + '</td>' +
+        '<td class="small">' + A.esc(waiting) + '</td>' +
+        '<td class="src">' + (r.source_url ? '<a href="' + A.esc(r.source_url) + '" target="_blank" rel="noopener">API</a>' : '—') + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
   /* ---------------- resolution table ---------------- */
 
   function renderResolutions() {
@@ -506,6 +542,7 @@
     renderStats();
     renderMarkets('markets-table');
     renderResolutions();
+    renderAwaiting();
     renderLadders();
     drawChart();
     setMode();

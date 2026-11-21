@@ -462,6 +462,7 @@ export function marketsQueryUrl(seriesTicker, extra = {}) {
   p.set('series_ticker', seriesTicker);
   if (extra.status) p.set('status', extra.status);
   if (extra.minSettledTs) p.set('min_settled_ts', String(extra.minSettledTs));
+  if (extra.maxSettledTs) p.set('max_settled_ts', String(extra.maxSettledTs));
   p.set('limit', String(extra.limit || 200));
   if (extra.cursor) p.set('cursor', extra.cursor);
   return `/markets?${p.toString()}`;
@@ -638,6 +639,9 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
   next.history = next.history || {};
   next.markets = next.markets || {};
   next.resolutions = next.resolutions || [];
+  // Every ticker this engine has ever tracked, so a resolution is still recognised after the
+  // 300-row market cap evicts a small row (F-66). Tiny: ticker -> topic.
+  next.settled_markets = next.settled_markets || {};
 
   // Merged, not reset: runOnce() calls applySample() twice (samples, then resolutions) and a
   // reset would report "0 markets sampled" for a run that sampled dozens.
@@ -809,10 +813,43 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
   for (const r of resolutions) {
     if (!r || !r.ticker) continue;
     if (r.result !== 'yes' && r.result !== 'no' && r.result !== 'scalar') continue;
-    if (!tracked.has(r.ticker)) { untracked += 1; continue; }
     if (next.resolutions.some((x) => x.ticker === r.ticker)) continue;
+    // A tracked market can be evicted from `next.markets` by the 300-row cap below (or by the
+    // earlier prune of a previous run) before its result is published. It is still a market this
+    // engine followed, and `settled_markets` remembers that, so its resolution is not dropped.
+    // Anything never tracked stays a count, not a row (see F-66).
+    if (!tracked.has(r.ticker) && !next.settled_markets?.[r.ticker]) { untracked += 1; continue; }
     next.resolutions.push(r);
+    // Keep the resolved row itself: `result`/`settlement_value_dollars` are the exchange's own
+    // yes/no answer, and the site reads them on the market page after the market leaves the
+    // open-market boards.
+    if (next.markets?.[r.ticker]) {
+      next.markets[r.ticker].result = r.result;
+      next.markets[r.ticker].status = r.status || next.markets[r.ticker].status;
+      next.markets[r.ticker].settlement_ts = r.settlement_ts ?? next.markets[r.ticker].settlement_ts;
+      next.markets[r.ticker].settlement_value_dollars = r.settlement_value_dollars ?? next.markets[r.ticker].settlement_value_dollars;
+    }
+    if (next.alerts.some((a) => a.ticker === r.ticker)) {
+      next.history[r.ticker] = next.history[r.ticker] || [];
+    }
   }
+  // A market that is no longer on an open board is still on this engine's follow list until its
+  // result is known; if the sample moved it here, restore it so the row keeps its final answer.
+  for (const r of next.resolutions) {
+    if (!next.markets[r.ticker] && next.settled_markets[r.ticker]) {
+      next.markets[r.ticker] = {
+        ticker: r.ticker, event_ticker: r.event_ticker || null, series_ticker: r.series_ticker || null,
+        topic: r.topic || next.settled_markets[r.ticker], title: r.title || null,
+        status: r.status || 'finalized', result: r.result,
+        price: r.last_price_dollars === null || r.last_price_dollars === undefined ? null : Number(r.last_price_dollars),
+        close_time: r.close_time || null, settlement_ts: r.settlement_ts || null,
+        settlement_value_dollars: r.settlement_value_dollars ?? null,
+        rules_primary: r.rules_primary || null, contract_terms_url: r.contract_terms_url || null,
+        source_url: r.source_url || null, resolved: true,
+      };
+    }
+  }
+
   next.run.untracked_settled_seen = (next.run.untracked_settled_seen || 0) + untracked;
   next.resolutions.sort((a, b) => String(b.settlement_ts || '').localeCompare(String(a.settlement_ts || '')));
   next.resolutions = next.resolutions.slice(0, MAX_RESOLUTIONS);
@@ -839,11 +876,35 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
   const keep = new Set(topMarketsByTopic(next, MAX_HISTORY_MARKETS).map((m) => m.ticker));
   for (const ticker of Object.keys(next.history)) if (!keep.has(ticker)) delete next.history[ticker];
 
+  // Remember what is tracked BEFORE the cap below evicts rows, so a later resolution for an
+  // evicted market is still attributed to this engine (F-66).
+  for (const [ticker, m] of Object.entries(next.markets)) {
+    if (m && m.topic) next.settled_markets[ticker] = m.topic;
+  }
+  // Markets the engine follows to the end are never evicted while they are still waiting for a
+  // result: evicting them is what silently broke resolution tracking. They are few (only
+  // markets that produced at least one alert), so they are kept outside the 300-row budget.
+  const resolvedAt = new Map((next.resolutions || []).map((r) => [r.ticker, Date.parse(r.settlement_ts || '') / 1000]));
+  // "Followed" = this engine published at least one alert for the market. Those are the markets
+  // the brief asks to carry to a yes/no answer, and there are only a handful of them.
+  const followed = new Set(
+    next.alerts.map((a) => a.ticker).filter((t) => {
+      const at = resolvedAt.get(t);
+      if (at !== undefined) return Number.isFinite(at) ? nowSeconds - at < 7 * 86400 : true;
+      // Not resolved yet: keep it only while the question is still live, so a market the demo API
+      // never settles cannot grow this file without limit.
+      const close = Date.parse(next.markets[t]?.close_time || '') / 1000;
+      return !Number.isFinite(close) || close > nowSeconds - 30 * 86400;
+    }),
+  );
   const marketTickers = Object.keys(next.markets);
-  if (marketTickers.length > 300) {
-    const ordered = topMarkets(next, 300).map((m) => m.ticker);
-    const keepMarkets = new Set(ordered);
-    for (const ticker of marketTickers) if (!keepMarkets.has(ticker)) delete next.markets[ticker];
+  const budget = 300;
+  if (marketTickers.length > budget) {
+    const keepMarkets = new Set(topMarkets(next, budget).map((m) => m.ticker));
+    for (const ticker of marketTickers) {
+      if (keepMarkets.has(ticker) || followed.has(ticker)) continue;
+      delete next.markets[ticker];
+    }
   }
 
   // Only a compact discovery summary is kept: the raw series rows carry long prohibition
@@ -871,26 +932,73 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
 /**
  * For every tracked market that is no longer open, read its settled state.
  * Uses GET /markets?series_ticker=..&status=settled (S4) and GET /markets/{ticker} (S5).
+ *
+ * Two properties this must keep, both measured as defects on 2026-11-21 (F-66):
+ *  1. A series can publish far more settled strikes than one page holds (`limit` is capped at
+ *     1000 by S4). Requesting `status=settled` alone sorts by *creation* time, newest first, so
+ *     the page is full of recently created strikes rather than recent settlements, and a market
+ *     that resolved this hour can be missed. S4 documents that `min_settled_ts`/`max_settled_ts`
+ *     sort by settlement time, latest first, and are the filters compatible with `status=settled`;
+ *     the request below therefore uses `min_settled_ts` (with an overlap window) and still follows
+ *     the cursor within a fixed budget.
+ *  2. Only markets still waiting for an answer are requested, and series whose tracked markets
+ *     closed most recently are looked at first, so the request budget is spent where a
+ *     resolution can actually exist. Previously the first 12 series in insertion order were
+ *     polled forever, even after every one of their tracked markets had resolved.
  */
-export async function collectResolutions(client, state, { maxSeries = 12, log = () => {} } = {}) {
-  const trackedSeries = new Set();
-  for (const m of Object.values(state.markets || {})) {
-    if (m && m.series_ticker) trackedSeries.add(m.series_ticker);
+export const SETTLE_OVERLAP_SECONDS = 900;
+
+export async function collectResolutions(client, state, { maxSeries = 12, maxPages = 2, nowSeconds = null, since = null, log = () => {} } = {}) {
+  const now = nowSeconds === null ? Math.floor(Date.now() / 1000) : nowSeconds;
+  const resolvedTickers = new Set((state.resolutions || []).map((r) => r.ticker));
+  const pending = Object.values(state.markets || {}).filter((m) => m && m.series_ticker && !resolvedTickers.has(m.ticker));
+  const pendingTickers = new Set(pending.map((m) => m.ticker));
+
+  const bySeries = new Map();
+  for (const m of pending) {
+    if (!bySeries.has(m.series_ticker)) bySeries.set(m.series_ticker, []);
+    bySeries.get(m.series_ticker).push(m);
   }
+  const lastClose = (rows) => rows.reduce((acc, r) => {
+    const t = Date.parse(r.close_time || '') / 1000;
+    return Number.isFinite(t) && t <= now && t > acc ? t : acc;
+  }, 0);
+  const list = [...bySeries.entries()]
+    .map(([series_ticker, rows]) => ({ series_ticker, rows, closedAt: lastClose(rows) }))
+    // A tracked market that has already passed close_time is the likeliest to have settled.
+    .sort((a, b) => (b.closedAt - a.closedAt) || (b.rows.length - a.rows.length))
+    .slice(0, maxSeries)
+    .map((s) => s.series_ticker);
+
+  // Only settlements newer than the previous sample (plus an overlap) are relevant; without this
+  // the newest page can be entirely older settlements for a busy series.
+  const previousRun = Date.parse(state.meta?.generated_at || '') / 1000;
+  const minSettledTs = Number.isFinite(since)
+    ? since
+    : (Number.isFinite(previousRun) ? Math.max(0, Math.floor(previousRun) - SETTLE_OVERLAP_SECONDS) : null);
+
   const out = [];
-  const list = [...trackedSeries].slice(0, maxSeries);
   for (const st of list) {
-    const path = marketsQueryUrl(st, { status: 'settled', limit: 100 });
     let data;
-    try {
-      data = await client.getJson(path);
-    } catch (e) {
-      log(`  settled lookup failed for ${st}: ${e.message}`);
-      continue;
-    }
-    for (const m of data.markets || []) {
-      if (m.result !== 'yes' && m.result !== 'no' && m.result !== 'scalar') continue;
-      out.push({
+    let cursor = '';
+    let pages = 0;
+    do {
+      const path = marketsQueryUrl(st, {
+        status: 'settled', limit: 1000, minSettledTs, cursor: cursor || null,
+      });
+      try {
+        data = await client.getJson(path);
+      } catch (e) {
+        log(`  settled lookup failed for ${st}: ${e.message}`);
+        data = null;
+        break;
+      }
+      pages += 1;
+      cursor = data.cursor || '';
+      for (const m of data.markets || []) {
+        if (!pendingTickers.has(m.ticker)) continue;      // counted as untracked below
+        if (m.result !== 'yes' && m.result !== 'no' && m.result !== 'scalar') continue;
+        out.push({
         ticker: m.ticker,
         event_ticker: m.event_ticker || null,
         series_ticker: st,
@@ -907,8 +1015,9 @@ export async function collectResolutions(client, state, { maxSeries = 12, log = 
         contract_terms_url: (state.markets?.[m.ticker] || {}).contract_terms_url || null,
         source_url: client.base + path,
       });
-      log(`  resolved: ${m.ticker} -> ${m.result}`);
-    }
+        log(`  resolved: ${m.ticker} -> ${m.result}`);
+      }
+    } while (cursor && pages < maxPages);
   }
   return out;
 }
@@ -1314,6 +1423,7 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
           run: next.run,
           alerts: next.alerts.slice(0, 200),
           resolutions: next.resolutions.slice(0, 100),
+          awaiting: awaitingResolutions(next, 40),
           markets: topMarkets(next, 60),
           by_topic: boardByTopic(next, 24),
           topics: next.topics || {},
@@ -1359,6 +1469,35 @@ export function boardByTopic(state, perTopic = 24) {
   return out;
 }
 
+/**
+ * Markets the engine has alerted on and is still following to a yes/no answer. This is the
+ * published evidence for "track live events until the events have resolved": each row says what
+ * it is waiting for (`waiting_for`: close_time / settlement) and links the API row behind it.
+ */
+export function awaitingResolutions(state, limit = 40) {
+  const resolved = new Set((state.resolutions || []).map((r) => r.ticker));
+  const alerted = [...new Set((state.alerts || []).map((a) => a.ticker))];
+  return alerted
+    .filter((t) => !resolved.has(t))
+    .map((t) => {
+      const m = state.markets?.[t];
+      if (!m) return null;
+      const lastAlert = (state.alerts || []).find((a) => a.ticker === t) || {};
+      return {
+        ticker: t, title: m.title || null, topic: m.topic || null,
+        event_ticker: m.event_ticker || null, series_ticker: m.series_ticker || null,
+        close_time: m.close_time || null, expected_expiration_time: m.expected_expiration_time || null,
+        status: m.status || null, last_price_dollars: m.last_price_dollars ?? null,
+        last_alert_ts: lastAlert.ts || null, last_alert_delta: lastAlert.delta ?? null,
+        tracking_since: (state.alerts || []).filter((a) => a.ticker === t).slice(-1)[0]?.ts || null,
+        source_url: m.source_url || null, rules_primary: m.rules_primary || null,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => String(a.close_time || '9999').localeCompare(String(b.close_time || '9999')))
+    .slice(0, limit);
+}
+
 /** Highest estimated traded dollars first — the brief's "highest dollar amount" ranking. */
 export function topMarkets(state, limit = 60) {
   return Object.values(state.markets || {})
@@ -1381,7 +1520,7 @@ export function slimHistory(state, limit = 12) {
  * Offline check of the pure logic. No network. Exits non-zero on any failed assertion,
  * so CI catches a regression in threshold handling or scoring.
  */
-export function selftest() {
+export async function selftest() {
   const fails = [];
   const ok = (cond, msg) => { if (!cond) fails.push(msg); };
 
@@ -1478,6 +1617,82 @@ export function selftest() {
   ok(s6.resolutions.length === 1 && s6.resolutions[0].result === 'yes', 'a resolution is recorded with its yes/no result');
   const s7 = applySample(s6, { nowSeconds: 14000, markets: [], resolutions: [{ ticker: 'T1', result: 'yes' }, { ticker: 'BAD', result: '' }] });
   ok(s7.resolutions.length === 1, 'resolutions de-duplicate and never store an empty result');
+
+  // resolution tracking survives the market cap (F-66).
+  // A market that produced an alert is small next to hundreds of bigger rows; before the fix the
+  // 300-row cap evicted it and its later yes/no result was discarded as "untracked".
+  const baseline = applySample(structuredClone(EMPTY_STATE), { nowSeconds: 19900, markets: [mk('SMALL', 0.30, 1)], runId: 'cap0' });
+  const many = [mk('SMALL', 0.45, 1)];
+  for (let i = 0; i < 400; i += 1) many.push(mk('BIG' + i, 0.50, 1000000));
+  const cappedAlerted = applySample(baseline, { nowSeconds: 20000, markets: many, runId: 'cap1' });
+  ok(cappedAlerted.alerts.some((a) => a.ticker === 'SMALL'), 'the followed market alerts inside the crowded sample');
+  ok(Object.keys(cappedAlerted.markets).length <= 301, `the 300-row market cap still bounds the map (${Object.keys(cappedAlerted.markets).length})`);
+  const cappedResolved = applySample(cappedAlerted, {
+    nowSeconds: 20200, markets: [],
+    resolutions: [{ ticker: 'SMALL', result: 'no', status: 'finalized', settlement_ts: '2026-11-21T07:00:00Z' }], runId: 'cap2',
+  });
+  ok(cappedResolved.resolutions.length === 1 && cappedResolved.resolutions[0].result === 'no',
+    'a resolution is kept for a tracked market that no longer fits the market map');
+  ok(cappedResolved.markets.SMALL && cappedResolved.markets.SMALL.result === 'no',
+    'the resolved row itself keeps the exchange result for the market page');
+  ok(cappedResolved.settled_markets && cappedResolved.settled_markets.SMALL === 'crypto',
+    'the ticker stays remembered as tracked after eviction');
+  const never = applySample(cappedResolved, {
+    nowSeconds: 20300, markets: [],
+    resolutions: [{ ticker: 'NEVER-SEEN', result: 'yes', status: 'finalized', settlement_ts: '2026-11-21T07:00:00Z' }], runId: 'cap3',
+  });
+  ok(never.resolutions.length === 1 && never.run.untracked_settled_seen >= 1,
+    'a settled market this engine never followed stays a count, not a row');
+
+  // collectResolutions: paging + pending-only + newest-close first (F-66)
+  const fakeClient = (pages) => {
+    const calls = [];
+    return {
+      base: 'https://example.invalid/trade-api/v2',
+      calls,
+      async getJson(path) {
+        calls.push(path);
+        const series = (path.match(/series_ticker=([^&]+)/) || [])[1];
+        const cursor = (path.match(/cursor=([^&]+)/) || [])[1] || '';
+        const page = cursor === 'p2' ? 1 : 0;
+        const p = pages[series];
+        if (!p) return { cursor: '', markets: [] };
+        return { cursor: page === 0 && p.length > 1 ? 'p2' : '', markets: p[page] || [] };
+      },
+    };
+  };
+  const cState = {
+    markets: {
+      // closed an hour ago -> should be looked at first
+      LATE: { ticker: 'LATE', series_ticker: 'S_LATE', topic: 'crypto', close_time: '2026-11-21T06:00:00Z', status: 'active' },
+      // still open, and settled results exist for it only on page 2
+      OPEN2: { ticker: 'OPEN2', series_ticker: 'S_OPEN', topic: 'gas', close_time: '2027-01-01T00:00:00Z', status: 'active' },
+      DONE: { ticker: 'DONE', series_ticker: 'S_DONE', topic: 'golf', close_time: '2026-11-01T00:00:00Z', status: 'active' },
+    },
+    resolutions: [{ ticker: 'DONE', result: 'yes' }],
+    alerts: [],
+    meta: { generated_at: '2026-11-21T07:00:00Z' },
+  };
+  const cClient = fakeClient({
+    S_LATE: [
+      [{ ticker: 'OTHER', result: 'yes' }],
+      [{ ticker: 'LATE', result: 'yes', status: 'finalized', settlement_ts: '2026-11-21T07:00:00Z', settlement_value_dollars: '1.0000' }],
+    ],
+    S_OPEN: [[{ ticker: 'OTHER2', result: 'no' }], [{ ticker: 'OPEN2', result: 'no', status: 'finalized', settlement_ts: '2026-11-21T07:00:00Z' }]],
+  });
+  const found = await collectResolutions(cClient, cState, { maxSeries: 12, maxPages: 5, nowSeconds: Date.parse('2026-11-21T07:10:00Z') / 1000 });
+  ok(found.length === 2 && found.some((r) => r.ticker === 'LATE') && found.some((r) => r.ticker === 'OPEN2'),
+    `settled results are found past page 1 and only for pending tickers (got ${found.map((r) => r.ticker).join(',') || 'none'})`);
+  ok(cClient.calls.every((p) => !p.includes('S_DONE')), 'a series whose tracked markets all resolved is no longer polled');
+  ok(cClient.calls[0].includes('S_LATE'), 'the series with the most recent close_time is polled first');
+  ok(cClient.calls.every((p) => p.includes('limit=1000')), 'the settled page is requested at the documented 1000-row maximum');
+  ok(cClient.calls.every((p) => p.includes('min_settled_ts=')), 'settled lookups sort by settlement time via min_settled_ts (S4)');
+  const sinceState = { ...cState, meta: { generated_at: '2026-11-21T07:00:00Z' } };
+  const sinceClient = fakeClient({ S_LATE: [[]] });
+  await collectResolutions(sinceClient, sinceState, { maxSeries: 12, maxPages: 1, nowSeconds: Date.parse('2026-11-21T07:10:00Z') / 1000 });
+  const m = sinceClient.calls[0].match(/min_settled_ts=(\d+)/);
+  ok(m && Number(m[1]) === Date.parse('2026-11-21T07:00:00Z') / 1000 - SETTLE_OVERLAP_SECONDS,
+    `the settled window starts one overlap before the previous sample (got ${m && m[1]})`);
 
   // ladder
   const ladder = buildLadder({ orderbook_fp: { yes_dollars: [['0.0100', '200.00'], ['0.4200', '13.00']], no_dollars: [['0.5600', '17.00']] } });
@@ -1582,7 +1797,8 @@ export function selftest() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const args = process.argv.slice(2);
   if (args.includes('--selftest')) {
-    process.exit(selftest());
+    // selftest is async only because it awaits collectResolutions with an in-memory client.
+    process.exit(await selftest());
   }
   const maxSeriesArg = args.indexOf('--max-series');
   const maxSeries = maxSeriesArg >= 0 ? parseInt(args[maxSeriesArg + 1], 10) : 12;

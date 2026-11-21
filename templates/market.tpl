@@ -60,6 +60,23 @@
       </div>
     </div>
     <div class="panel">
+      <h3>Resolution — how this contract ended</h3>
+      <p class="small" style="margin-top:0">Read from the exchange, never inferred. <code>result</code> is
+        <code>yes</code>, <code>no</code> or <code>scalar</code> (<a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a>,
+        <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>).
+        A blank cell means the exchange has not published a determination.</p>
+      <div class="table-wrap">
+        <table>
+          <tbody>
+            <tr><th>Result</th><td id="m-result-cell">—</td></tr>
+            <tr><th>Settlement value</th><td id="m-settle-value">—</td></tr>
+            <tr><th>Settled at</th><td id="m-settle-ts">—</td></tr>
+            <tr><th>Rules</th><td class="small"><span id="m-rule-text">—</span></td></tr>
+            <tr><th>Source</th><td id="m-settle-src" class="src">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
       <h3>Contract &amp; settlement</h3>
       <dl class="kv">
         <dt>Closes at</dt><dd id="m-close">—</dd>

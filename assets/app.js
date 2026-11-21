@@ -1153,6 +1153,28 @@
       $('#m-result').innerHTML = (m && m.result)
         ? '<span class="badge ' + (m.result === 'yes' ? 'good' : 'bad') + '">resolved ' + esc(m.result) + '</span>'
         : '<span class="muted">not resolved yet</span>';
+      /* Resolution block. Values come only from the API row (result, settlement_value_dollars,
+       * settlement_ts, rules_primary); a missing field stays an em dash, never a guess. */
+      var rc = $('#m-result-cell');
+      if (rc) {
+        rc.innerHTML = (m && m.result)
+          ? '<span class="badge ' + (m.result === 'yes' ? 'good' : (m.result === 'no' ? 'bad' : 'neutral')) + '">' + esc(m.result) + '</span>'
+          : '<span class="muted">not published by the exchange yet</span>';
+      }
+      var sv = $('#m-settle-value');
+      if (sv) sv.textContent = (m && m.settlement_value_dollars !== null && m.settlement_value_dollars !== undefined)
+        ? cents(m.settlement_value_dollars) : '—';
+      var st = $('#m-settle-ts');
+      if (st) st.textContent = (m && m.settlement_ts) ? m.settlement_ts : '—';
+      var rr = $('#m-rule-text');
+      if (rr) rr.textContent = (m && m.rules_primary) ? m.rules_primary : '—';
+      var ss = $('#m-settle-src');
+      if (ss) {
+        ss.innerHTML = (m && m.source_url)
+          ? '<a href="' + esc(m.source_url) + '" target="_blank" rel="noopener">API row</a>' +
+            (m.contract_terms_url ? ' · <a href="' + esc(m.contract_terms_url) + '" target="_blank" rel="noopener">contract terms</a>' : '')
+          : '—';
+      }
       $('#m-last').textContent = cents(m && m.last_price_dollars);
       $('#m-bid').textContent = cents(m && m.yes_bid_dollars);
       $('#m-ask').textContent = cents(m && m.yes_ask_dollars);

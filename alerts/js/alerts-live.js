@@ -359,6 +359,13 @@
     return (state.feed && state.feed.resolutions) || [];
   }
 
+  /* Followed-but-unresolved rows, computed by the engine (tools/live_engine.mjs
+   * awaitingResolutions). Empty for feeds written before that field existed; the page then
+   * simply shows an empty list rather than inventing rows. */
+  function awaiting() {
+    return (state.feed && state.feed.awaiting) || [];
+  }
+
   function markets() {
     var byTicker = {};
     ((state.feed && state.feed.markets) || []).forEach(function (m) { byTicker[m.ticker] = m; });
@@ -389,7 +396,7 @@
     BASE: BASE, THRESHOLD: THRESHOLD, TOPICS: TOPICS, DOCS: DOCS, HIGH_ROI_THRESHOLD: HIGH_ROI_THRESHOLD,
     state: state,
     loadFeed: loadFeed, pollLive: pollLive,
-    allAlerts: allAlerts, highRoiAlerts: highRoiAlerts, resolutions: resolutions,
+    allAlerts: allAlerts, highRoiAlerts: highRoiAlerts, resolutions: resolutions, awaiting: awaiting,
     markets: markets, history: history, orderbooks: orderbooks, topicSeriesCount: topicSeriesCount,
     modelScore: modelScore, trackedPrice: trackedPrice,
     num: num, round: round, usd: usd, esc: esc, topicLabel: topicLabel
