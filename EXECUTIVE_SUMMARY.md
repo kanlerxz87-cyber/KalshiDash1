@@ -1,10 +1,10 @@
 # Executive Summary — KalshiDash1
 
-**Updated:** 2026-11-21 · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/bfc2de45-kalshidash1`
+**Updated:** 2026-11-21 20:28 UTC · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/96019ad5-kalshidash1` · **Session:** `session-96019ad5`
 
 > **Scope and freshness note:** Sections 4–6 below preserve the historical findings from the explicitly dated
 > 2026-11-20 11:10 UTC snapshot; those numbers are not current-market claims. Current repository/feed checks and
-> the newly found stale-feed discrepancy are recorded in [the 2026-11-21 verification report](verification/2026-11-21-bfc2de45.md).
+> the stale-feed discrepancy are recorded in [this session's dated verification report](verification/2026-11-21-96019ad5.md).
 > The canonical live site is the root GitHub Pages build linked from [README](README.md), not the older `dash/` suite.
 
 ## 1. The brief, in one paragraph
@@ -13,17 +13,26 @@ Build a live, interactive dashboard for the Kalshi **demo** exchange that (a) tr
 
 ## Current operational status (2026-11-21 UTC)
 
-The background pipeline initially failed its write-back check during this audit, but was fixed and verified by parallel session PR #41 before this update. Current state at **2026-11-21 06:30 UTC**:
+> **Current status note — 2026-11-21 20:28 UTC (session-96019ad5).** This section replaces the earlier 06:30-UTC
+> status line ("173 alert rows", Pages commit `0a32e1d`) which described an earlier feed and no longer matches the
+> committed artifact. Historical findings from the 2026-11-20 11:10 UTC snapshot are preserved in the sections below
+> and are not current-market claims; the 2026-11-21 verification record is in [the dated verification report](verification/2026-11-21-96019ad5.md).
 
 | Check | Observed state | Source |
 |---|---|---|
-| Exchange status | Official demo status endpoint returned active at the time checked; this is a point-in-time response. | [Official demo exchange status](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status) |
-| Published background feed | Freshness check passed at 1.2 minutes old (45-minute stale limit). The feed has 173 alert rows: 99 for an election ticker and 74 for a BTC ticker. Its most recent run says 0 trade alerts, 60 candle alerts added, and 0 resolutions. This is not 173 distinct markets or validated ROI performance; see [F-BFC-01/F-BFC-03](verification/2026-11-21-bfc2de45.md#findings-requiring-review). | [Committed feed](data/live/feed.json) · [official election market](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-AKLO) · [official BTC market](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500) |
-| Automated data write-back | Fixed by [PR #41](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/41); main-branch live-alert and snapshot runs both succeeded and committed fresh data. | [Live alerts run](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714835) · [snapshot run](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714858) |
-| GitHub Pages | Latest Pages build for main commit `0a32e1d` reports `built` with no error. | [Pages build API](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest) |
-| Offline checks | Current feed freshness, site staleness/build, alert logic, rendering, and internal links passed. Full historical and follow-up command results are in the [dated verification report](verification/2026-11-21-bfc2de45.md#repository-and-automated-verification). | [Verification report](verification/2026-11-21-bfc2de45.md) |
+| Published background feed | **11 alert rows**, generated **2026-11-21T20:24:48Z** — crypto 6 · elections 5 (0 culture / 0 gas / 0 golf in the window); 3 high-ROI flags; 0 resolutions; 589 duplicates collapsed; 60 tracked markets; 8 orderbooks; all 11 by trade detection. | [Committed feed](data/live/feed.json) · [engine sample commit](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/25885b9c48b2e66d3621503e39242ba71dcb7d69) |
+| Feed staleness (live-alert threshold 20/45 min) | **FRESHNESS OK** — the committed feed is 1.3 minutes old at last check against the 45-minute stale limit; the scheduled sampler produced a new run at 2026-11-21T20:24:48Z (commit `25885b9`). Historical stall (F-45/F-58) is resolved for this run set; scheduled-run reliability remains documented as delayed/dropped and keeps the flag. | [freshness_check.mjs](tools/freshness_check.mjs) · [schedule docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) |
+| Data snapshot | Captured **2026-11-21T16:02:38.983Z** by the keepalive workflow (run 44922333872, success). Not re-captured from this session's offline sandbox. | [data/snapshot.json](data/snapshot.json) |
+| Scheduled write-back runs on `main` | `live-alerts` engine sample commit `25885b9` — success, 2026-11-21T20:24:59Z (generated feed 20:24:48Z). `refresh-data` schedule run 44905774178 — success, 2026-11-21T12:49:05Z. `keepalive` run 44922333872 — success, 2026-11-21T16:02:13Z. | [engine sample](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/25885b9c48b2e66d3621503e39242ba71dcb7d69) · [snapshot](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44905774178) · [keepalive](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44922333872) |
+| GitHub Pages | Latest build for `main` commit `25885b9` reports **built**, no error — 2026-11-21T20:25:01Z → +20.8 s. | [Pages build API](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest) |
+| Offline checks | `npm test` (engine, feed, flood-guard, page render, ids, source rows, lab, links) — **PASS**; `build-site --check` — PASS; duplicate-id scan — PASS (549 ids, 0 dupes); freshness-badge — PASS (53 assertions). | [Verification report](verification/2026-11-21-96019ad5.md) |
+| Exchange status / demo reachability | Not re-fetched from this sandbox (TLS failure to `external-api.demo.kalshi.co` and `kanlerxz87-cyber.github.io` — outbound access is github/npm/pypi only). The committed snapshot's meta records the official capture method and URL. | [data/snapshot.json](data/snapshot.json) · [official demo exchange status](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status) |
 
-Feed row counts describe the committed artifact, not independent confirmation of 173 distinct market events. Official demo trades for the BTC ticker alternate between `$0.97` and `$0.01` while the current book is very wide; those API-returned values are preserved but flagged for review rather than labelled false or treated as a reliable ROI signal. The interactive browser path was not checked across every visitor's CORS/network setup. See [F-BFC-01 through F-BFC-03](verification/2026-11-21-bfc2de45.md#findings-requiring-review).
+The committed feed row counts describe the last successful engine sample, not independent confirmation of market
+health. Official demo trades for the BTC ticker alternate between `$0.97` and `$0.01` while the current book is very
+wide; those API-returned values are preserved but flagged for review (F-BFC-03) rather than labelled false or treated
+as a reliable ROI signal. The interactive browser path was not checked across every visitor's CORS/network setup.
+See [F-BFC-01 through F-BFC-03](verification/2026-11-21-bfc2de45.md#findings-requiring-review).
 
 ## 2. Verified platform facts (official sources only)
 

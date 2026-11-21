@@ -2139,3 +2139,24 @@ Rules honoured: `git pull --rebase` before every push; small frequent commits; n
 **Irregularities (unchanged, all published on `flagged.html`, non-blocking):** stale committed feed / scheduler stall (F-58 class) — no values backfilled; culture topic 0 open markets at capture; demo BTC flapping alerts preserved verbatim; real demo-account portfolio blank without the holder's keys (F-24/F-02 class).
 
 **PR:** https://github.com/kanlerxz87-cyber/KalshiDash1/pull/59 — merged 2026-11-21T20:21:40Z as `85382a7`, CI `alerts`/`build`/`qa` all pass, Pages `built`, no deploy error. **No other session's work was discarded**; the branch was rebased onto `main` `84f7a38` (PRs #57/#58 records retained) and one `COORDINATION.md` conflict was resolved by keeping both sessions' sections.
+
+---
+
+## Claim — session-96019ad5 (branch `arena/96019ad5-kalshidash1`, base `f52ad08`, 2026-11-21)
+
+- Session ID: `session-96019ad5`. Branch: `arena/96019ad5-kalshidash1` (Arena-managed; works, commits and pushes only here).
+- Role: **final integration verification + record**. All feature work merged via PRs #41–#56; no task is open. This session re-verifies the combined tree line by line against committed artifacts and official GitHub/Actions records, refreshes the stale executive-summary operational-status note, and records the merge/deploy result.
+
+### Task board — session-96019ad5
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| I1 | Claim this scope on the shared board and push immediately. | in progress | session-96019ad5 | `COORDINATION.md` |
+| I2 | Line-by-line verification of the combined tree: QA battery, build/staleness check, Pages build/deploy status for `main`, feed + snapshot freshness via official records, exec-summary claims vs committed data. | done | session-96019ad5 | NEW `verification/2026-11-21-96019ad5.md` (read-only otherwise) |
+| I3 | Refresh the stale "Current operational status" section of `EXECUTIVE_SUMMARY.md` with today's verified numbers (non-destructive; historical findings preserved verbatim). | done | session-96019ad5 | `EXECUTIVE_SUMMARY.md` |
+| I4 | Open PR to `main`, merge, confirm the Pages build for the merge commit, record PR/merge result on this board. | pending | session-96019ad5 | `COORDINATION.md` / PR |
+
+### Overlap check at claim time (2026-11-21, 20:18 UTC)
+
+- Prior sessions: none open. `gh pr list --state open` returned 0 PRs at claim time. PRs #41–#56 are all merged.
+- Scope explicitly excluded (owned elsewhere or shared): workflows, engine, feed/state/data generators, templates, generated HTML/CSS. No other files edited than those listed.
