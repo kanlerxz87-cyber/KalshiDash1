@@ -1,6 +1,17 @@
 # Executive Summary — KalshiDash1
 
-**Date:** 2026-11-20 · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/cdfe52bd-kalshidash1`
+**Date:** 2026-11-21 (integration pass) · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/9bee7c49-kalshidash1`
+
+> **Update — 2026-11-21 (session 9bee7c49).** The canonical site is now the generated root site (`index.html` + `categories/*.html` + the alert console at `alerts/index.html`); `dash/` and `docs/` are earlier builds, kept for reference. The integration pass found and fixed four defects and corrected six published statements. In short:
+>
+> 1. **The alert chat carried one event 99 times.** The published feed held 99 alerts and every one came from a single contract flapping between $0.80 and $0.00. The de-duplication rule now keeps one swing per contract per 15 minutes, and the committed feed was re-de-duplicated with the engine's own code: **99 rows → 12**.
+> 2. **The "Resolved events" table could never fill.** A resolution was kept only while its contract was still open — and a contract leaves the open set the moment it settles, so the live feed reported *500 settled markets seen, 0 recorded*. The engine now remembers every contract it has followed, so the yes/no outcome of a followed event is kept. The brief's "track live events until they resolve" requirement can now actually be met.
+> 3. **The guard written to catch (1) could not fail a run** — it sat after the block that exits on violations. It is now a fixed-point check and demonstrably fails on the old feed.
+> 4. **Two of the three data-publishing workflows failed on every scheduled run** (`live-alerts` and `Refresh demo data snapshot`), while their capture and validation steps passed. The cause was three writers racing on one branch with three different concurrency groups while publishing overlapping generated files through a `git rebase` that conflicts by construction. Publishing was replaced by a helper that **moves** the branch tip and fast-forwards — no merge, so nothing can conflict — and a test that proves it now runs in CI. This is **not** claimed fixed until a scheduled run on `main` succeeds.
+>
+> Full evidence, with the official sources re-read for each claim: [`verification/2026-11-21-9bee7c49.md`](verification/2026-11-21-9bee7c49.md). Everything a reviewer should check is on the site's [Flagged for review](https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html) page (F-40, F-58–F-63).
+
+**Earlier record:** 2026-11-20 · session cdfe52bd · `arena/cdfe52bd-kalshidash1`
 
 ## 1. The brief, in one paragraph
 

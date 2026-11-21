@@ -1,5 +1,24 @@
 # VERIFICATION.md — Line-by-Line Verification Record
 
+## Final integration — session 9bee7c49 (2026-11-21)
+
+See [`verification/2026-11-21-9bee7c49.md`](verification/2026-11-21-9bee7c49.md) for the full scope, the official sources re-read this session, and every defect that was found and fixed.
+
+**Defects found and fixed in this session (all measured, none inferred):**
+
+| ID | Defect | Evidence | Fix |
+|---|---|---|---|
+| D-1 | The published feed carried **99 alerts, all from one ticker** (`KXPRESNOMD-28-AKLO`) flapping $0.80 ↔ $0.00, so the two scrolling chats carried one event 99 times | read from `data/live/feed.json` | de-duplication now keeps one swing per ticker per 15 min (direction-independent) → **99 rows became 12**; published as F-59 |
+| D-2 | The "Resolved events — how each one settled" table could **never** fill: a resolution was kept only if the ticker was still in the open-market set, and a market leaves that set the moment it settles | live feed reported `untracked_settled_seen: 500`, `resolutions: 0` | the engine keeps a `followed` registry of every ticker it has seen; `collectResolutions()` queries followed series too; 2 new selftest assertions; published as F-61 |
+| D-3 | The readability guard meant to catch D-1 sat **after** the block that exits on violations, so it could never fail a run | it passed against the exact 99-row flood it was written for | moved ahead of the report and rewritten as a fixed-point check; verified failing on the old feed and passing on the new one; published as F-60 |
+| D-4 | Two of the three data writers failed on **every** scheduled run (`live-alerts`, `Refresh demo data snapshot`) at their publish step | GitHub API: runs 44860334644 / 44824202497 / 44802297690 and 44858392056 / 44824102871 / 44802297778 — capture, validation and link check all passed, the commit/push step failed | the publish was replaced by `scripts/publish-data.sh`, which publishes by moving HEAD onto the fetched tip and fast-forwarding — no merge, so nothing can conflict; proved by `tools/test_publish.sh` (5/5) which now runs in CI; **not** claimed fixed until a scheduled run on `main` succeeds; published as F-58 |
+| D-5 | `templates/flagged.tpl` published the anchor `F-54` twice — the only duplicate element id in the tree (70 published HTML files scanned) | duplicate-id scan | the second row is renumbered **F-40**; published as F-62 |
+| D-6 | Four published statements no longer reproduced when re-checked against their live sources: F-45 (no schedule run had ever fired — six now have), F-46 (`package-lock.json` carried the root name `KalshiDash1` and dead `playwright`/`puppeteer-core` entries — it was regenerated and now matches `package.json` exactly, `npm ci` is clean), F-57 (zero alerts recorded — 12 are), F-44 (the publish failure "remains open") | re-fetched the GitHub API, read `package-lock.json`, ran `npm ci` in a clean directory, read `data/live/feed.json` | each row corrected in place, keeping its original wording inside the correction so the change is auditable; published as F-63 |
+
+**Official sources re-read on 2026-11-21:** the demo-environment endpoint table and the mock-funds/price caveat, the Get Series List OpenAPI spec (which documents **no** `limit` parameter — the basis of F-25), and a live settled-market response from the demo API carrying `result`, `settlement_value_dollars` and `settlement_ts` (the evidence D-2 depends on). Full table with quoted text in the session record.
+
+**QA battery:** engine selftest, feed validation, jsdom alerts-page render, freshness badge, the publishing-helper test, both whole-tree link checkers (90 pages, 2 118 internal links, 0 broken), the build-staleness gate, a duplicate-element-id scan, a page-reachability walk from the landing page (52 of 53; `404.html` is the intentional exception), a YAML parse of all 8 workflows, and `npm ci` in a clean directory — all pass.
+
 ## Final integration — session dd012e26 (2026-11-20)
 
 See [`verification/2026-11-20-dd012e26.md`](verification/2026-11-20-dd012e26.md) for full scope, evidence and limitations. Official demo endpoint roots and bids-only orderbook semantics were checked against Kalshi docs; one open gas market was compared field-by-field with the committed snapshot. All flag anchors are unique. The landing-page link graph reaches 52 of 53 published HTML pages; `404.html` is the intentional exception. Build freshness, whole-tree link checks, and automated suites pass. The zero schedule-triggered-run history and the stale lockfile metadata are flagged. A new schedule run, PR merge and Pages deployment remain unverified at this point.

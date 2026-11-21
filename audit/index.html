@@ -32,6 +32,15 @@
   <br><span class="note">The build sandbox cannot reach Kalshi hosts directly (outbound access is limited to GitHub, npm and PyPI), so live values were read with the fetch tool. Anyone can reproduce them with the links below.</span>
 </div>
 
+<div class="card">
+  <strong>Later verification passes.</strong>
+  This page records the 2026-11-20 pass. Three later passes re-checked the repository against official sources and are kept with it:
+  <a href="../verification/2026-11-20-dd012e26.md">2026-11-20 · session dd012e26</a> ·
+  <a href="../verification/2026-11-20-5bb909f6.md">2026-11-20 · session 5bb909f6</a> ·
+  <a href="../verification/2026-11-21-9bee7c49.md">2026-11-21 · session 9bee7c49</a>.
+  <br><span class="note">The 2026-11-21 pass found and fixed four defects in this repository — the alert feed carried 99 rows from a single flapping contract, the "Resolved events" table could never fill, the guard written to catch the first defect could not fail a run, and two of the three data-publishing workflows failed on every scheduled run. The fixes and their evidence are in that record and on the <a href="../flagged.html">Flagged for review</a> page (F-58 to F-63).</span>
+</div>
+
 <h2>1. Live values captured on 2026-11-20</h2>
 <table>
   <thead><tr><th>Item</th><th>Captured value</th><th>Source (official)</th></tr></thead>
