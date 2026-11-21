@@ -8,7 +8,11 @@
     "test:feed": "node scripts/check_alerts.mjs",
     "test:page": "node scripts/check_alerts_page.mjs",
     "test:links": "node scripts/check-links.mjs && python3 tools/linkcheck.py",
-    "test": "npm run test:engine && npm run test:feed && npm run test:page && npm run test:links"
+    "test": "npm run test:engine && npm run test:feed && npm run test:guard && npm run test:page && npm run test:ids && npm run test:rows && npm run test:lab && npm run test:links",
+    "test:guard": "node tools/check_alerts_guard_test.mjs",
+    "test:ids": "node scripts/check-html-ids.mjs",
+    "test:rows": "node scripts/check-row-sources.mjs",
+    "test:lab": "node scripts/check_lab.mjs"
   },
   "devDependencies": {
     "jsdom": "^25.0.1"

@@ -129,8 +129,15 @@ function mockFetch(url) {
 function loadPage(file, storageSeed) {
   const errors = [];
   const vc = new VirtualConsole();
+  /* data/dash-quality.json is an OPTIONAL bundle: assets/freshness.js documents fallback
+   * thresholds and check_freshness_badge.mjs already stubs the request. In a clean checkout the
+   * file does not exist, jsdom surfaces the resulting read as a resource error, and the old
+   * assertion counted it as an "unexpected script error" (published as F-59). Missing optional
+   * data is not a page failure, so it is excluded here by name — nothing else is. */
+  const optionalResource = /dash-quality\.json/;
   vc.on('jsdomError', (e) => {
-    if (!/Not implemented|module script|HTMLScriptElement/.test(String(e.message || e))) errors.push(String(e.message || e));
+    const msg = String(e.message || e);
+    if (!/Not implemented|module script|HTMLScriptElement/.test(msg) && !optionalResource.test(msg)) errors.push(msg);
   });
   vc.on('error', (m) => { if (!/Could not load|module/i.test(String(m))) errors.push(String(m)); });
   return JSDOM.fromFile(join(root, file), {

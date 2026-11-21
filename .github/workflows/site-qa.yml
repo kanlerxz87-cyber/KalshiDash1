@@ -31,6 +31,15 @@ jobs:
       - name: Root-site link and template check (project checker)
         run: node scripts/check-links.mjs
 
+      # The brief's rule: every published data row carries a source link. Measured, not assumed.
+      - name: Every enforced data row has a source link
+        run: node scripts/check-row-sources.mjs
+
+      # Duplicate element ids are invalid HTML and break in-page anchors. Three copies reached
+      # production before this check existed (F-64).
+      - name: No duplicate element ids in published HTML
+        run: node scripts/check-html-ids.mjs
+
       - name: Check JavaScript syntax
         run: |
           set -e
@@ -51,6 +60,11 @@ jobs:
         run: |
           npm install --no-save --silent jsdom@24.1.3
           node tools/alerts-render-test.mjs
+
+      # The catalyst / strategy-lab headless suite existed but ran only by hand (F-59). jsdom is
+      # installed by the step above, so it costs nothing to gate merges on it.
+      - name: Catalyst + strategy-lab render test (jsdom)
+        run: node scripts/check_lab.mjs
 
       - name: Python tool syntax
         run: python -m py_compile tools/*.py

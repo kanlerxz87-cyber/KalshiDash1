@@ -31,6 +31,11 @@ jobs:
       - name: Validate the committed engine feed (if the engine has produced one)
         run: node scripts/check_alerts.mjs
 
+      # The readability guard must be able to FAIL. It could not, once (F-63), so it is tested
+      # against a real flood built from a real row instead of being trusted.
+      - name: Chat-readability guard test (flood must be rejected)
+        run: node tools/check_alerts_guard_test.mjs
+
       - name: Render the alert page in jsdom and assert its behaviour
         run: node scripts/check_alerts_page.mjs
 

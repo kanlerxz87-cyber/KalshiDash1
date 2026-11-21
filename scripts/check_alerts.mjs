@@ -189,28 +189,55 @@ async function main() {
   console.log(`feed: ${nA} alerts (${nH} high-ROI), ${nR} resolutions, ${nM} market rows, ${Object.keys(obs).length} orderbooks`);
   if (nA) console.log(`largest recorded move: $${maxDelta.toFixed(2)}`);
 
+  /* Chat readability guard. This MUST run before the exit check below: in the first version
+   * it was appended after `process.exit(1)`, so its finding was recorded in `problems` and
+   * never read — a dead check that printed "OK" on a flooded feed (flagged as F-63).
+   *
+   * The invariant comes from the engine's own dedupe window: collapseDuplicates keeps at most
+   * one alert per ticker per 15 minutes, so a healthy feed can hold at most 4 alerts from one
+   * contract in any rolling hour (5 with boundary skew). More than that means the detector
+   * re-published the same flapping contract, which is what made the live chat unreadable on
+   * 2026-11-20 (99 of 99 rows from KXPRESNOMD-28-AKLO). Threshold: 6/hour — one row of slack
+   * above the theoretical maximum, still far below the 37/hour measured on the broken feed.
+   */
+  {
+    const MAX_PER_HOUR = 6;
+    const byTicker = {};
+    for (const a of feed.alerts || []) {
+      const ts = Date.parse(a.ts) || 0;
+      (byTicker[a.ticker] = byTicker[a.ticker] || []).push(ts);
+    }
+    for (const [ticker, times] of Object.entries(byTicker)) {
+      times.sort((x, y) => x - y);
+      for (let i = 0; i < times.length; i++) {
+        let n = 0;
+        for (let j = i; j < times.length && times[j] - times[i] < 3600000; j++) n++;
+        if (n > MAX_PER_HOUR) {
+          fail(`chat readability: ${ticker} has ${n} alerts inside one rolling hour `
+            + `(limit ${MAX_PER_HOUR}); collapseDuplicates should keep at most one per 15 min`);
+          break;
+        }
+      }
+    }
+    // Dominance is reported, not fatal: with a two-contract demo feed a legitimate market can
+    // own most rows. The per-hour cap above is the enforceable invariant.
+    const worst = Object.entries(byTicker)
+      .map(([t, ts]) => [t, ts.length])
+      .sort((x, y) => y[1] - x[1])[0];
+    if ((feed.alerts || []).length >= 10 && worst && worst[1] > (feed.alerts || []).length / 2) {
+      warn(`chat readability: ${worst[1]} of ${(feed.alerts || []).length} alerts come from one ticker (${worst[0]})`);
+    }
+  }
+
   for (const w of warnings) console.log(`warn: ${w}`);
   if (problems.length) {
     console.error(`\nFAILED — ${problems.length} violation(s):`);
     for (const p of problems) console.error('  ✗ ' + p);
     process.exit(1);
   }
-  
-/* Chat readability regression guard. Observed on the live feed 2026-11-20: a single market
- * flipping $0.80 <-> $0.00 produced 99 of 99 rows, so the "scrolling chat" carried one event.
- * A feed where more than half of all alerts come from one ticker is a detector bug, not news. */
-{
-  const rows = feed.alerts || [];
-  const byTicker = {};
-  for (const a of rows) byTicker[a.ticker] = (byTicker[a.ticker] || 0) + 1;
-  const worst = Object.entries(byTicker).sort((x, y) => y[1] - x[1])[0];
-  if (rows.length >= 10 && worst && worst[1] > rows.length / 2) {
-    fail(`chat readability: ${worst[1]} of ${rows.length} alerts come from one ticker (${worst[0]}); `
-      + 'collapseDuplicates should have merged the repeated swings');
-  }
-}
 
-console.log('OK: every alert, market, resolution and orderbook row passed the source and threshold checks.');
+  console.log('OK: every alert, market, resolution and orderbook row passed the source and threshold checks.');
+
 }
 
 main().catch((e) => { console.error('checker crashed:', e); process.exit(1); });
