@@ -79,6 +79,14 @@
     return Math.round(s / 86400) + 'd ago';
   }
 
+  /* "+120" / "no size" next to a quote. Never invents a number: a missing field prints nothing. */
+  function sizeNote(v) {
+    if (v === null || v === undefined || v === '') return '';
+    var n = Number(v);
+    if (!isFinite(n)) return '';
+    return n > 0 ? ' <span class="muted small">× ' + n.toLocaleString() + '</span>' : ' <span class="warn small">× 0</span>';
+  }
+
   function msgHtml(a) {
     var up = a.direction === 'up';
     var dir = up ? '▲ up' : '▼ down';
@@ -109,8 +117,12 @@
         A.esc(a.title || a.ticker) + '</a> <code class="small muted">' + A.esc(a.ticker) + '</code></div>' +
       '<div class="figs">' +
         '<span>' + A.usd(a.from, 2) + ' → <b>' + A.usd(a.to, 2) + '</b></span>' +
-        '<span>bid <b>' + A.usd(a.yes_bid_dollars, 2) + '</b></span>' +
-        '<span>ask <b>' + A.usd(a.yes_ask_dollars, 2) + '</b></span>' +
+        /* The brief asks how many contracts are available at a given price, so the size behind
+         * each quote is shown next to it rather than only in the ladder. A quote with $0.00 size
+         * is not tradeable at that price no matter what the price field says. */
+        '<span>bid <b>' + A.usd(a.yes_bid_dollars, 2) + '</b>' + sizeNote(a.yes_bid_size_fp) + '</span>' +
+        '<span>ask <b>' + A.usd(a.yes_ask_dollars, 2) + '</b>' + sizeNote(a.yes_ask_size_fp) + '</span>' +
+        (a.model && a.model.tradeable === false ? '<span class="warn">not executable at these quotes</span>' : '') +
         '<span>24h vol <b>' + (a.volume_24h_fp === null || a.volume_24h_fp === undefined ? '—' : A.esc(a.volume_24h_fp)) + '</b></span>' +
         (a.est_traded_dollars !== null && a.est_traded_dollars !== undefined ? '<span>est. $<b>' + A.esc(a.est_traded_dollars.toLocaleString()) + '</b></span>' : '') +
       '</div>' +
