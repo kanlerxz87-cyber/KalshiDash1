@@ -22,7 +22,12 @@ const iso = (s) => new Date(s * 1000).toISOString();
 /* A fixture that mirrors the engine's real output shape. One high-ROI alert, one low-ROI
  * alert, one below-threshold row that must never be shown, one resolution. */
 const feed = {
-  meta: { threshold: THRESHOLD, high_roi_threshold: 0.62, generated_at: iso(now - 120), model_version: 'heuristic-v1', base_url: BASE },
+  meta: {
+    threshold: THRESHOLD, high_roi_threshold: 0.62, generated_at: iso(now - 120), model_version: 'heuristic-v1', base_url: BASE,
+    legacy_unfillable_high_roi: [
+      { id: 'PHANTOM@1', ticker: 'KXPHANTOM-1', ts: iso(now - 200), reason: 'ask $0.01 vs swing price $0.97' }
+    ]
+  },
   run: { sampled_at: iso(now - 120), markets_sampled: 3, alerts_created: 2 },
   alerts: [
     {
@@ -41,6 +46,23 @@ const feed = {
       volume_24h_fp: '3.00', volume_fp: '40.00', est_traded_dollars: 32,
       source_url: BASE + '/markets?series_ticker=KXAAAGAS&status=open',
       model: { score: 0.18, highROI: false, reasons: ['headroom 0.08', 'spread $0.98 -> 0.00'] }
+    },
+    {
+      /* The exact shape that was published on 2026-11-21 and topped the high-ROI pane: a
+       * $0.01 -> $0.97 print on a market whose YES ask was $0.01 and whose bid was $0.00.
+       * After the follow-through fix its live score is 0.30 and it is NOT high ROI. */
+      id: 'PHANTOM@1', ts: iso(now - 200), ticker: 'KXPHANTOM-1', topic: 'crypto', title: 'BTC phantom swing',
+      direction: 'up', from: 0.01, to: 0.97, delta: 0.96, abs_delta: 0.96, threshold: THRESHOLD,
+      baseline_kind: 'previous trade within 30 min', detection: 'trade',
+      yes_bid_dollars: '0.0000', yes_ask_dollars: '0.0100',
+      yes_bid_size_fp: '0.00', yes_ask_size_fp: '0.00',
+      volume_24h_fp: '69487.15', volume_fp: '72323803.03', est_traded_dollars: 70154088.94,
+      source_url: BASE + '/markets/trades?ticker=KXPHANTOM-1&limit=1000',
+      model: {
+        score: 0.3, highROI: false, tradeable: false, legacy_unfillable: true,
+        original_score: 0.779, original_highROI: true,
+        reasons: ['headroom 0.02', 'move 100% of a $0.50 move', 'NOT tradeable at the swing price: ask $0.01 vs swing price $0.97 -> 0.00', 'capped at 0.30']
+      }
     }
   ],
   resolutions: [{
@@ -186,6 +208,24 @@ check(doc.querySelector('#log-all').textContent.includes('AAA gas price above 3.
 check(doc.querySelector('#log-roi').textContent.includes('BTC above 62000'), 'high-ROI feed shows the 0.86-score alert');
 check(!doc.querySelector('#log-roi').textContent.includes('AAA gas price above 3.20'), 'high-ROI feed excludes the 0.18-score alert');
 check(!logRoi.includes('KXLOW-2'), 'high-ROI feed never leaks a low-scoring ticker');
+/* And when nothing clears the threshold, the empty pane must EXPLAIN itself rather than go blank. */
+check(/withdrawn|clears the model threshold/.test(logRoi), 'an empty high-ROI pane explains itself instead of rendering blank');
+
+/* ---- follow-through labels (added 2026-11-21) ----
+ * The pane was measured to be topped by a print that could not be executed. The page must show
+ * that row in the ALL chat, say why in plain words, keep the original v1 score for audit, and
+ * never show it in the high-ROI chat. */
+check(logAll.includes('KXPHANTOM-1'), 'the all-events chat still shows the phantom swing (it is real recorded data)');
+check(logAll.includes('not tradeable'), 'the phantom swing is labelled "not tradeable"');
+check(logAll.includes('re-scored (v1'), 'the phantom swing is labelled as re-scored, not silently rewritten');
+check(logAll.includes('0.78'), 'the original v1 score is still visible for audit');
+check(!logRoi.includes('KXPHANTOM-1'), 'the phantom swing can never appear in the high-ROI chat');
+check(!logRoi.includes('0.779'), 'the withdrawn high-ROI score is not shown as current');
+
+/* Contracts available at the quoted price must be visible per alert (brief requirement). */
+const logAllText = doc.getElementById('log-all').textContent;
+check(/×\s*[\d,]+/.test(logAllText), 'each quote shows how many contracts sit behind it, got: ' + logAllText.slice(0, 200));
+check(/× 0/.test(logAllText), 'a zero-size quote is called out rather than looking tradeable');
 
 // threshold discipline: every rendered alert is >= $0.10
 const rendered = [...doc.querySelectorAll('#log-all .msg')];

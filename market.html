@@ -11,7 +11,7 @@
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span>
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span><span class="asof-wrap"><span id="feed-asof" class="small" data-state="pending" data-asof="2026-11-21T17:42:16.000Z">Data as of <b>2026-11-21 17:42:16Z</b> — samples older than 20 min are marked late, older than 45 min STALE (age measured in your browser when the page loaded).</span></span>
       <span id="mode-badge" class="badge warn">data: probing…</span>
       <span id="clock" class="mono small muted"></span>
     </div>
@@ -55,8 +55,13 @@
       <p class="small muted" id="book-total">—</p></div>
       <div class="table-wrap" style="border:0;border-radius:0">
         <table class="ladder"><thead><tr>
-          <th>NO bid</th><th class="num">Contracts</th><th>YES bid</th><th class="num">Contracts</th><th></th></tr></thead>
+          <th>YES bid</th><th class="num">Contracts</th><th>→ YES ask</th>
+          <th>NO bid</th><th class="num">Contracts</th><th>→ YES ask</th><th></th></tr></thead>
           <tbody id="book-body"></tbody></table>
+        <p class="small muted" style="padding:0 14px 12px">A YES ask is <code>1 − NO bid</code>, which is the
+        relation the exchange documents for a binary book. Both executable sides are shown because a
+        one-sided book (a bid with no offer, or an offer with no bid) means the headline price cannot be
+        traded — that is exactly the condition the high-ROI model now refuses to score.</p>
       </div>
     </div>
     <div class="panel">

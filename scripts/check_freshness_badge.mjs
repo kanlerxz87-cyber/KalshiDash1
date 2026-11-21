@@ -84,12 +84,22 @@ function run(page, base, feedBody, opts = {}) {
   return new Promise((resolve) => {
     setTimeout(() => {
       const el = window.document.getElementById('feed-freshness');
-      resolve({ el, text: el ? el.textContent : null, cls: el ? el.className : null, requests });
+      const asof = window.document.getElementById('feed-asof');
+      resolve({
+        el, text: el ? el.textContent : null, cls: el ? el.className : null, requests,
+        asofText: asof ? asof.textContent : null,
+        asofState: asof ? asof.getAttribute('data-state') : null,
+      });
+      /* The shipped script keeps a 30-second age tick alive for the visitor's benefit. That is
+       * correct in a browser and wrong in a test runner, so each case closes its own window —
+       * without this the checker hangs instead of exiting (measured: >120 s, exit 124). */
+      try { dom.window.close(); } catch (e) { /* nothing left to close */ }
     }, 60);
   });
 }
 
 const badge = (r) => (r.el ? `${r.cls} | ${r.text}` : 'MISSING');
+const asofStateFresh = (st) => st === 'fresh' || st === 'pending' || st === 'warn';
 
 /* ---------------------------------------------------------------- assertions */
 console.log('check_freshness_badge — the header must report the measured age, never a guess\n');
@@ -121,6 +131,21 @@ for (const [page, base] of PAGES) {
   ok(/unreadable/.test(broken.text), `${page}: unreadable feed must say so, got "${broken.text}"`);
   ok(!/live/.test(broken.cls), `${page}: unreadable feed must never render as live`);
   results += 1;
+
+  /* 4b. THE AS-OF LINE (added 2026-11-21). The badge ages in the browser, which is right for a
+   * live visitor and useless in a screenshot or an archived copy — on 2026-11-21 the committed
+   * feed was ~3 h old while the page still looked healthy. Every page must therefore carry a
+   * visible, absolute as-of line, and it must say STALE out loud, not only in a tooltip. */
+  const asofEl = fresh.asofText !== null;
+  ok(asofEl, `${page}: #feed-asof element missing — the page must state WHEN its data is from`);
+  if (asofEl) {
+    ok(/Alert engine sampled|Data as of/i.test(fresh.asofText || ''), `${page}: as-of line must label itself, got "${fresh.asofText}"`);
+    ok(/\d{4}-\d{2}-\d{2}/.test(fresh.asofText || ''), `${page}: as-of line must contain an absolute date/time, got "${fresh.asofText}"`);
+    ok(/STALE/.test(stale.asofText || ''), `${page}: 5-hour-old data must print STALE in the as-of line, got "${stale.asofText}"`);
+    ok(stale.asofState === 'stale', `${page}: as-of data-state must be "stale" for a 5-hour-old feed, got "${stale.asofState}"`);
+    ok(asofStateFresh(fresh.asofState), `${page}: as-of data-state must be fresh/live for a 2-minute-old feed, got "${fresh.asofState}"`);
+    ok(/unknown|could not be read/i.test(broken.asofText || ''), `${page}: unreadable feed must be stated in the as-of line, got "${broken.asofText}"`);
+  }
 }
 
 /* 5. It reads only same-origin committed data — no third party, no API call. */
