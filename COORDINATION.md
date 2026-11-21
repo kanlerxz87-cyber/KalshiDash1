@@ -6,8 +6,16 @@ Arena fixes this session's branch name as `arena/4251f2d1-kalshidash1`. Prior wo
 
 | Task | Status | Owner | File scope |
 |---|---|---|---|
-| Investigate failing scheduled snapshot and live-alert workflows; implement and verify a targeted fix if supported by evidence, otherwise flag the limitation | in progress | session-4251f2d1 | `.github/workflows/refresh-data.yml`, `.github/workflows/live-alerts.yml`, associated narrowly scoped tests if needed; `COORDINATION.md` session record; `templates/flagged.tpl` and generated `flagged.html` only if findings require publication |
+| Investigate failing scheduled snapshot and live-alert workflows; implement and verify a targeted fix if supported by evidence, otherwise flag the limitation | needs review — main write-back not yet confirmed | session-4251f2d1 | `.github/workflows/refresh-data.yml`, `.github/workflows/live-alerts.yml`, `scripts/check-data-workflow-shells.mjs`, `templates/flagged.tpl`, generated `flagged.html`, this board section |
 
+
+
+### Findings and handoff — session-4251f2d1
+
+- GitHub's official run records show [refresh 44860334644](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44860334644) and [live alerts 44858392056](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44858392056) fetched and validated data successfully but failed on their commit steps. Raw job logs could not be downloaded in this environment; exact failure output is unverified. Both previous shell scripts lacked a closing `fi`; `bash -n` reproduces unexpected EOF for each. Added `fi` and a no-network checker that syntax-checks every block-form run script in both workflows even on feature branches. On the original files the checker fails twice; on the fixed files all six blocks pass. Main write-back remains unverified until a main run succeeds (F-44).
+- [Keepalive 44846930005](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44846930005) succeeded including publication/freshness checks; scheduled runs now exist, so F-45 and historical scheduler F-54 have been updated. The two preexisting F-54 anchors referred to different findings: upstream-series finding retains F-54; historical scheduling finding is now F-58. No existing records removed. [GitHub schedule documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) cautions about delays and drops.
+- `npm test`, freshness-badge test, engine logic tests, site build/staleness check, both internal-link checkers pass. External links are listed, not fully fetched. Additional `node scripts/check_lab.mjs` reports two jsdom ENOENT errors for optional `data/dash-quality.json` on a clean checkout (F-59); functionality assertions passed, and this test discrepancy has not been fixed or represented as a successful test.
+- Parallel scope check: `session-4830ab32` is performing final independent review (its claimed files exclude templates and workflows); `session-bfc2de45` owns executive-summary freshness. Please incorporate this workflow repair and re-verify final combined outputs, including Pages and main-run publication. Open PR #39 owns alert-engine logic and was not touched.
 
 ## Session on this branch — session-e480a835 (verification + defect-fix pass, 2026-11-20)
 

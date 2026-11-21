@@ -21,6 +21,7 @@ on:
       - 'tools/live_engine.mjs'
       - '.github/workflows/live-alerts.yml'
       - 'scripts/check_alerts.mjs'
+      - 'scripts/check-data-workflow-shells.mjs'
 
 permissions:
   contents: write
@@ -43,6 +44,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Check data workflow shell syntax
+        run: node scripts/check-data-workflow-shells.mjs
 
       - name: Offline logic selftest (no network)
         run: node tools/live_engine.mjs --selftest
@@ -98,6 +102,7 @@ jobs:
               echo "::error::could not push the engine sample to origin/$TARGET_BRANCH after 5 attempts"
               exit 1
             fi
+          fi
         env:
           TARGET_BRANCH: ${{ github.ref_name }}
 
