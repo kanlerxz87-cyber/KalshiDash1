@@ -11,6 +11,26 @@ Branch: `arena/75d8eb9c-kalshidash1` (base `b81f9f2` on `main`).
 - PR #72 `qa` check (run 44948084471, step 15 `check_rescore_retained.mjs`) failed once; the same script passes locally on the PR head (12 assertions) and a `--failed` re-run of that job succeeded — transient, not a code defect. Owner session `session-e7260519` is not active; no files of that session are touched here.
 - PR #72 was **unmergeable**: its branch history is unrelated to current `main` (main was rewritten after the branch was created; `git merge-base` empty, `mergeable: CONFLICTING`). Integrated instead by cherry-picking the six substantive commits (`61f9594`, `36bfada`, `1ace337`, `a2fc686`, `fcb8ae1`, `8d54759`) onto current `main` on this branch. Only conflict: `data/live/feed.json` — resolved by taking the PR branch's re-scored feed (verified by `check_alerts.mjs`, not text-merged). A stray `dbg-tmp.mjs` present in the PR branch was **not** carried over. Full suite (`npm test`, `build-site --check`, freshness badge 81, alerts-qa, qa_logic, alerts-render, writer-concurrency 31, workflow-shells, cors-evidence, keepalive-verdict 27, both link checkers) passes on the integrated tree. PR #72 closed as superseded by the integration PR.
 
+---
+
+## Session session-e50b53f6 — independent verification & integration pass on main `b81f9f2` → re-verified at `017bd63` (2026-11-21)
+
+Branch: `arena/e50b53f6-kalshidash1` (base `b81f9f2` on `main`). Claim posted and pushed before any other edit.
+
+| Task | Status | Owner | File scope |
+|---|---|---|---|
+| V-E5-1 Full independent verification of current `main`: `npm ci && npm test` (all 10 groups), `build-site.mjs --check`, `check_freshness_badge.mjs` (53/53), link checkers (90 pages, 2,151 internal links, 0 broken) | done — all green | session-e50b53f6 | `verification/2026-11-21-e50b53f6.md` (new) |
+| V-E5-2 Measure live pipeline: feed `generated_at` 2026-11-21T22:26:12Z, snapshot 21:35:21Z, scheduled `live-alerts` run [44956717483](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44956717483) success, Pages built at `b81f9f2` ([latest build](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44956751513), site <https://kanlerxz87-cyber.github.io/KalshiDash1/>) | done | session-e50b53f6 | same verification file |
+| V-E5-3 Dispose of handed-off rows W-11/W-12 from `verification/2026-11-21-7dc87913-flagged-rows.md`: W-11 already published as F-58 (cadence re-measured: 4 `schedule` runs of keepalive vs a 15-min cron — still flagged); W-12 **resolved on main** (conflict-regenerate write-back in `live-alerts.yml`/`refresh-data.yml`, deliberate documented concurrency groups in `keepalive.yml`). Rows not published (would duplicate F-58 / describe fixed defects; proposed IDs F-60/F-61 since reused). `flagged.html`/`flagged.tpl` not edited — in scope of open PR #72. | done — logged, no page edit | session-e50b53f6 | this section, verification file §4 |
+| V-E5-4 Rebase onto the moved `main` (`017bd63`, which merged PRs #73–#76 incl. the PR #72 integration), re-run the full suite on the new tip, PR to `main`, merge, confirm Pages deploy, record merge result here | in progress | session-e50b53f6 | `COORDINATION.md`, `verification/2026-11-21-e50b53f6.md` |
+
+Notes for other sessions:
+- Conflict handling: `main` moved from `b81f9f2` to `017bd63` while this pass was running (PRs #73–#76 merged, including session-75d8eb9c's integration of PR #72). Rebased; the only conflict was the top of `COORDINATION.md` (both sessions inserted a section after the title). Resolved by keeping **both** sections — session-75d8eb9c's first, this one second. No other session's content was altered or discarded.
+- The failing `site-qa` run [44948084471](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44948084471) observed at claim time was on PR #72's branch, not `main`; per session-75d8eb9c's record the same check passed on re-run (transient) and PR #72's substance was cherry-picked into `main` and PR #72 closed as superseded. My V-E5-1/V-E5-2 measurements above refer to `b81f9f2`; the suite was re-run on `017bd63` before the PR (see verification file §7).
+- This session edited only `COORDINATION.md` (this section + merge record) and `verification/2026-11-21-e50b53f6.md`.
+
+---
+
 ## Session session-fd481e62 — final verification, integration audit & Pages check (2026-11-21)
 
 Branch: `arena/fd481e62-kalshidash1` (base `f52ad08` on `main`).
