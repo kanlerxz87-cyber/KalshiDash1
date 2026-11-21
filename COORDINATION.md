@@ -86,6 +86,47 @@ negatively: deleting `assets/freshness.js` still fails the test with
 `Could not load script: …/assets/freshness.js`, so real missing scripts are still caught. The test is
 now wired into `site-qa.yml` so it is actually enforced in CI. Result: `All lab checks passed.`
 
+### F-61 was then observed in production, and is now FIXED (not just flagged)
+
+The fragility this session had documented as "open, handed to the workflow owner" **failed on `main`
+during this session's own merge**:
+
+| | |
+|---|---|
+| Run | [keepalive 44876422837](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44876422837) |
+| When | 2026-11-21T06:37:33Z (push to `main`, PR #47 merge) |
+| Failed step | 13 "Commit and push (rebase-and-retry)" → `could not push after 3 attempts`, exit 1 |
+| Steps 4–12 | **all `success`** — syntax check, 27 monitor assertions, engine selftest, sample, feed validation, snapshot refresh, site rebuild, link check |
+| Cause | PRs #47 and #51 merged **three seconds apart**, so the second writer found a branch holding different regenerated content |
+
+Because the defect had fired in production, leaving it flagged was no longer adequate. Fixed in all
+three data writers, each fix backed by a reproduction:
+
+1. **Regenerate, never text-merge derived data.** On a rebase conflict the loop aborts, hard-resets to
+   the remote tip, re-runs the generator and commits again. Replaying the real conflict:
+   `attempt 1: rebase CONFLICTED -> regenerate on ff7b51e` → `SUCCESS attempt 2: remote tip == a9d2fa1`,
+   and the remote then serves the regenerated file.
+2. **Verify the push rather than trusting its exit code** — after pushing it requires
+   `git rev-parse HEAD == git rev-parse FETCH_HEAD`, which closes the silent no-op case (a push that
+   reports success without publishing). Confirmed separately that an already-applied commit is
+   recognised as "nothing further to publish", not as success.
+3. **One shared concurrency group** `data-writers-${{ github.ref }}` for `keepalive.yml`,
+   `live-alerts.yml` and `refresh-data.yml`. Previously `writer-…`, `live-alerts` and
+   `refresh-data-…` — never serialised, although `keepalive.yml`'s comment claimed they did.
+
+**New regression tests** (both added to `site-qa.yml`, both offline):
+- `scripts/check-data-writer-concurrency.mjs` — 29 assertions over the parsed YAML (one branch-scoped
+  group, tip verification, abort-instead-of-retry, regenerate-in-loop, loud failure, syntax gate
+  coverage). Verified to **fail on the pre-fix tree**, so it is a real guard, not a tautology.
+- `scripts/check-data-workflow-shells.mjs` — extended from 2 to **all 3** writers (9 blocks). Confirmed
+  by deleting one `fi`: `keepalive.yml:141: invalid shell block … unexpected end of file`, exit 1.
+
+Scope note: these are `.github/workflows/` files, which this session's original claim excluded because
+`session-4251f2d1` owned the workflow repair. That session's task is **merged and closed** (PRs #41,
+#44) and no open PR touches these three files (checked: #43 templates/docs, #39 engine, #46/#50 docs),
+so there is no collision. The repair here is the *separate* defect this session had already documented,
+not a re-do of the `fi` fix.
+
 ### PR, merge and deployment record — session-7dc87913
 
 - **PR:** [#47](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/47) — `arena/7dc87913-kalshidash1` → `main`.

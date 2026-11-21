@@ -5,7 +5,14 @@
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
-const files = ['.github/workflows/refresh-data.yml', '.github/workflows/live-alerts.yml'];
+/* keepalive.yml is included because it is the third data writer and its commit step is the one
+ * that actually failed on main on 2026-11-21T06:37:33Z ("could not push after 3 attempts").
+ * A syntax error there would fail the same way it did in the other two workflows. */
+const files = [
+  '.github/workflows/refresh-data.yml',
+  '.github/workflows/live-alerts.yml',
+  '.github/workflows/keepalive.yml',
+];
 let count = 0;
 for (const file of files) {
   const lines = readFileSync(file, 'utf8').split('\n');
