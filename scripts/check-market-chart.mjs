@@ -198,6 +198,10 @@ try {
     const rows = [...replay.w.document.querySelectorAll('#roi-table tr')];
     assert.ok(rows.length > 0 && rows.every((r) => r.querySelector('a[href^="' + BASE + '"]')));
   });
+  check('dashboard mode notice leaves probing and explains snapshot/retry without asking for input', () => {
+    assert.match(replay.w.document.querySelector('#mode-notice').textContent, /Snapshot mode/);
+    assert.doesNotMatch(replay.w.document.querySelector('#mode-notice').textContent, /Probing|refresh.*yourself/i);
+  });
   check('canonical dashboard has no unexpected script errors', () => assert.deepEqual(replay.errors, []));
 } finally { replay.dom.window.close(); }
 

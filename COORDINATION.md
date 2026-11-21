@@ -17,8 +17,8 @@
 |---|---|---|---|---|
 | I1 | Claim scope, commit and push immediately; preserve prior session work. | done | session-135bb43a | this section of `COORDINATION.md` |
 | I2 | Integrate stale PR #72, reproduce/fix its failed check, re-verify model/alert outputs without inventing data. | done (integrated main; 17 retained-score checks) | session-135bb43a (final integration) | PR #72's existing files via merge; targeted QA fixes as evidenced |
-| I3 | Fix canonical browser simulator only where defects are reproduced: executable YES/NO asks and quantities, no stale/snapshot assumed fills, verifiable performance accounting and final settlement; add offline regression tests. | done (53 paper / 30 DOM; live fills unverified) | session-135bb43a | `assets/app.js`, new `assets/paper.js`, new `scripts/check-paper.mjs`, `package.json`, `.github/workflows/site-qa.yml`, `templates/{market,portfolio,analysis,strategies,executive-summary,flagged}.tpl` |
-| I4 | Verify graph time/source semantics and event links; fix demonstrated issues, not infer news causation. | done (30 DOM; causes stay unverified) | session-135bb43a | `assets/chart.js`, `assets/app.js`, new `scripts/check-market-chart.mjs`, `templates/market.tpl` |
+| I3 | Fix canonical browser simulator only where defects are reproduced: executable YES/NO asks and quantities, no stale/snapshot assumed fills, verifiable performance accounting and final settlement; add offline regression tests. | done (53 paper / 31 DOM; live fills unverified) | session-135bb43a | `assets/app.js`, new `assets/paper.js`, new `scripts/check-paper.mjs`, `package.json`, `.github/workflows/site-qa.yml`, `templates/{market,portfolio,analysis,strategies,executive-summary,flagged}.tpl` |
+| I4 | Verify graph time/source semantics and event links; fix demonstrated issues, not infer news causation. | done (31 DOM; causes stay unverified) | session-135bb43a | `assets/chart.js`, `assets/app.js`, new `scripts/check-market-chart.mjs`, `templates/market.tpl` |
 | I5 | Full requirement/source audit, source-linked report, canonical site build, per-row official-source checks, internal-link checks, integration PR to main, merge and Pages confirmation. | in progress | session-135bb43a (final integration) | new `verification/2026-11-21-135bb43a.md`, `README.md`, this board; generated root/category HTML through `scripts/build-site.mjs` only |
 
 ### Integration conflict and handoff log
@@ -49,7 +49,7 @@
 
 ### Implementation verification checkpoint
 
-- Pure paper model: 53 offline regression cases pass. Canonical chart/paper DOM: 30 cases pass
+- Pure paper model: 53 offline regression cases pass. Canonical chart/paper DOM: 31 cases pass
   with synthetic fixtures, including automatic strategy execution, snapshot rejection, quantity
   sharing, final-only settlement, exact source URLs, candle reads, chart bounds and automatic
   public-data recovery. Tests contain synthetic values only; no fixture is published as data.
@@ -118,6 +118,9 @@
   Engine/browser formulas remain different and labelled, never forecast ROI.
 - `F-LAB-01`: prominent unverified-legacy label; missing settled close/P&L stay blank; seed/topic/
   strategy filters now affect all summaries/synthesis. Runtime source and behavior regressions pass.
+- Real headless Chromium 138 offline fallback smoke: 31 desktop/mobile page-viewport cases
+  passed, with actual canvas and snapshot-trade refusal. Screenshots inspected; corrected a
+  canonical-dashboard notice stuck in probing and added its regression. Not a live-network test.
 - `npm test` and `build-site --check` pass on the combined checkpoint (22 generated pages;
   90 scanned pages / 2,185 internal links / 0 broken; 331 external URLs listed, not fetched).
   [Dated source/requirement/report](verification/2026-11-21-135bb43a.md) now exists. I5 stays open

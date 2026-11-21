@@ -799,9 +799,8 @@
       } else if (state.mode === 'snapshot') {
         el.className = 'notice warn';
         el.innerHTML = '<strong>Snapshot mode.</strong> This browser could not reach the demo API (' + esc(state.lastError || 'network or CORS policy') + '). ' +
-          'Showing the verified snapshot committed to <code>data/snapshot.json</code> with per-row source links. ' +
-          'The live alert feed stays idle until the API is reachable — nothing is invented. ' +
-          'To refresh the snapshot yourself run <code>node scripts/fetch-snapshot.mjs</code> from a machine that can reach the API.';
+          'Showing the timestamped capture in <code>data/snapshot.json</code> with per-row source links. ' +
+          'Captured replay may remain visible; new live alerts resume automatically after public API access recovers. No snapshot trade fill is assumed.';
       } else {
         el.className = 'notice';
         el.innerHTML = 'Probing the official demo API…';
@@ -865,6 +864,7 @@
 
   /* --------------------------------------------------------- dashboard page */
   pages.dashboard = function () {
+    statusNotice($('#mode-notice'));
     var s = settings();
     var feedState = { topic: 'all', dir: 'all', minSwing: s.threshold, roiCut: s.roiCut };
     var logA = $('#chat-all .log'), logB = $('#chat-roi .log');
