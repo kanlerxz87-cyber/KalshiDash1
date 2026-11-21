@@ -1,0 +1,220 @@
+{
+  "generated_at": "2026-11-21T20:20:12.311Z",
+  "probe_origin": "https://kanlerxz87-cyber.github.io",
+  "secondary_origin": "http://localhost:8000",
+  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
+  "runner": {
+    "os": "Linux",
+    "image": "ubuntu26",
+    "workflow_run": "44945717661",
+    "commit": "950a43ed37aa735d27d4559bcad25dcee61813d7",
+    "node": "v22.23.5"
+  },
+  "results": [
+    {
+      "name": "exchange_status",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/exchange/status",
+      "status": 200,
+      "headers": {
+        "access-control-allow-origin": "https://kanlerxz87-cyber.github.io",
+        "access-control-allow-credentials": "true",
+        "access-control-expose-headers": "X-Csrf-Token,X-Ratelimit-Limit,X-Ratelimit-Remaining,X-Ratelimit-Reset,X-Ratelimit-Cost",
+        "vary": "Origin, Accept-Language"
+      },
+      "content_type": "application/json; charset=utf-8",
+      "ratelimit": {
+        "limit": null,
+        "remaining": null,
+        "reset": null
+      },
+      "body_bytes": 632,
+      "ms": 347,
+      "readable_from_browser": {
+        "allowed": true,
+        "why": "origin echoed"
+      }
+    },
+    {
+      "name": "markets_limit_1",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?limit=1",
+      "status": 200,
+      "headers": {
+        "access-control-allow-origin": "https://kanlerxz87-cyber.github.io",
+        "access-control-allow-credentials": "true",
+        "access-control-expose-headers": "X-Csrf-Token,X-Ratelimit-Limit,X-Ratelimit-Remaining,X-Ratelimit-Reset,X-Ratelimit-Cost",
+        "vary": "Origin, Accept-Encoding, Accept-Language"
+      },
+      "content_type": "application/json",
+      "ratelimit": {
+        "limit": null,
+        "remaining": null,
+        "reset": null
+      },
+      "body_bytes": 2281,
+      "ms": 324,
+      "readable_from_browser": {
+        "allowed": true,
+        "why": "origin echoed"
+      }
+    },
+    {
+      "name": "series_culture",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true",
+      "error": "fetch failed",
+      "ms": 4733,
+      "readable_from_browser": {
+        "allowed": null,
+        "why": "request failed"
+      }
+    },
+    {
+      "name": "orderbook",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-AKLO/orderbook?depth=5",
+      "status": 200,
+      "headers": {
+        "access-control-allow-origin": "https://kanlerxz87-cyber.github.io",
+        "access-control-allow-credentials": "true",
+        "access-control-expose-headers": "X-Csrf-Token,X-Ratelimit-Limit,X-Ratelimit-Remaining,X-Ratelimit-Reset,X-Ratelimit-Cost",
+        "vary": "Origin"
+      },
+      "content_type": "application/json; charset=utf-8",
+      "ratelimit": {
+        "limit": "600",
+        "remaining": null,
+        "reset": null
+      },
+      "body_bytes": 202,
+      "ms": 267,
+      "readable_from_browser": {
+        "allowed": true,
+        "why": "origin echoed"
+      }
+    },
+    {
+      "name": "trades_by_ticker",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXPRESNOMD-28-AKLO&limit=5",
+      "status": 200,
+      "headers": {
+        "access-control-allow-origin": "https://kanlerxz87-cyber.github.io",
+        "access-control-allow-credentials": "true",
+        "access-control-expose-headers": "X-Csrf-Token,X-Ratelimit-Limit,X-Ratelimit-Remaining,X-Ratelimit-Reset,X-Ratelimit-Cost",
+        "vary": "Origin, Accept-Encoding"
+      },
+      "content_type": "application/json; charset=utf-8",
+      "ratelimit": {
+        "limit": "600",
+        "remaining": "540",
+        "reset": "0.3"
+      },
+      "body_bytes": 1545,
+      "ms": 247,
+      "readable_from_browser": {
+        "allowed": true,
+        "why": "origin echoed"
+      }
+    },
+    {
+      "name": "candlesticks_1m",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPRESNOMD/markets/KXPRESNOMD-28-AKLO/candlesticks?start_ts=1795000000&end_ts=1795090000&period_interval=1",
+      "status": 200,
+      "headers": {
+        "access-control-allow-origin": "https://kanlerxz87-cyber.github.io",
+        "access-control-allow-credentials": "true",
+        "access-control-expose-headers": "X-Csrf-Token,X-Ratelimit-Limit,X-Ratelimit-Remaining,X-Ratelimit-Reset,X-Ratelimit-Cost",
+        "vary": "Origin, Accept-Encoding"
+      },
+      "content_type": "application/json; charset=utf-8",
+      "ratelimit": {
+        "limit": "600",
+        "remaining": "507",
+        "reset": "0.465"
+      },
+      "body_bytes": 681825,
+      "ms": 213,
+      "readable_from_browser": {
+        "allowed": true,
+        "why": "origin echoed"
+      }
+    },
+    {
+      "name": "portfolio_balance_no_key",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/portfolio/balance",
+      "status": 401,
+      "headers": {
+        "access-control-allow-origin": "https://kanlerxz87-cyber.github.io",
+        "access-control-allow-credentials": "true",
+        "access-control-expose-headers": "X-Csrf-Token,X-Ratelimit-Limit,X-Ratelimit-Remaining,X-Ratelimit-Reset,X-Ratelimit-Cost",
+        "vary": "Origin, Accept-Language"
+      },
+      "content_type": "application/json; charset=utf-8",
+      "ratelimit": {
+        "limit": null,
+        "remaining": null,
+        "reset": null
+      },
+      "body_bytes": 90,
+      "ms": 79,
+      "readable_from_browser": {
+        "allowed": true,
+        "why": "origin echoed"
+      }
+    }
+  ],
+  "preflights": [
+    {
+      "name": "preflight_signed_get",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/portfolio/balance",
+      "requested_method": "GET",
+      "requested_headers": "kalshi-access-key,kalshi-access-signature,kalshi-access-timestamp",
+      "status": 204,
+      "headers": {
+        "access-control-allow-origin": "https://kanlerxz87-cyber.github.io",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-methods": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS",
+        "access-control-allow-headers": "Origin,Content-Length,Content-Type,Idempotency-Key,X-Csrf-Token,X-Aws-Waf-Token,Traceparent,Tracestate,X-Gclid,X-Msclkid,X-Gbraid,X-Fbclid,X-Fbp,X-Fbc,X-Rdt-Cid,X-Ttclid,X-Ttp,X-Twclid,X-Sc-Cid,X-Idfa,X-Device-Idfv,X-Advertising-Id,X-Firebase-App-Instance-Id,X-Appsflyer-Web-Id,X-Af-Channel,X-Af-Media-Source,X-Appsflyer-Device-Id,X-Att-Status,X-Signature",
+        "access-control-max-age": "43200",
+        "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+      },
+      "ms": 81,
+      "allows_method": true,
+      "allows_requested_headers": false
+    },
+    {
+      "name": "preflight_post_order",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/portfolio/orders",
+      "requested_method": "POST",
+      "requested_headers": "content-type,kalshi-access-key,kalshi-access-signature,kalshi-access-timestamp",
+      "status": 204,
+      "headers": {
+        "access-control-allow-origin": "https://kanlerxz87-cyber.github.io",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-methods": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS",
+        "access-control-allow-headers": "Origin,Content-Length,Content-Type,Idempotency-Key,X-Csrf-Token,X-Aws-Waf-Token,Traceparent,Tracestate,X-Gclid,X-Msclkid,X-Gbraid,X-Fbclid,X-Fbp,X-Fbc,X-Rdt-Cid,X-Ttclid,X-Ttp,X-Twclid,X-Sc-Cid,X-Idfa,X-Device-Idfv,X-Advertising-Id,X-Firebase-App-Instance-Id,X-Appsflyer-Web-Id,X-Af-Channel,X-Af-Media-Source,X-Appsflyer-Device-Id,X-Att-Status,X-Signature",
+        "access-control-max-age": "43200",
+        "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+      },
+      "ms": 79,
+      "allows_method": true,
+      "allows_requested_headers": false
+    }
+  ],
+  "echo_test": {
+    "origin": "http://localhost:8000",
+    "status": 200,
+    "headers": {
+      "access-control-allow-origin": "http://localhost:8000",
+      "access-control-allow-credentials": "true",
+      "access-control-expose-headers": "X-Csrf-Token,X-Ratelimit-Limit,X-Ratelimit-Remaining,X-Ratelimit-Reset,X-Ratelimit-Cost",
+      "vary": "Origin, Accept-Language"
+    },
+    "error": null,
+    "acao_changes_with_origin": true
+  },
+  "summary": {
+    "public_gets_probed": 6,
+    "public_gets_readable": 5,
+    "all_public_gets_conclusive": false,
+    "browser_can_read_public_endpoints": null,
+    "note": "Readability is decided from the response headers only. A visitor whose network blocks the host still falls back to the committed snapshot; the site reports that at runtime."
+  }
+}
