@@ -1,5 +1,14 @@
 # COORDINATION.md — shared task board
 
+## Session session-4251f2d1 — scheduled data pipeline investigation (2026-11-21)
+
+Arena fixes this session's branch name as `arena/4251f2d1-kalshidash1`. Prior workflow investigation R1 was marked needs review on 2026-11-20; no current activity was found on that scope. This session takes over the unresolved investigation, without disturbing earlier records or open PR #39's alert-deduplication scope.
+
+| Task | Status | Owner | File scope |
+|---|---|---|---|
+| Investigate failing scheduled snapshot and live-alert workflows; implement and verify a targeted fix if supported by evidence, otherwise flag the limitation | in progress | session-4251f2d1 | `.github/workflows/refresh-data.yml`, `.github/workflows/live-alerts.yml`, associated narrowly scoped tests if needed; `COORDINATION.md` session record; `templates/flagged.tpl` and generated `flagged.html` only if findings require publication |
+
+
 ## Session on this branch — session-e480a835 (verification + defect-fix pass, 2026-11-20)
 
 - Session ID: `session-e480a835`
