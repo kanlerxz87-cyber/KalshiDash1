@@ -2254,6 +2254,8 @@ execution stays in GitHub Actions with repository secrets (as it already was).
 | GitHub Pages | `pages/builds/latest` → `status: built`, `error: null` for `caf5c13` (the build for `f214738` was `cancelled`, superseded by the newer commit — the normal Pages behaviour, not a failure) |
 | Live verification | `https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html` serves F-01 marked **Resolved** with the measured headers; `…/data/cors-probe.json` serves the `main`-run measurement (`workflow_run 44947086345`) |
 
+| Follow-up record PR | [#67](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/67) — **merged** 2026-11-21T20:37:24Z as `dcb647f340dd67c9bc5f3ffbe7838109fb9f08cb`; checks `alerts`/`build`/`qa`/`qa` pass; Pages `built`, `error: null`; main runs for `dcb647f` all `success` |
+
 A follow-up record commit corrects one inconsistency found *after* the merge: the published F-01 row still said "two
 independent runs" while this board and the verification record cite three (plus the post-merge fourth). The row now
 says three and names the fourth; the evidence guard keeps it tied to the file.
