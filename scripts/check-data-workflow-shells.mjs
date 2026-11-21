@@ -5,7 +5,8 @@
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
-const files = ['.github/workflows/refresh-data.yml', '.github/workflows/live-alerts.yml'];
+const files = ['.github/workflows/refresh-data.yml', '.github/workflows/live-alerts.yml',
+  '.github/workflows/keepalive.yml'];
 let count = 0;
 for (const file of files) {
   const lines = readFileSync(file, 'utf8').split('\n');

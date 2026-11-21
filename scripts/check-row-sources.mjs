@@ -73,6 +73,37 @@ function audit(file) {
   return { file, rows, missing, found: true };
 }
 
+/* Source URLs must also be USABLE. Measured 2026-11-21 06:40 UTC against the demo host:
+ *   GET /trade-api/v2/markets?ticker=KXAAAGASW-26NOV23-3.6400  -> 28 cursor pages of unrelated
+ *       KXMVECROSSCATEGORY markets (the parameter is silently ignored; Get Markets documents
+ *       `tickers`, plural, and no singular `ticker`)
+ *   GET /trade-api/v2/markets/trades?ticker=KXPRE...            -> the 3 trades for that market
+ * So `markets?ticker=` is a trap: the link looks specific and quietly returns the whole exchange.
+ * No published row may use it. (`/markets/trades?ticker=` is documented and correct.)
+ */
+function checkSourceParameterUsage() {
+  const patterns = [
+    /trade-api\/v2\/markets\?ticker=/,
+    /trade-api\/v2\/markets\?[^"'\s]*&ticker=/,
+  ];
+  console.log('\nSOURCE-PARAMETER — /markets accepts `tickers`; a singular `ticker` is silently ignored');
+  const bad = [];
+  for (const f of [...REQUIRED, ...REPORT_ONLY, 'data/live/feed.json', 'data/snapshot.json']) {
+    if (!existsSync(f)) continue;
+    const text = readFileSync(f, 'utf8');
+    for (const re of patterns) {
+      const m = text.match(re);
+      if (m) bad.push(`${f}: ${m[0].slice(0, 90)}`);
+    }
+  }
+  if (bad.length) {
+    for (const b of bad) console.error(`       ✗ unsupported parameter in a published source URL: ${b}`);
+    failures += bad.length;
+  } else {
+    console.log('       ok   no published source URL uses the ignored singular form');
+  }
+}
+
 let failures = 0;
 let enforcedRows = 0;
 let enforcedMissing = 0;
@@ -98,6 +129,8 @@ for (const f of REPORT_ONLY) {
   otherRows += r.rows;
   console.log(`       ${f.padEnd(30)} rows=${String(r.rows).padStart(4)} without-an-official-source=${r.missing.length}`);
 }
+
+checkSourceParameterUsage();
 
 console.log(`\nenforced rows: ${enforcedRows}, missing first-party source links: ${enforcedMissing}`);
 console.log(`report-only rows: ${otherRows}`);

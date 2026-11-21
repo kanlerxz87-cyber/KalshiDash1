@@ -124,16 +124,20 @@ jobs:
           STAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git commit -m "data(live): keepalive pulse ${STAMP}"
           BRANCH="${GITHUB_REF_NAME}"
-          for attempt in 1 2 3; do
-            echo "push attempt ${attempt}/3 to ${BRANCH}"
+          # Several agent sessions push to main continuously, so a 3-attempt / 30-second budget was
+          # measured to be too small: keepalive run 44876422837 (2026-11-21 06:37 UTC) failed exactly
+          # here while its sibling steps all passed, and the next pulse succeeded. The budget is now
+          # 6 attempts with jittered backoff (~4 minutes), which is still well inside the pulse.
+          for attempt in 1 2 3 4 5 6; do
+            echo "push attempt ${attempt}/6 to ${BRANCH}"
             if git pull --rebase --autostash origin "$BRANCH" && git push origin "HEAD:${BRANCH}"; then
               echo "pushed on attempt ${attempt}"
               exit 0
             fi
             git rebase --abort 2>/dev/null || true
-            sleep $((attempt * 10))
+            sleep $((attempt * 15 + RANDOM % 15))
           done
-          echo '::error::could not push after 3 attempts'
+          echo '::error::could not push after 6 attempts'
           exit 1
 
       # The gate that makes the live claim checkable. It reads the *published* feed (via the API,
