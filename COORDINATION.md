@@ -1,5 +1,43 @@
 # COORDINATION.md — shared task board
 
+## Session session-135bb43a — final integration and executable paper-trading verification (2026-11-21)
+
+- Arena-pinned branch: `arena/135bb43a-kalshidash1`, base `b81f9f2731a12fd90e0287cd1d77ded58c35d79e`.
+- Reviewed the existing board, repository and open PRs before implementation. Only open PR is
+  [#72](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/72), owned by session-e7260519,
+  last updated 2026-11-21T20:46:57Z (>60 minutes before this claim at 23:10 UTC).
+  Its feature work is done but site-qa failed. **Stale-claim handoff:** this session takes over
+  final integration/QA of that existing work (preserving its commits) on the assigned branch;
+  it will not recreate its model fix or push to the other session's branch.
+- No other open PR claims the new simulator/graph checks below. Historical merged claims are
+  retained as records, not treated as active locks. Shared generated pages will be changed only
+  by the final integration generator, after the source changes have passed their tests.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| I1 | Claim scope, commit and push immediately; preserve prior session work. | in progress | session-135bb43a | this section of `COORDINATION.md` |
+| I2 | Integrate stale PR #72, reproduce/fix its failed check, re-verify model/alert outputs without inventing data. | in progress | session-135bb43a (final integration) | PR #72's existing files via merge; targeted QA fixes as evidenced |
+| I3 | Fix canonical browser simulator only where defects are reproduced: executable YES/NO asks and quantities, no stale/snapshot assumed fills, verifiable performance accounting and final settlement; add offline regression tests. | in progress | session-135bb43a | `assets/app.js`, new `assets/paper.js`, new `scripts/check-paper.mjs`, `package.json`, `.github/workflows/site-qa.yml`, `templates/{market,portfolio,analysis,strategies,executive-summary,flagged}.tpl` |
+| I4 | Verify graph time/source semantics and event links; fix demonstrated issues, not infer news causation. | in progress | session-135bb43a | `assets/chart.js`, `assets/app.js`, new `scripts/check-market-chart.mjs`, `templates/market.tpl` |
+| I5 | Full requirement/source audit, source-linked report, canonical site build, per-row official-source checks, internal-link checks, integration PR to main, merge and Pages confirmation. | in progress | session-135bb43a (final integration) | new `verification/2026-11-21-135bb43a.md`, `README.md`, this board; generated root/category HTML through `scripts/build-site.mjs` only |
+
+### Initial evidence and limits
+
+- Official [demo environment](https://docs.kalshi.com/getting_started/demo_env) re-read: recommended
+  and alternate REST/WebSocket URLs match the brief; mock funds and separate credentials confirmed.
+- Official [orderbook](https://docs.kalshi.com/api-reference/market/get-market-orderbook.md) re-read:
+  book publishes bids only; YES bid at X is NO ask at 1-X, with identical contract quantity.
+  Existing `assets/app.js` buys NO at `no_bid_dollars` and falls back to last trade price if a touch
+  is missing (reproduced by code inspection; regression test to follow).
+- Official [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets.md) re-read:
+  prices/status can be cached; missing data cannot be treated as a confirmed executable quote.
+- `data/account.json` currently says `connected: false`, `captured_at: null`; no account balances,
+  fills or performance can be verified. `gh secret list` is denied with HTTP 403 by integration
+  permissions, so actual repository-secret configuration is **unverified**, not asserted absent.
+  No credentials requested, exposed, or fabricated. Account trade execution stays gated.
+
+---
+
 ## Session session-fd481e62 — final verification, integration audit & Pages check (2026-11-21)
 
 Branch: `arena/fd481e62-kalshidash1` (base `f52ad08` on `main`).
