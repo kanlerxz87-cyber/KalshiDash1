@@ -40,6 +40,35 @@ const srcLink = (url, label = 'source') => (url
   ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>`
   : '<span class="muted">—</span>');
 
+/* Age words for the as-of line. Deliberately the same thresholds as assets/freshness.js
+ * (20 min warn / 45 min stale), which are this project's operating limits, not Kalshi claims. */
+const ASOF_WARN_MIN = 20;
+const ASOF_STALE_MIN = 45;
+
+function feedAsOfHtml() {
+  const file = path.join(ROOT, 'data', 'live', 'feed.json');
+  if (!fs.existsSync(file)) {
+    return '<span id="feed-asof" class="small muted" data-state="missing">Data as of: no committed alert-feed sample yet.</span>';
+  }
+  let feed;
+  try { feed = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { feed = null; }
+  const iso = feed && feed.meta && feed.meta.generated_at ? feed.meta.generated_at : null;
+  if (!iso) {
+    return '<span id="feed-asof" class="small muted" data-state="missing">Data as of: the committed feed has no timestamp.</span>';
+  }
+  /* DETERMINISTIC BY DESIGN. The first version of this line printed "N min old at build" from
+   * Date.now(), which made the generated HTML depend on the wall clock: `build-site.mjs --check`
+   * then failed on the next CI run although nothing in the repo had changed (reproduced locally:
+   * "Committed site is stale for: market.html"). The measured age is now computed in the
+   * visitor's browser by assets/freshness.js (paintAsOf). The committed HTML carries the absolute
+   * sample time and the project's own staleness rule — both constant until the data changes — so
+   * a screenshot or a no-JS reader still sees WHEN the data is from. */
+  return `<span id="feed-asof" class="small" data-state="pending" data-asof="${esc(iso)}">`
+    + `Data as of <b>${esc(iso.replace('T', ' ').replace(/\.\d+Z$/, 'Z'))}</b> — `
+    + `samples older than ${ASOF_WARN_MIN} min are marked late, older than ${ASOF_STALE_MIN} min STALE `
+    + `(age measured in your browser when the page loaded).</span>`;
+}
+
 const TOPICS = [
   { id: 'gas', label: 'Gas Prices', color: 'gas' },
   { id: 'elections', label: 'Elections', color: 'elections' },
@@ -284,7 +313,7 @@ const CATEGORY_PAGES = TOPICS.map((t) => ({
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span><span id="mode-badge" class="badge warn">data: probing…</span><span id="clock" class="mono small muted"></span></div>
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span><span class="asof-wrap">{{FEED_ASOF}}</span><span id="mode-badge" class="badge warn">data: probing…</span><span id="clock" class="mono small muted"></span></div>
   </div>
   <nav class="site"><div class="nav-inner">{{NAV}}</div></nav>
 </header>
@@ -380,6 +409,11 @@ function replacements(text, base = '') {
     '{{NAV}}': navHtml(base),
     '{{FOOTER}}': footerHtml(base),
     '{{SNAPSHOT_CAPTURED}}': dt(snap.meta && snap.meta.captured_at),
+    /* Absolute, non-JS as-of line. Rendered into the HTML so a screenshot, a PDF, an archived
+     * copy or a no-JS reader sees the sample time and its age AT BUILD TIME. assets/freshness.js
+     * then replaces it with the age measured in the visitor's browser. The element id is read by
+     * assets/freshness.js (paintAsOf) and asserted by scripts/check_freshness_badge.mjs. */
+    '{{FEED_ASOF}}': feedAsOfHtml(),
     '{{SNAPSHOT_META}}': esc(JSON.stringify(snap.meta, null, 2)),
     '{{TOPICS_TABLE}}': topicOverviewTable(base),
     '{{TOP_MARKETS_TABLE}}': marketTable(live.slice(0, 20), { empty: 'No open focus-topic market at capture time.', base }),

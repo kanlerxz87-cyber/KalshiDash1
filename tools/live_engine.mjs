@@ -351,11 +351,77 @@ export function detectSwing({ ticker, topic, title, price, baseline, nowSeconds,
  * The returned `reasons` are shown next to the row in the site, so a reader can audit it.
  */
 export const HIGH_ROI_THRESHOLD = 0.62;
-export const MODEL_VERSION = 'heuristic-v1';
+export const MODEL_VERSION = 'heuristic-v2';
 
-export function modelScore({ from, delta, bid, ask, volume24h, sampleAgeSeconds = 0 }) {
+/* FOLLOW-THROUGH GATE — measured, not assumed.
+ *
+ * WHY THIS EXISTS (2026-11-21). The published feed's high-ROI pane was topped by
+ * `KXBTCY-27JAN0100-B97500` alerts reading "$0.01 -> $0.97 (up)" with `model.score 0.779`
+ * and `highROI: true`, and by `KXPRESNOMD-28-AKLO` reading "$0.803 -> $0.003 (down)" with
+ * `model 0.6288`. In both rows the *published* YES ask at detection was the opposite end of
+ * the book: `yes_ask_dollars` was $0.0100 on the "up to $0.97" row and $0.8030 on the "down
+ * to $0.003" row. So the recorded swing price could not have been bought or sold at the
+ * moment it was recorded — the score was ranking millisecond print noise, not an opportunity.
+ *
+ * The gate is computed only from fields the API returned, and it is a two-sided band, not a
+ * one-sided "was it cheap enough" comparison:
+ *
+ *   up   alert: the executable entry is the YES ask. Require |ask - to| <= tolerance.
+ *   down alert: the executable exit  is the YES bid. Require |bid - to| <= tolerance.
+ *   either side priced at $0.00 means "no offer to buy" / "no bid to sell into" -> not tradeable.
+ *
+ * A one-sided comparison was tried first and is wrong: it accepts a claimed $0.97 print whose
+ * ask is $0.01 ("cheaper to buy than the print"), which is precisely the phantom this gate
+ * exists to reject. The quote has to be *at* the swing price, not merely better than it.
+ *
+ * Tolerance is FOLLOW_TOLERANCE = $0.02: wider than one price step ($0.01 on the markets this
+ * dashboard tracks) so a real but slightly stale quote still passes, and far tighter than the
+ * 80–96 cent contradictions observed.
+ * When the quote is unknown the alert is NOT called untradeable (the data is missing, not
+ * contradictory): it is marked `follow_through: 'unknown'` and scores 0 on the new term, which
+ * keeps the published "never invent a value" rule intact.
+ *
+ * `modelScore` multiplies by this gate rather than subtracting from it, because a swing nobody
+ * can trade is not a weak signal — it is not a signal at all.
+ */
+export const FOLLOW_TOLERANCE = 0.02;
+
+export function followThrough({ direction, to, bid, ask }) {
+  if (to === null || to === undefined) return { ok: null, note: 'swing price missing — unverified' };
+  if (direction !== 'up' && direction !== 'down') return { ok: null, note: 'direction unknown — unverified' };
+  const ref = direction === 'up' ? ask : bid;
+  const side = direction === 'up' ? 'ask (the price you would pay)' : 'bid (the price you would receive)';
+  if (ref === null || ref === undefined) return { ok: null, note: `no YES ${side} published — unverified` };
+  if (ref <= 0) {
+    return {
+      ok: false,
+      gap: round(to - ref, 4),
+      note: `YES ${direction === 'up' ? 'ask' : 'bid'} is $${ref.toFixed(2)} — there is no ${direction === 'up' ? 'offer to buy' : 'bid to sell into'}`,
+    };
+  }
+  /* TWO-SIDED BAND, not a one-sided comparison. A claimed $0.97 print whose ask is $0.01 is not
+   * "cheaper to buy" — it means the quote fell back and the print did not hold. The published
+   * side has to sit where the swing says the price is, within FOLLOW_TOLERANCE. */
+  const gap = round(Math.abs(ref - to), 4);
+  return {
+    ok: gap <= FOLLOW_TOLERANCE + 1e-9,
+    gap,
+    note: `${side} $${ref.toFixed(2)} vs swing price $${to.toFixed(2)} (gap $${gap.toFixed(2)})`,
+  };
+}
+
+export function modelScore({ from, delta, direction = null, to = null, bid, ask, volume24h, sampleAgeSeconds = 0 }) {
   const reasons = [];
-  if (from === null || from === undefined) return { score: null, highROI: false, reasons: ['no baseline price — unverified'] };
+  if (from === null || from === undefined) {
+    return { score: null, highROI: false, tradeable: null, reasons: ['no baseline price — unverified'] };
+  }
+
+  // 0. REALITY GATE. If the row records which way the price moved and where it landed, the
+  //    published book has to agree that the recorded price was reachable. A row that does not
+  //    agree is displayed (the move is real data) but it can never be a high-ROI signal.
+  const ft = direction && to !== null && to !== undefined
+    ? followThrough({ direction, to, bid, ask })
+    : { ok: null, note: 'direction/price not supplied to the model' };
 
   // 1. headroom: how much of the probability range is left to move into
   const headroom = round(Math.max(0, Math.min(from, 1 - from) / 0.5), 4);
@@ -370,24 +436,44 @@ export function modelScore({ from, delta, bid, ask, volume24h, sampleAgeSeconds 
   const liq = round(Math.min(1, v / 1000), 4);
   reasons.push(`24h volume ${v} contracts -> liquidity ${liq.toFixed(2)}`);
 
-  // 4. spread
+  // 4. spread. THIS TERM WAS THE BUG. A one-sided book (yes_bid 0, yes_ask 0.97) used to score
+  //    0.90 "tight" because the code computed ask - bid and never asked whether the bid existed.
+  //    A missing or zero bid means there is no buyer to exit into, so the term is 0 and the row
+  //    keeps a reason saying so.
   let spreadScore = 0;
-  if (bid !== null && ask !== null && bid !== undefined && ask !== undefined && ask >= bid && ask > 0) {
+  const hasTwoSides = bid !== null && bid !== undefined && ask !== null && ask !== undefined
+    && bid > 0 && ask > 0 && ask >= bid;
+  if (hasTwoSides) {
     const spread = round(ask - bid, 4);
-    spreadScore = round(Math.max(0, 1 - spread * 10), 4); // $0.00 -> 1, $0.10 -> 0
+    spreadScore = round(Math.max(0, 1 - spread * 10), 4);
     reasons.push(`spread $${spread.toFixed(2)} -> ${spreadScore.toFixed(2)}`);
   } else {
-    reasons.push('spread unknown (bid/ask not both returned) -> 0.00');
+    reasons.push('book is one-sided or unpriced (no YES bid and ask) -> 0.00');
   }
+
+  // 5. follow-through: did the published quote still sit where the swing ended?
+  const followScore = ft.ok === true ? 1 : 0;
+  reasons.push(ft.ok === true
+    ? `quote follows the swing: ${ft.note} -> 1.00`
+    : ft.ok === false
+      ? `NOT tradeable at the swing price: ${ft.note} -> 0.00`
+      : `follow-through unverified (${ft.note}) -> 0.00`);
 
   let score = 0.20 * headroom + 0.20 * size + 0.35 * liq + 0.25 * spreadScore;
+  score = round(score, 4);
 
   if (sampleAgeSeconds > 3600) {
-    score *= 0.5;
+    score = round(score * 0.5, 4);
     reasons.push('sample older than 1h -> score halved (REST reads lag, S10)');
   }
+  // Untradeable rows are capped, not merely penalised: the pane is labelled "high ROI", and a
+  // price that could not be executed at the moment of detection has no ROI to be high.
+  if (ft.ok === false) {
+    score = Math.min(score, 0.3);
+    reasons.push('capped at 0.30 because the swing was not executable at the recorded price');
+  }
   score = round(Math.max(0, Math.min(1, score)), 4);
-  return { score, highROI: score >= HIGH_ROI_THRESHOLD, reasons };
+  return { score, highROI: score >= HIGH_ROI_THRESHOLD, tradeable: ft.ok, reasons };
 }
 
 /* ------------------------------------------------------------------ http */
@@ -761,6 +847,8 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
       const model = modelScore({
         from: swing.from,
         delta: swing.delta,
+        direction: swing.direction,
+        to: swing.to,
         bid,
         ask,
         volume24h: vol24,
@@ -1161,6 +1249,8 @@ export function mergeCandleAlerts(state, candleAlerts) {
     a.model = modelScore({
       from: a.from,
       delta: a.delta,
+      direction: a.direction,
+      to: a.to,
       bid: num(m.yes_bid_dollars),
       ask: num(m.yes_ask_dollars),
       volume24h: num(m.volume_24h_fp),
@@ -1171,6 +1261,12 @@ export function mergeCandleAlerts(state, candleAlerts) {
     a.volume_fp = m.volume_fp ?? null;
     a.yes_bid_dollars = m.yes_bid_dollars ?? null;
     a.yes_ask_dollars = m.yes_ask_dollars ?? null;
+    /* Carried so the chat can answer "how many contracts are at this price" (brief requirement).
+     * Measured 2026-11-21: 37 of 38 published rows had no size at all because these two fields
+     * were never copied here, even when the sampled market row had them. */
+    a.yes_bid_size_fp = m.yes_bid_size_fp ?? null;
+    a.yes_ask_size_fp = m.yes_ask_size_fp ?? null;
+    a.open_interest_fp = m.open_interest_fp ?? null;
     a.close_time = m.close_time ?? null;
     a.rules_primary = m.rules_primary ?? null;
     next.alerts.push(a);
@@ -1385,10 +1481,60 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
   // 6. orderbooks for the biggest rows
   const orderbooks = await collectOrderbooks(client, next, { log });
 
+  // 6b. SCORE SWINGS THAT DO NOT COME FROM A SAMPLED MARKET ROW.
+  //
+  // Trade and candle detectors publish swings for markets that are not in `next.markets`
+  // (the sampler keeps a ranked subset). Those rows reached the feed with NO model block at
+  // all, which is why the high-ROI pane could only ever show a handful of samplers. Quoting
+  // each one now, from the official single-market endpoint, lets every swing be scored on the
+  // same terms — and, more importantly, lets the follow-through gate see the real book.
+  next.meta.model_inputs_fetched = 0;
+  next.meta.model_inputs_failed = 0;
+  const unscored = next.alerts.filter((a) => !a.model || typeof a.model.score !== 'number');
+  const quoteCache = new Map();
+  for (const a of unscored.slice(0, 20)) {
+    try {
+      if (!quoteCache.has(a.ticker)) {
+        const data = await client.getJson(`/markets/${encodeURIComponent(a.ticker)}`);
+        quoteCache.set(a.ticker, (data && data.market) || null);
+      }
+      const q = quoteCache.get(a.ticker);
+      if (!q) { next.meta.model_inputs_failed += 1; continue; }
+      const bid = num(q.yes_bid_dollars);
+      const ask = num(q.yes_ask_dollars);
+      a.yes_bid_dollars = q.yes_bid_dollars ?? a.yes_bid_dollars ?? null;
+      a.yes_ask_dollars = q.yes_ask_dollars ?? a.yes_ask_dollars ?? null;
+      a.yes_bid_size_fp = q.yes_bid_size_fp ?? a.yes_bid_size_fp ?? null;
+      a.yes_ask_size_fp = q.yes_ask_size_fp ?? a.yes_ask_size_fp ?? null;
+      a.volume_24h_fp = q.volume_24h_fp ?? a.volume_24h_fp ?? null;
+      a.volume_fp = q.volume_fp ?? a.volume_fp ?? null;
+      a.model = modelScore({
+        from: a.from,
+        delta: a.delta,
+        direction: a.direction,
+        to: a.to,
+        bid,
+        ask,
+        volume24h: num(q.volume_24h_fp),
+        sampleAgeSeconds: a.ts ? Math.max(0, (Date.now() - Date.parse(a.ts)) / 1000) : 0,
+      });
+      a.model.quote_source_url = client.base + `/markets/${encodeURIComponent(a.ticker)}`;
+      a.model.quote_sampled_at = new Date().toISOString();
+      next.meta.model_inputs_fetched += 1;
+    } catch (e) {
+      next.meta.model_inputs_failed += 1;
+      log(`  quote failed for ${a.ticker}: ${e.message}`);
+    }
+  }
+
   // One swing can be seen by three detectors; keep only the most precise row.
   const beforeDedupe = next.alerts.length;
   next.alerts = collapseDuplicates(next.alerts);
   next.meta.duplicates_collapsed = beforeDedupe - next.alerts.length;
+  next.meta.high_roi_alerts = next.alerts.filter((a) => a.model && a.model.highROI).length;
+  next.meta.untradeable_high_roi_blocked = next.alerts.filter(
+    (a) => a.model && a.model.tradeable === false && a.model.score >= HIGH_ROI_THRESHOLD,
+  ).length;
 
   next.meta.base_url = BASE;
   next.meta.legacy_base_url = LEGACY_BASE;
@@ -1577,11 +1723,42 @@ export async function selftest() {
   ok(detectSwing({ ticker: 'T', topic: 'gas', title: 'x', price: 0.44, baseline: 0.34, nowSeconds: 1 }) !== null, 'float rounding does not drop a boundary alert');
 
   // model
-  const strong = modelScore({ from: 0.20, delta: 0.12, bid: 0.31, ask: 0.33, volume24h: 5000, sampleAgeSeconds: 0 });
+  const strong = modelScore({ from: 0.20, delta: 0.12, direction: 'up', to: 0.32, bid: 0.31, ask: 0.33, volume24h: 5000, sampleAgeSeconds: 0 });
   ok(strong.score !== null && strong.highROI === true, 'a large move on a liquid, tight market scores as high-ROI');
   const weak = modelScore({ from: 0.90, delta: 0.10, bid: 0.01, ask: 0.99, volume24h: 5, sampleAgeSeconds: 0 });
   ok(weak.score !== null && weak.highROI === false, 'a small-headroom move on an illiquid, wide market does not');
   ok(modelScore({ from: null, delta: 0.1 }).score === null, 'no baseline -> no score');
+
+  /* FOLLOW-THROUGH GATE (added 2026-11-21 after the high-ROI pane was measured to be topped by
+   * unfillable swings). Each case below is a row shape that actually appeared in the published
+   * feed, with the book fields copied from the official API response for that market. */
+  const phantomUp = modelScore({            // feed: KXBTCY-27JAN0100-B97500 "@...B97500@1795282837"
+    from: 0.01, delta: 0.96, direction: 'up', to: 0.97,
+    bid: 0.00, ask: 0.01, volume24h: 69487.15, sampleAgeSeconds: 0,
+  });
+  ok(phantomUp.tradeable === false, 'a $0.01 -> $0.97 print with a $0.01 ask is marked NOT tradeable');
+  ok(phantomUp.highROI === false, 'the phantom $0.96 "up" swing can never reach the high-ROI pane (score ' + phantomUp.score + ')');
+  ok(phantomUp.score <= 0.3, 'an untradeable row is capped at 0.30, not merely docked');
+  ok(phantomUp.reasons.some((r) => /NOT tradeable/.test(r)), 'the reason is stated in plain words on the row');
+
+  const phantomDown = modelScore({          // feed: KXPRESNOMD-28-AKLO "@...AKLO@1795190944"
+    from: 0.803, delta: -0.80, direction: 'down', to: 0.003,
+    bid: 0.00, ask: 0.803, volume24h: 62382.75, sampleAgeSeconds: 0,
+  });
+  ok(phantomDown.tradeable === false, 'a $0.803 -> $0.003 print with no YES bid is marked NOT tradeable');
+  ok(phantomDown.highROI === false, 'the phantom $0.80 "down" swing can never reach the high-ROI pane');
+
+  const oneSided = modelScore({ from: 0.50, delta: 0.12, direction: 'up', to: 0.62, bid: 0, ask: 0.62, volume24h: 5000, sampleAgeSeconds: 0 });
+  ok(oneSided.reasons.some((r) => /one-sided/.test(r)), 'a zero YES bid is called out as a one-sided book, not scored as a tight spread');
+
+  const unknownQuote = modelScore({ from: 0.30, delta: 0.12, direction: 'up', to: 0.42, bid: null, ask: null, volume24h: 5000, sampleAgeSeconds: 0 });
+  ok(unknownQuote.tradeable === null, 'a missing quote is reported as UNVERIFIED, never as untradeable');
+  ok(unknownQuote.highROI === false, 'an unverified quote cannot earn the high-ROI label either');
+
+  const tradableMove = modelScore({ from: 0.44, delta: 0.11, direction: 'up', to: 0.55, bid: 0.54, ask: 0.55, volume24h: 5000, sampleAgeSeconds: 0 });
+  ok(tradableMove.tradeable === true && tradableMove.highROI === true, 'a real, tight, liquid move still scores high (score ' + tradableMove.score + ')');
+  ok(modelScore({ from: 0.44, delta: 0.11, direction: 'up', to: 0.55, bid: 0.20, ask: 0.80, volume24h: 5000, sampleAgeSeconds: 0 }).tradeable === false,
+    'a 60-cent-wide book does not corroborate an 11-cent move');
 
   // applySample end-to-end on a synthetic cycle
   const st = structuredClone(EMPTY_STATE);
@@ -1608,6 +1785,11 @@ export async function selftest() {
   ok(s4.alerts.length === 1, 'no duplicate alert when the price is unchanged after an alert');
   const s5 = applySample(s4, { nowSeconds: 12000, markets: [mk('T1', 0.41, 1000)] });
   ok(s5.alerts.length === 1, 'cooldown expiry alone does not re-alert without another move');
+
+  // sizes are carried onto an alert (they were silently dropped before 2026-11-21)
+  const withSize = s3.alerts[0] || {};
+  ok(withSize.yes_bid_size_fp === '100.00' && withSize.yes_ask_size_fp === '100.00',
+    'a swing keeps the contract counts behind each quote (got ' + withSize.yes_bid_size_fp + '/' + withSize.yes_ask_size_fp + ')');
 
   // resolutions
   const s6 = applySample(s5, {

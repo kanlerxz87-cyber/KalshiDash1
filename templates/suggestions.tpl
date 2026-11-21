@@ -11,7 +11,7 @@
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span>
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span><span class="asof-wrap">{{FEED_ASOF}}</span>
       <span id="mode-badge" class="badge warn">data: probing…</span>
       <span id="clock" class="mono small muted"></span>
     </div>
@@ -104,6 +104,31 @@
           <td>Low</td><td>High</td></tr>
       </tbody>
     </table>
+  </div>
+
+  <h2>What this session changed, and what it recommends next</h2>
+  <div class="panel">
+    <p class="small">Five rows used to top the high-ROI chat that <strong>could not have been traded at the price shown</strong>
+    — a &ldquo;$0.01 → $0.97&rdquo; print on a market whose published YES ask was $0.01, and a &ldquo;$0.803 → $0.003&rdquo; print with
+    no YES bid at all. A trader reading that pane would have been looking at noise. Two changes fix the class of problem, not just
+    those rows: a <strong>follow-through gate</strong> (the quote has to sit where the swing ended, or the row is scored 0 and capped
+    at 0.30) and <strong>contract counts beside every quote</strong> (a $0.97 ask &times; 0 contracts is not an offer). Both are
+    checked by tests that were verified to fail on the old code. Details and every source link are in
+    <a href="flagged.html#F-71">F-71</a>.</p>
+    <p class="small">Recommended next, in the order that would most change what a trader can decide:</p>
+    <ol class="small" style="padding-left:20px">
+      <li><strong>Show the executable size on the chart.</strong> A price line says nothing about whether $0.10 of movement can be
+      bought. Plotting the touch size (already published as <code>yes_bid_size_fp</code> / <code>yes_ask_size_fp</code>) as a second,
+      low-contrast band would make &ldquo;real move or empty book&rdquo; a glance instead of a click.</li>
+      <li><strong>Cap alerts per ticker per day, not just per 15 minutes.</strong> One contract produced most of the recorded feed
+      (24 of 38 rows). The chat is readable today only because of the collapse rules; a daily cap would keep one flapping ticker
+      from owning the pane.</li>
+      <li><strong>Time-to-resolution on every row.</strong> <code>close_time</code> is already captured; sorting the panes by
+      &ldquo;how long does this have left&rdquo; answers the question a trader actually asking about a stale-looking market.</li>
+      <li><strong>Persist the alert history outside the repo.</strong> <code>data/live/feed.json</code> is capped at 200 rows and
+      is rewritten on every job run, so today&rsquo;s alerts quietly push out yesterday&rsquo;s. An append-only CSV artifact would
+      make the &ldquo;analyse the results by trade category&rdquo; part of the brief answerable over weeks rather than hours.</li>
+    </ol>
   </div>
 
   <h2>What would make the charts simpler, not busier</h2>
