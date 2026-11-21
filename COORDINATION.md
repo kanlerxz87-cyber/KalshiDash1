@@ -77,7 +77,14 @@
 
 - I5 now includes the canonical `templates/{dashboard,suggestions,questions,strategylab}.tpl`,
   `scripts/check-row-sources.mjs`, and the shared generator's footer/navigation copy for documented
-  source/copy defects only. The source gate currently accepts **any** anchor (even an internal
+  source/copy defects only. Final shared-table scope also includes `alerts/index.html`'s five
+  method rows (official field-definition links only), `templates/catalyst.tpl`'s S11 source,
+  `data/sources.json`'s attribution wording, and `audit/index.html`'s historical-ledger notice/links.
+  `assets/strategylab.js` is included for per-row project/field attribution and making its seed/topic
+  filters apply to aggregates as well as the log; it remains an explicitly unverified legacy lab,
+  not recertified canonical performance. PR #84 owns its data-writer workflow guard and PR #85
+  owns the alerts notice defect; those implementations are not touched.
+  The source gate currently accepts **any** anchor (even an internal
   market link) as an "official source" and leaves non-data rows report-only. The final integration
   will distinguish official field definitions from project-authored rules, add real publisher
   links where applicable, and flag genuinely unverifiable legacy/seed results rather than call
