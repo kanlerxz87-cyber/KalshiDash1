@@ -39,8 +39,12 @@
       <li><strong>Two scrolling chats.</strong> The left pane posts every tracked contract that moves at least $0.10 in either
       direction. The right pane posts only the moves the published ROI model likes. Both carry the official settlement source that
       decides the outcome, so a swing can be investigated in one click.</li>
-      <li><strong>Resolution tracking.</strong> Every market is followed from <code>active</code> through <code>determined</code> to
-      <code>finalized</code>; the result is shown in the tables and announced in the chat.</li>
+      <li><strong>Resolution tracking.</strong> Every contract this engine alerts on stays on a follow list until the exchange
+      publishes <code>result</code> — <code>yes</code>, <code>no</code> or <code>scalar</code> — with its
+      <code>settlement_ts</code> and <code>settlement_value_dollars</code>. Unanswered contracts are listed under
+      <a href="alerts/index.html#await-table">Followed to resolution</a>; answered ones move to the resolved table and to the
+      resolution block on each market page. Both lists are read from the API, never inferred (see F-66 on
+      <a href="flagged.html">Flagged for Review</a> for the two retention/retrieval defects this replaced).</li>
       <li><strong>Price and liquidity.</strong> A time-series chart with selectable 30-second to 24-hour windows, a price axis, and
       an order-book ladder that answers "how many contracts are available at this price".</li>
       <li><strong>Simulated trading.</strong> Five published strategies trade automatically against live prices, settle on
@@ -132,8 +136,14 @@
       only while a page is open.</li>
       <li><strong>A real portfolio without a key.</strong> No credential is committed, so the tracked portfolio is simulated; the
       demo-account page shows the demo-account snapshot that a GitHub Actions job produces from repository secrets. A browser
-      cannot read the account itself: the demo host’s CORS preflight does not allow the <code>KALSHI-ACCESS-*</code>
-      headers a signed request needs (measured 2026-11-21 — <a href="flagged.html#F-66">F-66</a>).</li>
+      cannot read the account itself: the demo host's CORS preflight does not allow the <code>KALSHI-ACCESS-*</code>
+      headers a signed request needs (measured 2026-11-21 &mdash; <a href="flagged.html#F-66">F-66</a>). No demo-account value
+      is published while the repository has no key: the portfolio figures are simulated and labelled as such, and
+      <code>data/account.json</code> records <code>connected: false</code>.</li>
+      <li><strong>A live order feed from the exchange.</strong> Kalshi's WebSocket handshake requires a signed API-key request
+      (<a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">Quick Start:
+      WebSockets</a>), so a static site cannot stream ticks. Alerts come from a scheduled REST sampler plus in-browser polling;
+      the header badge always states the measured age of the newest sample.</li>
       <li><strong>Anything outside the five topics.</strong> The demo exchange lists many more categories; they are out of scope by
       the brief, and the full taxonomy is linked from <a href="api.html">API reference</a>.</li>
     </ul>

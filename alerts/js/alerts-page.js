@@ -568,6 +568,20 @@
     setInterval(function () {
       A.pollLive({ maxSeries: 8 }).then(renderAll, setMode);
     }, 30000);
+
+    /* Re-read the committed engine feed as well. Without this the two chats only ever showed the
+     * sample that existed when the tab was opened: the 30 s loop above polls the API in this
+     * browser, but the history (and every alert found by the scheduled engine) lives in
+     * data/live/feed.json, which the page fetched exactly once at boot. A trader watching for a
+     * $0.10 swing would have to reload to see it. 60 s matches the engine's own 10-minute cadence
+     * with room to spare, and renderChats(false) keeps the scroll position and only highlights
+     * ids that were not on screen before. */
+    setInterval(function () {
+      A.loadFeed().then(function (f) {
+        if (!f) return;              // keep the current view; feedError surfaces in the badge
+        renderAll();
+      });
+    }, 60000);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
