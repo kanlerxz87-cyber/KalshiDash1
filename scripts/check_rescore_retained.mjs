@@ -175,6 +175,30 @@ const again = applySample(next, { nowSeconds: Math.floor(Date.now() / 1000) + 60
 ok(again.meta.rescored_by_current_model === 0, 'a second sample must not re-score anything (idempotent)');
 ok(fingerprint(again) === fingerprint(next), 'the second sample must leave the rows untouched');
 
+/* ---- 6. a re-scored row's provenance may not be dropped ------------------------------------ */
+/* Measured on the published feed 2026-11-21T23:18Z (F-77): the engine rebuilds feed.json from
+ * state.json every sample, and the legacy list had only ever been written to the feed, so the
+ * next sample published an empty list while the row still carried original_highROI. */
+const prov = structuredClone(state);
+prov.alerts = [{
+  id: 'trade:PROV@1', ticker: 'PROV-1', ts: ISO(30), direction: 'down', from: 0.802, to: 0.003, delta: -0.799,
+  abs_delta: 0.799, threshold: 0.1, baseline_kind: 'previous trade within 30 min', detection: 'trade',
+  topic: 'crypto', title: 'PROV-1',
+  yes_bid_dollars: '0.0000', yes_ask_dollars: '0.8020', volume_24h_fp: '500.00', volume_fp: '1000.00',
+  close_time: '2027-01-01T00:00:00Z', source_url: `${BASE}/markets/trades?ticker=PROV-1&limit=1000`,
+  model: { score: 0.3, highROI: false, tradeable: false, original_highROI: true, original_score: 0.987, reasons: ['re-scored'] },
+}];
+prov.meta = { ...prov.meta, legacy_unfillable_high_roi: [] };
+const noList = validate(asFeed(prov));
+ok(noList.code === 1 && /missing from meta\.legacy_unfillable_high_roi/.test(noList.out),
+  'the validator must reject a re-scored row whose provenance entry was dropped');
+prov.meta.legacy_unfillable_high_roi = [{
+  id: 'trade:PROV@1', ticker: 'PROV-1', ts: prov.alerts[0].ts, direction: 'down', from: 0.802, to: 0.003,
+  yes_bid_dollars: '0.0000', yes_ask_dollars: '0.8020', published_score: 0.987, reason: 'no bid',
+}];
+const withList = validate(asFeed(prov));
+ok(withList.code === 0, `the same row is accepted once it is listed (exit ${withList.code})\n${withList.out}`);
+
 rmSync(dir, { recursive: true, force: true });
 
 console.log(`\ncheck_rescore_retained — ${pass} assertion(s) passed`);

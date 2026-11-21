@@ -2088,7 +2088,49 @@
   "model_inputs_fetched": 0,
   "model_inputs_failed": 0,
   "high_roi_alerts": 2,
-  "untradeable_high_roi_blocked": 0
+  "untradeable_high_roi_blocked": 0,
+  "legacy_unfillable_high_roi": [
+   {
+    "id": "trade:KXPRESPERSON-28-VRAM@1795292123",
+    "ticker": "KXPRESPERSON-28-VRAM",
+    "ts": "2026-11-21T20:15:23.601Z",
+    "direction": "down",
+    "from": 0.802,
+    "to": 0.003,
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "0.8020",
+    "published_score": 0.6292,
+    "reason": "YES bid is $0.00 — there is no bid to sell into",
+    "detected_by": "scripts/annotate-legacy-unfillable.mjs"
+   },
+   {
+    "id": "trade:KXPRESPERSON-28-VRAM@1795290320",
+    "ticker": "KXPRESPERSON-28-VRAM",
+    "ts": "2026-11-21T19:45:20.401Z",
+    "direction": "down",
+    "from": 0.802,
+    "to": 0.003,
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "0.8020",
+    "published_score": 0.6292,
+    "reason": "YES bid is $0.00 — there is no bid to sell into",
+    "detected_by": "scripts/annotate-legacy-unfillable.mjs"
+   },
+   {
+    "id": "trade:KXPRESPERSON-28-VRAM@1795289416",
+    "ticker": "KXPRESPERSON-28-VRAM",
+    "ts": "2026-11-21T19:30:16.291Z",
+    "direction": "down",
+    "from": 0.802,
+    "to": 0.003,
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "0.8020",
+    "published_score": 0.6292,
+    "reason": "YES bid is $0.00 — there is no bid to sell into",
+    "detected_by": "scripts/annotate-legacy-unfillable.mjs"
+   }
+  ],
+  "legacy_unfillable_note": "High-ROI rows published by model heuristic-v1 before the follow-through gate existed. The published bid/ask at detection did not corroborate the swing price, so these rows are kept as recorded history but are marked \"not tradeable\" on the page and excluded from the live high-ROI ranking. Their score is the ORIGINAL v1 score and is labelled as such."
  },
  "run": {
   "run_id": "2026-11-21T23:18:26.000Z",
@@ -3158,7 +3200,8 @@
     "original_highROI": true,
     "original_model_version": "heuristic-v1",
     "tradeable": false,
-    "age_penalised": false
+    "age_penalised": false,
+    "relabelled_by": "scripts/annotate-legacy-unfillable.mjs (2026-11-21)"
    },
    "est_traded_dollars": 407220132.53,
    "volume_24h_fp": "58068.31",
@@ -3251,7 +3294,8 @@
     "original_highROI": true,
     "original_model_version": "heuristic-v1",
     "tradeable": false,
-    "age_penalised": false
+    "age_penalised": false,
+    "relabelled_by": "scripts/annotate-legacy-unfillable.mjs (2026-11-21)"
    },
    "est_traded_dollars": 407220132.53,
    "volume_24h_fp": "58068.31",
@@ -3300,7 +3344,8 @@
     "original_highROI": true,
     "original_model_version": "heuristic-v1",
     "tradeable": false,
-    "age_penalised": false
+    "age_penalised": false,
+    "relabelled_by": "scripts/annotate-legacy-unfillable.mjs (2026-11-21)"
    },
    "est_traded_dollars": 407220132.53,
    "volume_24h_fp": "58068.31",
