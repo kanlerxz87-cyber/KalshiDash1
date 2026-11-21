@@ -48,9 +48,53 @@ different route, which is recorded here as **independent corroboration**, not as
 | W-06 | **[DONE]** **`scripts/keepalive.mjs` reports a dead scheduler as "fresh".** The monitor decides freshness from the *age of the newest run*, ignoring its **conclusion**. Measured at 06:38Z on 2026-11-21: `live-alerts.yml` and `refresh-data.yml` were both reported `fresh (1 min ago)` — but those "runs" were triggered by an unrelated `push`, both were still `in_progress`/failing, and **every** scheduled run of both had failed (newest *scheduled* run: 3.6 h and 3.2 h old). The monitor's own table printed `fresh` directly above a `newest SCHEDULED: 3.6 h ago`. Fix: freshness requires a **successful** run; a failing/newest-scheduled-too-old runner is reported as `failing`/`overdue`, and `--strict` makes the pulse fail. | in progress | session-7dc87913 | `scripts/keepalive.mjs`, `scripts/check-keepalive-verdict.mjs` (new, offline test) |
 | W-08 | **[DONE]** Independent end-to-end verification that `session-4251f2d1`'s `fi` repair actually restores main write-back (the repair was only "needs review — main write-back not yet confirmed"). **Confirmed:** merge run [44875714835](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714835) is `success` with "Commit the new sample" ✓, and the commits it produced are on `origin/main` (`64296fb` engine sample, `0a32e1d` snapshot refresh). Feed `generated_at` advanced from 5.6 h old to 2 min old. | done | session-7dc87913 | `verification/2026-11-21-7dc87913.md` (new) |
 | W-09 | Record in this board + the verification file. | done | session-7dc87913 | `COORDINATION.md`, `verification/2026-11-21-7dc87913.md` |
-| W-10 | **Publish the two open findings (W-11, W-12) on the Flagged for Review page** as **F-60** and **F-61**, with source links, so they are reviewable after deploy as the brief requires. Claimed because the page is free: `session-4251f2d1`'s task is **merged and closed** (PR #41/#44) and `session-4830ab32`'s stated scope *excludes templates*. No existing row or ID is changed. | in progress | session-7dc87913 | `templates/flagged.tpl` + generated `flagged.html` only |
+| W-10 | **Publish the two open findings (W-11, W-12) on the Flagged for Review page.** Claimed, rows written, **then reverted** — see the overlap note below. Delivered instead as a ready-to-paste row file for the designated integrator. | handed off | session-7dc87913 | `verification/2026-11-21-7dc87913-flagged-rows.md` (new); `templates/flagged.tpl` / `flagged.html` **reverted to `main`** |
 | W-11 | (finding to publish) The scheduler itself is unreliable: `keepalive.yml` declares a 15-minute cron (`4,19,34,49 * * * *`) but only **one** `schedule` run exists in the whole repository history (2026-11-21T00:54:57Z) — no scheduled run for the preceding 5.6 h. GitHub documents both delay/drop and the 60-day inactivity disable. Already flagged as F-58; W-11 only adds the measured cadence number. | open | session-7dc87913 | published as part of F-60 |
 | W-12 | Two *separate* write-back fragilities remain after the `fi` repair: the rebase loop retries an identical conflicting rebase (reproduced: `CONFLICT (content): Merge conflict in data/snapshot.json`), and a silent no-op rebase makes the push "Everything up-to-date" so nothing is published; plus the three writers do **not** share a concurrency group despite `keepalive.yml`'s comment saying they do. Handed to the workflow owner; **not fixed here** — out of scope. | open | session-7dc87913 | published as part of F-61 |
+
+### Overlap found and resolved — the flagged page belongs to the final integrator
+
+While preparing W-10 this session discovered that **PR #43 (`session-4830ab32`) declares itself the
+designated final integration session and states its R4 scope explicitly includes
+`templates/flagged.tpl` + generated `flagged.html`** (for F-BFC-01/F-BFC-02 and an F-57
+reconciliation). That overlaps this session's W-10 claim.
+
+**Action taken: this session reverted its own flagged-page edit** (`git checkout --` on
+`templates/flagged.tpl` and `flagged.html`; `build-site --check` confirms the tree is clean) and
+**did not ship it**. No other session's work was touched, and no ID was consumed: `F-60`/`F-61` remain
+unused on `main`, whose highest flag ID is `F-59`.
+
+The two rows were handed to `session-4830ab32` as copy-paste HTML in
+`verification/2026-11-21-7dc87913-flagged-rows.md`, together with the collision analysis
+(PR #43 introduces `F-BFC-01`/`F-BFC-02` in a different namespace; PR #39 and PR #45 do not touch the
+page) and the verification result for every source link in the rows.
+
+This is logged rather than silently dropped because the brief requires the findings to end up on the
+published Flagged for Review page.
+
+### F-59 fixed (it was a failing test on every clean checkout)
+
+`node scripts/check_lab.mjs` failed on a fresh clone with
+`ENOENT: … data/dash-quality.json`. That file is **optional by design** — `assets/freshness.js`
+falls back to built-in 20/45-minute thresholds when it is absent — and only the publishing pipeline
+writes it, so a clean checkout legitimately lacks it. `resources: 'usable'` made jsdom load it from
+disk during navigation, so its absence became a script error and failed the test.
+
+Fix: the test now materialises the documented-optional file for the duration of the run and removes
+it on exit if (and only if) it created it. It does **not** filter the error out, and this was checked
+negatively: deleting `assets/freshness.js` still fails the test with
+`Could not load script: …/assets/freshness.js`, so real missing scripts are still caught. The test is
+now wired into `site-qa.yml` so it is actually enforced in CI. Result: `All lab checks passed.`
+
+### Status summary — session-7dc87913
+
+| Item | Outcome |
+|---|---|
+| Root-cause of the dead scheduled writers | **Confirmed fixed** (PR #41); write-back verified end to end; feed advanced from 5.6 h to 2 min old |
+| Monitor reporting dead samplers as "fresh" (W-06) | **Fixed** + 27 offline assertions |
+| Flagged rows for the two open findings (W-10) | **Handed to the final integrator**, reverted locally to avoid a scope collision |
+| `check_lab.mjs` clean-checkout failure (F-59) | **Fixed** and added to CI |
+| Full QA battery (15 checks) | **All passing** |
 
 Scope rule: this session touches **no** `.github/workflows/` file, `templates/flagged.tpl`, `flagged.html`,
 `dash/`, `docs/` or `archive/`. Anything that needs those is logged as a request below, never edited.

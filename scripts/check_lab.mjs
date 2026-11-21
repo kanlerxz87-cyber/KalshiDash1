@@ -14,8 +14,35 @@
  */
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+/* `assets/freshness.js` requests `data/dash-quality.json` with XHR, and jsdom's `resources:
+ * 'usable'` loads same-origin files from disk. That file is OPTIONAL BY DESIGN — loadQuality()
+ * falls back to its built-in 20/45-minute thresholds when it is absent — and only the publishing
+ * pipeline writes it, so a clean checkout does not have it. Its absence surfaced as an ENOENT
+ * script error and failed this test on every fresh clone (F-59, recorded by session-4251f2d1).
+ *
+ * It must be materialised for the WHOLE run, not just page construction: the XHR fires after the
+ * DOM resolves. Deleting it earlier, filtering the error out, or deleting the request from the
+ * script would either hide a genuinely missing script or change production behaviour. The file is
+ * removed on exit if (and only if) this test created it. */
+const OPTIONAL_FILE = join(root, 'data', 'dash-quality.json');
+const createdOptionalFile = (() => {
+  if (existsSync(OPTIONAL_FILE)) return false;
+  mkdirSync(dirname(OPTIONAL_FILE), { recursive: true });
+  writeFileSync(OPTIONAL_FILE, JSON.stringify({
+    freshness: { warn_minutes: 20, stale_minutes: 45 },
+    note: 'Written by scripts/check_lab.mjs for the duration of the test (documented-optional file).',
+  }, null, 2));
+  return true;
+})();
+if (createdOptionalFile) {
+  const cleanup = () => { try { rmSync(OPTIONAL_FILE, { force: true }); } catch { /* ignore */ } };
+  process.on('exit', cleanup);
+  for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { cleanup(); process.exit(130); });
+}
 
 let JSDOM, VirtualConsole;
 try {
@@ -138,6 +165,14 @@ function loadPage(file, storageSeed) {
     resources: 'usable',
     pretendToBeVisual: true,
     virtualConsole: vc,
+    /* `assets/freshness.js` requests data/dash-quality.json with XHR. The file is OPTIONAL BY
+     * DESIGN — loadQuality() falls back to its built-in 20/45-minute thresholds when it is absent
+     * — and it is written only by the publishing pipeline, so a clean checkout does not have it.
+     * jsdom loads same-origin files from disk during navigation, so the absence surfaced as an
+     * ENOENT script error and failed this test on every fresh clone (F-59, recorded by
+     * session-4251f2d1). Rather than silently ignoring the error (which would also hide a real
+     * missing script), provide the documented-optional file for the duration of the test and
+     * remove it afterwards if the test created it. */
     beforeParse(window) {
       window.fetch = mockFetch;
       // Deterministic in-memory localStorage (jsdom's file:// origins can be opaque).
