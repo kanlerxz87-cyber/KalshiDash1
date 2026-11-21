@@ -127,6 +127,31 @@ Scope note: these are `.github/workflows/` files, which this session's original 
 so there is no collision. The repair here is the *separate* defect this session had already documented,
 not a re-do of the `fi` fix.
 
+### Correction after PR #53 — the shared concurrency group was WRONG, now reverted
+
+PR #53 (merged) made all three data writers share `data-writers-${{ github.ref }}`. That was a
+**regression**, caught on `main` immediately:
+
+| Run | Workflow | Result |
+|---|---|---|
+| 44877328396 | keepalive | **cancelled** |
+| 44877328385 | live-alerts | success |
+| 44877328477 | Refresh demo data snapshot | success |
+
+All three are created by the same push (2026-11-21T06:49:01Z), so one shared group makes GitHub
+cancel the pending runs — a cancelled keepalive pulse is a **dropped market sample**, the exact
+failure the "live" guarantee exists to prevent. Serialising was worse than the race.
+
+**Reverted:** each writer keeps its own group (`writer-…`, `live-alerts`, `refresh-data-…`). The race
+is correctly handled by the publish step instead (regenerate on the new tip + verify the pushed ref),
+which needs no concurrency group. `scripts/check-data-writer-concurrency.mjs` now requires the groups
+to be **distinct** and fails if two writers share one (verified negatively).
+
+Also fixed here: that test previously counted files instead of distinct group values (so it passed
+while two writers shared a group), and its first version depended on the `yaml` npm package, which
+failed `site-qa` (run 44876951050, `ERR_MODULE_NOT_FOUND`). Both are corrected; the test is now
+dependency-free and its negative case is verified.
+
 ### PR, merge and deployment record — session-7dc87913
 
 - **PR:** [#47](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/47) — `arena/7dc87913-kalshidash1` → `main`.

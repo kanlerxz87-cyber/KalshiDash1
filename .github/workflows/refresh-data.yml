@@ -27,13 +27,17 @@ permissions:
   contents: write
 
 concurrency:
-  # SHARED with keepalive.yml on purpose (session-7dc87913, F-61). These three workflows all
-  # commit to the same branch and rewrite overlapping generated files; keepalive.yml's comment
-  # already claimed they "queue behind this one (see the shared group name in live-alerts.yml and
-  # refresh-data.yml)", but each file declared a *different* group, so they never serialised.
-  # Measured consequence: two PRs merged seconds apart made the third writer fail with
-  # "could not push after 3 attempts" (keepalive run 44876422837, 2026-11-21T06:37:33Z).
-  group: data-writers-${{ github.ref }}
+  # DELIBERATELY NOT SHARED with the other data writers (session-7dc87913).
+  # Measured 2026-11-21T06:49:01Z: a single push to main triggers keepalive, live-alerts AND
+  # refresh-data at the same instant. When all three shared one concurrency group, GitHub cancelled
+  # the pending ones — run 44877328396 (`keepalive`) completed **cancelled**, i.e. a dropped market
+  # sample, which is exactly what this project refuses to treat as acceptable.
+  # So each writer keeps its own group, and the safety that serialisation was supposed to give is
+  # provided by the publish step instead: on a conflict it regenerates the derived data on the new
+  # tip and verifies the ref actually moved. Only the two workflows that edit data on every trigger
+  # share a group where a superseded run is genuinely redundant.
+  # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#concurrency
+  group: refresh-data-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
