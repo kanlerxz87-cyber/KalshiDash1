@@ -1,6 +1,6 @@
 # Executive Summary — KalshiDash1
 
-**Updated:** 2026-11-21 20:20 UTC · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/96019ad5-kalshidash1` · **Session:** `session-96019ad5`
+**Updated:** 2026-11-21 20:28 UTC · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/96019ad5-kalshidash1` · **Session:** `session-96019ad5`
 
 > **Scope and freshness note:** Sections 4–6 below preserve the historical findings from the explicitly dated
 > 2026-11-20 11:10 UTC snapshot; those numbers are not current-market claims. Current repository/feed checks and
@@ -13,18 +13,18 @@ Build a live, interactive dashboard for the Kalshi **demo** exchange that (a) tr
 
 ## Current operational status (2026-11-21 UTC)
 
-> **Current status note — 2026-11-21 20:20 UTC (session-96019ad5).** This section replaces the earlier 06:30-UTC
+> **Current status note — 2026-11-21 20:28 UTC (session-96019ad5).** This section replaces the earlier 06:30-UTC
 > status line ("173 alert rows", Pages commit `0a32e1d`) which described an earlier feed and no longer matches the
 > committed artifact. Historical findings from the 2026-11-20 11:10 UTC snapshot are preserved in the sections below
 > and are not current-market claims; the 2026-11-21 verification record is in [the dated verification report](verification/2026-11-21-96019ad5.md).
 
 | Check | Observed state | Source |
 |---|---|---|
-| Published background feed | **38 alert rows**, generated **2026-11-21T17:42:16Z** — crypto 26 · elections 11 · golf 1 (0 culture / 0 gas in the window); 6 high-ROI flags; 0 resolutions; 362 duplicates collapsed; 60 tracked markets; 8 orderbooks; detection split trade 31 / candle 6 / book-sample 1. | [Committed feed](data/live/feed.json) · [live-alerts run](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44931467026) |
-| Feed staleness (live-alert threshold 20/45 min) | **FRESHNESS FAIL** — the committed feed is 156.8 minutes old against the 45-minute stale limit; the scheduled sampler has not produced a new run since 2026-11-21T17:41:59Z. Scheduled runs are documented by GitHub to be delayed or dropped (and the repo's own F-58/F-45 flag records the same limitation). | [freshness_check.mjs](tools/freshness_check.mjs) · [schedule docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) |
+| Published background feed | **11 alert rows**, generated **2026-11-21T20:24:48Z** — crypto 6 · elections 5 (0 culture / 0 gas / 0 golf in the window); 3 high-ROI flags; 0 resolutions; 589 duplicates collapsed; 60 tracked markets; 8 orderbooks; all 11 by trade detection. | [Committed feed](data/live/feed.json) · [engine sample commit](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/25885b9c48b2e66d3621503e39242ba71dcb7d69) |
+| Feed staleness (live-alert threshold 20/45 min) | **FRESHNESS OK** — the committed feed is 1.3 minutes old at last check against the 45-minute stale limit; the scheduled sampler produced a new run at 2026-11-21T20:24:48Z (commit `25885b9`). Historical stall (F-45/F-58) is resolved for this run set; scheduled-run reliability remains documented as delayed/dropped and keeps the flag. | [freshness_check.mjs](tools/freshness_check.mjs) · [schedule docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) |
 | Data snapshot | Captured **2026-11-21T16:02:38.983Z** by the keepalive workflow (run 44922333872, success). Not re-captured from this session's offline sandbox. | [data/snapshot.json](data/snapshot.json) |
-| Scheduled write-back runs on `main` | `live-alerts` schedule run 44931467026 — success, 2026-11-21T17:41:59Z. `refresh-data` schedule run 44905774178 — success, 2026-11-21T12:49:05Z. `keepalive` run 44922333872 — success, 2026-11-21T16:02:13Z. | [live-alerts](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44931467026) · [snapshot](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44905774178) · [keepalive](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44922333872) |
-| GitHub Pages | Latest build for `main` commit `f52ad08` reports **built**, no error — 2026-11-21T17:42:30Z → 17:42:53Z (23.8 s). | [Pages build API](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest) |
+| Scheduled write-back runs on `main` | `live-alerts` engine sample commit `25885b9` — success, 2026-11-21T20:24:59Z (generated feed 20:24:48Z). `refresh-data` schedule run 44905774178 — success, 2026-11-21T12:49:05Z. `keepalive` run 44922333872 — success, 2026-11-21T16:02:13Z. | [engine sample](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/25885b9c48b2e66d3621503e39242ba71dcb7d69) · [snapshot](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44905774178) · [keepalive](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44922333872) |
+| GitHub Pages | Latest build for `main` commit `25885b9` reports **built**, no error — 2026-11-21T20:25:01Z → +20.8 s. | [Pages build API](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest) |
 | Offline checks | `npm test` (engine, feed, flood-guard, page render, ids, source rows, lab, links) — **PASS**; `build-site --check` — PASS; duplicate-id scan — PASS (549 ids, 0 dupes); freshness-badge — PASS (53 assertions). | [Verification report](verification/2026-11-21-96019ad5.md) |
 | Exchange status / demo reachability | Not re-fetched from this sandbox (TLS failure to `external-api.demo.kalshi.co` and `kanlerxz87-cyber.github.io` — outbound access is github/npm/pypi only). The committed snapshot's meta records the official capture method and URL. | [data/snapshot.json](data/snapshot.json) · [official demo exchange status](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status) |
 
