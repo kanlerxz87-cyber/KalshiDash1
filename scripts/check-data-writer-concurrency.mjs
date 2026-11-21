@@ -11,8 +11,8 @@
  *
  *   1. all three data writers commit overlapping regenerated files, and the retry loop
  *      re-ran the SAME `git rebase` that had just conflicted — it can never succeed;
- *   2. the writers declared three DIFFERENT concurrency groups, although `keepalive.yml`'s
- *      comment claimed they were shared, so nothing serialised them;
+ *   2. nothing serialised the writers, and `keepalive.yml`'s comment claimed a shared concurrency
+ *      group that did not exist;
  *   3. a "successful" push was trusted by exit code, so a no-op could exit 0 having published
  *      nothing.
  *
@@ -67,14 +67,23 @@ function runBlocks(file) {
 }
 
 /* ------------------------------------------------------------------------------------------
- * 1. One concurrency group shared by every data writer, branch-scoped, and not cancelling.
- *    A cancellation mid-push is another way to lose a sample.
+ * 1. THE WRITERS MUST **NOT** SHARE ONE CONCURRENCY GROUP.
+ *
+ *    This is the opposite of the first attempt, and the reversal is measured rather than
+ *    theoretical. A single push to `main` triggers `keepalive`, `live-alerts` AND `refresh-data`
+ *    at the same instant (verified: all three created at 2026-11-21T06:49:01Z). When all three
+ *    shared `data-writers-<ref>`, GitHub cancelled the ones that were still pending — run
+ *    44877328396 (`keepalive`) completed `cancelled`, i.e. **a dropped market sample**. Losing
+ *    samples is the exact failure this project's "live" guarantee exists to prevent, so
+ *    serialising them is worse than the race it was meant to remove.
+ *
+ *    The race itself is handled where it belongs, in the publish step (items 2 and 3): derived
+ *    data is regenerated on the new tip and the pushed ref is verified. So the requirement here
+ *    is that no two writers share a group, and that none cancels an in-progress run.
  * ---------------------------------------------------------------------------------------- */
 const groups = new Map();
 for (const f of WRITERS) {
   const ls = lines[f];
-  /* The top-level `concurrency:` block (column 0) is the workflow-level one. Job-level blocks are
-   * indented; the writers only use the workflow-level form. */
   const ci = ls.findIndex((l) => /^concurrency:\s*$/.test(l));
   ok(ci !== -1, `${f}: declares a workflow-level concurrency block`);
   if (ci === -1) continue;
@@ -90,17 +99,18 @@ for (const f of WRITERS) {
     if (c) cancel = c[1];
   }
   ok(Boolean(group), `${f}: concurrency group is set`);
-  ok(cancel === 'false', `${f}: does not cancel an in-progress writer (got ${cancel})`);
+  ok(cancel === 'false', `${f}: never cancels an in-progress writer (got ${cancel})`);
   if (group) groups.set(f, group);
 }
 
-const distinct = new Set(groups.values());
-ok(distinct.size === 1,
-  `all three data writers share ONE concurrency group (found ${distinct.size}: ${[...distinct].join(' | ')})`);
-
-const only = [...distinct][0] || '';
-ok(/\$\{\{\s*github\.ref\s*\}\}/.test(only),
-  `the shared group is branch-scoped so unrelated branches do not serialise (${only || 'none'})`);
+/* NOTE: `groups` is keyed by file, so its size is always the number of writers. The property being
+ * checked is the number of DISTINCT group values — this assertion was written with `groups.size`
+ * first and silently passed while two writers shared a group (caught by its own negative test). */
+const distinctGroups = new Set(groups.values());
+ok(distinctGroups.size === WRITERS.length,
+  `each data writer keeps its OWN group — sharing one cancels samples `
+  + `(found ${distinctGroups.size} distinct groups for ${WRITERS.length} writers: `
+  + `${[...distinctGroups].join(' | ')})`);
 
 /* ------------------------------------------------------------------------------------------
  * 2. The step that publishes must (a) verify the ref actually moved instead of trusting the push
