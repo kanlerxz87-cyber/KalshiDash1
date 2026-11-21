@@ -28,6 +28,12 @@ jobs:
       - name: Check internal links across the whole published tree (root, docs/, archive/)
         run: python tools/linkcheck.py
 
+      # session-2ea8e33c (F-75): the generator's --check ignores only the alert sample clock.
+      # Pinned offline: a new feed timestamp passes, a template edit and a changed published
+      # table value still fail. Verified to fail against the pre-fix generator.
+      - name: Staleness check ignores the sample clock and nothing else
+        run: node scripts/check_build_staleness.mjs
+
       - name: Root-site link and template check (project checker)
         run: node scripts/check-links.mjs
 
@@ -82,6 +88,13 @@ jobs:
       # recorded prices must not move.
       - name: Retained alerts are re-scored with the current model
         run: node scripts/check_rescore_retained.mjs
+
+
+      # session-4b5ddd87: the feed is what the published site reads. If MODEL_VERSION moves and the
+      # scheduled engine does not run (F-55/F-58), the site would keep publishing old verdicts under
+      # a new version label. This re-scores the committed files offline and fails on any drift.
+      - name: Committed alert data carries the current model verdict
+        run: node scripts/rescore-feed.mjs --check
 
       - name: CORS evidence matches the published claim
         run: node scripts/check-cors-evidence.mjs

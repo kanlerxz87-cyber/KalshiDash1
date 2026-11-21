@@ -442,6 +442,25 @@ function replacements(text, base = '') {
   return text;
 }
 
+/* WHAT "STALE" MEANS (fixed 2026-11-21, session-2ea8e33c, F-75)
+ * --------------------------------------------------------------
+ * `--check` used to compare the committed HTML byte-for-byte with a fresh render. The as-of line
+ * (F-72) embeds `data/live/feed.json`'s `meta.generated_at`, and that file is rewritten by the
+ * scheduled data writers every ~10 minutes — so every automated data commit silently made all 22
+ * pages "stale". Measured on main at 2026-11-21T23:14Z: feed `generated_at 23:13:08Z`, committed
+ * HTML `data-asof="2026-11-21T17:42:16.000Z"` -> `build-site.mjs --check` exited 1 listing every
+ * page, and the next push-triggered CI run would have failed the Pages build check although no
+ * template or table had changed.
+ *
+ * The sample timestamp in that one span is expected to move without a rebuild (the page re-reads
+ * the feed and repaints the age in the browser). So the comparison ignores ONLY the contents of
+ * the `#feed-asof` element. Everything else — tables, counts, links, every other byte — is still
+ * compared exactly, so a template edit or a data-table change that was not rebuilt still fails.
+ * A data change that never touches a table (a new alert) therefore no longer reddens CI; a market
+ * row that changes a published table still does. */
+const asofSpan = /<span id="feed-asof"[\s\S]*?<\/span>/g;
+const comparable = (html) => String(html).replace(asofSpan, '<span id="feed-asof"></span>');
+
 let stale = [];
 for (const page of PAGES) {
   // templates are stored as *.tpl so the whole-tree HTML link checker never treats them as published pages
@@ -457,6 +476,8 @@ for (const page of PAGES) {
   const dest = path.join(OUT, page.out);
   const existing = fs.existsSync(dest) ? fs.readFileSync(dest, 'utf8') : null;
   if (existing === html) continue;
+  /* Under --check, ignore a difference that lives only in the as-of timestamp (see F-75 above). */
+  if (checkOnly && existing !== null && comparable(existing) === comparable(html)) continue;
   if (checkOnly) { stale.push(page.out); continue; }
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   fs.writeFileSync(dest, html);

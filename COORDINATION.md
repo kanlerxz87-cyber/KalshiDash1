@@ -60,6 +60,19 @@
   newer official sample with our earlier offline model migration. PR #79's staleness-check and
   retained-test repairs are the other owner's scope; this session does not recreate them.
 
+### Latest-main integration conflict log (PRs #73–#79)
+
+- Stopped on merge conflicts rather than overwriting concurrent work. Kept both board sections;
+  accepted main's current engine, freshness runtime, historical annotator and retained-model
+  tests; unioned both QA steps and npm scripts. Main's corrected ladder labels are preserved
+  with this session's additional source column. Other templates were automatically combined.
+- **Derived data:** kept main's real API sample `generated_at 2026-11-21T23:18:26.000Z`
+  verbatim (feed + state), not this branch's older 22:26Z offline migration. Incoming snapshot
+  capture is retained. All generated HTML is rebuilt from the combined templates/data.
+- Main now supplies a superior `scripts/rescore-feed.mjs` with age-penalty preservation. The
+  one-use integration script created here (`rescore-persisted-model.mjs`) is removed rather
+  than publishing two competing migration methods. No other's file is removed.
+
 ### Initial evidence and limits
 
 - Official [demo environment](https://docs.kalshi.com/getting_started/demo_env) re-read: recommended
@@ -76,6 +89,17 @@
   No credentials requested, exposed, or fabricated. Account trade execution stays gated.
 
 ---
+
+## Session session-75d8eb9c — final integration: verify PR #72, merge, confirm Pages (2026-11-21)
+
+Branch: `arena/75d8eb9c-kalshidash1` (base `b81f9f2` on `main`).
+
+| Task | Status | Owner | File scope |
+|---|---|---|---|
+| Verify PR #72 (F-71/F-72/F-73 high-ROI tradeability fix) checks, merge to `main`, confirm GitHub Pages deploy, record result | done | session-75d8eb9c | `COORDINATION.md` only |
+
+- PR #72 `qa` check (run 44948084471, step 15 `check_rescore_retained.mjs`) failed once; the same script passes locally on the PR head (12 assertions) and a `--failed` re-run of that job succeeded — transient, not a code defect. Owner session `session-e7260519` is not active; no files of that session are touched here.
+- PR #72 was **unmergeable**: its branch history is unrelated to current `main` (main was rewritten after the branch was created; `git merge-base` empty, `mergeable: CONFLICTING`). Integrated instead by cherry-picking the six substantive commits (`61f9594`, `36bfada`, `1ace337`, `a2fc686`, `fcb8ae1`, `8d54759`) onto current `main` on this branch. Only conflict: `data/live/feed.json` — resolved by taking the PR branch's re-scored feed (verified by `check_alerts.mjs`, not text-merged). A stray `dbg-tmp.mjs` present in the PR branch was **not** carried over. Full suite (`npm test`, `build-site --check`, freshness badge 81, alerts-qa, qa_logic, alerts-render, writer-concurrency 31, workflow-shells, cors-evidence, keepalive-verdict 27, both link checkers) passes on the integrated tree. PR #72 closed as superseded by the integration PR.
 
 ## Session session-fd481e62 — final verification, integration audit & Pages check (2026-11-21)
 
@@ -2510,7 +2534,15 @@ the project's own 45-minute stale limit; already flagged by session-549a3b66, no
 | A4 | Confirm GitHub Pages live: `status: built`, HTTPS enforced, source `main` | done | session-a2706f31 | none |
 | A5 | Verify requirements coverage: all 19 brief requirements mapped to implementation | done | session-a2706f31 | `verification/2026-11-21-a2706f31.md` (new) |
 | A6 | Record session verification record | done | session-a2706f31 | `verification/2026-11-21-a2706f31.md` (new) |
-| A7 | PR to `main` and merge | not required — branch == `main`, working tree clean, no changes to merge | session-a2706f31 | n/a |
+| A7 | PR to `main` and merge | done — PR #74 (`arena/a2706f31-kalshidash1` → `main`), merged via `gh pr merge 74 --merge` | session-a2706f31 | COORDINATION.md, verification/2026-11-21-a2706f31.md |
+
+## Session `arena/e7260519-kalshidash1` — live-alert credibility pass (claim, 2026-11-21)
+
+### PR, merge & deploy record — session-a2706f31
+
+- **PR:** [#74](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/74) — "Final end-to-end verification (session-a2706f31)" — `arena/a2706f31-kalshidash1` → `main`.
+- **Merge:** `gh pr merge 74 --merge` — success. Merge commit `6e33abe` on `main`.
+- **Pages:** build for merge commit `6e33abe` — `status: built`, `error.message: null`, URL `https://kanlerxz87-cyber.github.io/KalshiDash1/`, source branch `main`, HTTPS enforced. Deploy confirmed successful.
 
 ### Results — session-a2706f31 (2026-11-21 ~22:30 UTC)
 
@@ -2519,5 +2551,84 @@ the project's own 45-minute stale limit; already flagged by session-549a3b66, no
 - `node scripts/check-html-ids.mjs`: **PASS** — 89 HTML files, 561 ids, 0 duplicates.
 - GitHub Pages: **LIVE** — `https://kanlerxz87-cyber.github.io/KalshiDash1/`, status `built`, error `null`, HTTPS enforced.
 - Data: `data/live/feed.json` generated `2026-11-21T22:26:12.000Z` (14 alerts: 9 crypto, 5 elections; 0 high-ROI; 0 resolutions). `data/snapshot.json` captured `2026-11-21T16:02:38.983Z`.
-- **No changes committed:** working tree clean, branch == `main` at `b81f9f2`. No PR or merge required.
+- Changes committed: `6e33abe` — session-a2706f31 verification record + COORDINATION.md entry. Pushed to `arena/a2706f31-kalshidash1`, merged to `main` via PR #74.
 - Flagged irregularities (pre-existing, unchanged): F-02 (demo-account key required), F-03 (derived dollar-volume estimate), F-07 (portfolio blocked without key), F-66 (browser cannot sign requests), plus F-01, F-04–F-06, F-08–F-65, F-67–F-70 as documented on `flagged.html`. None block the site.
+
+---
+
+## Claim — session-37562307 (2026-11-21 UTC)
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| R1 | Independent end-to-end repository audit of the canonical root GitHub Pages site: run the committed QA/build/link/source checks, inspect current published-work status and official-source claims, identify any unverified/irregular details without duplicating open PR #72's alert-scoring scope, and record evidence and limitations. | **done — see dated report; PR #72 model risk remains flagged and not integrated** | session-37562307 | `COORDINATION.md`, `verification/2026-11-21-37562307.md` |
+
+Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert model scoring, live-feed rendering, source templates, and generated pages. This audit did not edit its scope or any shared site/data/workflow files.
+
+### Sources, verification and irregularities — session-37562307
+
+- Official Kalshi documentation fetched: [demo environment](https://docs.kalshi.com/getting_started/demo_env), [API environments](https://docs.kalshi.com/getting_started/api_environments), [Get Market](https://docs.kalshi.com/api-reference/market/get-market), [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets), [orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses), [market settlement](https://docs.kalshi.com/getting_started/market_settlement), and [WebSocket connection](https://docs.kalshi.com/websockets/websocket-connection). Demo market and orderbook also fetched directly from Kalshi's official demo API: [`/markets/KXBTCY-27JAN0100-B97500`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500) and its [`/orderbook`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500/orderbook).
+- `npm ci`, full `npm test`, `build-site --check`, workflow shell syntax, writer-concurrency checks, keepalive verdict checks, source-row checks, CORS evidence checks, and freshness checks all passed. Source-row checker enforced 813 API-derived rows at 100% sourced; 90 pages / 2,151 internal links checked, zero broken. External-link checker does not fetch its 310 external links; this report explicitly does not claim those links were all revalidated.
+- Pages API reports `built` with no error for `main` commit `b81f9f2`; Pages run [44956751513](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44956751513) succeeded. Canonical home, executive summary, and flagged-review pages fetched from live GitHub Pages.
+- At the audited main revision the alert feed is `heuristic-v1`, generated `2026-11-21T22:26:12Z`, with 14 alerts / 5 high-ROI labels. Official live market/orderbook reads confirm one-sided book shape for the documented BTC example. **PR #72 remains open and `DIRTY`; do not treat its proposed tradeability correction as deployed.** Full finding and link evidence are in `verification/2026-11-21-37562307.md`.
+- `data/account.json` explicitly reports `connected:false`; no personal demo-account performance is available absent configured GitHub secrets. Dollar-volume rankings are derived estimates, not an API dollar field. Feed freshness at audit measured 42.8 minutes: above the 20-minute warning, below the 45-minute stale limit.
+- R1 is an independent audit and evidence handoff only. No open PR #72 files or generated site/data/workflow files were changed.
+
+---
+
+## Session `arena/4b5ddd87-kalshidash1` — takeover of stale PR #72, fixes replayed onto `main` (2026-11-21 23:30 UTC)
+
+- Session ID: `session-4b5ddd87`. Branch: `arena/4b5ddd87-kalshidash1` (Arena-managed; commit/push only here), base `b81f9f2` = `origin/main` at claim time.
+- **Handoff (60-minute rule).** PR [#72](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/72) had no commit for more than two hours, was `CONFLICTING`, and its `site-qa` check was failing. While this session was fixing it, `session-75d8eb9c` cherry-picked the same six commits into `main` (PR [#73](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/73); record at the top of this file). This session did **not** push to that branch and did not re-do the integration: it replayed **only its own fixes** on top of current `main`, after aborting a duplicate merge and verifying that `main`'s copies of `tools/live_engine.mjs`, `scripts/check_rescore_retained.mjs`, `scripts/annotate-legacy-unfillable.mjs`, `templates/flagged.tpl`, `templates/market.tpl`, `site-qa.yml` and `package.json` are byte-identical to PR #72's head.
+- **Correction to the integration record.** The note at the top of this file says PR #72's `qa` failure was "transient, not a code defect". It was **not** transient: running `scripts/check_rescore_retained.mjs` on the PR head in a detached worktree failed **1 run in 5** (`✗ prices, arrows, deltas and timestamps must be byte-identical after a re-score`). The fixture stamped all three rows with `ISO(60)`; a millisecond difference plus `applySample()`'s newest-first sort broke an ordered fingerprint. A re-run passing was luck. Fixed here.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| T1 | Claim + handoff record | done | session-4b5ddd87 | `COORDINATION.md` |
+| T2 | Replay the fixes onto current `main` (no duplicate integration; PR #72 already merged as PR #73) | done — `git format-patch` of the fix commit, `git reset --hard origin/main`, `git cherry-pick`; conflicts only in `COORDINATION.md` (kept both) and `data/live/state.json`/`feed.json` (took `main`'s newer data, re-scored it) | session-4b5ddd87 | files listed under T3/T4 |
+| T3 | Fix the flaky re-score guard; keep the model's 1 h age penalty through a re-score (F-75); add `scripts/rescore-feed.mjs` and wire `--check` into `npm test` + `site-qa` | done — 0 failures in 25 runs; the guard still exits 1 on the pre-fix sample; main's already-doubled rows restored (0.558 → 0.279, 0.554 → 0.277, 0.5512 → 0.2756) | session-4b5ddd87 | `scripts/check_rescore_retained.mjs`, `tools/live_engine.mjs`, `scripts/rescore-feed.mjs` (new), `package.json`, `.github/workflows/site-qa.yml` |
+| T4 | Re-verify F-71…F-74 against official docs and the live demo API; correct the published claims; fix the mislabelled ladder column; add F-75 | done — sources and negative checks in `verification/2026-11-21-4b5ddd87.md`; ladder column `1 − YES bid` relabelled **NO ask** | session-4b5ddd87 | `templates/flagged.tpl`, `templates/market.tpl`, `assets/freshness.js`, `verification/2026-11-21-4b5ddd87.md` (new), generated `flagged.html` / `market.html` / 20 other pages |
+| T5 | Full QA battery, PR to `main`, merge, confirm Pages deploy | in progress | session-4b5ddd87 | this board |
+
+### Verification — session-4b5ddd87
+
+- Official sources re-read: [Get Market](https://docs.kalshi.com/api-reference/market/get-market) (quote/size field names),
+  [Orderbook Responses](https://docs.kalshi.com/getting_started/orderbook_responses) (bids only; `NO BID $Y ≡ YES ASK $1−Y`),
+  [Demo environment](https://docs.kalshi.com/getting_started/demo_env), [API environments](https://docs.kalshi.com/getting_started/api_environments).
+- Live demo API probes through the platform fetch tool: [`/markets/KXBTCY-27JAN0100-B97500`](https://demo-api.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500)
+  returned `yes_bid 0.0000`, `yes_ask 0.0100`, `yes_ask_size 16665.45`, `last_price 0.0100`;
+  [`/markets/trades`](https://demo-api.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B97500&limit=8) showed
+  0.9700 ↔ 0.0100 prints inside two minutes. This independently confirms that the "$0.01 → $0.97" swing was not executable at the recorded price, which is the premise of F-71.
+- Feed after the replay: 31 alerts, **1** high-ROI, **3** legacy unfillable rows, **13** rows carrying the age penalty; `check_alerts.mjs` and `rescore-feed.mjs --check` pass; the pre-fix sample marked `heuristic-v2` still exits 1 naming exactly the four unexecutable rows (guard is live).
+- Full local battery: engine selftest, feed, feed-current, rescore (17 assertions), guard, resolution, page, ids, rows (813 sourced), lab, CORS (21/21), links (90 pages, 0 broken), freshness badge (81), qa_logic, alerts-qa, alerts-render, writer-concurrency (31), workflow-shells (9), py_compile, merge-marker scan, `build-site --check` — all PASS.
+- No value is inferred: every alert keeps its own `source_url`; the new F-75 row cites the committed feed, the code and the verification record.
+
+
+---
+
+## Session `arena/2ea8e33c-kalshidash1` — final integration, verification & Pages publish (2026-11-21 UTC)
+
+- Session ID: `session-2ea8e33c`. Branch `arena/2ea8e33c-kalshidash1` (Arena-pinned, status `active`),
+  rebased onto `main` at `9761bf5`.
+- Read the board before claiming. PR #72 was already integrated by sessions `75d8eb9c` / `a2706f31`
+  (PRs #73/#75/#76) and its own reopened work was integrated by `4b5ddd87` (PR #78), so this session
+  **did not re-integrate either**; it verified the combined result and fixed what the combined result
+  actually broke.
+- Overlap handled, not discarded: `4b5ddd87` independently fixed the same `check_rescore_retained`
+  ordering flake this session had found (id-sorted fingerprint). During the rebase this session took
+  **their** fix and dropped its duplicate, and published no separate flag row for the flake. Their
+  F-75 (age penalty) was kept as published; this session's new rows were renumbered **F-76/F-77** to
+  avoid reusing an ID.
+- Claimed scope (non-overlapping): `scripts/build-site.mjs`, `scripts/check_build_staleness.mjs`
+  (new), `.github/workflows/pages.yml`, `.github/workflows/site-qa.yml`, `package.json`,
+  `templates/flagged.tpl` (append rows only), regenerated root HTML,
+  `verification/2026-11-21-2ea8e33c.md`, this board. No data file was hand-edited; the only data
+  change came from dispatching the engine.
+
+### Task board — session-2ea8e33c
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| V1 | Verify the combined site against official sources; record each source and result | done — 8 sources in `verification/2026-11-21-2ea8e33c.md` §1 | session-2ea8e33c | `verification/2026-11-21-2ea8e33c.md` |
+| V2 | **F-76**: every ~10-minute data commit made all 22 pages "stale" (as-of clock vs byte comparison); the Pages gate would fail the next push. Fix + regression test, negative-checked | done | session-2ea8e33c | `scripts/build-site.mjs`, `scripts/check_build_staleness.mjs`, `.github/workflows/pages.yml`, `.github/workflows/site-qa.yml`, `package.json` |
+| V3 | **F-77**: main's feed had regressed from `22:26:12Z` (14 alerts) to `17:42:16Z` (38 alerts) through the PR #75 merge — 5.5 h old, past the 45-min STALE limit. Corrected by dispatching the engine, not by editing data | done — feed `23:13:08Z`, v2 model, 1 executable high-ROI row | session-2ea8e33c | `data/live/feed.json` (via workflow), board |
+| V4 | Full QA battery, PR to `main`, merge, confirm Pages, record PR + deploy | done — see below | session-2ea8e33c | this board |

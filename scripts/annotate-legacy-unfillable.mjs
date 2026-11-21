@@ -25,11 +25,14 @@ for (const file of files) {
   const rows = (feed.alerts || []).filter((a) => a.model && a.model.highROI);
   const legacy = [];
   let relabelled = 0;
-  /* Candidate rows are (a) anything currently labelled high ROI and (b) anything previously
-   * relabelled by this script — the second group is what makes a re-run idempotent. Without it a
-   * second run would see highROI:false, skip the row, and then publish an empty legacy list,
-   * silently dropping the provenance record. (Found by running the script twice.) */
-  const candidates = (feed.alerts || []).filter((a) => a.model && (a.model.highROI || a.model.relabelled_by));
+  /* Candidate rows are (a) anything currently labelled high ROI, (b) anything previously
+   * relabelled by this script and (c) anything whose ORIGINAL (pre-fix) verdict was high ROI,
+   * which is how `scripts/rescore-feed.mjs` records a re-score. (b) and (c) are what make a re-run
+   * idempotent: without them a second run would see highROI:false, skip the row, and then publish
+   * an empty legacy list, silently dropping the provenance record. (Found by running the script
+   * twice; (c) added by session-4b5ddd87 after a model re-score moved the rows out of (a).) */
+  const candidates = (feed.alerts || []).filter((a) => a.model
+    && (a.model.highROI || a.model.relabelled_by || a.model.original_highROI === true));
   rows.length = 0;
   rows.push(...candidates);
   for (const a of rows) {

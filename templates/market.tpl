@@ -60,8 +60,8 @@
       <p class="small muted" id="book-total">—</p></div>
       <div class="table-wrap" style="border:0;border-radius:0">
         <table class="ladder"><thead><tr>
-          <th>YES bid</th><th class="num">Contracts</th><th>→ YES ask</th>
-          <th>NO bid</th><th class="num">Contracts</th><th>→ YES ask</th><th></th><th>Source</th></tr></thead>
+          <th>YES bid</th><th class="num">Contracts</th><th>→ NO ask <span class="muted">(1 − YES bid)</span></th>
+          <th>NO bid</th><th class="num">Contracts</th><th>→ YES ask <span class="muted">(1 − NO bid)</span></th><th></th><th>Source</th></tr></thead>
           <tbody id="book-body"></tbody></table>
         <p class="small muted" style="padding:0 14px 12px">A YES ask is <code>1 − NO bid</code>, which is the
         relation the exchange documents for a binary book. Both executable sides are shown because a
