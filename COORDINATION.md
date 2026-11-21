@@ -1808,7 +1808,7 @@ TBD — recorded below once the PR exists.
 | R1 | **Line-by-line repo review**: templates, root site, scripts, tools, data, docs, workflows — verify the live site's claims against the committed tree and against official sources; record irregularities in the verification file. | **done** — duplicate `F-54` anchor found; fixed on `main` by session-4251f2d1 (PR #41) before the merge; the rest clean (see verification file). | session-4830ab32 | `verification/2026-11-21-4830ab32.md` |
 | R2 | **QA battery**: `build-site.mjs --check`, both link checkers, engine selftest, feed check, page-render/behaviour tests, JS syntax checks, conflict-marker scan. | **done** — all checks pass on the merged tree (see verification file; feed: 173 alerts, 0 resolutions, largest move $0.96). | session-4830ab32 | (read-only) |
 | R3 | **Live-site verification**: fetch the published GitHub Pages site and confirm the key pages serve, nav reaches the pages, and the alert feed is present and fresh. | **done** — `/`, `/executive-summary.html`, `/alerts/index.html` all serve current snapshot/feed data. | session-4830ab32 | (read-only) |
-| R4 | **PR → merge → Pages confirmation + board record**. | **in progress** — PR #43 reopened on the merged tree; checks green; merge below | session-4830ab32 | `COORDINATION.md` |
+| R4 | **PR → merge → Pages confirmation + board record**. | **done** — PR #43 merged 2026-11-21T06:36:31Z (merge commit `e66c0cf`); Pages built the merge commit (`built`, 06:36:55Z, no error) | session-4830ab32 | `COORDINATION.md` |
 
 Rules honoured: only files in scope are edited; no other session's file is modified (PR #39's files are off-limits); no value is inferred — unverified values stay blank and are flagged in the verification file; `git pull --rebase` before every push.
 
@@ -1821,3 +1821,12 @@ Rules honoured: only files in scope are edited; no other session's file is modif
 - **Actions audit:** keepalive schedule run 2026-11-21T00:54:57Z → success; post-repair push-triggered live-alerts run 44875714835 and refresh-data run 44875714858 → success (write-back landed; feed `meta.generated_at` 2026-11-21T06:28:52Z, snapshot `captured_at` 2026-11-21T06:28:54.320Z, 173 rows: 99 `KXPRESNOMD-28-AKLO` + 74 `KXBTCY-27JAN0100-B97500`, latest run 0 new trade alerts / 60 candle alerts / 242 duplicates collapsed; freshness check 1.2 minutes). Two earlier 2026-11-21 scheduled runs failed at commit/write-back (engine + validation passed); the defect class is repaired and recorded as F-44/F-58. Raw logs could not be downloaded in this sandbox; recorded as-is.
 - **Unverified / not re-fetched:** all F-01…F-59 flag rows were kept as written (not re-verified row-by-row); browser live-poll (covered by jsdom page test); demo-account real-key flow (no key provided, per the brief); a scheduled run landing on main (not yet observed — F-45 says scheduled jobs can be delayed or dropped).
 - **Handoff for the reviewer:** PR #39 (swing-per-ticker deduplication, session-f7490df7) merged on main; the feed's committed counts are the honest read. The 173-row history is not validated ROI performance; historical $0.80/$0.96 swings stay flagged for review.
+
+### Post-merge record — session-4830ab32 (2026-11-21T06:36:55Z)
+
+- **PR:** https://github.com/kanlerxz87-cyber/KalshiDash1/pull/43 — merged 2026-11-21T06:36:31Z as `e66c0cf88f0ab5dff046edcb3647d172ad3d9979`.
+- **Pages:** merge commit building → status `built`, no error, via the Pages API at `https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest` (commit `e66c0cf`, created 2026-11-21T06:36:32Z, updated 2026-11-21T06:36:55Z).
+- **Site:** live at https://kanlerxz87-cyber.github.io/KalshiDash1/ — flagged page renders F-BFC-01/F-BFC-03 and the reconciled F-57 annotation; ALERTS doc agrees with the persisted feed window.
+- **PR #39:** merged on main 2026-11-21T06:29:04Z (alert deduplication); its files were not edited by this PR.
+- **R1–R3 verdict:** line-by-line review and QA on the merged tree are recorded above; the site is publishable and live.
+
