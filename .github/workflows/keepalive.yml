@@ -57,10 +57,14 @@ on:
 permissions:
   contents: write
 
-# The other two writers queue behind this one instead of racing it (see the shared group name in
-# live-alerts.yml and refresh-data.yml).
+# The other two data writers now genuinely queue behind this one (session-7dc87913, F-61).
 concurrency:
-  group: writer-${{ github.ref }}
+  # SHARED with live-alerts.yml and refresh-data.yml. This comment used to claim the other two
+  # writers queued behind this one, but the three files declared `writer-…`, `live-alerts` and
+  # `refresh-data-…`, so they never serialised at all. Measured consequence: two PRs merged seconds
+  # apart made this workflow fail with "could not push after 3 attempts"
+  # (run 44876422837, 2026-11-21T06:37:33Z). One group means one writer at a time per branch.
+  group: data-writers-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -125,30 +129,76 @@ jobs:
       - name: Check internal links before publishing anything
         run: node scripts/check-links.mjs
 
-      - name: Commit and push (rebase-and-retry)
+      - name: Commit and push (rebase, retry, and VERIFY the ref moved)
         id: push
+        # FIXED (session-7dc87913, F-61). This step failed on `main` on 2026-11-21T06:37:33Z with
+        # "could not push after 3 attempts" (exit 1): two PRs merged seconds apart, so a second
+        # writer had already published. The old loop trusted exit codes, which produces two
+        # distinct silent/loud failures:
+        #   * `git pull --rebase` CONFLICTS on the regenerated files (both branches rewrote
+        #     data/live/feed.json, data/live/state.json, data/snapshot.json and the generated HTML
+        #     with different content). Retrying the same rebase can never succeed.
+        #   * even a "successful" push can be a no-op, so the run exits 0 having published nothing.
+        # The fix is to treat the generated files as DERIVED, never as things to merge: on any
+        # conflict, throw the local commit away, fast-forward to the remote tip, RE-RUN the
+        # generators, and commit again. Finally confirm the remote tip really is our commit.
         run: |
           set -euo pipefail
           git config user.name  'kalshidash1-engine'
           git config user.email 'engine@users.noreply.github.com'
-          git add data/ '*.html' assets categories
+          BRANCH="${GITHUB_REF_NAME}"
+
+          stage() { git add data/ '*.html' assets categories 2>/dev/null || git add data/ '*.html' assets; }
+
+          stage
           if git diff --cached --quiet; then
             echo 'Nothing changed in this pulse.'
             exit 0
           fi
-          STAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          git commit -m "data(live): keepalive pulse ${STAMP}"
-          BRANCH="${GITHUB_REF_NAME}"
-          for attempt in 1 2 3; do
-            echo "push attempt ${attempt}/3 to ${BRANCH}"
-            if git pull --rebase --autostash origin "$BRANCH" && git push origin "HEAD:${BRANCH}"; then
-              echo "pushed on attempt ${attempt}"
+
+          for attempt in 1 2 3 4 5; do
+            STAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git commit -m "data(live): keepalive pulse ${STAMP}" || true
+
+            if ! git fetch origin "$BRANCH"; then
+              echo "::warning::attempt ${attempt}: could not fetch origin/${BRANCH}"
+              sleep $((attempt * 5)); continue
+            fi
+
+            # Rebase onto the current tip. On conflict we do NOT retry the rebase: the data files
+            # are regenerated from the API on every pulse, so the right resolution is to regenerate
+            # them on top of whatever is now on the branch.
+            if git rebase FETCH_HEAD 2>/dev/null; then
+              if git push origin "HEAD:${BRANCH}"; then
+                git fetch -q origin "$BRANCH"
+                if [ "$(git rev-parse HEAD)" = "$(git rev-parse FETCH_HEAD)" ]; then
+                  echo "pushed and verified on attempt ${attempt}: remote ${BRANCH} == $(git rev-parse --short HEAD)"
+                  exit 0
+                fi
+                echo "::warning::attempt ${attempt}: push returned success but the remote tip is not our commit — retrying"
+              fi
+            else
+              echo "attempt ${attempt}: rebase conflicted on regenerated files — regenerating instead of merging them"
+              git rebase --abort 2>/dev/null || true
+            fi
+
+            # Discard our derived-file commit and rebuild it on the new tip.
+            git reset --hard FETCH_HEAD
+            echo "regenerating data on top of $(git rev-parse --short HEAD)"
+            node tools/live_engine.mjs --max-series 12 --candle-markets 6 >/dev/null 2>&1 || \
+              echo "::warning::attempt ${attempt}: engine rerun failed; reusing committed data"
+            node scripts/fetch-snapshot.mjs >/dev/null 2>&1 || \
+              echo "::warning::attempt ${attempt}: snapshot rerun failed; reusing committed snapshot"
+            node scripts/build-site.mjs >/dev/null 2>&1 || true
+            stage
+            if git diff --cached --quiet; then
+              echo 'Nothing to publish after regenerating — the branch already has this data.'
               exit 0
             fi
-            git rebase --abort 2>/dev/null || true
-            sleep $((attempt * 10))
+            git commit -q -m "data(live): keepalive pulse $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           done
-          echo '::error::could not push after 3 attempts'
+
+          echo '::error::could not publish the pulse after 5 regenerating attempts'
           exit 1
 
       # The gate that makes the live claim checkable. It reads the *published* feed (via the API,

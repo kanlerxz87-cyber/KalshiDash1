@@ -27,7 +27,13 @@ permissions:
   contents: write
 
 concurrency:
-  group: writer-${{ github.ref }}
+  # SHARED with keepalive.yml on purpose (session-7dc87913, F-61). These three workflows all
+  # commit to the same branch and rewrite overlapping generated files; keepalive.yml's comment
+  # already claimed they "queue behind this one (see the shared group name in live-alerts.yml and
+  # refresh-data.yml)", but each file declared a *different* group, so they never serialised.
+  # Measured consequence: two PRs merged seconds apart made the third writer fail with
+  # "could not push after 3 attempts" (keepalive run 44876422837, 2026-11-21T06:37:33Z).
+  group: data-writers-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -78,28 +84,52 @@ jobs:
           elif [ "$TARGET_BRANCH" != "main" ]; then
             echo "Sample validated on $TARGET_BRANCH; write-back is intentionally restricted to main."
           else
-            STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-            git commit -m "data(live): engine sample ${STAMP}"
+            # FIXED (session-7dc87913, F-61): this loop used to abort the whole run the moment a
+            # rebase conflicted, and the three data writers do not share a concurrency group, so
+            # two merges seconds apart made the second writer fail (measured on main:
+            # keepalive run 44876422837, 2026-11-21T06:37:33Z, "could not push after 3 attempts").
+            # data/live/ is REGENERATED every run, so it must never be text-merged: on conflict,
+            # discard the commit, fast-forward, re-run the engine, and commit again. The push is
+            # then verified against the remote tip instead of trusted.
             PUSHED=false
             for attempt in 1 2 3 4 5; do
+              STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+              git commit -m "data(live): engine sample ${STAMP}" >/dev/null 2>&1 || true
+
               if ! git fetch origin "$TARGET_BRANCH"; then
-                echo "::error::could not fetch origin/$TARGET_BRANCH"
-                exit 1
+                echo "::warning::attempt $attempt: could not fetch origin/$TARGET_BRANCH"
+                sleep $((attempt * 5)); continue
               fi
-              if ! git rebase FETCH_HEAD; then
-                git rebase --abort || true
-                echo "::error::could not rebase the engine sample onto origin/$TARGET_BRANCH"
-                exit 1
+
+              if git rebase FETCH_HEAD 2>/dev/null; then
+                if git push origin "HEAD:$TARGET_BRANCH"; then
+                  git fetch -q origin "$TARGET_BRANCH"
+                  if [ "$(git rev-parse HEAD)" = "$(git rev-parse FETCH_HEAD)" ]; then
+                    echo "Pushed and verified the engine sample on attempt $attempt (remote $TARGET_BRANCH == $(git rev-parse --short HEAD))."
+                    PUSHED=true
+                    break
+                  fi
+                  echo "::warning::attempt $attempt: push reported success but the remote tip is not ours"
+                fi
+              else
+                echo "attempt $attempt: rebase conflicted on regenerated data — regenerating instead of merging"
+                git rebase --abort 2>/dev/null || true
               fi
-              if git push origin "HEAD:$TARGET_BRANCH"; then
-                echo "Pushed the engine sample to origin/$TARGET_BRANCH on attempt $attempt."
+
+              git reset --hard FETCH_HEAD
+              echo "regenerating on top of $(git rev-parse --short HEAD)"
+              node tools/live_engine.mjs --max-series 12 --candle-markets 6 >/dev/null 2>&1 || \
+                echo "::warning::attempt $attempt: engine rerun failed; reusing committed data"
+              git add data/live/
+              if git diff --cached --quiet -- data/live/; then
+                echo "Nothing to publish after regenerating — the branch already has this data."
                 PUSHED=true
                 break
               fi
-              echo "Push attempt $attempt lost a concurrent-update race; retrying after fetch/rebase."
+              git commit -q -m "data(live): engine sample $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             done
             if [ "$PUSHED" != true ]; then
-              echo "::error::could not push the engine sample to origin/$TARGET_BRANCH after 5 attempts"
+              echo "::error::could not publish the engine sample to origin/$TARGET_BRANCH after 5 attempts"
               exit 1
             fi
           fi

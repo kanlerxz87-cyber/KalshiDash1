@@ -56,6 +56,14 @@ jobs:
       # documented-optional data/dash-quality.json is absent (F-59). It is now created for the
       # duration of the test and removed afterwards, so the page render assertions are actually
       # enforced in CI instead of being skipped or red for an unrelated reason.
+      # session-7dc87913: pins the data-writer publish path (one shared concurrency group, verify
+      # the ref moved, regenerate rather than text-merge on conflict). Static, no network.
+      - name: Data-writer publish path checks
+        run: node scripts/check-data-writer-concurrency.mjs
+
+      - name: Data workflow shell syntax (all three writers)
+        run: node scripts/check-data-workflow-shells.mjs
+
       - name: Catalyst + strategy lab render tests (jsdom)
         run: node scripts/check_lab.mjs
 
