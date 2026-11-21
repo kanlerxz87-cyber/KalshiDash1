@@ -44,6 +44,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
+import { assessRuns, humanAge } from './keepalive-verdict.mjs';
 
 const argv = process.argv.slice(2);
 const flag = (name, fallback = null) => {
@@ -58,6 +59,13 @@ const STALE_MIN = Number(flag('stale-minutes', '20'));
 const REF = String(flag('ref', process.env.GITHUB_REF_NAME || 'main'));
 const DISPATCH = argv.includes('--dispatch');
 const JSON_OUT = argv.includes('--json');
+/* --strict makes an unhealthy sampler fail the run (used by keepalive.yml's own pulse).
+ * --exclude-self drops the workflow that is currently executing from the gate, because a
+ * workflow cannot observe its own successful completion while it is still running; it would
+ * otherwise always look "overdue" to itself. */
+const STRICT = argv.includes('--strict');
+const EXCLUDE_SELF = argv.includes('--exclude-self');
+const SELF = process.env.KEEPALIVE_SELF || 'keepalive.yml';
 
 const REPO = process.env.GITHUB_REPOSITORY || 'kanlerxz87-cyber/KalshiDash1';
 const TOKEN = process.env.GH_TOKEN || process.env.GITHUB_TOKEN || '';
@@ -83,8 +91,7 @@ function call(method, path, body) {
 
 const now = Date.now();
 const ageMin = (iso) => (iso ? Math.round((now - Date.parse(iso)) / 60000) : null);
-const human = (m) => (m === null ? 'never' : m < 1 ? 'just now'
-  : m < 60 ? `${m} min ago` : m < 2880 ? `${(m / 60).toFixed(1)} h ago` : `${Math.round(m / 1440)} d ago`);
+const human = humanAge;
 
 const report = [];
 let hardFail = false;
@@ -98,43 +105,58 @@ for (const target of TARGETS) {
     continue;
   }
   const list = (runs.json && runs.json.workflow_runs) || [];
-  const newest = list[0];
-  const newestMin = newest ? ageMin(newest.created_at) : null;
-  const scheduled = list.find((r) => r.event === 'schedule');
-  const scheduledMin = scheduled ? ageMin(scheduled.created_at) : null;
+  /* The verdict is no longer "how old is the newest run". It is "did a run actually SUCCEED
+   * recently", computed in scripts/keepalive-verdict.mjs and covered by an offline test.
+   * The measured reason for the change: on 2026-11-21 06:38Z this monitor reported
+   * `live-alerts.yml` and `refresh-data.yml` as `fresh (1 min ago)` while every scheduled run of
+   * both had failed and their last successful runs were hours old. See that module's header. */
+  const isSelf = EXCLUDE_SELF && target === SELF;
+  const v = assessRuns(list, { staleMinutes: STALE_MIN, now });
 
-  let verdict;
+  let verdict = isSelf && v.verdict.startsWith('overdue')
+    ? `${v.verdict} (this workflow is still running — not self-gating)`
+    : v.verdict;
   let action = 'none';
-  if (newestMin !== null && newestMin < STALE_MIN) {
-    verdict = `fresh (${human(newestMin)})`;
-  } else if (newestMin === null) {
-    verdict = 'never run';
-  } else {
-    verdict = `overdue (${human(newestMin)})`;
-    if (DISPATCH) {
-      const res = call('POST', `/repos/${REPO}/actions/workflows/${id}/dispatches`, { ref: REF });
-      const ok = res.status === 204 || res.status === 200;
-      action = ok ? `dispatched on ${REF} (HTTP ${res.status})` : `dispatch refused (HTTP ${res.status})`;
-      if (!ok) hardFail = true;
-    }
+
+  const unhealthy = !v.ok && !isSelf;
+  if (unhealthy && DISPATCH) {
+    const res = call('POST', `/repos/${REPO}/actions/workflows/${id}/dispatches`, { ref: REF });
+    const dispatched = res.status === 204 || res.status === 200;
+    action = dispatched ? `dispatched on ${REF} (HTTP ${res.status})` : `dispatch refused (HTTP ${res.status})`;
+    if (!dispatched) hardFail = true;
   }
-  report.push({ workflow: target, newest: newest ? newest.created_at : null, newestAge: newestMin,
-    scheduled: scheduled ? scheduled.created_at : null, scheduledAge: scheduledMin, verdict, action });
+  /* A dispatch cannot repair a failing *script*; it only re-runs it. So strict mode reports the
+   * failure rather than pretending the dispatch fixed it. */
+  if (unhealthy && STRICT) hardFail = true;
+
+  report.push({ workflow: target, newest: v.newest, newestAge: v.newestAge,
+    newestConclusion: v.newestConclusion,
+    scheduled: v.newestScheduled, scheduledAge: v.newestScheduledAge,
+    scheduledConclusion: v.newestScheduledConclusion,
+    newestSuccess: v.newestSuccess, newestSuccessAge: v.newestSuccessAge,
+    failing: v.failing, scheduledStale: v.scheduledStale, ok: v.ok, verdict, action });
 }
 
 const neverScheduled = report.every((r) => r.scheduled === null);
+const failingCount = report.filter((r) => r.failing || r.scheduledStale).length;
 
 if (JSON_OUT) {
   console.log(JSON.stringify({ ref: REF, stale_minutes: STALE_MIN, generated_at: new Date().toISOString(),
-    never_scheduled: neverScheduled, report }, null, 2));
+    never_scheduled: neverScheduled, unhealthy: failingCount, strict: STRICT, report }, null, 2));
 } else {
   console.log(`keepalive monitor · ${REPO} · ref ${REF} · overdue at ${STALE_MIN} min · `
-    + `${TOKEN ? 'authenticated' : 'anonymous'}${DISPATCH ? ' · dispatch enabled' : ''}\n`);
+    + `${TOKEN ? 'authenticated' : 'anonymous'}${DISPATCH ? ' · dispatch enabled' : ''}`
+    + `${STRICT ? ' · strict (fails on an unhealthy sampler)' : ''}\n`);
   for (const r of report) {
     console.log(`· ${r.workflow}`);
-    console.log(`    newest run:      ${r.newest ? `${r.newest} → ${human(r.newestAge)}` : 'none'}`);
-    console.log(`    newest SCHEDULED:${r.scheduled ? ` ${r.scheduled} → ${human(r.scheduledAge)}` : ' never fired on this repo'}`);
+    console.log(`    newest run:      ${r.newest ? `${r.newest} → ${human(r.newestAge)} (${r.newestConclusion})` : 'none'}`);
+    console.log(`    newest SUCCESS:  ${r.newestSuccess ? `${r.newestSuccess} → ${human(r.newestSuccessAge)}` : 'none on record'}`);
+    console.log(`    newest SCHEDULED:${r.scheduled ? ` ${r.scheduled} → ${human(r.scheduledAge)} (${r.scheduledConclusion})` : ' never fired on this repo'}`);
     console.log(`    verdict:         ${r.verdict}${r.action !== 'none' ? ` → ${r.action}` : ''}`);
+  }
+  if (failingCount) {
+    console.log(`\n${failingCount} of ${report.length} workflows are not publishing as scheduled `
+      + '(failing, or no recent successful scheduled run). See the FAILING rows above.');
   }
   if (neverScheduled) {
     console.log('\nNo `schedule` run has ever fired for these workflows. That is why '
@@ -148,10 +170,19 @@ const summary = [
   '',
   `Overdue threshold **${STALE_MIN} min** · ref \`${REF}\``,
   '',
-  '| Workflow | Newest run | Newest *scheduled* run | Verdict |',
-  '| --- | --- | --- | --- |',
-  ...report.map((r) => `| \`${r.workflow}\` | ${r.newest ? human(r.newestAge) : 'never'} | `
-    + `${r.scheduled ? human(r.scheduledAge) : 'never'} | ${r.verdict}${r.action !== 'none' ? ` → ${r.action}` : ''} |`),
+  '| Workflow | Newest run | Newest **successful** run | Newest *scheduled* run | Verdict |',
+  '| --- | --- | --- | --- | --- |',
+  ...report.map((r) => `| \`${r.workflow}\` | ${r.newest ? `${human(r.newestAge)} (${r.newestConclusion})` : 'never'} | `
+    + `${r.newestSuccess ? human(r.newestSuccessAge) : '**none**'} | `
+    + `${r.scheduled ? `${human(r.scheduledAge)} (${r.scheduledConclusion})` : 'never'} | `
+    + `${r.verdict}${r.action !== 'none' ? ` → ${r.action}` : ''} |`),
+  '',
+  ...(report.some((r) => r.failing)
+    ? ['> **A scheduled sampler is FAILING.** A run that ran and failed is not freshness: the '
+      + 'rows marked `FAILING` above ran recently but did not succeed, so the data they were '
+      + 'supposed to publish may not have advanced. This monitor previously reported those rows '
+      + 'as `fresh` because it looked only at run age. See `scripts/keepalive-verdict.mjs`.']
+    : []),
   '',
   ...(neverScheduled ? ['> **No scheduled run has ever fired on this repository.** '
     + '`keepalive.yml` therefore samples the API inline rather than trusting the cron, and '
