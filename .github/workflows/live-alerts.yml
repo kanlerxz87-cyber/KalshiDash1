@@ -27,7 +27,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: live-alerts
+  group: writer-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:

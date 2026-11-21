@@ -20,6 +20,7 @@
  */
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { collapseDuplicates } from '../tools/live_engine.mjs';
 
 const FEED = process.env.ALERTS_FEED || 'data/live/feed.json';
 const OFFICIAL_HOSTS = ['external-api.demo.kalshi.co', 'demo-api.kalshi.co'];
@@ -181,6 +182,24 @@ async function main() {
     }
   }
 
+  // 8. chat readability / flap-suppression guard: no ticker may appear twice within 15 minutes
+  {
+    const byTicker = {};
+    for (const a of feed.alerts || []) {
+      if (!a.ticker || !a.ts) continue;
+      (byTicker[a.ticker] = byTicker[a.ticker] || []).push(Date.parse(a.ts));
+    }
+    for (const [ticker, times] of Object.entries(byTicker)) {
+      times.sort((x, y) => x - y);
+      for (let i = 1; i < times.length; i++) {
+        if (times[i] - times[i - 1] <= 15 * 60 * 1000) {
+          fail(`chat readability: ${ticker} has two alerts ${Math.round((times[i] - times[i - 1]) / 1000)}s apart (must be > 15 min)`);
+          break;
+        }
+      }
+    }
+  }
+
   // report
   const nA = (feed.alerts || []).length;
   const nR = (feed.resolutions || []).length;
@@ -189,64 +208,37 @@ async function main() {
   console.log(`feed: ${nA} alerts (${nH} high-ROI), ${nR} resolutions, ${nM} market rows, ${Object.keys(obs).length} orderbooks`);
   if (nA) console.log(`largest recorded move: $${maxDelta.toFixed(2)}`);
 
-  /* Chat readability guard. This MUST run before the exit check below: in the first version
-   * it was appended after `process.exit(1)`, so its finding was recorded in `problems` and
-   * never read — a dead check that printed "OK" on a flooded feed (flagged as F-63).
-   *
-   * The invariant is derived from the engine's own dedupe rule. collapseDuplicates keeps one
-   * alert per ticker per 15 minutes within a detector, and merges different detectors of the same
-   * ticker only inside 3 minutes, so the engine can legitimately publish at most
-   * 3 detectors × 4 quarter-hour windows = 12 alerts from one contract per rolling hour.
-   * Measured on the broken feed before PR #39: 22 and 30 rows from one ticker inside one hour
-   * (99 of 173 rows overall), which is what made the live chat unreadable. The cap is therefore
-   * 12/hour: exactly the engine's documented capacity, and roughly half the observed flood.
-   * A first version used 6/hour, which was below the engine's real capacity — it failed a live
-   * sample in CI on 2026-11-21 06:38 UTC before this derivation was written down.
-   */
+  for (const w of warnings) console.log(`warn: ${w}`);
+
+  /* Chat-readability invariant. A concentration threshold is not an integrity test: a real
+   * market can produce most of the recorded moves. Instead, compare the published rows with the
+   * engine's direction-independent, per-ticker deduplication rule. If another application of
+   * that rule would remove a row, the feed still contains a flap/cross-detector duplicate.
+   * This directly covers the 2026-11-20 $0.80 <-> $0.00 one-ticker flood without suppressing
+   * distinct swings more than the documented deduplication windows apart. */
   {
-    const MAX_PER_HOUR = 12;
-    const byTicker = {};
-    for (const a of feed.alerts || []) {
-      const ts = Date.parse(a.ts) || 0;
-      (byTicker[a.ticker] = byTicker[a.ticker] || []).push(ts);
-    }
-    for (const [ticker, times] of Object.entries(byTicker)) {
-      times.sort((x, y) => x - y);
-      for (let i = 0; i < times.length; i++) {
-        let n = 0;
-        for (let j = i; j < times.length && times[j] - times[i] < 3600000; j++) n++;
-        if (n > MAX_PER_HOUR) {
-          fail(`chat readability: ${ticker} has ${n} alerts inside one rolling hour `
-            + `(limit ${MAX_PER_HOUR}); collapseDuplicates should keep at most one per 15 min`);
-          break;
-        }
-      }
-    }
-    // Dominance is reported, not fatal: with a two-contract demo feed a legitimate market can
-    // own most rows. The per-hour cap above is the enforceable invariant.
-    const worst = Object.entries(byTicker)
-      .map(([t, ts]) => [t, ts.length])
-      .sort((x, y) => y[1] - x[1])[0];
-    if ((feed.alerts || []).length >= 10 && worst && worst[1] > (feed.alerts || []).length / 2) {
-      warn(`chat readability: ${worst[1]} of ${(feed.alerts || []).length} alerts come from one ticker (${worst[0]})`);
+    const rows = feed.alerts || [];
+    const deduped = collapseDuplicates(rows);
+    if (deduped.length !== rows.length) {
+      fail(`chat readability: ${rows.length - deduped.length} alert row(s) still match the engine's duplicate rule; `
+        + 'collapseDuplicates should have removed the repeated swing(s) before publication');
     }
   }
 
-  for (const w of warnings) console.log(`warn: ${w}`);
+  // All checks, including the chat-readability invariant above, must run before deciding
+  // whether the feed is publishable. Keeping this gate last makes every collected violation fatal.
   if (problems.length) {
     console.error(`\nFAILED — ${problems.length} violation(s):`);
     for (const p of problems) {
       console.error('  ✗ ' + p);
       /* The raw job log is not always downloadable (measured 2026-11-21: the Actions log endpoint
        * returned EOF in this environment). Workflow annotations are readable through the API, so
-       * every violation is also emitted as one — a failing gate must be diagnosable. */
+       * every violation is also emitted as one — a failing gate has to be diagnosable. */
       if (process.env.GITHUB_ACTIONS === 'true') console.error(`::error title=feed validation::${p}`);
     }
     process.exit(1);
   }
-
   console.log('OK: every alert, market, resolution and orderbook row passed the source and threshold checks.');
-
 }
 
 main().catch((e) => { console.error('checker crashed:', e); process.exit(1); });

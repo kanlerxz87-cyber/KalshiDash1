@@ -61,9 +61,11 @@ jobs:
           npm install --no-save --silent jsdom@24.1.3
           node tools/alerts-render-test.mjs
 
-      # The catalyst / strategy-lab headless suite existed but ran only by hand (F-59). jsdom is
-      # installed by the step above, so it costs nothing to gate merges on it.
-      - name: Catalyst + strategy-lab render test (jsdom)
+      # session-7dc87913: the lab test previously failed on every clean checkout because the
+      # documented-optional data/dash-quality.json is absent (F-59). It is now created for the
+      # duration of the test and removed afterwards, so the page render assertions are actually
+      # enforced in CI instead of being skipped or red for an unrelated reason.
+      - name: Catalyst + strategy lab render tests (jsdom)
         run: node scripts/check_lab.mjs
 
       - name: Python tool syntax

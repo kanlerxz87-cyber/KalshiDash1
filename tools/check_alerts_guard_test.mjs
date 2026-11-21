@@ -72,7 +72,7 @@ const flood = {
 const b = run(flood, 'flood');
 check(b.status === 1, `flooded feed fails the checker (exit ${b.status})`);
 check(/chat readability/.test(b.out), 'failure names the chat-readability guard');
-check(/limit 12/.test(b.out), 'failure states the per-hour limit');
+check(/duplicate rule|readability/.test(b.out), 'failure explains the readability/duplicate rule');
 
 // C. the same count spread one per hour is not a flood: the cap is a rolling window, not a total
 const gentler = {

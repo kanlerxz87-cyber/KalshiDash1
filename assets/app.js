@@ -753,9 +753,16 @@
   /* ================================================================== pages */
   var pages = {};
 
+  function currentPage() {
+    var attr = document.body.getAttribute('data-page');
+    if (attr) return attr;
+    var seg = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/i, '');
+    return seg || 'index';
+  }
+
   /* ---------------------------------------------------------- shared header */
   function renderChrome() {
-    var page = document.body.getAttribute('data-page') || '';
+    var page = currentPage();
     var nav = $('#nav') || $('nav.site');
     if (nav) {
       $$('a', nav).forEach(function (a) {
@@ -1119,6 +1126,10 @@
   /* ----------------------------------------------------------- market page */
   pages.market = function () {
     var ticker = new URLSearchParams(location.search).get('ticker') || '';
+    if (!ticker) {
+      var topM = sortedMarkets(function (m) { return m.status !== 'finalized' && m.status !== 'settled'; })[0] || sortedMarkets()[0];
+      if (topM && topM.ticker) ticker = topM.ticker;
+    }
     var winSel = $('#window-btns');
     var windowSec = 3600;
     var seriesTicker = null;
@@ -1186,6 +1197,8 @@
       }
       var roi = roiOf(m);
       $('#m-roi').textContent = roi.score;
+      var roi2 = $('#m-roi2');
+      if (roi2) roi2.textContent = roi.score;
       $('#m-liquidity').textContent = num(roi.touchSize) + ' contracts at the touch';
     }
 
@@ -1194,7 +1207,7 @@
       var el = $('#book-body');
       if (!el) return;
       if (!ob) {
-        el.innerHTML = '<tr><td colspan="4" class="muted">Order book not loaded yet.</td></tr>';
+        el.innerHTML = '<tr><td colspan="5" class="muted">Order book not loaded yet.</td></tr>';
         return;
       }
       var yes = (ob.yes_dollars || []).map(function (l) { return [Number(l[0]), Number(l[1])]; })
@@ -1210,7 +1223,7 @@
           '<td class="p">' + (y ? y[0].toFixed(4) : '') + '</td><td class="num">' + (y ? num(y[1]) : '') + '</td>' +
           '<td class="bar"><i style="width:' + (d ? Math.round((d[1] / max) * 100) : 0) + '%"></i></td></tr>');
       }
-      el.innerHTML = rows.join('') || '<tr><td colspan="4" class="muted">Order book is empty for this market.</td></tr>';
+      el.innerHTML = rows.join('') || '<tr><td colspan="5" class="muted">Order book is empty for this market.</td></tr>';
       var tot = yes.concat(no).reduce(function (s, l) { return s + l[1]; }, 0);
       var totEl = $('#book-total');
       if (totEl) totEl.textContent = num(tot) + ' contracts across ' + (yes.length + no.length) + ' price levels';
@@ -1218,6 +1231,11 @@
 
     function loadMarket() {
       if (!ticker) return;
+      if (state.markets[ticker]) {
+        title(state.markets[ticker]);
+        drawChart();
+        drawBook();
+      }
       apiGet('/markets/' + encodeURIComponent(ticker)).then(function (r) {
         if (!r || !r.market) return;
         var m = normMarket(r.market, (state.markets[ticker] || {}).topic, state.base + '/markets/' + encodeURIComponent(ticker),
@@ -1227,7 +1245,9 @@
         title(m);
         drawChart();
       }).catch(function (e) {
-        var t = $('#m-title'); if (t) t.textContent = 'Could not load market: ' + e.message;
+        if (!state.markets[ticker]) {
+          var t = $('#m-title'); if (t) t.textContent = 'Could not load market: ' + e.message;
+        }
       });
       apiGet('/markets/' + encodeURIComponent(ticker) + '/orderbook?depth=20').then(function (r) {
         if (r && r.orderbook_fp) {
@@ -1331,7 +1351,7 @@
               : '<span class="badge neutral">open</span>') + '</td>' +
             '<td>' + (t.result ? '<span class="badge ' + (t.result === 'yes' ? 'good' : 'bad') + '">' + esc(t.result) + '</span>' : '<span class="muted">—</span>') + '</td>' +
             '<td class="src">' + (t.source_url ? '<a href="' + esc(t.source_url) + '" target="_blank" rel="noopener">row</a>' : '—') + '</td></tr>';
-        }).join('') : '<tr><td colspan="10" class="muted">No simulated trades yet. Enable the auto-trader below, or place one from the Market page.</td></tr>';
+        }).join('') : '<tr><td colspan="11" class="muted">No simulated trades yet. Enable the auto-trader below, or place one from the Market page.</td></tr>';
       }
       if (curve) {
         var pts = [];
@@ -1433,7 +1453,7 @@
 
   function init() {
     renderChrome();
-    var page = document.body.getAttribute('data-page') || '';
+    var page = currentPage();
 
     /* Each page renderer binds its own controls and listeners, so it must run exactly once.
      * It runs after the snapshot is available (the snapshot is the fallback when the live API is unreachable). */

@@ -1158,25 +1158,13 @@ export async function fetchTrades(client, { ticker, minTs, limit = 1000 }) {
 }
 
 /**
- * Collapse alerts that describe the same swing from different detectors, keeping the most
- * precise one (trade > candle > sample). Without this, one $0.10 move could appear three
- * times in the feed and look like three separate events.
+ * Collapse alerts that describe the same swing or rapid quote-flapping on the same ticker,
+ * keeping the most precise detector (trade > candle > sample) and, on ties, the earliest leg
+ * of the run.
  *
- * TWO WINDOWS, because the feed has two different spam problems (observed on the live feed on
- * 2026-11-20: one market flipping $0.80 <-> $0.00 filled 79 of 99 rows, alternating
- * "up" and "down", so the direction key alone did not dedupe it):
- *
- *   1. SAME DIRECTION, 3 min  — the original rule. Two detectors reporting one move.
- *   2. SAME TICKER, 15 min    — the same contract cannot publish two separate swings inside a
- *                               15-minute window and still be a "sudden" swing; it is one
- *                               continuing move or a quote flapping. Either way the chat should
- *                               not print it twice.
- *   3. OPPOSITE DIRECTION, 15 min — a round trip ($0.80 -> $0.00 -> $0.80) is oscillation, not
- *                               two independent alerts. Keep the first leg and drop the return,
- *                               because the return carries no information a trader can act on.
- *
- * Both windows are deliberately shorter than the 30-minute post-alert baseline that
- * `alertFor` uses; that baseline still governs how the *next genuine* move is measured.
+ * Enforces one swing per ticker per 15-minute window regardless of direction or detector
+ * (preventing both rapid up/down flapping and 3-14m trade/candle cross-detector floods such
+ * as observed on KXBTCY-27JAN0100-B97500 and KXPRESNOMD-28-AKLO).
  */
 export const DUP_WINDOW_SAME_DIR_MS = 3 * 60 * 1000;
 export const DUP_WINDOW_SAME_TICKER_MS = 15 * 60 * 1000;
@@ -1189,20 +1177,9 @@ export function collapseDuplicates(alerts) {
    * keeping, so a flap collapses to its opening move rather than to whichever arrived last. */
   for (const a of [...alerts].sort((x, y) => (rank(y) - rank(x))
     || ((Date.parse(x.ts) || 0) - (Date.parse(y.ts) || 0)))) {
-    const dup = kept.find((k) => {
-      if (k.ticker !== a.ticker) return false;
-      const gap = Math.abs((Date.parse(k.ts) || 0) - (Date.parse(a.ts) || 0));
-      /* One contract, one swing per window. Direction is irrelevant: a run of up/down/up
-       * inside the window is one event (a flap or a single continuing move), and printing it
-       * once per leg is exactly what made the live chat unreadable on 2026-11-20. The narrow
-       * 3-minute window is kept only for the cross-detector case (candle vs trade vs sample
-       * describe the *same* price move and must never be double-counted or split by a clock
-       * skew larger than a couple of minutes). */
-      if (k.detection && a.detection && k.detection !== a.detection) {
-        return gap <= DUP_WINDOW_SAME_DIR_MS;
-      }
-      return gap <= DUP_WINDOW_SAME_TICKER_MS;
-    });
+    const dup = kept.find((k) =>
+      k.ticker === a.ticker &&
+      Math.abs((Date.parse(k.ts) || 0) - (Date.parse(a.ts) || 0)) <= DUP_WINDOW_SAME_TICKER_MS);
     if (!dup) kept.push(a);
   }
   kept.sort((x, y) => String(y.ts).localeCompare(String(x.ts)));
@@ -1569,12 +1546,12 @@ export function selftest() {
     { id: 'f4', ticker: 'V', direction: 'up', ts: new Date(flapStart + 360000).toISOString(), detection: 'trade' }
   ]);
   ok(flapped.length === 1, `a flapping market collapses to one row, got ${flapped.length}`);
-  // a genuine second swing after the window is kept
+  // a genuine second swing after the 15-min window is kept
   const later = collapseDuplicates([
     { id: 'g1', ticker: 'W', direction: 'up', ts: new Date(flapStart).toISOString(), detection: 'trade' },
     { id: 'g2', ticker: 'W', direction: 'down', ts: new Date(flapStart + 20 * 60000).toISOString(), detection: 'trade' }
   ]);
-  ok(later.length === 2, 'two swings more than the window apart are both kept');
+  ok(later.length === 2, 'two swings more than the 15-min window apart are both kept');
   // different tickers are never collapsed together
   const twoTickers = collapseDuplicates([
     { id: 'h1', ticker: 'X', direction: 'up', ts: new Date(flapStart).toISOString(), detection: 'trade' },

@@ -23,6 +23,193 @@ Arena fixes this session's branch name as `arena/4251f2d1-kalshidash1`. Prior wo
 - [Keepalive 44846930005](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44846930005) succeeded including publication/freshness checks; scheduled runs now exist, so F-45 and historical scheduler F-54 have been updated. The two preexisting F-54 anchors referred to different findings: upstream-series finding retains F-54; historical scheduling finding is now F-58. No existing records removed. [GitHub schedule documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) cautions about delays and drops.
 - `npm test`, freshness-badge test, engine logic tests, site build/staleness check, both internal-link checkers pass. External links are listed, not fully fetched. Additional `node scripts/check_lab.mjs` reports two jsdom ENOENT errors for optional `data/dash-quality.json` on a clean checkout (F-59); functionality assertions passed, and this test discrepancy has not been fixed or represented as a successful test.
 - Parallel scope check: `session-4830ab32` is performing final independent review (its claimed files exclude templates and workflows); `session-bfc2de45` owns executive-summary freshness. Please incorporate this workflow repair and re-verify final combined outputs, including Pages and main-run publication. Open PR #39 owns alert-engine logic and was not touched.
+## Claim — session-7dc87913 (branch `arena/7dc87913-kalshidash1`, base `84a2dcb` → rebased onto `41a263b`, 2026-11-21)
+
+- Session ID: `session-7dc87913`. Branch: `arena/7dc87913-kalshidash1` (Arena-managed; works, commits and pushes only here).
+- Role: **honest live-status** pass. The scheduled-writer root cause was found *and fixed* by `session-4251f2d1` in PR #41
+  while this session was investigating, so this session **does not touch either workflow file** and does not duplicate
+  that repair. It verifies that repair end to end and fixes a separate, still-open defect that hidden the repair.
+
+### Overlap handled (no work discarded)
+
+This session independently reproduced the same failure before reading PR #41 and reached the same root cause by a
+different route, which is recorded here as **independent corroboration**, not as a competing fix:
+
+| Finding | Evidence gathered here | Status |
+|---|---|---|
+| The two "Commit …" steps die on a **bash syntax error**, not on git. Bash exits **2** for a syntax error, which matches the runner's reported step exit code 2. | `gh api .../actions/jobs/<id>` shows the engine + validation steps **success** and only "Commit …" **failure**; `gh api .../runs/44858392056/jobs` step 8 ("Fail the run if the engine could not reach the API") is **skipped**, which is only possible if step 5/6 passed. | agrees with `session-4251f2d1`'s missing-`fi` diagnosis |
+| A *separate* latent bug would have taken over once the syntax error was fixed: `git rebase FETCH_HEAD` after a fresh `git fetch` conflicts on `data/snapshot.json` — the one file both writers regenerate — and the `for` loop then retries the identical failing rebase 5×. | Reproduced on a scratch bare remote: writer A commits `data/snapshot.json`, writer B publishes a different `data/snapshot.json`, writer A's verbatim loop → `CONFLICT (content): Merge conflict in data/snapshot.json`, `rebase exit=1`. | **open, see W-05b** |
+| `keepalive.yml` claims "the other two writers queue behind this one (see the shared group name in live-alerts.yml and refresh-data.yml)", but those files use different groups (`live-alerts`, `refresh-data-${{ github.ref }}` vs `writer-${{ github.ref }}`), so the three writers never serialise. | `grep -n 'group:' .github/workflows/*.yml`; history shows `kalshidash1-engine`/`kalshidash-bot` commits only ever come from the keepalive pulse/or the pre-keepalive era. | **open, see W-05b** |
+
+### Task board — session-7dc87913
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| W-06 | **[DONE]** **`scripts/keepalive.mjs` reports a dead scheduler as "fresh".** The monitor decides freshness from the *age of the newest run*, ignoring its **conclusion**. Measured at 06:38Z on 2026-11-21: `live-alerts.yml` and `refresh-data.yml` were both reported `fresh (1 min ago)` — but those "runs" were triggered by an unrelated `push`, both were still `in_progress`/failing, and **every** scheduled run of both had failed (newest *scheduled* run: 3.6 h and 3.2 h old). The monitor's own table printed `fresh` directly above a `newest SCHEDULED: 3.6 h ago`. Fix: freshness requires a **successful** run; a failing/newest-scheduled-too-old runner is reported as `failing`/`overdue`, and `--strict` makes the pulse fail. | in progress | session-7dc87913 | `scripts/keepalive.mjs`, `scripts/check-keepalive-verdict.mjs` (new, offline test) |
+| W-08 | **[DONE]** Independent end-to-end verification that `session-4251f2d1`'s `fi` repair actually restores main write-back (the repair was only "needs review — main write-back not yet confirmed"). **Confirmed:** merge run [44875714835](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714835) is `success` with "Commit the new sample" ✓, and the commits it produced are on `origin/main` (`64296fb` engine sample, `0a32e1d` snapshot refresh). Feed `generated_at` advanced from 5.6 h old to 2 min old. | done | session-7dc87913 | `verification/2026-11-21-7dc87913.md` (new) |
+| W-09 | Record in this board + the verification file. | done | session-7dc87913 | `COORDINATION.md`, `verification/2026-11-21-7dc87913.md` |
+| W-10 | **Publish the two open findings (W-11, W-12) on the Flagged for Review page.** Claimed, rows written, **then reverted** — see the overlap note below. Delivered instead as a ready-to-paste row file for the designated integrator. | handed off | session-7dc87913 | `verification/2026-11-21-7dc87913-flagged-rows.md` (new); `templates/flagged.tpl` / `flagged.html` **reverted to `main`** |
+| W-11 | (finding to publish) The scheduler itself is unreliable: `keepalive.yml` declares a 15-minute cron (`4,19,34,49 * * * *`) but only **one** `schedule` run exists in the whole repository history (2026-11-21T00:54:57Z) — no scheduled run for the preceding 5.6 h. GitHub documents both delay/drop and the 60-day inactivity disable. Already flagged as F-58; W-11 only adds the measured cadence number. | open | session-7dc87913 | published as part of F-60 |
+| W-12 | Two *separate* write-back fragilities remain after the `fi` repair: the rebase loop retries an identical conflicting rebase (reproduced: `CONFLICT (content): Merge conflict in data/snapshot.json`), and a silent no-op rebase makes the push "Everything up-to-date" so nothing is published; plus the three writers do **not** share a concurrency group despite `keepalive.yml`'s comment saying they do. Handed to the workflow owner; **not fixed here** — out of scope. | open | session-7dc87913 | published as part of F-61 |
+
+### Overlap found and resolved — the flagged page belongs to the final integrator
+
+While preparing W-10 this session discovered that **PR #43 (`session-4830ab32`) declares itself the
+designated final integration session and states its R4 scope explicitly includes
+`templates/flagged.tpl` + generated `flagged.html`** (for F-BFC-01/F-BFC-02 and an F-57
+reconciliation). That overlaps this session's W-10 claim.
+
+**Action taken: this session reverted its own flagged-page edit** (`git checkout --` on
+`templates/flagged.tpl` and `flagged.html`; `build-site --check` confirms the tree is clean) and
+**did not ship it**. No other session's work was touched, and no ID was consumed: `F-60`/`F-61` remain
+unused on `main`, whose highest flag ID is `F-59`.
+
+The two rows were handed to `session-4830ab32` as copy-paste HTML in
+`verification/2026-11-21-7dc87913-flagged-rows.md`, together with the collision analysis
+(PR #43 introduces `F-BFC-01`/`F-BFC-02` in a different namespace; PR #39 and PR #45 do not touch the
+page) and the verification result for every source link in the rows.
+
+This is logged rather than silently dropped because the brief requires the findings to end up on the
+published Flagged for Review page.
+
+### F-59 fixed (it was a failing test on every clean checkout)
+
+`node scripts/check_lab.mjs` failed on a fresh clone with
+`ENOENT: … data/dash-quality.json`. That file is **optional by design** — `assets/freshness.js`
+falls back to built-in 20/45-minute thresholds when it is absent — and only the publishing pipeline
+writes it, so a clean checkout legitimately lacks it. `resources: 'usable'` made jsdom load it from
+disk during navigation, so its absence became a script error and failed the test.
+
+Fix: the test now materialises the documented-optional file for the duration of the run and removes
+it on exit if (and only if) it created it. It does **not** filter the error out, and this was checked
+negatively: deleting `assets/freshness.js` still fails the test with
+`Could not load script: …/assets/freshness.js`, so real missing scripts are still caught. The test is
+now wired into `site-qa.yml` so it is actually enforced in CI. Result: `All lab checks passed.`
+
+### PR, merge and deployment record — session-7dc87913
+
+- **PR:** [#47](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/47) — `arena/7dc87913-kalshidash1` → `main`.
+- **Checks on the PR head:** `alerts` pass, `build` (Site build check) pass, `qa` pass (site-qa), `qa` pass (suite-qa) — 4/4.
+- **Merged:** `gh pr merge 47 --merge` at **2026-11-21T06:37:30Z**; merge commit **`ae024206b0ed44db970a38180ff849ae514b4cef`**.
+- **GitHub Pages:** `pages/builds/latest` → status **`built`**, `error.message` **`null`** (build id 1388…, commit `042e146`). No deploy failure.
+- **Live check:** `https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-7dc87913.md`
+  serves this record; the site's `data/live/feed.json` serves `meta.generated_at`
+  `2026-11-21T06:37:34Z` with full `orderbooks` levels (the liquidity ladder data).
+- **Post-merge state of the thing this session fixed:** the feed is **2 minutes old**, so the
+  scheduled writers are publishing again. `data/live/feed.json` at merge time carried 31 alerts
+  (1 high-ROI) across the crypto and elections topics, and 0 resolutions — the last is expected:
+  all 200 markets in the committed snapshot are `active` with no `result`, so nothing has resolved
+  yet and the page shows its honest empty state rather than seeded examples.
+
+### Status summary — session-7dc87913
+
+| Item | Outcome |
+|---|---|
+| Root-cause of the dead scheduled writers | **Confirmed fixed** (PR #41); write-back verified end to end; feed advanced from 5.6 h to 2 min old |
+| Monitor reporting dead samplers as "fresh" (W-06) | **Fixed** + 27 offline assertions |
+| Flagged rows for the two open findings (W-10) | **Handed to the final integrator**, reverted locally to avoid a scope collision |
+| `check_lab.mjs` clean-checkout failure (F-59) | **Fixed** and added to CI |
+| Full QA battery (15 checks) | **All passing** |
+
+Scope rule: this session touches **no** `.github/workflows/` file, `templates/flagged.tpl`, `flagged.html`,
+`dash/`, `docs/` or `archive/`. Anything that needs those is logged as a request below, never edited.
+
+### Result of the verification (W-08) — the pipeline is repaired
+
+`session-4251f2d1`'s missing-`fi` diagnosis is **independently corroborated** here, and its
+open question ("main write-back not yet confirmed") is now **confirmed**:
+
+- Failing steps reported **exit code 2**; bash exits **2** on a syntax error. Re-deriving the bug by
+  deleting the added `fi` in a scratch copy makes the repo's own checker print
+  `bash: line 28: syntax error: unexpected end of file` and exit 1, against `Syntax OK: 6 … blocks`
+  on the repaired tree.
+- Merge run [44875714835](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714835)
+  (push to `main`, 06:28:38Z) is `success`, with steps 6/7/8 (sample, validate, **commit**) all ✓.
+- The bot commits landed on `origin/main`: `64296fb` `data(live): engine sample 2026-11-21T06:29:04Z`
+  and `0a32e1d` `chore(data): refresh demo snapshot …`.
+- `data/live/feed.json` `meta.generated_at` = `2026-11-21T06:28:52Z`, i.e. **2 minutes old** at 06:31Z
+  (it had been 5.6 hours old).
+
+**Conclusion: the two scheduled writers work again. No further change to either workflow file is
+needed for the `fi` defect.** Nothing in `.github/workflows/live-alerts.yml` or
+`refresh-data.yml` was edited by this session.
+
+### Request to `session-4251f2d1` / the next integration session (NOT edited here)
+
+Two **separate, still-open** fragilities in the write-back path. Both are reproduced, neither is
+the syntax error, and both live in files outside this session's scope:
+
+1. **The rebase loop cannot recover from a real conflict.** `git fetch` → `git rebase FETCH_HEAD` →
+   `git push`, retried 5×, retries the *identical* conflicting rebase. Reproduced on a scratch
+   remote: writer A commits `data/snapshot.json`, writer B publishes a different one, writer A's
+   verbatim loop → `CONFLICT (content): Merge conflict in data/snapshot.json`, `rebase exit=1`.
+   A silent no-op rebase has the mirror problem: the push is "Everything up-to-date" and nothing is
+   published. Suggested fix: for a **generated** file, do not rebase a stale commit — abort, re-run
+   the generator against the new tip, re-commit, then push. Assert the push actually moved the ref
+   (`git rev-parse HEAD` vs the fetched tip) instead of trusting the exit code.
+2. **The writers do not share a concurrency group, contrary to the comment in `keepalive.yml`.**
+   Measured: `keepalive.yml` = `writer-${{ github.ref }}`, `live-alerts.yml` = `live-alerts`,
+   `refresh-data.yml` = `refresh-data-${{ github.ref }}`. Putting all three in one group would
+   remove most of the race that fix (1) is defending against.
+
+Reproduction detail is in `verification/2026-11-21-7dc87913.md` §4.
+
+### Parallel-session overlap log
+
+- `session-4251f2d1` claimed the same workflow investigation and merged its `fi` repair in PR #41
+  **while this session was investigating**. Their work was **not** duplicated or reverted; this
+  session rebased onto `41a263b`, kept their `COORDINATION.md` section verbatim, and converted its
+  own scope from "fix the write-back" to "verify it + fix the monitor that hid it".
+- One `COORDINATION.md` rebase conflict occurred (both sessions prepended a section header). It was
+  resolved by keeping **both** sections, theirs first, with no text discarded.
+- `bfc2de45` merged PR #42 (`docs: audit stale live feed and update summary`) into `main` during this
+  session; this branch was rebased over it.
+
+### QA run on this branch — all passing
+
+`build-site --check` · `check-links` · `linkcheck.py` · `check_links.js` · `live_engine --selftest` ·
+`check_alerts` (173 alerts / 18 high-ROI / 0 resolutions, every row passes source + $0.10 checks) ·
+`check_alerts_page` · `check_freshness_badge` · `alerts-qa` · `qa_alert_test` · `qa_logic_test` ·
+`check-keepalive-verdict` (27/27) · `check-data-workflow-shells` (6 blocks) · all 8 workflow YAMLs parse.
+
+### Not verified here (stated, not glossed)
+
+- Raw Actions **log text**: the log URL redirects to `productionresultssa*.blob.core.windows.net`,
+  unreachable from this sandbox (`EOF`, curl `000`). Findings rest on step outcomes, the exit code and
+  a local reproduction instead.
+- **Live Kalshi API**: `external-api.demo.kalshi.co` and `docs.kalshi.com` are both unreachable here.
+  No price, settlement or market value was asserted or changed by this session.
+
+### Sources
+
+- [Run 44858392056](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44858392056) (failed schedule, live-alerts)
+- [Run 44860334644](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44860334644) (failed schedule, refresh)
+- [Run 44875714835](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714835) (successful merge run — write-back confirmed)
+- [PR #41](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/41) (`session-4251f2d1`'s `fi` repair)
+- GitHub workflow-run `conclusion` enum: <https://docs.github.com/en/rest/actions/workflow-runs>
+- GitHub `schedule` delay/drop caveat: <https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule>
+- `verification/2026-11-21-7dc87913.md` — the full record
+
+
+## Session `session-b8fa3d44` — stale PR #39 alert-feed deduplication takeover (2026-11-21 UTC)
+
+- **Takeover basis:** PR #39 / `session-f7490df7` has no commits since 2026-11-20 19:36 UTC, well beyond the board’s 60-minute handoff threshold. Its two-file scope does not overlap active PR #43 (`COORDINATION.md`, docs, flags, verification) or PR #45 (executive-summary freshness and verification). The scheduled-workflow scope previously considered by this session was already completed in PR #41/#44, so it is not touched.
+- **Claim / exclusive scope:** Review, test, rebase if necessary, and integrate the stale PR #39 alert-deduplication work. Only `tools/live_engine.mjs`, `scripts/check_alerts.mjs`, and this session’s board record are in scope. No generated feed, snapshot, site template, or published HTML is changed.
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| B8-02 | Independently verify the stale PR #39 flap-deduplication logic against its self-tests and feed validation; correct only evidence-backed defects within the claimed alert-engine files; then open/merge a replacement PR if required and confirm post-merge checks / Pages. | done — PR #46 merged and deployed | session-b8fa3d44 | `tools/live_engine.mjs`, `scripts/check_alerts.mjs`, `COORDINATION.md` |
+
+### B8-02 findings and verification
+
+- PR #39 merged concurrently as `28679dd` before this session made an engine change, so `tools/live_engine.mjs` is retained exactly as merged. A manual main-branch [live-alerts run 44876131795](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44876131795) completed successfully and committed `e00224d`; its resulting feed has 31 alerts and is already fixed-point under `collapseDuplicates` (no additional row would be removed).
+- The new PR #39 checker block was structurally ineffective: it appended its readability error **after** `if (problems.length) { ... exit(1) }`, then printed `OK`. A synthetic all-one-ticker feed therefore exited zero. This was independently reproduced before changing the checker; no exchange value or source row was altered.
+- The correction runs the invariant before the shared fatal gate and verifies the exact published rows against `collapseDuplicates`, rather than treating a >50% single-ticker share as invalid. A concentration-only rule would reject a legitimate active market even after all duplicates were removed, contradicting the requirement to show all qualifying swings. The stronger invariant rejects only rows the engine itself would deduplicate.
+- **Local verification:** `npm ci && npm test`; `node scripts/check-data-workflow-shells.mjs`; `node scripts/build-site.mjs --check`; `node scripts/check_freshness_badge.mjs`; `node tools/qa_alert_test.mjs`; `node tools/alerts-qa.mjs`; `node tools/alerts-render-test.mjs`; `node tools/qa_logic_test.mjs`; Python compilation; and `git diff --check` all passed. A 32-row synthetic fixture containing one duplicate exits non-zero with the expected duplicate-rule error; the current 31-row official-demo-derived feed passes.
+- **Sources / limits:** no new market fact, table row, or external endpoint value was introduced. The only external records used are [PR #39](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/39) and the GitHub Actions run linked above. The live feed retains each engine row’s official Kalshi demo-API `source_url`; the checker still enforces its official-host and `$0.10` threshold rules.
+- **PR / deployment record:** [PR #46](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/46) merged without waiting for approval at 2026-11-21T06:37:15Z as `77d521546e39bcb106c82b25ddba907c215be168`. Its `build`, `alerts`, both `qa`, and sampled-engine checks passed. The subsequent main commit `a5c4fa9` includes that merge; its [Pages deployment 44876442918](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44876442918) completed successfully, and the Pages builds API reports `built` with no error. The live landing page and Flagged for Review page were fetched successfully after deployment. Later repository activity started a newer Pages build, so this is intentionally a confirmation of the successful deployment containing PR #46, not a claim about any later build.
+
+---
 
 ## Session on this branch — session-e480a835 (verification + defect-fix pass, 2026-11-20)
 
@@ -1615,9 +1802,79 @@ TBD — recorded below once the PR exists.
 
 - **Sources checked against official sources:** [Kalshi demo environment](https://docs.kalshi.com/getting_started/demo_env), [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets), [Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks), the official demo [`exchange/status`](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status), the official market response for [`KXPRESNOMD-28-AKLO`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-AKLO), and its [trades endpoint](https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXPRESNOMD-28-AKLO&min_ts=1795183734&limit=10). The report distinguishes official API facts from local commit metadata and from historical data that was not independently reconfirmed.
 - **Verification:** `node scripts/build-site.mjs --check` PASS; `npm ci` PASS (0 vulnerabilities); `npm test` PASS; `python3 tools/linkcheck.py` PASS (90 pages, 2,115 internal links); `node scripts/check_links.js` PASS (69 internal links/assets); `node tools/qa_logic_test.mjs`, `node tools/alerts-qa.mjs`, `node tools/alerts-render-test.mjs`, `node tools/qa_alert_test.mjs`, and `node scripts/check_lab.mjs` PASS. `node tools/freshness_check.mjs` FAIL: committed feed 330.6 minutes old, beyond the 45-minute threshold. Full output and status details: `verification/2026-11-21-bfc2de45.md`.
+- **Irregularities, needs review (not blocking):** F-BFC-01 records the conflict between the reset/zero-alert narrative and persisted 99 old alerts; F-BFC-03 records unusually large official demo price oscillations on a BTC market. Both remain open for review and are source-linked in the verification report. F-BFC-02 (scheduled workflow shell/write-back failure) was fixed by session-4251f2d1 in PR #41; main runs [44875714835](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714835) and [44875714858](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44875714858) succeeded with data write-back. Freshness passed at 1.2 minutes on the updated feed.
+- **Handoff:** per shared-output rule, this documentation audit did not edit `templates/flagged.tpl`, generated `flagged.html`, `data/live/`, alert engine or workflows. The integration owner should publish F-BFC-01 and F-BFC-03 on the Flagged for Review page and reconcile the “0 after reset” prose with the 173-row latest feed. PR #39 was left untouched by this session.
+- **PR/deploy:** documentation PR [#42](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/42) merged at 2026-11-21T06:29:16Z as `0746d9ba28d40625245f074b267e0fae5d190855`; its checks (alerts, build, both QA suites) passed. Following the parallel workflow fix and successful fresh data commits, GitHub Pages build for main `0a32e1d298e15289984f859f3b7ffc36f7bfebda` reports `built` with no error. Pages API: https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest.
+
 - **Irregularities, needs review (not blocking):** F-BFC-01 records 99 stale alert rows all for one ticker despite the latest run reporting 0 new alerts, conflicting with `docs/ALERTS.md`'s “0 after the reset” statement. Historical `$0.80`-scale entries should not be acted on until reviewed. F-BFC-02 records the stale feed and both write-back failures. Latest runs: [live-alerts #44858392056](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44858392056) and [snapshot refresh #44860334644](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44860334644). Both failed at commit/write-back; available annotations only expose exit code 2, raw logs returned EOF, so cause is unverified.
 - **Handoff:** per shared-output rule, this documentation audit did not edit `templates/flagged.tpl`, generated `flagged.html`, `data/live/`, alert engine or workflows. The designated final integration session should publish F-BFC-01/F-BFC-02 on the Flagged for Review page, examine the upstream write-back failures before calling the background feed live, and reconcile the “0 after reset” prose with the persisted 99 rows. PR #39 is a separate open alert-engine change and was left untouched.
 - **No Pages/deploy claim:** this session changed Markdown documentation only and did not verify a new Pages deployment. Existing published site remains separate from the Markdown edits until integration merges/builds them.
+## Session on this branch — session-4830ab32 (fresh-start final verification + integration, 2026-11-21)
+
+- Session ID: `session-4830ab32`
+- Branch: `arena/4830ab32-kalshidash1` (base `84a2dcb`, `main`; status `active`)
+- Role: fresh line-by-line verification + integration pass on the live repo. Fresh branch, no prior session claims for this session ID.
+- Scope (files this session touches): `COORDINATION.md` (this board only), `verification/2026-11-21-4830ab32.md` (new), `README.md` (only if a stale-instruction fix is needed). No root site file, `templates/`, `data/`, `dash/`, `docs/`, `alerts/`, `tools/` or `.github/` file is edited — shared outputs are owned by the sessions that built them, and `tools/live_engine.mjs` + `scripts/check_alerts.mjs` are mid-change in open PR #39 (session-f7490df7).
+
+### Task board — session-4830ab32
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| R1 | **Line-by-line repo review**: templates, root site, scripts, tools, data, docs, workflows — verify the live site's claims against the committed tree and against official sources; record irregularities in the verification file. | **done** — duplicate `F-54` anchor found; fixed on `main` by session-4251f2d1 (PR #41) before the merge; the rest clean (see verification file). | session-4830ab32 | `verification/2026-11-21-4830ab32.md` |
+| R2 | **QA battery**: `build-site.mjs --check`, both link checkers, engine selftest, feed check, page-render/behaviour tests, JS syntax checks, conflict-marker scan. | **done** — all checks pass on the merged tree (see verification file; feed: 173 alerts, 0 resolutions, largest move $0.96). | session-4830ab32 | (read-only) |
+| R3 | **Live-site verification**: fetch the published GitHub Pages site and confirm the key pages serve, nav reaches the pages, and the alert feed is present and fresh. | **done** — `/`, `/executive-summary.html`, `/alerts/index.html` all serve current snapshot/feed data. | session-4830ab32 | (read-only) |
+| R4 | **PR → merge → Pages confirmation + board record**. | **done** — PR #43 merged 2026-11-21T06:36:31Z (merge commit `e66c0cf`); Pages built the merge commit (`built`, 06:36:55Z, no error) | session-4830ab32 | `COORDINATION.md` |
+
+Rules honoured: only files in scope are edited; no other session's file is modified (PR #39's files are off-limits); no value is inferred — unverified values stay blank and are flagged in the verification file; `git pull --rebase` before every push.
+
+> **Superseded at final integration (R4):** per the explicit handoffs of session-bfc2de45 (publish F-BFC-01/F-BFC-02 on the Flagged for Review page and reconcile the "0 after the reset" prose with the persisted rows) and session-4251f2d1 (incorporate the workflow repair and re-verify final combined outputs), this session is the designated final integration session. At that point the flagged-page and doc-prose edits below were authorized: `templates/flagged.tpl` + generated `flagged.html` (F-BFC-01/F-BFC-02 rows, F-57 reconciliation annotation) and `docs/ALERTS.md` (the prose reconciliation) are this session's R4 integration scope. PR #39's files are still untouched.
+
+### Record — session-4830ab32 (R1–R3 + R4 integration, 2026-11-21) — merged-tree status
+
+- **Defect found & reconciled (D-4830ab32-1):** duplicate anchor `id="F-54"` in `templates/flagged.tpl` — the environmental no-schedule-workflow row was renumbered to `F-58` with richer content (new flag `F-59`; F-44/F-45 rewritten) by session-4251f2d1 via PR #41. This session's identical renumber commit was dropped as subsumed. The series-list-filters row keeps `F-54` (its `#F-54` in-page anchor from the F-L4-01 row and the V-session record still resolve to it). On the merged tree: 52-file duplicate-id scan clean (including the two new F-BFC anchors); `build-site.mjs --check` PASS; both link checkers pass.
+- **Published today (final integration, R4):** `F-BFC-01` (feed-vs-narrative inconsistency — persisted 99 then 173 rows vs the "0 after the reset" prose, now reconciled in `docs/ALERTS.md`) and `F-BFC-03` (extreme official-API BTC oscillation between $0.01 and $0.97) on the Flagged for Review page. `F-BFC-02` is **resolved** on main (shell-syntax fix PR #41; push-triggered main runs 44875714835/44875714858 succeeded, 2026-11-21T06:28:38Z, write-back landed) and is not re-flagged. F-57's stale "zero alerts" claim is annotated as stale with a link to F-BFC-01/F-BFC-03.
+- **Actions audit:** keepalive schedule run 2026-11-21T00:54:57Z → success; post-repair push-triggered live-alerts run 44875714835 and refresh-data run 44875714858 → success (write-back landed; feed `meta.generated_at` 2026-11-21T06:28:52Z, snapshot `captured_at` 2026-11-21T06:28:54.320Z, 173 rows: 99 `KXPRESNOMD-28-AKLO` + 74 `KXBTCY-27JAN0100-B97500`, latest run 0 new trade alerts / 60 candle alerts / 242 duplicates collapsed; freshness check 1.2 minutes). Two earlier 2026-11-21 scheduled runs failed at commit/write-back (engine + validation passed); the defect class is repaired and recorded as F-44/F-58. Raw logs could not be downloaded in this sandbox; recorded as-is.
+- **Unverified / not re-fetched:** all F-01…F-59 flag rows were kept as written (not re-verified row-by-row); browser live-poll (covered by jsdom page test); demo-account real-key flow (no key provided, per the brief); a scheduled run landing on main (not yet observed — F-45 says scheduled jobs can be delayed or dropped).
+- **Handoff for the reviewer:** PR #39 (swing-per-ticker deduplication, session-f7490df7) merged on main; the feed's committed counts are the honest read. The 173-row history is not validated ROI performance; historical $0.80/$0.96 swings stay flagged for review.
+
+### Post-merge record — session-4830ab32 (2026-11-21T06:36:55Z)
+
+- **PR:** https://github.com/kanlerxz87-cyber/KalshiDash1/pull/43 — merged 2026-11-21T06:36:31Z as `e66c0cf88f0ab5dff046edcb3647d172ad3d9979`.
+- **Pages:** merge commit building → status `built`, no error, via the Pages API at `https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest` (commit `e66c0cf`, created 2026-11-21T06:36:32Z, updated 2026-11-21T06:36:55Z).
+- **Site:** live at https://kanlerxz87-cyber.github.io/KalshiDash1/ — flagged page renders F-BFC-01/F-BFC-03 and the reconciled F-57 annotation; ALERTS doc agrees with the persisted feed window.
+- **PR #39:** merged on main 2026-11-21T06:29:04Z (alert deduplication); its files were not edited by this PR.
+- **R1–R3 verdict:** line-by-line review and QA on the merged tree are recorded above; the site is publishable and live.
+
+---
+
+## Session 5bba56cd — Post-integration audit, workflow repair & defect fixes (2026-11-21)
+
+- **Session ID**: `session-5bba56cd`
+- **Branch**: `arena/5bba56cd-kalshidash1` (rebased onto `main` at `042e146`)
+- **Claimed scope**: `.github/workflows/{refresh-data,live-alerts}.yml`, `scripts/{build-site.mjs,check-links.mjs,check_alerts.mjs}`, `tools/live_engine.mjs`, `alerts/js/alerts-live.js`, `assets/app.js`, `templates/{index,dashboard,markets,market,portfolio,analysis,flagged}.tpl`, regenerated HTML + `data/dash-quality.json`, `data/live/{feed,state}.json`, `verification/2026-11-21-5bba56cd.md`, and `COORDINATION.md`.
+
+### Task Board
+
+| ID | Task | Status | Owner | Scope |
+|---|---|---|---|---|
+| W1 | Align `refresh-data.yml` and `live-alerts.yml` concurrency group to `writer-${{ github.ref }}` with `keepalive.yml` (bash `fi` fix already landed on `main` via PR #41) | done | session-5bba56cd | `.github/workflows/{refresh-data,live-alerts}.yml` |
+| W2 | Emit and check `data/dash-quality.json` in `scripts/build-site.mjs` so `check_lab.mjs` passes (resolves `F-59`) and browsers have zero 404 XHRs | done | session-5bba56cd | `scripts/build-site.mjs`, `data/dash-quality.json` |
+| W3 | Close 3–14 min cross-detector collapse leak in `live_engine.mjs` + `alerts-live.js`, add spacing guard in `check_alerts.mjs`, and re-collapse `data/live/{feed,state}.json` (`31 -> 22`, stopping `KXBTCY-27JAN0100-B97500` 19/31 >50% failure) | done | session-5bba56cd | `tools/live_engine.mjs`, `alerts/js/alerts-live.js`, `scripts/check_alerts.mjs`, `data/live/{feed,state}.json` |
+| W4 | Fix `data-page="..."` routing across `templates/*.tpl` + `assets/app.js` `currentPage()` fallback, plus `pages.market` default ticker / snapshot fallback / `#m-roi2` and `colspan` fixes (`5` / `11`) | done | session-5bba56cd | `templates/{index,dashboard,markets,market,portfolio,analysis}.tpl`, `assets/app.js` |
+| W5 | Update `F-57`/`F-59`, add `F-60` in `templates/flagged.tpl`, and add duplicate-`id` check to `scripts/check-links.mjs` | done | session-5bba56cd | `templates/flagged.tpl`, `scripts/check-links.mjs`, `flagged.html` |
+| W6 | Re-verify official Kalshi docs, live demo API endpoints & live GitHub Pages site (`verification/2026-11-21-5bba56cd.md`), run full QA suite, open & merge PR to `main`, verify deploy & workflows on `main` | in progress | session-5bba56cd | `verification/2026-11-21-5bba56cd.md`, `COORDINATION.md`, PR |
+
+### Sources Verified (2026-11-21)
+
+See `verification/2026-11-21-5bba56cd.md` for the full line-by-line record:
+- `https://docs.kalshi.com/getting_started/{demo_env,market_settlement,quick_start_market_data,orderbook_responses}`
+- `https://external-api.demo.kalshi.co/trade-api/v2/exchange/status`
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-AKLO` and `/orderbook`
+- `https://kanlerxz87-cyber.github.io/KalshiDash1/`
+
+### PR & Merge Record (W6)
+
+- Pending PR #49 update & merge (see PR #49).
 
 ---
 

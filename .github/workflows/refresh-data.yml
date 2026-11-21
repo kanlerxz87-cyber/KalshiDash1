@@ -27,7 +27,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: refresh-data-${{ github.ref }}
+  group: writer-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:

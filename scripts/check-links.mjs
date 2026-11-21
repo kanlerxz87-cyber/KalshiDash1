@@ -60,6 +60,14 @@ for (const file of pages) {
   // JavaScript fragments inside inline <script> blocks contain href/src string
   // concatenations that are not real links — strip script/style blocks first.
   const scanText = html.replace(/<script\b[\s\S]*?<\/script>|<style\b[\s\S]*?<\/style>/gi, " ");
+  // Check for duplicate HTML id attributes within the same page (can break anchor links like #F-54).
+  if (!independent) {
+    const seenIds = new Set();
+    for (const m of scanText.matchAll(/\sid="([^"]+)"/g)) {
+      if (seenIds.has(m[1])) errors.push(`${rel}: duplicate id "${m[1]}"`);
+      seenIds.add(m[1]);
+    }
+  }
   for (const m of scanText.matchAll(/\b(href|src)="([^"]*)"/g)) {
     const raw = m[2];
     if (raw === "" || raw.startsWith("mailto:") || raw.startsWith("data:") || raw.startsWith("#")) continue;

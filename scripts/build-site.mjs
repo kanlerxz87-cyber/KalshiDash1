@@ -428,6 +428,27 @@ for (const page of PAGES) {
   console.log('wrote', page.out);
 }
 
+/* Machine-readable operating thresholds read by assets/freshness.js (no 404 XHRs). */
+{
+  const qualityPath = path.join(OUT, 'data', 'dash-quality.json');
+  const qualityBody = JSON.stringify({
+    freshness: {
+      warn_minutes: 20,
+      stale_minutes: 45,
+      source: 'scripts/build-site.mjs',
+      note: 'Project operating thresholds matching the 15-minute keepalive.yml cadence.'
+    }
+  }, null, 2) + '\n';
+  const existingQ = fs.existsSync(qualityPath) ? fs.readFileSync(qualityPath, 'utf8') : null;
+  if (existingQ !== qualityBody) {
+    if (checkOnly) stale.push('data/dash-quality.json');
+    else {
+      fs.writeFileSync(qualityPath, qualityBody);
+      console.log('wrote data/dash-quality.json');
+    }
+  }
+}
+
 if (checkOnly) {
   if (stale.length) {
     console.error('Committed site is stale for: ' + stale.join(', '));

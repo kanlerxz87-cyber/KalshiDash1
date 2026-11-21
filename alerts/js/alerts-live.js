@@ -332,23 +332,23 @@
 
   /* ---------------- merged views ---------------- */
 
-  /* All alerts: engine + browser, newest first, de-duplicated. */
+  /* All alerts: engine + browser, newest first, de-duplicated per ticker within 15 minutes
+   * (matching tools/live_engine.mjs collapseDuplicates so flapping quotes cannot flood the chat). */
   function allAlerts() {
-    var seen = {};
-    var out = [];
-    function add(a) {
-      var k = a.ticker + '|' + Math.round((Date.parse(a.ts) || 0) / 60000); // same minute
-      if (seen[k]) {
-        // Prefer the engine row: it carries candle context and survives reloads.
-        return;
-      }
-      seen[k] = true;
-      out.push(a);
+    var WINDOW_MS = 15 * 60 * 1000;
+    var kept = [];
+    function consider(a) {
+      if (!a || !a.ticker) return;
+      var t = Date.parse(a.ts) || 0;
+      var dup = kept.some(function (k) {
+        return k.ticker === a.ticker && Math.abs((Date.parse(k.ts) || 0) - t) <= WINDOW_MS;
+      });
+      if (!dup) kept.push(a);
     }
-    ((state.feed && state.feed.alerts) || []).forEach(add);
-    state.live.alerts.forEach(add);
-    out.sort(function (a, b) { return String(b.ts).localeCompare(String(a.ts)); });
-    return out;
+    ((state.feed && state.feed.alerts) || []).forEach(consider);
+    state.live.alerts.forEach(consider);
+    kept.sort(function (a, b) { return String(b.ts).localeCompare(String(a.ts)); });
+    return kept;
   }
 
   function highRoiAlerts() {
