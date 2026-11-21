@@ -143,6 +143,22 @@
   **2026-11-21T23:33:35.000Z**, snapshot **2026-11-21T23:21:00.999Z**. No older sample or offline
   re-score overwrites a later capture. Full tests are rerun before committing this merge.
 
+### PR #84 integration / final release candidate
+
+- Reviewed all eight successful checks for PR #84 head `6acdc718` and explicitly merged the
+  completed PR as `dd735218` at 2026-11-21T23:42:47Z. It hardens the already-merged best-effort
+  writer repair: mandatory rebuild before staging, retry rebuild on conflict, and post-push
+  `--check`, plus 20 offline guard assertions with negative controls. It is not a replacement
+  for another owner's work; its F-80 row credits the prior repair.
+- Merge conflicts: unioned `test:writers` with all paper/chart/demo/source tests and preserved
+  both board histories. Kept F-80 follow-up content verbatim but moved its long explanation
+  from the ID cell into the description cell for readable shared-table layout. Kept every
+  other finding including F-81's added publisher pointer. Regenerated `flagged.html` only.
+- Minor already-scoped quantity contract: a combined touch count is now blank when either
+  side's count is unknown, while the explicitly project-authored liquidity component scores
+  missing evidence zero. The existing missing-touch regression now pins both distinctions.
+- No feed/state/snapshot change is introduced by this merge. Full combined tests are rerun.
+
 ### Initial evidence and limits
 
 - Official [demo environment](https://docs.kalshi.com/getting_started/demo_env) re-read: recommended
@@ -2847,3 +2863,62 @@ session's UI row as **F-81**; `check-html-ids` now reports "no duplicate element
   - **Live verification (cache-busted):** `alerts/index.html?v=2331` now renders **"Showing the engine feed."** above 40 alerts instead of the false "No data available"; `check-html-ids` on the merge tree reports "no duplicate element ids".
   - Rebases: two more as sessions merged #81/#82/#83; the only conflicts were `COORDINATION.md` and generated HTML, resolved by keeping both sessions' sections and regenerating from the merged templates.
 - **Duplicate-id incident recorded:** `main` carried `id="F-78"` twice between 23:25 and 23:29 (two sessions used the same number for different findings; `site-qa` failed on `a7d1502` and `587d830`). Fixed in #85 by renumbering session-`e50b53f6`'s row to **F-80** (content/owner unchanged, note in the row) and publishing this session's UI row as **F-81**. The guard that exists for exactly this (`scripts/check-html-ids.mjs`, F-64) is now green on `main`.
+
+---
+
+---
+
+---
+
+## Session `arena/08b1c207-kalshidash1` — published-claim verification + write-back hardening (2026-11-21 23:35 UTC)
+
+**Session ID:** `session-08b1c207`. Branch `arena/08b1c207-kalshidash1`, rebased onto `main` @ `89549ea`.
+Full record: `verification/2026-11-21-08b1c207.md`.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| A1 | Claim + push | done | session-08b1c207 | `COORDINATION.md` |
+| A2 | Verify every published platform claim against official documentation, one row per claim | **done** — 22 of 23 confirmed verbatim; 1 wording over-reach flagged | session-08b1c207 | `verification/2026-11-21-08b1c207.md` §2 |
+| A3 | Independent deployment/CI/consistency check | done — `main` was inconsistent before A4 (§3) | session-08b1c207 | same |
+| A4 | Harden the engine write-back so a sample can never land without the pages generated from it; add an offline guard | done | session-08b1c207 | `.github/workflows/live-alerts.yml`, `scripts/check-workflow-site-consistency.mjs` (new), `package.json`, `.github/workflows/site-qa.yml`, `templates/flagged.tpl` + `flagged.html` |
+| A5 | QA, PR, merge, Pages | done — see the PR record below | session-08b1c207 | this board |
+
+### Sources fetched live this session (official)
+
+[demo env](https://docs.kalshi.com/getting_started/demo_env) · [WebSocket connection](https://docs.kalshi.com/websockets/websocket-connection) ·
+[Get Exchange Status](https://docs.kalshi.com/api-reference/exchange/get-exchange-status.md) ·
+[Get Tags for Series Categories](https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories.md) ·
+[Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list.md) · [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets.md) ·
+[Get Events](https://docs.kalshi.com/api-reference/events/get-events.md) · [Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md) ·
+[orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses) · [market settlement](https://docs.kalshi.com/getting_started/market_settlement) ·
+[settlement bounds](https://docs.kalshi.com/getting_started/settlement_bounds) ·
+[GitHub: `GITHUB_TOKEN` pushes create no workflow run](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow#triggering-a-workflow-from-a-workflow)
+
+Live demo-API reads: `/exchange/status`, `/series?category=Culture`, `/search/tags_by_categories`, `/markets/KXBTCY-27JAN0100-B97500`, candlesticks.
+
+### Overlap, reconciled (three sessions, one defect)
+
+`session-2ea8e33c` fixed the **gate** side as **F-76**; `session-e50b53f6` fixed the **writer** side and it landed on
+`main` as **F-76/F-78** (later republished as F-80). This session measured the same defect independently and shipped a
+third variant, which collided twice on flag IDs (F-76, then F-78 — and `main` even carried a duplicate `F-78`).
+Resolution: the row is now **F-80**, un-duplicating `main`, and its text **credits the earlier fix** and records only
+what is new. Nothing was reverted; no other session's row, script, workflow or data was removed in any rebase.
+
+**What is genuinely new here:** the merged fix made the rebuild *best-effort*
+(`node scripts/build-site.mjs … || echo "::warning::…"`), so a failing rebuild still published the sample and the run
+stayed green. This session makes the rebuild **mandatory and pre-staging** (`exit 1`), rebuilds-and-retries on the
+conflict path, re-checks staleness **after** the push against the landed tree, and adds
+`scripts/check-workflow-site-consistency.mjs` (20 assertions, negative controls include the `|| true` shape) to
+`npm test` and `site-qa` — necessary because token-pushed commits never trigger the CI gate.
+
+Executed proof (the step's own extracted `run:` script against a scratch bare remote): working generator → published
+tip passes `--check` and `index.html` `data-asof` equals the feed's `generated_at`; generator forced to fail → step
+exits 1 and the remote tip is unchanged; pre-fix script → published tip stale on all 22 pages.
+
+### Handed to review (published on the Flagged page, non-blocking)
+
+The `$1.00 per contract` sentence on a line that also lists `scalar` (true only for yes/no) · undocumented `limit` on
+`/series` in `alerts/js/alerts-live.js` and `scripts/fetch_snapshot.mjs` · the engine comment mis-describing
+`previous_price_dollars` · no demo API key, so no authenticated read was exercised · `Site build check` still cannot
+guard token-pushed commits (needs a GitHub App/PAT — a repository-settings decision) · the repo's sandbox-egress note
+is stale for this environment (docs and demo API are readable via the page fetcher).

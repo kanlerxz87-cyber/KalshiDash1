@@ -526,14 +526,15 @@
     var w = CFG.roiWeights;
     var spread = (m.yes_ask_dollars !== null && m.yes_bid_dollars !== null && m.yes_ask_dollars > 0 && m.yes_bid_dollars > 0)
       ? (m.yes_ask_dollars - m.yes_bid_dollars) : null;
-    var touchSize = (m.yes_bid_size_fp || 0) + (m.yes_ask_size_fp || 0);
+    var bidSize = nullableNumber(m.yes_bid_size_fp), askSize = nullableNumber(m.yes_ask_size_fp);
+    var touchSize = bidSize === null || askSize === null ? null : bidSize + askSize;
     var depth = bookDepth(m.ticker);
     var ref = refPrice(m);
     var hist = state.history[m.ticker] || [];
     var vol = hist.length >= 2 ? Math.abs(hist[hist.length - 1].v - hist[hist.length - 2].v) : 0;
 
     var parts = {
-      liquidity: clamp01(touchSize / 300),
+      liquidity: touchSize === null ? 0 : clamp01(touchSize / 300),
       depth: depth === null ? 0 : clamp01(depth / 1200),
       tightness: spread === null ? 0 : clamp01(1 - spread / 0.10),
       volume: clamp01((m.volume_24h_fp || 0) / 20000),

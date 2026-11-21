@@ -174,6 +174,8 @@ try {
     w.KD.state.history.FIXTURE = [{ t: NOW / 1000 - 5, v: 0.4 }, { t: NOW / 1000, v: 0.5 }];
     assert.ok(w.KD.roi(m).parts.volatility > 0.33);
     assert.equal(w.KD.roi({ ...m, yes_bid_size_fp: null }).eligible, false);
+    assert.equal(w.KD.roi({ ...m, yes_bid_size_fp: null }).touchSize, null);
+    assert.equal(w.KD.roi({ ...m, yes_bid_size_fp: null }).parts.liquidity, 0);
     assert.equal(w.KD.roi({ ...m, yes_ask_dollars: null }).parts.tightness, 0);
     assert.ok(w.KD.roi({ ...m, yes_ask_dollars: null }).score <= 30);
   });

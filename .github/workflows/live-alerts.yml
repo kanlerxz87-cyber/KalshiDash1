@@ -81,6 +81,17 @@ jobs:
           set -euo pipefail
           git config user.name  "kalshidash1-engine"
           git config user.email "engine@users.noreply.github.com"
+          # F-80 (session-08b1c207): rebuild BEFORE anything is staged. The pages embed the feed's
+          # `generated_at`, so a committed sample without its regenerated pages is a site that
+          # contradicts its own data. Done first so the "is there anything to commit?" test below
+          # sees data and pages together.
+          # A FAILING rebuild must not be committed: tolerating it (`|| true`) republishes exactly
+          # the defect — sample lands, pages do not, run is green. The generator is deterministic
+          # and offline, so a failure here is a real defect and the run must stop.
+          if ! node scripts/build-site.mjs; then
+            echo "::error::site rebuild failed — refusing to commit a sample without the pages generated from it"
+            exit 1
+          fi
           git add data/live/
           if git diff --cached --quiet -- data/live/; then
             echo "No market change in this run — nothing to commit."
@@ -103,8 +114,6 @@ jobs:
             # branch that picked up the new feed, e.g. run 44960909852). keepalive.yml and
             # refresh-data.yml already rebuild before committing; do the same here so each sample
             # commit is self-consistent with the staleness gate in pages.yml.
-            node scripts/build-site.mjs >/dev/null 2>&1 || \
-              echo "::warning::site rebuild failed; committing the sample without regenerated pages"
             git add data/ '*.html' assets categories
             PUSHED=false
             for attempt in 1 2 3 4 5; do
@@ -137,7 +146,11 @@ jobs:
                 echo "::warning::attempt $attempt: engine rerun failed; reusing committed data"
               # F-80 (session-e50b53f6): rebuild the pages on the new tip too, so the regenerated
               # sample commit is self-consistent exactly like the first-pass commit above.
-              node scripts/build-site.mjs >/dev/null 2>&1 || true
+              # F-80 (session-08b1c207): this must SUCCEED for the same reason as above.
+              if ! node scripts/build-site.mjs >/dev/null 2>&1; then
+                echo "::warning::attempt $attempt: site rebuild failed on the new tip; retrying"
+                sleep $((attempt * 5)); continue
+              fi
               git add data/ '*.html' assets categories
               if git diff --cached --quiet -- data/live/; then
                 echo "Nothing to publish after regenerating — the branch already has this data."
@@ -150,6 +163,14 @@ jobs:
               echo "::error::could not publish the engine sample to origin/$TARGET_BRANCH after 5 attempts"
               exit 1
             fi
+            # F-80 (session-08b1c207): POST-PUSH GUARD. Check the tree that actually landed, not
+            # this runner's working copy — a pre-push check compares freshly staged pages with
+            # freshly staged data and can always pass. If any future edit to this step (or to the
+            # generator) lets a sample land without its pages again, this run fails and names the
+            # pages, instead of the staleness sitting on main until someone opens a PR.
+            echo "Verifying the committed site still matches the committed data after the push..."
+            git fetch -q origin "$TARGET_BRANCH"
+            node scripts/build-site.mjs --check
           fi
         env:
           TARGET_BRANCH: ${{ github.ref_name }}
