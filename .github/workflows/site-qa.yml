@@ -76,6 +76,13 @@ jobs:
       # session-c85ee474: F-01/F-51 were closed by measurement and F-66 was opened from the same
       # data. This re-derives every verdict from data/cors-probe.json and fails if the published
       # claim and the recorded headers disagree, or if the retired in-browser-signing copy returns.
+      # session-e7260519: live-alerts run 44947818572 failed at "Validate the feed" because rows
+      # scored by the PREVIOUS model were carried forward by data/live/state.json. This pins the
+      # re-score pass: the validator must reject those rows, one sample must fix them, and the
+      # recorded prices must not move.
+      - name: Retained alerts are re-scored with the current model
+        run: node scripts/check_rescore_retained.mjs
+
       - name: CORS evidence matches the published claim
         run: node scripts/check-cors-evidence.mjs
 

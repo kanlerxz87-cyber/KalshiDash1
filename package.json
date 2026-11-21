@@ -10,6 +10,7 @@
     "test:links": "node scripts/check-links.mjs && python3 tools/linkcheck.py",
     "test": "npm run test:engine && npm run test:feed && npm run test:guard && npm run test:resolution && npm run test:page && npm run test:ids && npm run test:rows && npm run test:lab && npm run test:cors && npm run test:links",
     "test:guard": "node tools/check_alerts_guard_test.mjs",
+    "test:rescore": "node scripts/check_rescore_retained.mjs",
     "test:resolution": "node tools/check_resolution_logic_test.mjs",
     "test:ids": "node scripts/check-html-ids.mjs",
     "test:rows": "node scripts/check-row-sources.mjs",
