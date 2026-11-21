@@ -35,7 +35,19 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
-const API_ROOT = process.env.KALSHI_API_ROOT || "https://external-api.demo.kalshi.co/trade-api/v2";
+/* Hard safety boundary, not merely a default. Validate before loading any key or making
+ * any request. Never echo a rejected value: it could contain embedded credentials. */
+export function normalizeDemoRoot(value) {
+  let u;
+  try { u = new URL(value); } catch { /* same non-sensitive error below */ }
+  if (!u || u.protocol !== "https:" || u.username || u.password || u.port || u.search || u.hash
+      || !["external-api.demo.kalshi.co", "demo-api.kalshi.co"].includes(u.hostname)
+      || !/^\/trade-api\/v2\/?$/.test(u.pathname)) {
+    throw new Error("DEMO-ONLY: API root must be one of Kalshi's two official HTTPS demo /trade-api/v2 roots; refused before credentials or network use.");
+  }
+  return u.origin + "/trade-api/v2";
+}
+const API_ROOT = normalizeDemoRoot(process.env.KALSHI_API_ROOT || "https://external-api.demo.kalshi.co/trade-api/v2");
 const here = dirnameSafe(fileURLToPath(import.meta.url));
 const REPO = path.join(here, "..");
 const DATA_DIR = path.join(REPO, "data");
@@ -57,7 +69,7 @@ function loadKey() {
  * (path from root, e.g. /trade-api/v2/portfolio/events/orders). Timestamp in MILLISECONDS.
  * Verified against quick_start_create_order.md + quick_start_authenticated_requests.md,
  * and matching scripts/fetch_snapshot.mjs in this repo. */
-function sign(key, timestamp, method, pathname) {
+export function sign(key, timestamp, method, pathname) {
   const msg = Buffer.from(timestamp + method + pathname);
   if (key.asymmetricKeyType === "ed25519") return crypto.sign(null, msg, key).toString("base64");
   return crypto.sign("sha256", msg, {
@@ -67,7 +79,7 @@ function sign(key, timestamp, method, pathname) {
   }).toString("base64");
 }
 
-function apiPathname(p) {
+export function apiPathname(p) {
   // full path from root for signing, e.g. /trade-api/v2/portfolio/balance
   return new URL(API_ROOT + p).pathname;
 }
@@ -86,7 +98,7 @@ async function callAuth(creds, method, p, body) {
     headers["content-type"] = "application/json";
     payload = JSON.stringify(body);
   }
-  const res = await fetch(API_ROOT + p, { method, headers, body: payload });
+  const res = await fetch(API_ROOT + p, { method, headers, body: payload, redirect: "error", signal: AbortSignal.timeout(15000) });
   const text = await res.text();
   let json = null;
   try { json = JSON.parse(text); } catch { /* keep text */ }
@@ -94,7 +106,7 @@ async function callAuth(creds, method, p, body) {
 }
 
 async function callPublic(p) {
-  const res = await fetch(API_ROOT + p, { headers: { accept: "application/json" } });
+  const res = await fetch(API_ROOT + p, { headers: { accept: "application/json" }, redirect: "error", signal: AbortSignal.timeout(15000) });
   const text = await res.text();
   let json = null;
   try { json = JSON.parse(text); } catch { /* keep text */ }
@@ -133,42 +145,54 @@ async function cmdAccount(args) {
     process.exitCode = 1;
     return;
   }
-  const paths = [
-    "/portfolio/balance",
-    "/portfolio/positions",
-    "/portfolio/fills?limit=200",
-    "/portfolio/settlements?limit=200",
-  ];
+  const out = await captureAccount(creds);
+  if (print) console.log(JSON.stringify(out, null, 2).slice(0, 4000));
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  const file = path.join(DATA_DIR, "account.json");
+  fs.writeFileSync(file, JSON.stringify(out, null, 2) + "\n");
+  console.log(`wrote ${path.relative(REPO, file)} (responses; keys not stored; connected=${out.connected})`);
+  if (!out.connected) process.exitCode = 1;
+}
+
+/* Separate the capture from persistence so HTTP failures can be tested entirely offline.
+ * A timestamped attempt is not a successful authenticated account connection. */
+export async function captureAccount(creds, request = callAuth) {
+  const paths = ["/portfolio/balance", "/portfolio/positions", "/portfolio/fills?limit=200", "/portfolio/settlements?limit=200"];
   const out = {
-    captured_at: new Date().toISOString(),
+    captured_at: null,
+    attempted_at: new Date().toISOString(),
     environment: "demo",
     api_root: API_ROOT,
-    connected: true,
+    connected: false,
     key_fingerprint: keyFingerprint(creds.keyId),
     source_urls: paths.map((p) => API_ROOT + p),
-    disclaimer: "Verbatim demo-account API responses captured by tools/demo_trader.mjs. Demo environment only; values may not reflect real markets (https://docs.kalshi.com/getting_started/demo_env).",
+    disclaimer: "Verbatim demo-account API responses captured by tools/demo_trader.mjs. Each list is a first page, not a complete performance history. Demo environment only; values may not reflect real markets (https://docs.kalshi.com/getting_started/demo_env).",
   };
   for (const p of paths) {
-    const r = await callAuth(creds, "GET", p);
+    const r = await request(creds, "GET", p);
     const name = p.split("?")[0].split("/").pop();
-    if (!r.ok) {
-      console.error(`GET ${p} → ${r.status}: ${String(r.text).slice(0, 300)}`);
+    if (!r.ok || !r.json) {
+      console.error(`GET ${p} → ${r.status}: authenticated account data unverified`);
       out[name] = { error: true, status: r.status, body: String(r.text).slice(0, 500) };
       continue;
     }
     out[name] = r.json;
-    console.log(`GET ${p} → ${r.status} (source: ${r.url})`);
-    if (print) console.log(JSON.stringify(r.json, null, 2).slice(0, 4000));
-    // be polite with the balance bucket (1 req/s on Basic/Advanced tiers)
-    await new Promise((r2) => setTimeout(r2, 300));
+    console.log(`GET ${p} → ${r.status} (source: ${API_ROOT + p})`);
+    if (request === callAuth) await new Promise((resolve) => setTimeout(resolve, 300));
   }
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  const file = path.join(DATA_DIR, "account.json");
-  fs.writeFileSync(file, JSON.stringify(out, null, 2) + "\n");
-  console.log(`wrote ${path.relative(REPO, file)} (verbatim responses; keys not stored)`);
+  out.connected = ["balance", "positions", "fills", "settlements"].every((key) => out[key] && !out[key].error);
+  if (out.connected) out.captured_at = out.attempted_at;
+  return out;
 }
 
-function orderBody(args) {
+export function mutationRequested(args) {
+  if (args.includes("--dry-run") && args.includes("--confirm-live")) {
+    throw new Error("Conflicting --dry-run and --confirm-live flags; nothing sent.");
+  }
+  return args.includes("--confirm-live");
+}
+
+export function orderBody(args) {
   const get = (flag) => { const i = args.indexOf(flag); return i >= 0 ? args[i + 1] : undefined; };
   const ticker = get("--ticker");
   const side = get("--side"); // "bid" = buy YES, "ask" = sell YES (quick-start example posts side:"bid")
@@ -178,13 +202,17 @@ function orderBody(args) {
     console.error("buy requires --ticker, --side bid|ask, --count N, --price P (price as decimal string, e.g. 0.3500)");
     process.exit(2);
   }
-  if (!/^\d+$/.test(count)) { console.error("--count must be a positive integer"); process.exit(2); }
-  if (!/^\d+(\.\d+)?$/.test(price)) { console.error("--price must be numeric (e.g. 0.35 or 0.3500)"); process.exit(2); }
-  const priceStr = Number(price).toFixed(4); // price grid is 4-decimal dollars (verified: price_ranges step "0.0100", C-1/C-3)
+  if (!/^\d+$/.test(count) || !Number.isSafeInteger(Number(count)) || Number(count) <= 0) {
+    throw new Error("--count must be a positive, safe whole number; nothing sent.");
+  }
+  if (!/^\d+(\.\d{1,4})?$/.test(price) || !Number.isFinite(Number(price)) || Number(price) <= 0 || Number(price) >= 1) {
+    throw new Error("This tool requires a binary price strictly between $0 and $1 with at most four decimal places; no rounding or fill is assumed.");
+  }
+  const priceStr = Number(price).toFixed(4); // representation only; market-specific tick grid is still validated by the exchange
   return {
     ticker,
     side,
-    count,
+    count: Number(count).toFixed(2),
     price: priceStr,
     time_in_force: "good_till_canceled",
     self_trade_prevention_type: "taker_at_cross",
@@ -193,7 +221,7 @@ function orderBody(args) {
 }
 
 async function cmdBuy(args) {
-  const live = args.includes("--confirm-live");
+  const live = mutationRequested(args);
   const body = orderBody(args);
   console.log(`POST ${API_ROOT}/portfolio/events/orders`);
   console.log(JSON.stringify(body, null, 2));
@@ -211,31 +239,33 @@ async function cmdBuy(args) {
 }
 
 async function cmdCancel(args) {
-  const live = args.includes("--confirm-live");
+  const live = mutationRequested(args);
   const i = args.indexOf("--order-id");
   const orderId = i >= 0 ? args[i + 1] : undefined;
   if (!orderId) { console.error("cancel requires --order-id"); process.exit(2); }
-  console.log(`DELETE ${API_ROOT}/portfolio/events/orders/${orderId}`);
+  console.log(`DELETE ${API_ROOT}/portfolio/events/orders/${encodeURIComponent(orderId)}`);
   if (!live) { console.log("DRY RUN — nothing was sent. Re-run with --confirm-live to cancel on the demo exchange."); return; }
   const creds = loadKey();
   if (!creds) { console.error("no credentials in environment"); process.exit(1); }
-  const r = await callAuth(creds, "DELETE", `/portfolio/events/orders/${orderId}`);
+  const r = await callAuth(creds, "DELETE", `/portfolio/events/orders/${encodeURIComponent(orderId)}`);
   console.log(`→ HTTP ${r.status} ${String(r.text).slice(0, 500)}`);
   if (!r.ok) process.exitCode = 1;
 }
 
 /* ---------------- main ---------------- */
-const [cmd, ...args] = process.argv.slice(2);
-try {
-  if (cmd === "status") await cmdStatus(args);
-  else if (cmd === "account") await cmdAccount(args);
-  else if (cmd === "buy") await cmdBuy(args);
-  else if (cmd === "cancel") await cmdCancel(args);
-  else {
-    console.log("usage: node tools/demo_trader.mjs status|account|buy|cancel  (see header comment)");
-    process.exit(2);
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const [cmd, ...args] = process.argv.slice(2);
+  try {
+    if (cmd === "status") await cmdStatus(args);
+    else if (cmd === "account") await cmdAccount(args);
+    else if (cmd === "buy") await cmdBuy(args);
+    else if (cmd === "cancel") await cmdCancel(args);
+    else {
+      console.log("usage: node tools/demo_trader.mjs status|account|buy|cancel  (see header comment)");
+      process.exitCode = 2;
+    }
+  } catch (e) {
+    console.error(`demo_trader: ${e && e.message ? e.message : e}`);
+    process.exitCode = 1;
   }
-} catch (e) {
-  console.error(`demo_trader: ${e && e.message ? e.message : e}`);
-  process.exit(1);
 }

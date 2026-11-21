@@ -24,6 +24,7 @@
 <main class="content">
 
 <h1>Repo review, verified facts and Flagged for Review</h1>
+<div class="notice warn"><strong>Historical verification ledger — 2026-11-20.</strong> These statuses describe that earlier review, not current facts or deployment. V7's Culture conclusion was superseded by <a href="../flagged.html#F-52">F-52</a> and R-10's CORS question by <a href="../flagged.html#F-01">F-01</a>. Read the <a href="../verification/2026-11-21-135bb43a.md">2026-11-21 verification report</a> and <a href="../flagged.html#F-SOURCE-01">current source-audit scope</a>.</div>
 <p class="lead">Session <code>bf16f2dd</code> · branch <code>arena/bf16f2dd-kalshidash1</code> · checked 2026-11-20 (UTC). Not linked from the shared site navigation.</p>
 
 <div class="card">
@@ -61,7 +62,7 @@
     <tr><td>V13</td><td>Numeric rate limit for unauthenticated public requests</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits">Rate limits and tiers</a></td><td><span class="tag unverified">Unverified</span></td><td>The page says public requests have separate limits and gives no number. Clients should back off on HTTP 429.</td></tr>
     <tr><td>V14</td><td>Candlestick requests return at most 5,000 periods</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks">Get Market Candlesticks</a></td><td><span class="tag unverified">Unverified</span></td><td>The number appears in a repo file, but the parameter section was not read to that point. Not confirmed here.</td></tr>
     <tr><td>V15</td><td>Live news or events that cause price jumps (requested in the brief)</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets">Get Markets</a>, <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks">Get Market Candlesticks</a></td><td><span class="tag unverified">Not in API</span></td><td>No news or cause field appears in the market, event or candlestick responses read. Any cause link would come from outside Kalshi and must be sourced separately.</td></tr>
-    <tr><td>V16</td><td>Portfolio, balance and order endpoints need a demo API key</td><td>Not re-read in this session</td><td><span class="tag unverified">Not re-checked</span></td><td>Carried over from the earlier sessions’ notes. Not re-verified here.</td></tr>
+    <tr><td>V16</td><td>Portfolio, balance and order endpoints need a demo API key</td><td>Not re-read in the historical session; current definition: <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests">official authenticated requests</a></td><td><span class="tag unverified">Not re-checked</span></td><td>Carried over from the earlier sessions’ notes. Not re-verified here.</td></tr>
   </tbody>
 </table>
 
@@ -78,7 +79,7 @@
     <tr><td>R-07</td><td>The notional-value definition is stated more firmly in the repo than the source page confirms (see V9).</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets">Get Markets</a></td><td><span class="tag unverified">Open · flagged</span></td></tr>
     <tr><td>R-08</td><td>The coordination board’s old top section describes a branch that was already merged. Several earlier records mark files “done” that are not on their branch.</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/COORDINATION.md">COORDINATION.md</a></td><td><span class="tag unverified">Open · record only</span></td></tr>
     <tr><td>R-09</td><td>On the root flagged page, F-16 appears before F-14 (numbering out of order).</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/flagged.html">flagged.html</a></td><td><span class="tag unverified">Open · cosmetic</span></td></tr>
-    <tr><td>R-10</td><td>Browser access (CORS) from the public site to the demo API has not been tested. The sandbox cannot reach Kalshi hosts directly.</td><td><a href="../flagged.html#F-01">Site flag F-01</a></td><td><span class="tag unverified">Open · needs a browser test</span></td></tr>
+    <tr><td>R-10</td><td>Browser access (CORS) from the public site to the demo API has not been tested. The sandbox cannot reach Kalshi hosts directly.</td><td><a href="../flagged.html#F-01">Site flag F-01</a> · <a href="https://fetch.spec.whatwg.org/#http-cors-protocol">CORS protocol</a></td><td><span class="tag unverified">Open · needs a browser test</span></td></tr>
   </tbody>
 </table>
 
@@ -106,6 +107,7 @@
 </footer>
 </main>
 </div>
+<script src="../assets/paper.js"></script>
 <script src="../assets/app.js" type="module"></script>
 </body>
 </html>

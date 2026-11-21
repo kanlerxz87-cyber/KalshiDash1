@@ -16,15 +16,14 @@
       <span id="clock" class="mono small muted"></span>
     </div>
   </div>
-  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
+  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Browser research dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
 </header>
 
 <main><div class="wrap">
   <div class="page-head">
     <div class="grow">
       <h1>Simulated portfolio</h1>
-      <p class="sub">Paper trades executed in your browser against live demo prices, settled the way Kalshi settles:
-      the winning side receives $1.00 per contract when the market is determined.
+      <p class="sub">An explicitly hypothetical model using observed demo asks and confirmed quantities. Positions are held until the exchange publishes <code>finalized</code> with a binary result. Gross results are not account returns.
       <strong>No real order is ever sent from this site.</strong> For your actual demo account, see
       <a href="demo-account.html">Demo account</a>.</p>
     </div>
@@ -35,12 +34,13 @@
 
   <div id="mode-notice" class="notice">Probing the official demo API…</div>
 
+  <div id="paper-notice" class="notice" role="status"></div>
   <div class="grid cols-4" id="portfolio-stats"></div>
 
   <h2>Equity curve</h2>
   <div class="chart-box">
     <canvas id="equity-chart" class="short"></canvas>
-    <div class="chart-legend"><span><i style="background:#4c9aff"></i>cumulative realised P&amp;L per settled paper trade</span></div>
+    <div class="chart-legend"><span><i style="background:#4c9aff"></i>cumulative gross P&amp;L at final settlement time (or explicitly recorded observation time)</span></div>
   </div>
 
   <h2>Auto-trader</h2>
@@ -49,14 +49,14 @@
       <div class="shrink"><label class="switch"><input type="checkbox" id="auto-trade"> Run the published strategies automatically</label></div>
       <div><p class="small muted" style="margin:0">Each strategy is defined with exact thresholds on
       <a href="strategies.html">Strategies</a>. The auto-trader opens one paper position per market per strategy, fills at the
-      current touch, and settles automatically when the market is determined.</p></div>
+      observed ask only when its whole quantity is available, and settles only at finalization. It runs while a canonical-site tab is open, not in the background.</p></div>
     </div>
   </div>
 
   <h2>Trade log</h2>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Time</th><th>Market</th><th>Topic</th><th>Side</th><th class="num">Contracts</th><th class="num">Entry</th><th class="num">Last</th><th>Strategy</th><th>P&amp;L</th><th>Result</th><th>Source</th></tr></thead>
+      <thead><tr><th>Time</th><th>Market</th><th>Topic</th><th>Side</th><th class="num">Contracts</th><th class="num">Entry</th><th class="num">Side bid (mark)</th><th>Strategy</th><th>Gross P&amp;L / model status</th><th>Result</th><th>Source</th></tr></thead>
       <tbody id="portfolio-trades"></tbody>
     </table>
   </div>
@@ -66,13 +66,13 @@
     <ul>
       <li>On a <strong>yes</strong> outcome the YES holders receive $1.00 per contract; on a <strong>no</strong> outcome the NO
       holders receive $1.00 per contract — <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>.</li>
-      <li>A paper trade is settled when the market reaches <code>determined</code> or <code>finalized</code> with a result of
+      <li>A paper trade is settled only when the market reaches <code>finalized</code> with a result of
       yes or no — <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a>.</li>
       <li>Realised P&amp;L = (payout − entry price) × contracts. Fees are not applied: Kalshi states settlement fees are zero for
       simple yes/no determinations, and the simulator does not model a trading fee.</li>
-      <li>Mark-to-market uses the last observed price, not a guaranteed exit price.</li>
+      <li>Mark-to-market uses the purchased side’s fresh bid with sufficient size; if any open position lacks one, the total stays blank. Neither a quote nor a paper fill is an exchange execution.</li>
     </ul>
-    <p class="small muted">Trades are stored in this browser's local storage only. Clearing the browser data removes them.</p>
+    <p class="small muted">Trades are stored in this browser only. Legacy fills are retained but excluded from the corrected model’s statistics. Project caps: 50 open positions and $1,000 open entry cost (not demo-account cash); 15-second maximum local quote age. Queue position, impact and trading fees are not modeled. Clearing browser data removes this history.</p>
   </div>
 </div></main>
 
@@ -87,12 +87,13 @@
        <a href="sources.html">Sources</a> ·
        <a href="flagged.html">Flagged for review</a> ·
        <a href="COORDINATION.md">Coordination board</a></p>
-    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
-    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+    <p class="muted">Table rows link the relevant publisher or field definitions. Exchange observations, computed metrics and project rules are distinct; a source link does not verify a hypothetical fill or news cause.
+    Browser trades are local paper records, not exchange orders. Actual demo-account access is separate and credential-gated.</p>
     <p class="muted small">Canonical site: the pages in the navigation above. Two earlier builds are still published for
     reference only and are not kept up to date:
     <a href="dash/index.html">dash/</a> · <a href="docs/index.html">docs/</a>.</p>
   </div></footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/chart.js"></script>
 <script src="assets/freshness.js"></script>

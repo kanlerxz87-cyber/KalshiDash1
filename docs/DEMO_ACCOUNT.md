@@ -2,7 +2,7 @@
 
 Session: `session-d5b935f4`. Verified contract record: [`verification/2026-11-20-d5b935f4.md`](../verification/2026-11-20-d5b935f4.md) (C-3, C-8).
 
-This tool covers the brief's *"Track the portfolio performance using the kalshi demo account"* and
+This tool implements the credential-gated path for the brief's *"Track the portfolio performance using the kalshi demo account"* and
 *"Execute trades on events"* for the **real Kalshi demo account** — the authenticated path that the
 simulated (paper) engines deliberately do not touch. It is separate from `session-815b546d`'s
 simulated auto-trade engine and from the portfolio *pages* owned by the final integration session.
@@ -37,20 +37,34 @@ any command. `--print` shows the raw JSON responses on stdout.
 
 ## Security model
 
+- **Hard demo-only host boundary.** `KALSHI_API_ROOT` may select only
+  `https://external-api.demo.kalshi.co/trade-api/v2` or
+  `https://demo-api.kalshi.co/trade-api/v2` ([official environment table](https://docs.kalshi.com/getting_started/demo_env)).
+  Production, arbitrary hosts, embedded credentials, extra ports, query strings and altered paths
+  are rejected **before** a private key is read or any request is sent. Redirects are refused so
+  signed headers cannot be forwarded elsewhere.
+- Orders require a positive safe whole count and a binary price strictly between $0 and $1,
+  with no more than four decimals. The tool never rounds an invalid price into a new order;
+  exchange-specific tick grids, eligibility and actual available funds remain exchange-validated.
+  This is not the browser paper model or a guarantee of a fill.
+- `npm run test:demo-safety` tests both demo roots, refusal of production, invalid order values,
+  dry-run/confirm conflicts, RSA-PSS/Ed25519 signing and failed-account status using offline
+  fixtures and ephemeral test keys only. Passing these tests does **not** verify live authentication.
+
 - Keys exist only in GitHub Actions secrets or your shell environment — **never** in this
   repository, never in `data/account.json`, never printed (only a SHA-256 fingerprint of the key
   *id* is logged). The browser never sees keys; a static page cannot and must not sign requests
-  (repo flag F-07).
-- Mutating commands require an explicit `--confirm-live`; everything else is dry-run.
+  (measured browser-signing limitation [F-66](../flagged.html#F-66)).
+- Mutating commands require an explicit `--confirm-live` (the retained flag name means **demo only**, never production). Everything else is dry-run; combining it with `--dry-run` is rejected.
 - Without secrets the tool is a no-op (`account --ci` exits 0) and the site shows
   "not connected" with this setup page.
 
 ## Data produced (`data/account.json`)
 
-`captured_at`, `environment: "demo"`, `api_root`, `key_fingerprint`, `source_urls[]`, and the four
+`captured_at` (only after all four reads succeed), `attempted_at`, `connected`, `environment: "demo"`, `api_root`, `key_fingerprint`, `source_urls[]`, and the four
 verbatim API responses (`balance`, `positions`, `fills`, `settlements`). Every field is exactly what
 the API returned; nothing is inferred. If a call fails, the failure body is stored under that key
-with `error: true` — never fabricated.
+with `error: true` — never fabricated. Any failed or empty read keeps `connected: false` and `captured_at: null`; the CLI exits nonzero. The lists are first-page samples (fills/settlements limit 200), not a complete account-history return calculation.
 
 ## Caveats (flagged, not blocking)
 

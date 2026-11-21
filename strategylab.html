@@ -17,7 +17,7 @@
       <span id="clock" class="mono small muted"></span>
     </div>
   </div>
-  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
+  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Browser research dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
 </header>
 
 <main><div class="wrap">
@@ -26,6 +26,8 @@
 <strong>strategy, topic, entry-price band and holding period</strong>, and <strong>synthesise strategy rules
 from the type of trade</strong> that actually won. All data is simulated — no orders are placed, no
 credentials are used, and every computed metric is labelled. Values that are not recorded stay blank.</p>
+
+<div class="notice warn"><strong>Unverified legacy/exploratory lab.</strong> This page ingests browser-local and possibly seeded examples from multiple older schemas. It does not validate entry execution or final settlement and is not actual account performance. Use <a href="analysis.html">canonical Trade analysis</a> for the corrected paper model. All numbers here describe local records only; no official source confirms these trades. <a href="flagged.html#F-LAB-01">Review limitations</a>.</div>
 
 <div class="cards" id="lab-cards"></div>
 
@@ -57,31 +59,31 @@ and this page will ingest them automatically. Field names follow the official AP
 (<code>*_fp</code> quantities, <code>*_dollars</code> prices —
 <a href="https://docs.kalshi.com/getting_started/fixed_point_migration" target="_blank" rel="noopener">Fixed-Point Representation ↗</a>).
 Blanks are allowed and are never filled in.</p>
-<div class="table-wrap"><table><thead><tr><th>Field</th><th>Type</th><th>Meaning</th><th>Official source for the semantics</th></tr></thead><tbody>
-<tr><td><code>schema</code></td><td>string</td><td>Record-set tag: <code>kalshidash:trades:v2</code></td><td>This page (session-7f90cf50)</td></tr>
-<tr><td><code>id</code></td><td>string</td><td>Trade id, unique within the store</td><td>This page</td></tr>
-<tr><td><code>ts_open</code> / <code>ts_close</code></td><td>ISO 8601 string</td><td>Open / close timestamps (close blank while open)</td><td>This page</td></tr>
+<div class="table-wrap"><table><thead><tr><th>Field</th><th>Type</th><th>Meaning</th><th>Publisher / field definitions (not trade verification)</th></tr></thead><tbody>
+<tr><td><code>schema</code></td><td>string</td><td>Record-set tag: <code>kalshidash:trades:v2</code></td><td>Project-only schema — <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/assets/strategylab.js">project definition</a>; not an official fill</td></tr>
+<tr><td><code>id</code></td><td>string</td><td>Trade id, unique within the store</td><td>Project-only schema — <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/assets/strategylab.js">project definition</a>; not an official fill</td></tr>
+<tr><td><code>ts_open</code> / <code>ts_close</code></td><td>ISO 8601 string</td><td>Open / close timestamps (close blank while open)</td><td>Project-only schema — <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/assets/strategylab.js">project definition</a>; not an official fill</td></tr>
 <tr><td><code>ticker</code></td><td>string</td><td>Market ticker the trade references</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market ↗</a></td></tr>
 <tr><td><code>event_ticker</code> / <code>series_ticker</code></td><td>string</td><td>Parent event / series tickers</td><td><a href="https://docs.kalshi.com/api-reference/events/get-events" target="_blank" rel="noopener">Get Events ↗</a></td></tr>
 <tr><td><code>title</code></td><td>string</td><td>Market title as returned by the API</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets ↗</a></td></tr>
-<tr><td><code>topic</code></td><td>gas | elections | culture | crypto | golf | other</td><td>Focus-topic tag (client-side heuristic on API category/title fields)</td><td>Heuristic — see flag F-62 on <a href="flagged.html#F-62">the flagged page</a> (Get Events documents no <code>category</code> parameter; client-side heuristic only)</td></tr>
-<tr><td><code>strategy</code></td><td>string</td><td>Strategy tag used by the producing engine (e.g. momentum, mean-reversion, hold-to-resolution)</td><td>This page / producing engine</td></tr>
+<tr><td><code>topic</code></td><td>gas | elections | culture | crypto | golf | other</td><td>Focus-topic tag (client-side heuristic on API category/title fields)</td><td>Heuristic — see flag F-62 on <a href="flagged.html#F-62">the flagged page</a> (<a href="https://docs.kalshi.com/api-reference/events/get-events">Get Events</a> documents no <code>category</code> parameter; client-side heuristic only)</td></tr>
+<tr><td><code>strategy</code></td><td>string</td><td>Strategy tag used by the producing engine (e.g. momentum, mean-reversion, hold-to-resolution)</td><td>Project-only schema — <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/assets/strategylab.js">project definition</a>; not an official fill</td></tr>
 <tr><td><code>order_side</code></td><td>bid | ask</td><td>The Create Order (V2) <code>side</code> value (single-book bid/ask). Informational — P&amp;L below is computed from entry/exit/result, not from this field.</td><td><a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2) ↗</a></td></tr>
 <tr><td><code>outcome</code></td><td>yes | no</td><td>Which binary side of the market the position is on</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement ↗</a></td></tr>
 <tr><td><code>count_fp</code></td><td>string (2 dp)</td><td>Contract quantity, fixed-point string (e.g. "10.00")</td><td><a href="https://docs.kalshi.com/getting_started/fixed_point_migration" target="_blank" rel="noopener">Fixed-Point Representation ↗</a></td></tr>
 <tr><td><code>entry_price_dollars</code> / <code>exit_price_dollars</code></td><td>string (≤4 dp)</td><td>Prices in fixed-point dollars ("0.5600"). Exit blank while open.</td><td><a href="https://docs.kalshi.com/getting_started/fixed_point_migration" target="_blank" rel="noopener">Fixed-Point Representation ↗</a></td></tr>
-<tr><td><code>status</code></td><td>open | closed | settled</td><td><em>Simulated trade</em> lifecycle (not the market status enum)</td><td>This page</td></tr>
-<tr><td><code>result</code></td><td>yes | no | ""</td><td>Market settlement result once determined</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets schema (<code>result</code>) ↗</a></td></tr>
-<tr><td><code>pnl_dollars</code></td><td>string | blank</td><td>P&amp;L as recorded by the producing engine (never filled in here)</td><td>Producing engine</td></tr>
-<tr><td><code>fees_dollars</code></td><td>string | blank</td><td>Fees as recorded by the producing engine</td><td>Producing engine</td></tr>
-<tr><td><code>engine</code> / <code>seed</code> / <code>notes</code></td><td>string / bool / string</td><td>Provenance: which engine wrote the row; whether it is a seeded example; free-form notes</td><td>This page</td></tr>
+<tr><td><code>status</code></td><td>open | closed | settled</td><td><em>Simulated trade</em> lifecycle (not the market status enum)</td><td>Project-only schema — <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/assets/strategylab.js">project definition</a>; not an official fill</td></tr>
+<tr><td><code>result</code></td><td>yes | no | ""</td><td>Result recorded by the producing engine; this legacy lab does not verify finalization</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets schema (<code>result</code>) ↗</a></td></tr>
+<tr><td><code>pnl_dollars</code></td><td>string | blank</td><td>P&amp;L as recorded by the producing engine (never filled in here)</td><td>Project-only schema — <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/assets/strategylab.js">project definition</a>; not an official fill</td></tr>
+<tr><td><code>fees_dollars</code></td><td>string | blank</td><td>Fees as recorded by the producing engine</td><td>Project-only schema — <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/assets/strategylab.js">project definition</a>; not an official fill</td></tr>
+<tr><td><code>engine</code> / <code>seed</code> / <code>notes</code></td><td>string / bool / string</td><td>Provenance: which engine wrote the row; whether it is a seeded example; free-form notes</td><td>Project-only schema — <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/assets/strategylab.js">project definition</a>; not an official fill</td></tr>
 </tbody></table></div>
 
 <h2>Method &amp; limits (read before using any number)</h2>
 <div class="panel">
 <ul>
-  <li><strong>Simulation only.</strong> Real order placement is <code>POST /portfolio/events/orders</code> with signed auth headers
-  (<a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2) ↗</a>); this site never calls it.
+  <li><strong>Simulation only.</strong> The separate credential-gated demo tool implements <code>POST /portfolio/events/orders</code> with signed auth headers
+  (<a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2) ↗</a>); this browser lab never calls it; no exchange execution was verified in this session.
   Tracking a real demo account needs the account holder's API key, which is deliberately not requested or stored
   (see <a href="questions.html">Questions &amp; answers</a>).</li>
   <li><strong>Settlement semantics</strong> used for computed P&amp;L: winning side receives $1 per contract; <code>result</code> = yes/no
@@ -107,12 +109,13 @@ Blanks are allowed and are never filled in.</p>
        <a href="sources.html">Sources</a> ·
        <a href="flagged.html">Flagged for review</a> ·
        <a href="COORDINATION.md">Coordination board</a></p>
-    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
-    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+    <p class="muted">Table rows link the relevant publisher or field definitions. Exchange observations, computed metrics and project rules are distinct; a source link does not verify a hypothetical fill or news cause.
+    Browser trades are local paper records, not exchange orders. Actual demo-account access is separate and credential-gated.</p>
     <p class="muted small">Canonical site: the pages in the navigation above. Two earlier builds are still published for
     reference only and are not kept up to date:
     <a href="dash/index.html">dash/</a> · <a href="docs/index.html">docs/</a>.</p>
   </div></footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/strategylab.js" defer></script>
 <script src="assets/freshness.js"></script>

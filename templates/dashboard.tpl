@@ -23,10 +23,10 @@
   <div class="page-head">
     <div class="grow">
       <h1>Live alert dashboard</h1>
-      <p class="sub">Two scrolling chats. The left pane posts <strong>every</strong> tracked contract that moves at least
+      <p class="sub">Two scrolling chats. The left pane posts observed tracked-contract changes of at least
       <strong>$0.10</strong> in either direction, with the official sources that decide the outcome.
       The right pane posts only the moves the <a href="strategies.html">ROI model</a> likes.
-      Resolution announcements are posted in both panes the moment a market is determined yes or no.</p>
+      Final binary resolution announcements appear after an API poll observes <code>finalized</code>. Polling can miss intervening moves; the first live read establishes a baseline, not a snapshot-to-now alert.</p>
     </div>
     <div class="btnrow">
       <button class="btn" id="pause-btn">Pause feed</button>
@@ -79,7 +79,7 @@
   </div>
 
   <h2>Highest-dollar live markets</h2>
-  <p class="sub">The tracked universe, ranked by 24-hour dollar volume. Click a row's market to open the detail page.</p>
+  <p class="sub">A sampled universe, ranked by 24-hour contract volume (equivalent to notional turnover only for equal-notional contracts). Dollar columns are derived contracts × published notional, not actual traded dollars. Click a row's market to open the detail page.</p>
   <div class="table-wrap">
     <table>
       <thead><tr><th>Market</th><th>Topic</th><th class="num">Last</th><th class="num">Bid / Ask</th><th class="num">Spread</th><th class="num">24h vol ($)</th><th class="num">Total vol ($)</th><th class="num">Open int ($)</th><th class="num">ROI</th><th>Status</th><th>Result</th><th>Source</th></tr></thead>
@@ -87,12 +87,12 @@
     </table>
   </div>
 
-  <h2>ROI ranking</h2>
-  <p class="sub">The score used by the right-hand chat. Every component is computed from fields the Kalshi API returns and the
+  <h2>Browser research ranking (0–100)</h2>
+  <p class="sub">The project score used by this page's right-hand chat. It differs from the background console's 0–1 score; neither is an ROI forecast. Every component is computed from fields the Kalshi API returns and the
   weights are published on <a href="strategies.html">Strategies</a>. It is a heuristic ranking aid, not a recommendation.</p>
   <div class="table-wrap">
     <table class="compact">
-      <thead><tr><th>Market</th><th>Topic</th><th class="num">Score</th><th class="num">Liquidity</th><th class="num">Depth</th><th class="num">Tightness</th><th class="num">Volume</th><th class="num">Volatility</th><th class="num">Spread</th><th class="num">Contracts at touch</th></tr></thead>
+      <thead><tr><th>Market</th><th>Topic</th><th class="num">Score</th><th class="num">Liquidity</th><th class="num">Depth</th><th class="num">Tightness</th><th class="num">Volume</th><th class="num">Volatility</th><th class="num">Spread</th><th class="num">Contracts at touch</th><th>Official source fields</th></tr></thead>
       <tbody id="roi-table"></tbody>
     </table>
   </div>
@@ -111,14 +111,13 @@
         for election series, as named in each series record (the Texas Secretary of State is the example the registry cites);</li>
         <li>the exact API endpoint the row was read from.</li>
       </ul>
-      <p class="small muted">The Kalshi API publishes no news feed, so a link is a <em>candidate</em> source for the move, not a
-      proven cause. That limitation is listed on the <a href="flagged.html">Flagged for Review</a> page.</p>
+      <p class="small muted">The Kalshi API publishes no news feed, so settlement/research links are context, not proof of a cause. That limitation is listed on the <a href="flagged.html">Flagged for Review</a> page.</p>
     </div>
     <div class="panel">
       <h3>Right pane — high ROI only</h3>
       <p>The same messages, filtered to the contracts whose ROI score clears the filter shown in the toolbar. The score
       rewards liquidity at the touch, depth in the book, a tight spread, real 24-hour volume and enough recent movement to be
-      worth acting on. Set the filter to 0 to see every message the left pane shows.</p>
+      worth acting on. Captured replays, old unverified scores and unconfirmed/empty touches are excluded from this pane even if the numerical filter is 0. See <a href="strategies.html">the published eligibility gate</a>.</p>
       <p class="small muted">Scoring is fully deterministic and published on <a href="strategies.html">Strategies</a>, so a
       reader can recompute any score from the same public fields.</p>
     </div>
@@ -141,6 +140,7 @@
 </div></main>
 
 <footer class="site">{{FOOTER}}</footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/chart.js"></script>
 <script src="{{BASE}}assets/freshness.js"></script>

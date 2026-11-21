@@ -84,15 +84,21 @@
     contractSize: 10
   };
 
+  var PAPER = window.KDPaper;
+  function nullableNumber(v) {
+    if (v === null || v === undefined || typeof v === 'boolean' || (typeof v === 'string' && !v.trim())) return null;
+    return Number.isFinite(Number(v)) ? Number(v) : null;
+  }
+
   var STRATEGIES = [
     { id: 'momentum', label: 'Momentum',
-      rule: 'Go long YES when the reference price rose at least $0.05 across the last 3 observations; exit when it falls at least $0.05.' },
+      rule: 'Buy YES after a rise of at least $0.05 over the last 3 observations; buy NO after an equivalent fall. Hold to final settlement.' },
     { id: 'mean-reversion', label: 'Mean reversion',
       rule: 'Buy YES when the price is at or below $0.25 and the last move was down; buy NO when the price is at or above $0.75 and the last move was up.' },
     { id: 'favorite', label: 'Favorite (liquidity)',
       rule: 'Buy YES in the most liquid market of the topic when its ROI score is at least 70 and the price is at least $0.80.' },
-    { id: 'longshot', label: 'Longshot',
-      rule: 'Buy NO in markets priced at or below $0.15 whose ROI score is at least 60 (cheap optionality, capped size).' },
+    { id: 'longshot', label: 'Low-YES NO buyer',
+      rule: 'Buy NO when the YES reference is at or below $0.15 and the score is at least 60. This is not cheap NO optionality. Hold to final settlement.' },
     { id: 'catalyst', label: 'Volume catalyst',
       rule: 'Buy YES in a market whose 24h contract volume is at least 5x its total open interest and whose ROI score is at least 60.' }
   ];
@@ -174,14 +180,14 @@
   /* ================================================================== trades */
   var TRADES_KEY = 'kalshidash:v1:trades';
   function getTrades() {
-    try { return JSON.parse(localStorage.getItem(TRADES_KEY) || '[]'); } catch (e) { return []; }
+    try { var trades = JSON.parse(localStorage.getItem(TRADES_KEY) || '[]'); return Array.isArray(trades) ? trades.filter(function (t) { return t && typeof t === 'object'; }) : []; } catch (e) { return []; }
   }
   function setTrades(t) { try { localStorage.setItem(TRADES_KEY, JSON.stringify(t)); } catch (e) { /* ignore */ } }
 
   /* ================================================================== alerts */
   var ALERTS_KEY = 'kalshidash:v1:alerts';
   function getAlerts() {
-    try { return JSON.parse(localStorage.getItem(ALERTS_KEY) || '[]'); } catch (e) { return []; }
+    try { var rows = JSON.parse(localStorage.getItem(ALERTS_KEY) || '[]'); return Array.isArray(rows) ? rows.filter(function (a) { return a && typeof a === 'object'; }) : []; } catch (e) { return []; }
   }
   function setAlerts(a) {
     if (a.length > 400) a = a.slice(a.length - 400);
@@ -208,7 +214,10 @@
     lastRefresh: null,
     charts: {},                 // ticker -> {points, candles}
     alerts: [],                 // in-memory alert log (session)
-    seenAlerts: {}              // dedupe key -> ts
+    seenAlerts: {},             // dedupe key -> ts
+    quoteUsed: {},               // ticker+side -> consumption within a single observed quote
+    paperStatus: 'Waiting for a fresh live quote with confirmed ask quantity.',
+    pollInFlight: false
   };
 
   function emit(evt) { state.listeners.forEach(function (fn) { try { fn(evt, state); } catch (e) { console.error(e); } }); }
@@ -267,25 +276,28 @@
       topic: topic || null,
       series_ticker: seriesTicker || null,
       settlement_sources: settlementSources || [],
+      market_type: m.market_type || null,
+      data_mode: 'live',
+      observed_at: Date.now(),   // local API-response observation, NOT a trade timestamp
       status: m.status || null,
       result: (m.result && m.result !== '') ? m.result : null,
-      last_price_dollars: m.last_price_dollars === undefined ? null : Number(m.last_price_dollars),
-      previous_price_dollars: m.previous_price_dollars === undefined ? null : Number(m.previous_price_dollars),
-      yes_bid_dollars: m.yes_bid_dollars === undefined ? null : Number(m.yes_bid_dollars),
-      yes_ask_dollars: m.yes_ask_dollars === undefined ? null : Number(m.yes_ask_dollars),
-      no_bid_dollars: m.no_bid_dollars === undefined ? null : Number(m.no_bid_dollars),
-      no_ask_dollars: m.no_ask_dollars === undefined ? null : Number(m.no_ask_dollars),
-      yes_bid_size_fp: m.yes_bid_size_fp === undefined ? null : Number(m.yes_bid_size_fp),
-      yes_ask_size_fp: m.yes_ask_size_fp === undefined ? null : Number(m.yes_ask_size_fp),
-      volume_fp: m.volume_fp === undefined ? null : Number(m.volume_fp),
-      volume_24h_fp: m.volume_24h_fp === undefined ? null : Number(m.volume_24h_fp),
-      open_interest_fp: m.open_interest_fp === undefined ? null : Number(m.open_interest_fp),
-      notional_value_dollars: m.notional_value_dollars === undefined ? null : Number(m.notional_value_dollars),
+      last_price_dollars: nullableNumber(m.last_price_dollars),
+      previous_price_dollars: nullableNumber(m.previous_price_dollars),
+      yes_bid_dollars: nullableNumber(m.yes_bid_dollars),
+      yes_ask_dollars: nullableNumber(m.yes_ask_dollars),
+      no_bid_dollars: nullableNumber(m.no_bid_dollars),
+      no_ask_dollars: nullableNumber(m.no_ask_dollars),
+      yes_bid_size_fp: nullableNumber(m.yes_bid_size_fp),
+      yes_ask_size_fp: nullableNumber(m.yes_ask_size_fp),
+      volume_fp: nullableNumber(m.volume_fp),
+      volume_24h_fp: nullableNumber(m.volume_24h_fp),
+      open_interest_fp: nullableNumber(m.open_interest_fp),
+      notional_value_dollars: nullableNumber(m.notional_value_dollars),
       close_time: m.close_time || null,
       expected_expiration_time: m.expected_expiration_time || null,
       latest_expiration_time: m.latest_expiration_time || null,
       settlement_ts: m.settlement_ts || null,
-      settlement_value_dollars: m.settlement_value_dollars === undefined ? null : Number(m.settlement_value_dollars),
+      settlement_value_dollars: nullableNumber(m.settlement_value_dollars),
       rules_primary: m.rules_primary || '',
       source_url: sourceUrl || null
     };
@@ -294,16 +306,18 @@
   function ingestSnapshot(snap) {
     if (!snap) return;
     (snap.markets || []).forEach(function (m) {
-      state.markets[m.ticker] = m;
+      if (state.markets[m.ticker] && state.markets[m.ticker].data_mode === 'live') return;
+      var capturedAt = Date.parse(snap.meta && snap.meta.captured_at);
+      state.markets[m.ticker] = Object.assign({}, m, { data_mode: 'snapshot', observed_at: Number.isFinite(capturedAt) ? capturedAt : null });
       if (m.last_price_dollars !== null && m.last_price_dollars !== undefined) {
         state.lastRef[m.ticker] = m.last_price_dollars;
-        state.history[m.ticker] = [{ t: Math.floor(Date.now() / 1000), v: m.last_price_dollars }];
+        state.history[m.ticker] = Number.isFinite(capturedAt) ? [{ t: Math.floor(capturedAt / 1000), v: m.last_price_dollars, source_url: m.source_url, basis: 'snapshot observation' }] : [];
       }
       if (m.status) state.status[m.ticker] = m.status;
       if (m.series_ticker && m.settlement_sources) state.settlementSources[m.series_ticker] = m.settlement_sources;
     });
     Object.keys(snap.orderbooks || {}).forEach(function (t) {
-      state.orderbooks[t] = snap.orderbooks[t];
+      state.orderbooks[t] = Object.assign({}, snap.orderbooks[t], { data_mode: 'snapshot', observed_at: Date.parse(snap.meta && snap.meta.captured_at) || null });
     });
     Object.keys(snap.topics || {}).forEach(function (tid) {
       var t = snap.topics[tid];
@@ -329,17 +343,17 @@
       var m = state.markets[ticker];
       var candles = (snap.candlesticks[ticker].m1 || {}).candles || [];
       for (var i = 1; i < candles.length; i++) {
-        var from = Number(candles[i - 1][1]), to = Number(candles[i][1]);
-        if (!isFinite(from) || !isFinite(to)) continue;
+        var from = nullableNumber(candles[i - 1][1]), to = nullableNumber(candles[i][1]);
+        if (from === null || to === null || from < 0 || from > 1 || to < 0 || to > 1) continue;
         var delta = to - from;
-        if (Math.abs(delta) < s.threshold) continue;
+        if (Math.round(Math.abs(delta) * 10000) < Math.round(s.threshold * 10000)) continue;
         seeded.push({
           id: 'seed-' + ticker + '-' + i,
           type: 'swing', ts: Number(candles[i][0]),
           ticker: ticker, topic: m ? m.topic : null,
           title: m ? m.title : ticker,
           from: from, to: to, delta: delta,
-          roi: m ? roiOf(m).score : null,
+          roi: null, // no bid/ask/size evidence at this historical candle time; never backfill today's score
           roiParts: null,
           links: m ? candidateLinks(m) : [],
           source_url: (snap.candlesticks[ticker].m1 || {}).source_url || null,
@@ -370,6 +384,7 @@
           kept = kept.slice(0, CFG.seriesPerTopic);
           state.seriesByTopic[topic.id] = kept.map(function (s) {
             state.settlementSources[s.ticker] = s.settlement_sources || [];
+            s.source_url = state.base + topic.query;
             return s;
           });
           var inner = Promise.resolve();
@@ -390,11 +405,7 @@
     });
     return chain.then(function () {
       all.forEach(function (m) {
-        var old = state.markets[m.ticker];
         state.markets[m.ticker] = m;
-        if (old && old.last_price_dollars !== null && m.last_price_dollars === null) {
-          m.last_price_dollars = old.last_price_dollars;
-        }
         if (state.lastRef[m.ticker] === undefined && m.last_price_dollars !== null) {
           state.lastRef[m.ticker] = m.last_price_dollars;
         }
@@ -406,44 +417,47 @@
 
   /* ----------------------------------------------------------- price polling */
   function trackedTickers() {
-    return Object.keys(state.markets).filter(function (t) {
-      var m = state.markets[t];
-      return m.status !== 'finalized' && m.status !== 'settled' && m.status !== 'closed';
+    var ids = Object.keys(state.markets).filter(function (t) {
+      return state.markets[t].status !== 'finalized';
     });
+    getTrades().forEach(function (t) { if (t.status === 'open' && t.ticker && ids.indexOf(t.ticker) < 0) ids.push(t.ticker); });
+    return ids;
   }
 
   function pollPrices() {
-    if (state.mode === 'snapshot') return Promise.resolve(null);
+    if (state.mode === 'snapshot' || state.pollInFlight) return Promise.resolve(null);
     var tickers = trackedTickers();
     if (!tickers.length) return Promise.resolve(null);
+    state.pollInFlight = true;
     var chunks = [];
     for (var i = 0; i < tickers.length; i += 40) chunks.push(tickers.slice(i, i + 40));
-
     return Promise.all(chunks.map(function (chunk) {
-      return apiGet('/markets?tickers=' + encodeURIComponent(chunk.join(','))).catch(function () { return { markets: [] }; });
+      var url = state.base + '/markets?tickers=' + encodeURIComponent(chunk.join(','));
+      return fetchJSON(url).then(function (r) { return { data: r, url: url }; })
+        .catch(function (e) { return { error: e.message }; });
     })).then(function (responses) {
-      var swings = [];
-      responses.forEach(function (r) {
-        (r.markets || []).forEach(function (m) {
+      var swings = [], received = 0, errors = [];
+      responses.forEach(function (response) {
+        if (response.error) { errors.push(response.error); return; }
+        (response.data.markets || []).forEach(function (m) {
           var prev = state.markets[m.ticker];
-          var row = normMarket(m, prev ? prev.topic : null, state.base + '/markets?tickers=…', prev ? prev.series_ticker : null, prev ? prev.settlement_sources : []);
-          if (prev) {
-            row.topic = prev.topic;
-            row.series_ticker = prev.series_ticker;
-            row.settlement_sources = prev.settlement_sources;
-          }
+          var stored = prev || getTrades().filter(function (t) { return t.ticker === m.ticker; })[0] || {};
+          var row = normMarket(m, stored.topic, response.url, stored.series_ticker, stored.settlement_sources);
+          if (!prev || prev.data_mode !== 'live') state.lastRef[m.ticker] = refPrice(row);
           var swing = detectSwing(m.ticker, row);
           if (swing) swings.push(swing);
           var resolved = detectResolution(m.ticker, row);
           if (resolved) swings.push(resolved);
           state.markets[m.ticker] = row;
+          received++;
         });
       });
-      state.lastRefresh = Date.now();
+      state.lastError = errors.length ? errors.length + ' market request(s) failed. Older quotes remain timestamped; stale paper fills are blocked.' : (received ? null : 'No market quotes returned.');
+      if (received) state.lastRefresh = Date.now();
       emit('poll');
       swings.forEach(function (s) { handleSwing(s); });
-      return swings;
-    });
+      return received ? swings : null;
+    }).finally(function () { state.pollInFlight = false; });
   }
 
   /* Reference price = last trade price, or the mid of the touch when there is no trade. */
@@ -468,14 +482,13 @@
     state.lastRef[ticker] = ref;
     var mid = midPrice(m);
     var hist = state.history[ticker] || (state.history[ticker] = []);
-    hist.push({ t: Math.floor(Date.now() / 1000), v: ref });
+    hist.push({ t: Math.floor(Date.now() / 1000), v: ref, source_url: m.source_url, basis: 'browser poll observation' });
     if (hist.length > 4000) hist.splice(0, hist.length - 4000);
     if (prev === undefined || prev === null) return null;
 
     var s = settings();
     var dTrade = ref - prev;
-    var dMid = (mid !== null && state.history[ticker].length > 1) ? 0 : 0;
-    if (Math.abs(dTrade) < s.threshold) return null;
+    if (Math.round(Math.abs(dTrade) * 10000) < Math.round(s.threshold * 10000)) return null;
 
     var key = ticker + '|' + (dTrade > 0 ? 'up' : 'down');
     var now = Date.now();
@@ -490,15 +503,11 @@
   }
 
   function detectResolution(ticker, m) {
-    var prevStatus = state.status[ticker];
-    var st = (m.status || '').toLowerCase();
-    var resolvedStates = ['determined', 'finalized', 'settled', 'closed'];
-    if (prevStatus && resolvedStates.indexOf(st) >= 0 && prevStatus !== st) {
-      if (m.result === 'yes' || m.result === 'no') {
-        return { type: 'resolve', ticker: ticker, market: m, result: m.result, ts: Math.floor(Date.now() / 1000) };
-      }
-    }
+    var previous = state.status[ticker];
     if (m.status) state.status[ticker] = m.status;
+    if (m.status === 'finalized' && previous !== 'finalized' && (m.result === 'yes' || m.result === 'no')) {
+      return { type: 'resolve', ticker: ticker, market: m, result: m.result, ts: Math.floor(Date.now() / 1000) };
+    }
     return null;
   }
 
@@ -517,22 +526,29 @@
     var w = CFG.roiWeights;
     var spread = (m.yes_ask_dollars !== null && m.yes_bid_dollars !== null && m.yes_ask_dollars > 0 && m.yes_bid_dollars > 0)
       ? (m.yes_ask_dollars - m.yes_bid_dollars) : null;
-    var touchSize = (m.yes_bid_size_fp || 0) + (m.yes_ask_size_fp || 0);
+    var bidSize = nullableNumber(m.yes_bid_size_fp), askSize = nullableNumber(m.yes_ask_size_fp);
+    var touchSize = bidSize === null || askSize === null ? null : bidSize + askSize;
     var depth = bookDepth(m.ticker);
     var ref = refPrice(m);
-    var prev = state.lastRef[m.ticker];
-    var vol = Math.abs((prev !== undefined && ref !== null) ? (ref - prev) : 0);
+    var hist = state.history[m.ticker] || [];
+    var vol = hist.length >= 2 ? Math.abs(hist[hist.length - 1].v - hist[hist.length - 2].v) : 0;
 
     var parts = {
-      liquidity: clamp01(touchSize / 300),
+      liquidity: touchSize === null ? 0 : clamp01(touchSize / 300),
       depth: depth === null ? 0 : clamp01(depth / 1200),
-      tightness: spread === null ? 0.25 : clamp01(1 - spread / 0.10),
+      tightness: spread === null ? 0 : clamp01(1 - spread / 0.10),
       volume: clamp01((m.volume_24h_fp || 0) / 20000),
       volatility: clamp01(vol / 0.30)
     };
     var score = 0;
     Object.keys(w).forEach(function (k) { score += w[k] * parts[k]; });
-    return { score: Math.round(score * 100), parts: parts, spread: spread, touchSize: touchSize, depth: depth, ref: ref };
+    // Project eligibility gate: an unconfirmed, one-sided or contradictory touch is not high ROI.
+    var eligible = m.status === 'active' && m.yes_bid_dollars > 0 && m.yes_ask_dollars < 1
+      && spread !== null && spread >= 0 && m.yes_bid_size_fp > 0 && m.yes_ask_size_fp > 0
+      && (m.no_bid_dollars === null || Math.abs(m.yes_ask_dollars + m.no_bid_dollars - 1) <= 0.00010001)
+      && (m.no_ask_dollars === null || Math.abs(m.yes_bid_dollars + m.no_ask_dollars - 1) <= 0.00010001);
+    return { score: eligible ? Math.round(score * 100) : Math.min(30, Math.round(score * 100)),
+      eligible: eligible, parts: parts, spread: spread, touchSize: touchSize, depth: depth, ref: ref };
   }
 
   /* ============================================================== alert feed */
@@ -561,6 +577,7 @@
       result: s.result || null,
       roi: roi.score,
       roiParts: roi.parts,
+      roiEligible: roi.eligible,
       links: candidateLinks(m),
       source_url: m.source_url || null
     };
@@ -572,115 +589,89 @@
   /* ============================================================ paper trading */
   function openTrades() { return getTrades().filter(function (t) { return t.status === 'open'; }); }
 
+  function recordPaperTrade(m, side, qty, strategy, why, trades) {
+    trades = trades || getTrades();
+    if (!PAPER) return { ok: false, reason: 'Paper execution module unavailable; no fill recorded.' };
+    var key = m.ticker + '|' + side;
+    var used = state.quoteUsed[key];
+    var consumed = used && used.observed_at === m.observed_at ? used.qty : 0;
+    var fill = PAPER.quote(m, side, qty, { now: Date.now(), mode: state.mode, consumed: consumed });
+    if (!fill.ok) { state.paperStatus = fill.reason; return fill; }
+    var risk = PAPER.risk(trades, fill.price * qty);
+    if (risk) { state.paperStatus = risk; return { ok: false, reason: risk }; }
+    var trade = {
+      id: 'p' + Date.now() + Math.random().toString(36).slice(2, 7), ts: new Date().toISOString(),
+      ticker: m.ticker, title: m.title, topic: m.topic, series_ticker: m.series_ticker,
+      side: side, price: fill.price, qty: qty, strategy: strategy, status: 'open',
+      result: null, exit_price: null, pnl: null, roi: roiOf(m).score, why: why,
+      simulated: true, execution_model: PAPER.VERSION, quote: fill, source_url: fill.source_url,
+      assumptions: 'Observed ask and whole size only; no exchange execution, trading fees, queue, impact or latency model.'
+    };
+    trades.push(trade);
+    state.quoteUsed[key] = { observed_at: m.observed_at, qty: consumed + qty };
+    state.paperStatus = 'Paper model running on fresh quotes. No order sent; gross results exclude fees and market impact.';
+    return { ok: true, trade: trade };
+  }
+
   function autoTradeStep() {
     var s = settings();
-    if (!s.autoTrade) return;
-    var trades = getTrades();
-    var open = trades.filter(function (t) { return t.status === 'open'; });
-    var openKeys = {};
-    open.forEach(function (t) { openKeys[t.ticker + '|' + t.strategy] = true; });
-
-    var priceHistory = state.history;
+    if (!s.autoTrade || !PAPER) return;
+    var trades = getTrades(), before = trades.length, openKeys = {}, favorites = {};
+    trades.forEach(function (t) { if (t.status === 'open') openKeys[t.ticker + '|' + t.strategy] = true; });
+    Object.keys(state.markets).forEach(function (ticker) {
+      var m = state.markets[ticker];
+      if (m.status !== 'active') return;
+      var current = favorites[m.topic];
+      if (!current || roiOf(m).touchSize > roiOf(current).touchSize) favorites[m.topic] = m;
+    });
     STRATEGIES.forEach(function (strat) {
       if (!s.strategies[strat.id]) return;
       Object.keys(state.markets).forEach(function (ticker) {
         var m = state.markets[ticker];
-        if (!m || m.status === 'finalized' || m.status === 'settled') return;
+        if (!m || m.status !== 'active' || !CFG.topics.some(function (t) { return t.id === m.topic; })) return;
         if (openKeys[ticker + '|' + strat.id]) return;
-        var ref = refPrice(m);
+        var ref = refPrice(m), hist = state.history[ticker] || [], roi = roiOf(m), signal = null;
         if (ref === null || ref <= 0 || ref >= 1) return;
-        var hist = priceHistory[ticker] || [];
-        var roi = roiOf(m);
-        var signal = null;
-
-        if (strat.id === 'momentum') {
-          if (hist.length >= 3) {
-            var d = ref - hist[hist.length - 3].v;
-            if (d >= 0.05) signal = { side: 'yes', why: 'up ' + d.toFixed(2) + ' over 3 ticks' };
-            else if (d <= -0.05) signal = { side: 'no', why: 'down ' + Math.abs(d).toFixed(2) + ' over 3 ticks' };
-          }
+        if (strat.id === 'momentum' && hist.length >= 3) {
+          var d = ref - hist[hist.length - 3].v;
+          if (d >= 0.05) signal = { side: 'yes', why: 'up ' + d.toFixed(2) + ' over 3 observations' };
+          else if (d <= -0.05) signal = { side: 'no', why: 'down ' + Math.abs(d).toFixed(2) + ' over 3 observations' };
         } else if (strat.id === 'mean-reversion') {
           var lastMove = hist.length >= 2 ? ref - hist[hist.length - 2].v : 0;
-          if (ref <= 0.25 && lastMove < 0) signal = { side: 'yes', why: 'price ' + ref.toFixed(2) + ' and falling' };
-          else if (ref >= 0.75 && lastMove > 0) signal = { side: 'no', why: 'price ' + ref.toFixed(2) + ' and rising' };
-        } else if (strat.id === 'favorite') {
-          if (roi.score >= 70 && ref >= 0.80) signal = { side: 'yes', why: 'ROI ' + roi.score + ', price ' + ref.toFixed(2) };
-        } else if (strat.id === 'longshot') {
-          if (ref <= 0.15 && roi.score >= 60) signal = { side: 'no', why: 'price ' + ref.toFixed(2) + ', ROI ' + roi.score };
-        } else if (strat.id === 'catalyst') {
-          var oi = m.open_interest_fp || 0, v24 = m.volume_24h_fp || 0;
-          if (oi > 0 && v24 / oi >= 5 && roi.score >= 60) signal = { side: 'yes', why: '24h vol ' + num(v24) + ' vs OI ' + num(oi) };
+          if (ref <= 0.25 && lastMove < 0) signal = { side: 'yes', why: 'low YES reference and falling' };
+          else if (ref >= 0.75 && lastMove > 0) signal = { side: 'no', why: 'high YES reference and rising' };
+        } else if (strat.id === 'favorite' && favorites[m.topic] === m && roi.score >= 70 && ref >= 0.80) {
+          signal = { side: 'yes', why: 'largest observed touch in topic, score ' + roi.score };
+        } else if (strat.id === 'longshot' && ref <= 0.15 && roi.score >= 60) {
+          signal = { side: 'no', why: 'low YES reference, score ' + roi.score };
+        } else if (strat.id === 'catalyst' && m.open_interest_fp > 0 && m.volume_24h_fp / m.open_interest_fp >= 5 && roi.score >= 60) {
+          signal = { side: 'yes', why: '24h contracts >= 5x open interest, score ' + roi.score };
         }
-
         if (!signal) return;
-        var fill = signal.side === 'yes'
-          ? (m.yes_ask_dollars !== null && m.yes_ask_dollars > 0 ? m.yes_ask_dollars : ref)
-          : (m.no_bid_dollars !== null && m.no_bid_dollars > 0 ? m.no_bid_dollars : 1 - ref);
-        var qty = s.contracts;
-        trades.push({
-          id: 'p' + Date.now() + Math.random().toString(36).slice(2, 7),
-          ts: new Date().toISOString(),
-          ticker: ticker, title: m.title, topic: m.topic,
-          side: signal.side, price: fill, qty: qty,
-          strategy: strat.id, status: 'open', result: null, exit_price: null, pnl: null,
-          roi: roi.score, why: signal.why, simulated: true,
-          source_url: m.source_url || null
-        });
-        openKeys[ticker + '|' + strat.id] = true;
+        var result = recordPaperTrade(m, signal.side, Number(s.contracts), strat.id, signal.why, trades);
+        if (result.ok) openKeys[ticker + '|' + strat.id] = true;
       });
     });
-    if (trades.length !== getTrades().length) { setTrades(trades); emit('trades'); }
+    if (trades.length !== before) { setTrades(trades); emit('trades'); }
   }
 
-  /* Settle simulated positions once the market resolves (result yes / no). */
   function settleTrades() {
-    var trades = getTrades();
-    var changed = false;
+    if (!PAPER) return;
+    var trades = getTrades(), changed = false;
     trades.forEach(function (t) {
       if (t.status !== 'open') return;
-      var m = state.markets[t.ticker];
-      if (!m) return;
-      var st = (m.status || '').toLowerCase();
-      if (['determined', 'finalized', 'settled'].indexOf(st) < 0) return;
-      if (m.result !== 'yes' && m.result !== 'no') return;
-      var payout = (t.side === m.result) ? 1 : 0;
-      t.result = m.result;
-      t.status = 'settled';
-      t.exit_price = payout;
-      t.pnl = (payout - t.price) * t.qty;
-      t.settled_ts = m.settlement_ts || new Date().toISOString();
+      var result = PAPER.settlement(t, state.markets[t.ticker]);
+      if (!result) return;
+      Object.assign(t, result, { status: 'settled', settlement_observed_at: new Date().toISOString() });
       changed = true;
     });
     if (changed) { setTrades(trades); emit('trades'); }
   }
 
-  function portfolioStats(trades) {
-    var st = { realized: 0, wins: 0, losses: 0, open: 0, openExposure: 0, unrealized: 0, byStrategy: {}, byTopic: {} };
-    trades.forEach(function (t) {
-      var key = t.strategy || 'manual';
-      if (!st.byStrategy[key]) st.byStrategy[key] = { label: key, trades: 0, wins: 0, losses: 0, pnl: 0, open: 0 };
-      if (!st.byTopic[t.topic || 'other']) st.byTopic[t.topic || 'other'] = { label: t.topic || 'other', trades: 0, wins: 0, losses: 0, pnl: 0, open: 0 };
-      if (t.status === 'settled') {
-        var p = t.pnl || 0;
-        st.realized += p;
-        st.byStrategy[key].trades++; st.byStrategy[key].pnl += p;
-        st.byTopic[t.topic || 'other'].trades++; st.byTopic[t.topic || 'other'].pnl += p;
-        if (p > 0) { st.wins++; st.byStrategy[key].wins++; st.byTopic[t.topic || 'other'].wins++; }
-        else { st.losses++; st.byStrategy[key].losses++; st.byTopic[t.topic || 'other'].losses++; }
-      } else {
-        st.open++;
-        st.openExposure += (t.price * t.qty);
-        st.byStrategy[key].open++; st.byTopic[t.topic || 'other'].open++;
-        var m = state.markets[t.ticker];
-        var ref = m ? refPrice(m) : null;
-        if (ref !== null) {
-          var mv = (t.side === 'yes' ? ref : 1 - ref);
-          st.unrealized += (mv - t.price) * t.qty;
-        }
-      }
-    });
-    st.winRate = (st.wins + st.losses) ? st.wins / (st.wins + st.losses) : null;
-    return st;
+  function portfolioStats(trades) { return PAPER.stats(trades, state.markets, Date.now()); }
+  function paperStatusHtml() {
+    return esc(state.mode === 'snapshot' ? 'Snapshot is view-only. Paper trading waits for fresh live asks and confirmed quantities.' : state.paperStatus) +
+      ' <a href="' + rootHref('flagged.html#F-PAPER-01') + '">Model limits / legacy trades</a>';
   }
 
   /* ============================================================== rendering */
@@ -784,7 +775,8 @@
     var modeEl = $('#mode-badge');
     if (modeEl) {
       var paint = function () {
-        if (state.mode === 'live') { modeEl.className = 'badge live'; modeEl.textContent = 'LIVE · demo API'; }
+        if ((state.mode === 'live' || state.mode === 'legacy') && state.lastError) { modeEl.className = 'badge warn'; modeEl.textContent = 'DEGRADED · market data'; }
+        else if (state.mode === 'live') { modeEl.className = 'badge live'; modeEl.textContent = 'LIVE · demo API'; }
         else if (state.mode === 'legacy') { modeEl.className = 'badge live'; modeEl.textContent = 'LIVE · shared demo host'; }
         else if (state.mode === 'snapshot') { modeEl.className = 'badge warn'; modeEl.textContent = 'SNAPSHOT · API unreachable'; }
         else { modeEl.className = 'badge warn'; modeEl.textContent = 'probing…'; }
@@ -798,7 +790,9 @@
   function statusNotice(el) {
     if (!el) return;
     var paint = function () {
-      if (state.mode === 'live' || state.mode === 'legacy') {
+      if ((state.mode === 'live' || state.mode === 'legacy') && state.lastError) {
+        el.className = 'notice warn'; el.textContent = state.lastError + ' Last successful quote batch: ' + (state.lastRefresh ? new Date(state.lastRefresh).toISOString() : 'not yet received');
+      } else if (state.mode === 'live' || state.mode === 'legacy') {
         el.className = 'notice good';
         el.innerHTML = '<strong>Live data.</strong> Connected to the official Kalshi demo Trade API (<code>' + esc(state.base) + '</code>). ' +
           'Tables and charts refresh from it. The committed ' + dt(state.snapshot && state.snapshot.meta ? state.snapshot.meta.captured_at : null) +
@@ -806,9 +800,8 @@
       } else if (state.mode === 'snapshot') {
         el.className = 'notice warn';
         el.innerHTML = '<strong>Snapshot mode.</strong> This browser could not reach the demo API (' + esc(state.lastError || 'network or CORS policy') + '). ' +
-          'Showing the verified snapshot committed to <code>data/snapshot.json</code> with per-row source links. ' +
-          'The live alert feed stays idle until the API is reachable — nothing is invented. ' +
-          'To refresh the snapshot yourself run <code>node scripts/fetch-snapshot.mjs</code> from a machine that can reach the API.';
+          'Showing the timestamped capture in <code>data/snapshot.json</code> with per-row source links. ' +
+          'Captured replay may remain visible; new live alerts resume automatically after public API access recovers. No snapshot trade fill is assumed.';
       } else {
         el.className = 'notice';
         el.innerHTML = 'Probing the official demo API…';
@@ -872,6 +865,7 @@
 
   /* --------------------------------------------------------- dashboard page */
   pages.dashboard = function () {
+    statusNotice($('#mode-notice'));
     var s = settings();
     var feedState = { topic: 'all', dir: 'all', minSwing: s.threshold, roiCut: s.roiCut };
     var logA = $('#chat-all .log'), logB = $('#chat-roi .log');
@@ -887,11 +881,11 @@
       var head = '<div class="m-head"><span class="m-time">' + clock(a.ts) + ' UTC</span>' +
         (a.topic ? '<span class="tag ' + esc(t.id) + '">' + esc(t.label) + '</span>' : '') +
         (a.replay ? '<span class="badge info">snapshot replay</span>' : '') +
-        (a.roi !== undefined && a.roi !== null ? '<span class="badge neutral">ROI ' + a.roi + '</span>' : '') + '</div>';
+        (a.roiEligible !== undefined && a.roi !== null ? '<span class="badge neutral">research score ' + a.roi + (a.roiEligible ? '' : ' · ineligible') + '</span>' : '<span class="badge warn">historical score unverified</span>') + '</div>';
       var body;
       if (a.type === 'resolve') {
         body = '<div class="m-title"><a href="' + rootHref('market.html?ticker=') + encodeURIComponent(a.ticker) + '">' + esc(a.title) + '</a> resolved <b class="' + (a.result === 'yes' ? 'up' : 'down') + '">' + esc(a.result).toUpperCase() + '</b></div>' +
-          '<div class="m-body">Settlement published by the exchange. YES holders receive $1.00 per contract, NO holders $1.00 per contract.</div>';
+          '<div class="m-body">Final outcome published by the exchange. Only holders of the winning side receive $1.00 per contract.</div>';
       } else if (a.type === 'system') {
         body = '<div class="m-body">' + esc(a.title) + '</div>';
       } else {
@@ -911,7 +905,8 @@
         if (feedState.dir === 'up' && a.delta <= 0) return false;
         if (feedState.dir === 'down' && a.delta >= 0) return false;
       }
-      if (useRoi && a.type === 'swing' && (a.roi === undefined || a.roi === null || a.roi < feedState.roiCut)) return false;
+      if (a.type === 'swing' && (nullableNumber(a.delta) === null || Math.round(Math.abs(a.delta) * 10000) < Math.round(feedState.minSwing * 10000))) return false;
+      if (useRoi && a.type === 'swing' && (a.replay || a.roiEligible !== true || a.roi === undefined || a.roi === null || a.roi < feedState.roiCut)) return false;
       return true;
     }
 
@@ -950,8 +945,8 @@
             '<td class="num">' + Math.round(p.volume * 100) + '</td>' +
             '<td class="num">' + Math.round(p.volatility * 100) + '</td>' +
             '<td class="num">' + (x.r.spread === null ? '—' : cents(x.r.spread)) + '</td>' +
-            '<td class="num">' + num(x.r.touchSize) + '</td></tr>';
-        }).join('') : '<tr><td colspan="10" class="muted">No rows yet.</td></tr>';
+            '<td class="num">' + num(x.r.touchSize, 2) + '</td><td class="src"><a href="' + esc(x.m.source_url || CFG.docs.market) + '" target="_blank" rel="noopener">API fields</a></td></tr>';
+        }).join('') : '<tr><td colspan="11" class="muted">No rows yet.</td></tr>';
       }
     }
 
@@ -1134,6 +1129,7 @@
     var winSel = $('#window-btns');
     var windowSec = 3600;
     var seriesTicker = null;
+    var bookPending = false, lastBookRequest = 0;
 
     var WINDOWS = [
       { id: '30s', label: '30 s', sec: 30 },
@@ -1152,7 +1148,7 @@
       $('#m-topic').innerHTML = '<span class="tag ' + esc(topic.id) + '">' + esc(topic.label) + '</span>';
       $('#m-status').innerHTML = (m && m.status) ? '<span class="badge neutral">' + esc(m.status) + '</span>' : '<span class="muted">—</span>';
       $('#m-result').innerHTML = (m && m.result)
-        ? '<span class="badge ' + (m.result === 'yes' ? 'good' : 'bad') + '">resolved ' + esc(m.result) + '</span>'
+        ? '<span class="badge neutral">' + (m.status === 'finalized' ? 'final result ' : 'provisional result ') + esc(m.result) + '</span>'
         : '<span class="muted">not resolved yet</span>';
       /* Resolution block. Values come only from the API row (result, settlement_value_dollars,
        * settlement_ts, rules_primary); a missing field stays an em dash, never a guess. */
@@ -1196,34 +1192,77 @@
         if (m && m.event_ticker) links.push('<a href="' + CFG.endpoints.web + '/markets/' + encodeURIComponent(m.event_ticker) + '" target="_blank" rel="noopener">Kalshi event page</a>');
         src.innerHTML = links.join(' ') || '<span class="muted">—</span>';
       }
+      $$('.market-field-source').forEach(function (cell) {
+        cell.innerHTML = '<a href="' + esc(m && m.source_url || CFG.docs.market) + '" target="_blank" rel="noopener">API field</a>';
+      });
       var trade = $('#trade-form');
       if (trade) trade.hidden = !m;
     }
 
+    function loadCandles(m) {
+      if (!m || !m.series_ticker || ['live', 'legacy'].indexOf(state.mode) < 0) return;
+      var period = windowSec <= 3600 ? 1 : 60, key = ticker + '|' + period;
+      var cached = state.charts[key];
+      var span = Math.max(windowSec, 3600);
+      if (cached && (cached.pending || (Date.now() - cached.requested_at < 60000 && cached.span >= span))) return;
+      var end = Math.floor(Date.now() / 1000);
+      var url = state.base + '/series/' + encodeURIComponent(m.series_ticker) + '/markets/' + encodeURIComponent(ticker) +
+        '/candlesticks?start_ts=' + (end - span) + '&end_ts=' + end + '&period_interval=' + period;
+      state.charts[key] = Object.assign({}, cached || {}, { pending: true, requested_at: Date.now(), span: span });
+      fetchJSON(url).then(function (r) {
+        state.charts[key].points = (r.candlesticks || []).map(function (c) {
+          return { t: nullableNumber(c.end_period_ts), v: nullableNumber(c.price && c.price.close_dollars),
+            source_url: url, basis: period + '-minute published trade candle close' };
+        });
+        state.charts[key].error = null;
+      }).catch(function (e) { state.charts[key].error = e.message; })
+        .finally(function () { state.charts[key].pending = false; drawChart(); });
+    }
+
     function drawChart() {
       var m = state.markets[ticker];
-      if (!m) return;
-      // shared with startUniverseRefresh() so the chart can follow the poller while the tab is open
-      var pts = (state.history[ticker] || []).slice();
+      if (!m || !window.KDChart) return;
+      seriesTicker = m.series_ticker;
+      loadCandles(m);
+      var pts = [];
       var snapCandles = state.snapshot && state.snapshot.candlesticks && state.snapshot.candlesticks[ticker];
+      var captured = state.snapshot && state.snapshot.meta && state.snapshot.meta.captured_at;
       if (snapCandles) {
-        var c = (windowSec <= 3600 ? snapCandles.m1 : snapCandles.m60);
+        var c = (windowSec <= 3600 ? snapCandles.m1 : snapCandles.m60) || {};
         (c.candles || []).forEach(function (k) {
-          if (!Array.isArray(k)) return;
-          var close = Number(k[1]);
-          if (isFinite(close)) pts.push({ t: Number(k[0]), v: close });
+          if (Array.isArray(k)) pts.push({ t: nullableNumber(k[0]), v: nullableNumber(k[1]), source_url: c.source_url,
+            basis: 'snapshot ' + (windowSec <= 3600 ? '1' : '60') + '-minute candle close' });
         });
       }
-      if (window.KDChart) {
-        KDChart.line($('#price-chart'), pts, {
-          windowSeconds: windowSec, zoom: false, threshold: settings().threshold, color: '#00dd94'
-        });
-      }
+      var live = state.charts[ticker + '|' + (windowSec <= 3600 ? 1 : 60)] || {};
+      pts = KDChart.preparePoints(pts.concat(live.points || [], state.history[ticker] || []));
+      var snapshotView = m.data_mode !== 'live';
+      var anchor = snapshotView ? Date.parse(captured) / 1000 : Math.floor(Date.now() / 1000);
+      if (!Number.isFinite(anchor)) anchor = pts.length ? pts[pts.length - 1].t : Math.floor(Date.now() / 1000);
+      var events = KDChart.jumps(pts, 0.10).filter(function (ev) { return ev.t >= anchor - windowSec && ev.t <= anchor; });
+      KDChart.line($('#price-chart'), pts, { now: anchor, windowSeconds: windowSec, zoom: false, color: '#00dd94', events: events,
+        onEvent: function (event) {
+          var row = document.getElementById('jump-' + Math.floor(event.t));
+          if (row) { row.focus(); if (row.scrollIntoView) row.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+        } });
+      var note = $('#chart-status');
+      if (note) note.textContent = (snapshotView ? 'SNAPSHOT VIEW — axis ends at capture ' + (captured || 'time unverified') :
+        'REST observations — seconds are browser observation times, not exchange trade timestamps') +
+        '. Historical candles are at least 1 minute. ' + (live.error ? 'Live candles unavailable; timestamped captured history is retained.' : 'Hover for values; click a gold marker for its sourced row.');
+      var jumpBody = $('#price-events');
+      if (jumpBody) jumpBody.innerHTML = events.length ? events.slice(-12).reverse().map(function (ev) {
+        var source = ev.source_url || m.source_url || CFG.docs.market;
+        return '<tr id="jump-' + Math.floor(ev.t) + '" tabindex="-1"><td>' + dt(new Date(ev.t * 1000).toISOString()) + '</td>' +
+          '<td class="num">' + cents(ev.from) + ' → ' + cents(ev.to) + '</td><td class="num">' + (ev.delta > 0 ? '+' : '') + cents(ev.delta) + '</td>' +
+          '<td class="small">' + esc(ev.basis) + '</td><td>— <span class="muted">cause unverified</span></td>' +
+          '<td class="src"><a href="' + esc(source) + '" target="_blank" rel="noopener">observations</a>' +
+          (m.event_ticker ? ' · <a href="' + CFG.endpoints.web + '/markets/' + encodeURIComponent(m.event_ticker) + '" target="_blank" rel="noopener">event</a>' : '') +
+          ' · <a href="' + rootHref('catalyst.html') + '">research (not causation)</a></td></tr>';
+      }).join('') : '<tr><td colspan="6" class="muted">No observed ≥ $0.10 change in this window. No cause or price point is invented.</td></tr>';
       var roi = roiOf(m);
       $('#m-roi').textContent = roi.score;
-      var roi2 = $('#m-roi2');
-      if (roi2) roi2.textContent = roi.score;
-      $('#m-liquidity').textContent = num(roi.touchSize) + ' contracts at the touch';
+      var roi2 = $('#m-roi2'); if (roi2) roi2.textContent = roi.score;
+      $('#m-liquidity').textContent = num(roi.touchSize, 2) + ' observed contracts at the touch';
     }
 
     /* The exchange quotes a YES bid and a NO bid; a YES ask is 1 - (best NO bid). The old
@@ -1237,13 +1276,16 @@
       var el = $('#book-body');
       if (!el) return;
       if (!ob) {
-        el.innerHTML = '<tr><td colspan="6" class="muted">Order book not loaded yet.</td></tr>';
+        el.innerHTML = '<tr><td colspan="8" class="muted">Order book not loaded; quantities unverified.</td></tr>';
         return;
       }
-      var yes = (ob.yes_dollars || []).map(function (l) { return [Number(l[0]), Number(l[1])]; })
-        .sort(function (a, b) { return b[0] - a[0]; });
-      var no = (ob.no_dollars || []).map(function (l) { return [Number(l[0]), Number(l[1])]; })
-        .sort(function (a, b) { return b[0] - a[0]; });
+      function levels(input) {
+        return (input || []).filter(Array.isArray).map(function (l) { return [nullableNumber(l[0]), nullableNumber(l[1])]; })
+          .filter(function (l) { return l[0] !== null && l[0] > 0 && l[0] < 1 && l[1] !== null && l[1] > 0; })
+          .sort(function (a, b) { return b[0] - a[0]; });
+      }
+      var yes = levels(ob.yes_dollars), no = levels(ob.no_dollars);
+      var invalidLevels = (ob.yes_dollars || []).length + (ob.no_dollars || []).length - yes.length - no.length;
       var bestYesBid = yes.length ? yes[0] : null;
       var bestNoBid = no.length ? no[0] : null;
       var yesAsk = bestNoBid ? [Math.round((1 - bestNoBid[0]) * 10000) / 10000, bestNoBid[1]] : null;
@@ -1253,52 +1295,55 @@
       for (var i = 0; i < Math.min(n, 12); i++) {
         var y = yes[i], d = no[i];
         rows.push('<tr class="ask">' +
-          '<td class="p">' + (y ? y[0].toFixed(4) : '—') + '</td><td class="num">' + (y ? num(y[1]) : '—') + '</td>' +
+          '<td class="p">' + (y ? y[0].toFixed(4) : '—') + '</td><td class="num">' + (y ? num(y[1], 2) : '—') + '</td>' +
           '<td class="p">' + (y ? (1 - y[0]).toFixed(4) : '—') + '</td>' +
-          '<td class="p">' + (d ? d[0].toFixed(4) : '—') + '</td><td class="num">' + (d ? num(d[1]) : '—') + '</td>' +
+          '<td class="p">' + (d ? d[0].toFixed(4) : '—') + '</td><td class="num">' + (d ? num(d[1], 2) : '—') + '</td>' +
           '<td class="p">' + (d ? (1 - d[0]).toFixed(4) : '—') + '</td>' +
-          '<td class="bar"><i style="width:' + (d ? Math.round((d[1] / max) * 100) : 0) + '%"></i></td></tr>');
+          '<td class="bar"><i style="width:' + (d ? Math.round((d[1] / max) * 100) : 0) + '%"></i></td>' +
+          '<td class="src"><a href="' + esc(ob.source_url || CFG.docs.orderbook) + '" target="_blank" rel="noopener">book</a></td></tr>');
       }
-      el.innerHTML = rows.join('') || '<tr><td colspan="7" class="muted">The exchange returned no resting orders for this market. That is a real, reportable state: there is nothing to trade against right now.</td></tr>';
+      el.innerHTML = rows.join('') || '<tr><td colspan="8" class="muted">The exchange returned no resting orders for this market. That is a real, reportable state: there is nothing to trade against right now.</td></tr>';
       var tot = yes.concat(no).reduce(function (s, l) { return s + l[1]; }, 0);
       var totEl = $('#book-total');
       if (totEl) {
-        totEl.innerHTML = num(tot) + ' contracts across ' + (yes.length + no.length) + ' price levels. ' +
-          /* Prices are subpenny on these contracts (0.0020), so 2-dp formatting displayed the best
-           * bid/ask as "$0.00" on the live page (observed 2026-11-21 on KXPRESNOMD-28-MSHE). Use the
-           * same 4-dp contract-price format as the ladder and the static Bid/Ask panel. */
-          'Best YES bid <b>' + (bestYesBid ? cents(bestYesBid[0]) + ' × ' + num(bestYesBid[1]) : 'none') + '</b> · ' +
-          'Best YES ask <b>' + (yesAsk ? cents(yesAsk[0]) + ' × ' + num(yesAsk[1]) + ' (from the NO bid)' : 'none') + '</b>. ' +
-          (yesAsk ? '' : '<span class="warn">No YES offer exists, so a YES swing to a high price cannot be executed — the high-ROI model now scores that 0.</span>');
+        // Preserve main's subpenny formatting repair alongside observation-time/invalid-level provenance.
+        totEl.innerHTML = (ob.data_mode === 'live' ? 'API book observed ' : 'SNAPSHOT book captured ') +
+          (ob.observed_at ? dt(new Date(ob.observed_at).toISOString()) : 'time unverified') + '. ' + (invalidLevels ? invalidLevels + ' malformed level(s) omitted; values unverified. ' : '') + num(tot, 2) + ' contracts across ' + (yes.length + no.length) + ' price levels. ' +
+          'Best YES bid <b>' + (bestYesBid ? cents(bestYesBid[0]) + ' × ' + num(bestYesBid[1], 2) : 'none') + '</b> · ' +
+          'Best YES ask <b>' + (yesAsk ? cents(yesAsk[0]) + ' × ' + num(yesAsk[1], 2) + ' (from the NO bid)' : 'none') + '</b>. ' +
+          (yesAsk ? '' : '<span class="warn">No YES offer is visible in this captured book; execution is unverified.</span>');
       }
     }
 
+    function loadBook() {
+      if (!ticker || bookPending || Date.now() - lastBookRequest < 5000) return;
+      bookPending = true; lastBookRequest = Date.now();
+      var url = state.base + '/markets/' + encodeURIComponent(ticker) + '/orderbook?depth=20';
+      fetchJSON(url).then(function (r) {
+        if (!r || !r.orderbook_fp || !Array.isArray(r.orderbook_fp.yes_dollars) || !Array.isArray(r.orderbook_fp.no_dollars)) throw new Error('Unverified orderbook response shape');
+        state.orderbooks[ticker] = { yes_dollars: r.orderbook_fp.yes_dollars, no_dollars: r.orderbook_fp.no_dollars,
+          source_url: url, observed_at: Date.now(), data_mode: 'live' };
+        drawBook();
+      }).catch(function () { /* Retain the timestamped snapshot/last book, never relabel it live. */ })
+        .finally(function () { bookPending = false; });
+    }
     function loadMarket() {
       if (!ticker) return;
-      if (state.markets[ticker]) {
-        title(state.markets[ticker]);
-        drawChart();
-        drawBook();
-      }
-      apiGet('/markets/' + encodeURIComponent(ticker)).then(function (r) {
+      if (state.markets[ticker]) { title(state.markets[ticker]); drawChart(); drawBook(); }
+      var url = state.base + '/markets/' + encodeURIComponent(ticker);
+      fetchJSON(url).then(function (r) {
         if (!r || !r.market) return;
-        var m = normMarket(r.market, (state.markets[ticker] || {}).topic, state.base + '/markets/' + encodeURIComponent(ticker),
-          (state.markets[ticker] || {}).series_ticker, (state.markets[ticker] || {}).settlement_sources);
+        var old = state.markets[ticker] || {};
+        var m = normMarket(r.market, old.topic, url, old.series_ticker, old.settlement_sources);
         state.markets[ticker] = m;
-        seriesTicker = m.series_ticker;
-        title(m);
-        drawChart();
+        state.lastRef[ticker] = refPrice(m);
+        var ref = refPrice(m);
+        if (ref !== null) (state.history[ticker] || (state.history[ticker] = [])).push({ t: Math.floor(m.observed_at / 1000), v: ref, source_url: url, basis: 'browser poll observation' });
+        title(m); drawChart();
       }).catch(function (e) {
-        if (!state.markets[ticker]) {
-          var t = $('#m-title'); if (t) t.textContent = 'Could not load market: ' + e.message;
-        }
+        if (!state.markets[ticker]) { var titleEl = $('#m-title'); if (titleEl) titleEl.textContent = 'Market unverified: ' + e.message; }
       });
-      apiGet('/markets/' + encodeURIComponent(ticker) + '/orderbook?depth=20').then(function (r) {
-        if (r && r.orderbook_fp) {
-          state.orderbooks[ticker] = { yes_dollars: r.orderbook_fp.yes_dollars || [], no_dollars: r.orderbook_fp.no_dollars || [], source_url: state.base + '/markets/' + encodeURIComponent(ticker) + '/orderbook?depth=20' };
-          drawBook();
-        }
-      }).catch(function () { /* orderbook may be empty */ });
+      loadBook();
     }
 
     if (winSel) {
@@ -1335,25 +1380,25 @@
         var m = state.markets[ticker];
         if (!m) return;
         var side = $('#t-side').value;
-        var qty = parseInt($('#t-qty').value, 10) || 1;
-        var strat = $('#t-strategy').value;
-        var price = side === 'yes'
-          ? (m.yes_ask_dollars || m.last_price_dollars)
-          : (m.no_bid_dollars !== null && m.no_bid_dollars !== undefined && m.no_bid_dollars > 0 ? m.no_bid_dollars : 1 - (m.last_price_dollars || 0));
+        var qty = Number($('#t-qty').value);
         var trades = getTrades();
-        trades.push({
-          id: 'm' + Date.now(), ts: new Date().toISOString(), ticker: ticker, title: m.title, topic: m.topic,
-          side: side, price: price, qty: qty, strategy: strat, status: 'open', result: null, pnl: null,
-          simulated: true, why: 'manual', roi: roiOf(m).score, source_url: m.source_url || null
-        });
-        setTrades(trades);
+        var result = recordPaperTrade(m, side, qty, $('#t-strategy').value, 'manual paper request', trades);
         var out = $('#trade-msg');
-        if (out) out.innerHTML = '<span class="badge good">simulated</span> Recorded ' + qty + ' ' + side + ' @ ' + cents(price) + '. No real order was sent.';
+        if (!result.ok) {
+          if (out) out.textContent = result.reason;
+          return;
+        }
+        setTrades(trades);
+        if (out) out.textContent = 'PAPER ONLY: recorded ' + qty + ' ' + side.toUpperCase() + ' at observed ask ' + cents(result.trade.price) + '. No exchange order sent.';
         emit('trades');
       });
     }
 
     state.listeners.push(function () {
+      if (!ticker) {
+        var first = sortedMarkets()[0];
+        if (first) { ticker = first.ticker; loadMarket(); }
+      }
       var m = state.markets[ticker];
       if (m) { title(m); drawChart(); drawBook(); }
     });
@@ -1366,67 +1411,56 @@
       if (!m) return;
       title(m);
       drawChart();
+      if (state.mode !== 'snapshot') loadBook();
       drawBook();
     };
   };
 
   /* --------------------------------------------------------- portfolio page */
+  function tradePnlHtml(t) {
+    if (!PAPER.certified(t)) return '<span class="badge warn">legacy / unverified</span>';
+    if (t.status !== 'settled') return '<span class="badge neutral">open — awaiting finalization</span>';
+    if (!PAPER.isSettled(t)) return '<span class="badge warn">settlement unverified</span>';
+    return '<span class="badge ' + (t.pnl >= 0 ? 'good' : 'bad') + '">' + usd(t.pnl) + ' gross</span>';
+  }
+  function tradeSourceHtml(t) {
+    var url = t.quote && t.quote.source_url || t.source_url;
+    return url && PAPER.official(url) ? '<a href="' + esc(url) + '" target="_blank" rel="noopener">API fields</a>' :
+      '<a href="' + CFG.docs.market + '" target="_blank" rel="noopener">fields (row unverified)</a>';
+  }
   pages.portfolio = function () {
-    var tradesBody = tbodyOf('portfolio-trades');
-    var statsEl = $('#portfolio-stats');
-    var curve = $('#equity-chart');
-
+    var tradesBody = tbodyOf('portfolio-trades'), statsEl = $('#portfolio-stats'), curve = $('#equity-chart');
+    statusNotice($('#mode-notice'));
     function paint() {
-      var trades = getTrades();
-      var st = portfolioStats(trades);
-      if (statsEl) {
-        statsEl.innerHTML =
-          '<div class="stat"><div class="label">Realized P&amp;L</div><div class="value ' + (st.realized >= 0 ? 'up' : 'down') + '">' + usd(st.realized) + '</div><div class="note">settled simulated trades</div></div>' +
-          '<div class="stat"><div class="label">Win rate</div><div class="value">' + (st.winRate === null ? '—' : pct(st.winRate, 1)) + '</div><div class="note">' + st.wins + ' wins / ' + st.losses + ' losses</div></div>' +
-          '<div class="stat"><div class="label">Open exposure</div><div class="value">' + usd(st.openExposure) + '</div><div class="note">' + st.open + ' open positions</div></div>' +
-          '<div class="stat"><div class="label">Mark-to-market</div><div class="value ' + (st.unrealized >= 0 ? 'up' : 'down') + '">' + usd(st.unrealized) + '</div><div class="note">against the latest observed price</div></div>';
-      }
-      if (tradesBody) {
-        var rows = trades.slice().reverse();
-        tradesBody.innerHTML = rows.length ? rows.map(function (t) {
-          var m = state.markets[t.ticker];
-          var live = m ? (m.last_price_dollars !== null && m.last_price_dollars !== undefined ? cents(m.last_price_dollars) : '—') : '—';
-          var strat = STRATEGIES.filter(function (s) { return s.id === t.strategy; })[0];
-          return '<tr><td>' + dt(t.ts) + '</td>' +
-            '<td><a href="' + rootHref('market.html?ticker=') + encodeURIComponent(t.ticker) + '">' + esc(t.title || t.ticker) + '</a><br><span class="ticker">' + esc(t.ticker) + '</span></td>' +
-            '<td><span class="tag ' + esc(topicOf(t.topic).id) + '">' + esc(topicOf(t.topic).label) + '</span></td>' +
-            '<td>' + esc(t.side) + '</td>' +
-            '<td class="num">' + num(t.qty) + '</td>' +
-            '<td class="num">' + cents(t.price) + '</td>' +
-            '<td class="num">' + live + '</td>' +
-            '<td>' + esc(strat ? strat.label : (t.strategy || 'manual')) + '</td>' +
-            '<td>' + (t.status === 'settled'
-              ? '<span class="badge ' + (t.pnl >= 0 ? 'good' : 'bad') + '">' + usd(t.pnl) + '</span>'
-              : '<span class="badge neutral">open</span>') + '</td>' +
-            '<td>' + (t.result ? '<span class="badge ' + (t.result === 'yes' ? 'good' : 'bad') + '">' + esc(t.result) + '</span>' : '<span class="muted">—</span>') + '</td>' +
-            '<td class="src">' + (t.source_url ? '<a href="' + esc(t.source_url) + '" target="_blank" rel="noopener">row</a>' : '—') + '</td></tr>';
-        }).join('') : '<tr><td colspan="11" class="muted">No simulated trades yet. Enable the auto-trader below, or place one from the Market page.</td></tr>';
-      }
-      if (curve) {
-        var pts = [];
-        var cum = 0;
-        trades.filter(function (t) { return t.status === 'settled'; })
-          .sort(function (a, b) { return String(a.ts).localeCompare(String(b.ts)); })
-          .forEach(function (t) {
-            cum += t.pnl || 0;
-            pts.push({ t: Math.floor(new Date(t.ts).getTime() / 1000), v: cum });
-          });
-        if (window.KDChart) KDChart.line(curve, pts, { windowSeconds: Math.max(3600, 86400 * 30), zoom: true, fill: true, color: '#4c9aff', hover: false });
+      var trades = getTrades(), st = portfolioStats(trades), notice = $('#paper-notice');
+      if (notice) notice.innerHTML = paperStatusHtml() + (st.excluded ? ' ' + st.excluded + ' legacy/unverified record(s) kept below but excluded from totals.' : '');
+      if (statsEl) statsEl.innerHTML =
+        '<div class="stat"><div class="label">Realized gross P&amp;L</div><div class="value ' + (st.realized >= 0 ? 'up' : 'down') + '">' + usd(st.realized) + '</div><div class="note">finalized paper positions only; excludes fees</div></div>' +
+        '<div class="stat"><div class="label">Win rate</div><div class="value">' + (st.winRate === null ? '—' : pct(st.winRate, 1)) + '</div><div class="note">' + st.wins + ' wins / ' + st.losses + ' losses / ' + st.breakeven + ' flat</div></div>' +
+        '<div class="stat"><div class="label">Open entry cost</div><div class="value">' + usd(st.openExposure) + '</div><div class="note">' + st.open + ' modeled positions · not account cash</div></div>' +
+        '<div class="stat"><div class="label">Unrealized gross P&amp;L</div><div class="value">' + usd(st.unrealized) + '</div><div class="note">' + (st.unpricedOpen ? st.unpricedOpen + ' open position(s) lack fresh exit depth; total unverified' : 'at the side-specific observed bid; not an exchange fill') + '</div></div>';
+      if (tradesBody) tradesBody.innerHTML = trades.length ? trades.slice().reverse().map(function (t) {
+        var mark = PAPER.mark(t, state.markets[t.ticker], Date.now());
+        var strat = STRATEGIES.filter(function (s) { return s.id === t.strategy; })[0];
+        return '<tr><td>' + dt(t.ts) + '</td><td><a href="' + rootHref('market.html?ticker=') + encodeURIComponent(t.ticker) + '">' + esc(t.title || t.ticker) + '</a><br><span class="ticker">' + esc(t.ticker) + '</span></td>' +
+          '<td><span class="tag ' + esc(topicOf(t.topic).id) + '">' + esc(topicOf(t.topic).label) + '</span></td>' +
+          '<td>' + esc(t.side) + '</td><td class="num">' + num(t.qty) + '</td><td class="num">' + cents(t.price) + '</td>' +
+          '<td class="num">' + (mark ? cents(mark.price) : '—') + '</td><td>' + esc(strat ? strat.label : t.strategy || 'manual') + '</td>' +
+          '<td>' + tradePnlHtml(t) + '</td><td>' + esc(t.result || '—') + '</td><td class="src">' + tradeSourceHtml(t) + '</td></tr>';
+      }).join('') : '<tr><td colspan="11" class="muted">No paper trades recorded. Strategies run automatically while this tab is open and fresh, sufficiently sized quotes meet a rule. Snapshot data never creates a fill.</td></tr>';
+      if (curve && window.KDChart) {
+        var cumulative = 0;
+        var closed = trades.filter(function (t) { return PAPER.isSettled(t); })
+          .map(function (t) { return { trade: t, time: Date.parse(t.settled_ts || t.settlement_observed_at) / 1000 }; })
+          .filter(function (t) { return Number.isFinite(t.time); }).sort(function (a, b) { return a.time - b.time; });
+        var pts = closed.map(function (row) { cumulative += row.trade.pnl; return { t: row.time, v: cumulative }; });
+        KDChart.line(curve, pts, { windowSeconds: pts.length ? Math.max(3600, Date.now() / 1000 - pts[0].t + 60) : 86400,
+          binary: false, zoom: true, fill: true, color: '#4c9aff', hover: true });
       }
     }
-    state.listeners.push(paint);
-    paint();
-
+    state.listeners.push(paint); paint();
     var auto = $('#auto-trade');
-    if (auto) {
-      auto.checked = settings().autoTrade;
-      auto.addEventListener('change', function () { saveSettings({ autoTrade: auto.checked }); });
-    }
+    if (auto) { auto.checked = settings().autoTrade; auto.addEventListener('change', function () { saveSettings({ autoTrade: auto.checked }); paint(); }); }
     var reset = $('#reset-trades');
     if (reset) reset.addEventListener('click', function () {
       if (confirm('Delete all simulated trades stored in this browser?')) { setTrades([]); paint(); emit('trades'); }
@@ -1435,53 +1469,33 @@
 
   /* ----------------------------------------------------------- analysis page */
   pages.analysis = function () {
-    var body = $('#analysis-body');
-    var stratBody = tbodyOf('strategy-stats');
-    var topicBody = tbodyOf('topic-stats');
-
+    var body = $('#analysis-body'), stratBody = tbodyOf('strategy-stats'), topicBody = tbodyOf('topic-stats');
+    statusNotice($('#mode-notice'));
     function paint() {
-      var trades = getTrades();
-      var st = portfolioStats(trades);
-      if (stratBody) {
-        var keys = Object.keys(st.byStrategy);
-        stratBody.innerHTML = keys.length ? keys.map(function (k) {
-          var v = st.byStrategy[k];
-          var label = (STRATEGIES.filter(function (s) { return s.id === k; })[0] || {}).label || k;
-          var wr = (v.wins + v.losses) ? (v.wins / (v.wins + v.losses)) : null;
-          return '<tr><td><strong>' + esc(label) + '</strong><br><span class="small muted">' + esc(k) + '</span></td>' +
-            '<td class="num">' + v.trades + '</td><td class="num">' + v.open + '</td>' +
-            '<td class="num">' + (wr === null ? '—' : pct(wr, 1)) + '</td>' +
-            '<td class="num ' + (v.pnl >= 0 ? 'up' : 'down') + '">' + usd(v.pnl) + '</td>' +
-            '<td class="num">' + (v.trades ? usd(v.pnl / v.trades) : '—') + '</td></tr>';
-        }).join('') : '<tr><td colspan="6" class="muted">No simulated trades categorised yet.</td></tr>';
+      var trades = getTrades(), st = portfolioStats(trades), note = $('#analysis-notice');
+      if (note) note.textContent = 'Computed paper-model results only, not account performance. Gross P&L excludes fees. ' + st.excluded + ' legacy/unverified record(s) are excluded from summaries and kept in the log.';
+      function performance(map, topic) {
+        return Object.keys(map).map(function (key) {
+          var v = map[key];
+          var name = topic ? topicOf(key).label : (STRATEGIES.filter(function (s) { return s.id === key; })[0] || {}).label || key;
+          var wr = v.wins + v.losses ? v.wins / (v.wins + v.losses) : null;
+          return '<tr><td>' + esc(name) + '</td><td class="num">' + v.trades + '</td><td class="num">' + v.open + '</td>' +
+            '<td class="num">' + (wr === null ? '—' : pct(wr, 1)) + '</td><td class="num">' + usd(v.pnl) + '</td>' +
+            (topic ? '' : '<td class="num">' + (v.trades ? usd(v.pnl / v.trades) : '—') + '</td>') +
+            '<td class="src"><a href="' + CFG.docs.settlement + '" target="_blank" rel="noopener">payout rule</a></td></tr>';
+        }).join('') || '<tr><td colspan="' + (topic ? '6' : '7') + '" class="muted">No supported paper-model results yet.</td></tr>';
       }
-      if (topicBody) {
-        var tkeys = Object.keys(st.byTopic);
-        topicBody.innerHTML = tkeys.length ? tkeys.map(function (k) {
-          var v = st.byTopic[k];
-          var wr = (v.wins + v.losses) ? (v.wins / (v.wins + v.losses)) : null;
-          return '<tr><td><span class="tag ' + esc(k) + '">' + esc(topicOf(k).label) + '</span></td>' +
-            '<td class="num">' + v.trades + '</td><td class="num">' + v.open + '</td>' +
-            '<td class="num">' + (wr === null ? '—' : pct(wr, 1)) + '</td>' +
-            '<td class="num ' + (v.pnl >= 0 ? 'up' : 'down') + '">' + usd(v.pnl) + '</td></tr>';
-        }).join('') : '<tr><td colspan="5" class="muted">No simulated trades categorised yet.</td></tr>';
-      }
-      if (body) {
-        var rows = trades.slice().reverse();
-        body.innerHTML = rows.length ? rows.map(function (t) {
-          var strat = (STRATEGIES.filter(function (s) { return s.id === t.strategy; })[0] || {}).label || t.strategy;
-          return '<tr><td>' + dt(t.ts) + '</td><td>' + esc(t.title || t.ticker) + '</td>' +
-            '<td><span class="tag ' + esc(topicOf(t.topic).id) + '">' + esc(topicOf(t.topic).label) + '</span></td>' +
-            '<td>' + esc(strat) + '</td><td>' + esc(t.side) + '</td><td class="num">' + num(t.qty) + '</td>' +
-            '<td class="num">' + cents(t.price) + '</td>' +
-            '<td>' + (t.status === 'settled' ? '<span class="badge ' + (t.pnl >= 0 ? 'good' : 'bad') + '">' + usd(t.pnl) + '</span>' : '<span class="badge neutral">open</span>') + '</td>' +
-            '<td>' + (t.result ? esc(t.result) : '—') + '</td>' +
-            '<td class="small">' + esc(t.why || '') + '</td></tr>';
-        }).join('') : '<tr><td colspan="10" class="muted">No simulated trades yet — run the auto-trader from the Portfolio page and come back.</td></tr>';
-      }
+      if (stratBody) stratBody.innerHTML = performance(st.byStrategy, false);
+      if (topicBody) topicBody.innerHTML = performance(st.byTopic, true);
+      if (body) body.innerHTML = trades.length ? trades.slice().reverse().map(function (t) {
+        var strat = (STRATEGIES.filter(function (s) { return s.id === t.strategy; })[0] || {}).label || t.strategy;
+        return '<tr><td>' + dt(t.ts) + '</td><td>' + esc(t.title || t.ticker) + '</td><td>' + esc(topicOf(t.topic).label) + '</td>' +
+          '<td>' + esc(strat) + '</td><td>' + esc(t.side) + '</td><td class="num">' + num(t.qty) + '</td><td class="num">' + cents(t.price) + '</td>' +
+          '<td>' + tradePnlHtml(t) + '</td><td>' + esc(t.result || '—') + '</td><td class="small">' + esc(t.why || '') + '</td>' +
+          '<td class="src">' + tradeSourceHtml(t) + '</td></tr>';
+      }).join('') : '<tr><td colspan="11" class="muted">No simulated trades yet. The automatic paper model needs a fresh, executable quote and a matching strategy signal.</td></tr>';
     }
-    state.listeners.push(paint);
-    paint();
+    state.listeners.push(paint); paint();
   };
 
   /* ============================================================== lifecycle */
@@ -1489,26 +1503,27 @@
     stopPolling();
     var s = settings();
     state.pollTimer = setInterval(function () {
-      pollPrices().then(function () {
-        settleTrades();
-        autoTradeStep();
+      pollPrices().then(function (result) {
+        if (result !== null) { settleTrades(); autoTradeStep(); }
         emit('poll-done');
       });
     }, Math.max(2000, s.pollMs));
-    pollPrices().then(function () { settleTrades(); autoTradeStep(); emit('poll-done'); });
+    pollPrices().then(function (result) { if (result !== null) { settleTrades(); autoTradeStep(); } emit('poll-done'); });
   }
   function stopPolling() {
     if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
   }
 
   function startUniverseRefresh() {
+    if (state.universeTimer) clearInterval(state.universeTimer);
+    if (state.chartTimer) clearInterval(state.chartTimer);
     state.universeTimer = setInterval(function () { refreshUniverse(); }, 10 * 60 * 1000);
 
     /* Chart accumulation while the tab is open. detectSwing() records one [time, price] point per
      * market per poll, but the market page only redrew the chart after an explicit action (window
      * button, ticker change, resize). A trader watching a market therefore saw a chart that did
      * not move even though the poller was collecting points behind it. This redraws the chart and
-     * the book ~5 times a second at most, only when this is the market page and only if it exists,
+     * the book once per 5 seconds at most, only when this is the market page and only if it exists,
      * and it never re-renders the tables (which would fight the reader's own scrolling). */
     if (currentPage() === 'market') {
       state.chartTimer = setInterval(function () {
@@ -1525,20 +1540,23 @@
 
     /* Each page renderer binds its own controls and listeners, so it must run exactly once.
      * It runs after the snapshot is available (the snapshot is the fallback when the live API is unreachable). */
+    var connecting = false;
+    function connect() {
+      if (connecting) return Promise.resolve(false);
+      connecting = true;
+      return probe().then(function (live) {
+        if (!live) return false;
+        startPolling(); startUniverseRefresh();
+        return refreshUniverse().then(function () { emit('universe'); return true; });
+      }).finally(function () { connecting = false; });
+    }
     loadSnapshot().then(function () {
       if (pages[page]) pages[page]();
+      return connect();
     });
-
-    probe().then(function (live) {
-      emit('mode');
-      if (live) {
-        return refreshUniverse().then(function () {
-          startPolling();
-          startUniverseRefresh();
-          emit('universe');
-        });
-      }
-    });
+    state.recoveryTimer = setInterval(function () {
+      if (state.mode === 'snapshot') connect();
+    }, 60000);
 
     window.addEventListener('resize', function () {
       emit('resize');
@@ -1550,7 +1568,9 @@
       api: { get: apiGet },   /* no signed/browser-side key handling: keys never reach the browser (see demo-account) */
       roi: roiOf, portfolioStats: portfolioStats, settings: settings, saveSettings: saveSettings,
       getTrades: getTrades, setTrades: setTrades, getAlerts: getAlerts, setAlerts: setAlerts,
-      refPrice: refPrice, detectSwing: detectSwing, emit: emit
+      refPrice: refPrice, detectSwing: detectSwing, emit: emit, normMarket: normMarket,
+      paper: { record: recordPaperTrade, step: autoTradeStep, settle: settleTrades },
+      pollPrices: pollPrices, trackedTickers: trackedTickers
     };
   }
 

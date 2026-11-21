@@ -13,6 +13,7 @@
  * Skips (exit 0, with a message) when jsdom is not installed.
  */
 import { fileURLToPath } from 'node:url';
+import { auditHtml } from './check-row-sources.mjs';
 import { dirname, join } from 'node:path';
 import { existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 
@@ -293,6 +294,19 @@ console.log('Test 2 — strategylab.html categorises trades, computes P&L, synth
   const synth = await waitFor(() => doc.querySelector('#synthesis .card.idea, #synthesis .notice'), 'synthesis output');
   ok(synth.classList.contains('idea'), 'synthesis emitted a rule hypothesis for the 3-win cell');
   ok(/hypothesis only/.test(doc.querySelector('#synthesis').textContent), 'synthesis labelled hypothesis-only');
+  ok(auditHtml(doc.documentElement.outerHTML).missing.length === 0, 'every runtime lab row has a publisher/field-definition link, not an invented market lookup');
+  ok(/Unverified legacy/.test(doc.body.textContent), 'legacy performance is prominently separated from canonical results');
+  const oldSeed = [...doc.querySelectorAll('#trade-table tbody tr')].find((r) => r.textContent.includes('KXDEMOFUTHOURLY'));
+  ok(oldSeed && /unknown/.test(oldSeed.textContent), 'settled legacy record without close time has unknown holding band, not a fabricated current close');
+  const seed = doc.querySelector('#f-seed'); seed.checked = false;
+  seed.dispatchEvent(new dom.window.Event('change', { bubbles: true }));
+  const cards = doc.querySelector('#lab-cards').textContent;
+  ok(cards.includes('4') && !doc.querySelector('#trade-table').textContent.includes('KXDEMOFUTHOURLY'), 'excluding seeds also updates summary cardinality and log');
+  const topic = doc.querySelector('#f-topic'); topic.value = 'gas';
+  topic.dispatchEvent(new dom.window.Event('change', { bubbles: true }));
+  ok(!doc.querySelector('#stat-tables').textContent.includes('momentum'), 'topic filter reaches all aggregate tables');
+  ok(!doc.querySelector('#synthesis .card.idea'), 'topic filter cannot leave hypotheses based on hidden trades');
+  ok(!doc.querySelector('#stat-tables').textContent.includes('$0.00'), 'unknown P&L for an open-only group is blank, never a fabricated zero');
   ok(errors.length === 0, 'no unexpected script errors (' + errors.join(' | ') + ')');
   dom.window.close();
 }

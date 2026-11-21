@@ -1,5 +1,193 @@
 # COORDINATION.md — shared task board
 
+## Session session-135bb43a — final integration and executable paper-trading verification (2026-11-21)
+
+- Arena-pinned branch: `arena/135bb43a-kalshidash1`, base `b81f9f2731a12fd90e0287cd1d77ded58c35d79e`.
+- Reviewed the existing board, repository and open PRs before implementation. Only open PR is
+  [#72](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/72), owned by session-e7260519,
+  last updated 2026-11-21T20:46:57Z (>60 minutes before this claim at 23:10 UTC).
+  Its feature work is done but site-qa failed. **Stale-claim handoff:** this session takes over
+  final integration/QA of that existing work (preserving its commits) on the assigned branch;
+  it will not recreate its model fix or push to the other session's branch.
+- No other open PR claims the new simulator/graph checks below. Historical merged claims are
+  retained as records, not treated as active locks. Shared generated pages will be changed only
+  by the final integration generator, after the source changes have passed their tests.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| I1 | Claim scope, commit and push immediately; preserve prior session work. | done | session-135bb43a | this section of `COORDINATION.md` |
+| I2 | Integrate stale PR #72, reproduce/fix its failed check, re-verify model/alert outputs without inventing data. | done (integrated main; 17 retained-score checks) | session-135bb43a (final integration) | PR #72's existing files via merge; targeted QA fixes as evidenced |
+| I3 | Fix canonical browser simulator only where defects are reproduced: executable YES/NO asks and quantities, no stale/snapshot assumed fills, verifiable performance accounting and final settlement; add offline regression tests. | done (53 paper / 31 DOM; live fills unverified) | session-135bb43a | `assets/app.js`, new `assets/paper.js`, new `scripts/check-paper.mjs`, `package.json`, `.github/workflows/site-qa.yml`, `templates/{market,portfolio,analysis,strategies,executive-summary,flagged}.tpl` |
+| I4 | Verify graph time/source semantics and event links; fix demonstrated issues, not infer news causation. | done (31 DOM; causes stay unverified) | session-135bb43a | `assets/chart.js`, `assets/app.js`, new `scripts/check-market-chart.mjs`, `templates/market.tpl` |
+| I5 | Full requirement/source audit, source-linked report, canonical site build, per-row official-source checks, internal-link checks, integration PR to main, merge and Pages confirmation. | QA done; PR #91 merge/Pages pending | session-135bb43a (final integration) | new `verification/2026-11-21-135bb43a.md`, `README.md`, this board; generated root/category HTML through `scripts/build-site.mjs` only |
+
+### Integration conflict and handoff log
+
+- Merging PR #72 into this session branch conflicted in `COORDINATION.md` and the generated
+  `data/live/feed.json`. **Stopped before continuing implementation:** both board sections are
+  preserved in full. For generated data, keep main's newer 22:26:12Z official sample, then
+  re-score only model-derived values with the incoming model; do not text-merge prices/history
+  from the older 20:42Z sample. Original scores stay recorded. The engine's persisted state must
+  receive the same deterministic migration; `data/live/state.json` and a reproducible migration
+  script are added to I2's file scope. No API-sample timestamp is advanced by an offline re-score.
+- The previously failed `site-qa` run 44948084471 was independently re-run (attempt 2) and is now
+  successful, with no PR-head change (`8d54759`). Its raw earlier logs are blocked by sandbox
+  egress to Actions log storage. Exact original failure is unverified; no invented root cause
+  or unrelated "fix" will be claimed. PR #72 still conflicts with main and needs integration.
+
+- Main advanced with documentation-only PR #74 during integration. A flattening rebase
+  attempted to replay PR #72's already-preserved commit history, so it was aborted without
+  dropping any work; a merge of main preserved both histories instead. The only conflict in
+  that merge is this board, resolved by keeping both sessions' sections. Future pre-push
+  `git pull --rebase` targets this session's own remote branch, not main, so the imported PR
+  commits are not rewritten. Main is integrated by merge on this branch only.
+
+- I3 dependency scope addition: every canonical template's script list, category script list in
+  `scripts/build-site.mjs`, and `audit/index.html` load the new dependency-free paper rules
+  before `app.js`. No other page content is changed under that dependency-only scope. Source
+  audits and copy for the actual paper/market pages remain this session's integration scope.
+
+### Implementation verification checkpoint
+
+- Pure paper model: 53 offline regression cases pass. Canonical chart/paper DOM: 31 cases pass
+  with synthetic fixtures, including automatic strategy execution, snapshot rejection, quantity
+  sharing, final-only settlement, exact source URLs, candle reads, chart bounds and automatic
+  public-data recovery. Tests contain synthetic values only; no fixture is published as data.
+- New finding IDs use namespaces `F-PAPER-01`, `F-PAPER-02`, `F-CHART-01`, because the concurrent
+  PR #79 owns F-75–F-77. Those findings are appended with official source links, not renumbered.
+- PR #72 has meanwhile been integrated to main by other sessions (#73/#75/#76). This branch
+  preserves the same feature commits and will incorporate latest main rather than replacing its
+  newer official sample with our earlier offline model migration. PR #79's staleness-check and
+  retained-test repairs are the other owner's scope; this session does not recreate them.
+
+### Latest-main integration conflict log (PRs #73–#79)
+
+- Stopped on merge conflicts rather than overwriting concurrent work. Kept both board sections;
+  accepted main's current engine, freshness runtime, historical annotator and retained-model
+  tests; unioned both QA steps and npm scripts. Main's corrected ladder labels are preserved
+  with this session's additional source column. Other templates were automatically combined.
+- **Derived data:** kept main's real API sample `generated_at 2026-11-21T23:18:26.000Z`
+  verbatim (feed + state), not this branch's older 22:26Z offline migration. Incoming snapshot
+  capture is retained. All generated HTML is rebuilt from the combined templates/data.
+- Main now supplies a superior `scripts/rescore-feed.mjs` with age-penalty preservation. The
+  one-use integration script created here (`rescore-persisted-model.mjs`) is removed rather
+  than publishing two competing migration methods. No other's file is removed.
+
+### Final audit scope extension (claimed before edits)
+
+- I5 now includes the canonical `templates/{dashboard,suggestions,questions,strategylab}.tpl`,
+  `scripts/check-row-sources.mjs`, and the shared generator's footer/navigation copy for documented
+  source/copy defects only. Final shared-table scope also includes `alerts/index.html`'s five
+  method rows (official field-definition links only), `templates/catalyst.tpl`'s S11 source,
+  `data/sources.json`'s attribution wording, and `audit/index.html`'s historical-ledger notice/links.
+  `assets/strategylab.js` is included for per-row project/field attribution and making its seed/topic
+  filters apply to aggregates as well as the log; it remains an explicitly unverified legacy lab,
+  not recertified canonical performance. PR #84 owns its data-writer workflow guard and PR #85
+  owns the alerts notice defect; those implementations are not touched.
+  The source gate currently accepts **any** anchor (even an internal
+  market link) as an "official source" and leaves non-data rows report-only. The final integration
+  will distinguish official field definitions from project-authored rules, add real publisher
+  links where applicable, and flag genuinely unverifiable legacy/seed results rather than call
+  them validated. No archived or other active session's implementation is taken over.
+- I3/I4 follow-up evidence: discovery copies an older last price into a fresh row when the new
+  response has no last, and snapshot-alert replay still uses `Number(null)`; both violate the
+  blank/observation-time contract. Regression tests and minimal corrections are within the
+  already-claimed `assets/app.js` and canonical test scope.
+- New safety-only scope: `tools/demo_trader.mjs`, new `scripts/check-demo-safety.mjs`,
+  `docs/DEMO_ACCOUNT.md`, and package/CI test wiring. Code inspection shows `KALSHI_API_ROOT` can
+  currently route signed "demo" orders to production or any host and `--count 0` passes. This
+  violates the demo-only constraint. Enforce the two official demo roots before credentials or
+  network use; test with offline dry runs only. Also do not mark all failed authenticated reads
+  connected. No credential is requested and no exchange order is sent in these tests.
+- Latest open PR #77 is another session's board-only deployment ledger; that owner retains it.
+  PR #80 is merged. Shared source-table edits occur only in this final integration phase.
+
+### Source/safety completion checkpoint (before final merge)
+
+- `F-DEMO-01`: strict official-demo-only transport boundary before key/network use, validated
+  whole quantities/prices, no redirect or dry-run/confirm ambiguity, failed-auth captures remain
+  disconnected. **37 offline tests pass** with ephemeral keys/mock HTTP only. Current real account
+  snapshot is unchanged/disconnected; no authenticated exchange read/order made by this session.
+- `F-SOURCE-01`: any-anchor/report-only source gate replaced by publisher-aware checks on every
+  canonical static table, including suggestions, policy/schema and historical audit rows.
+  **10 positive/negative controls + 1,014 static rows, zero missing publisher links.** Links define
+  mechanics/project rules; this is not 1,014 independent live/semantic verifications. Normalized
+  capture provenance, historical statuses and project judgments are explicitly distinguished.
+- `F-OBS-01`: null replay prices and fresh relabeling of stale last prices fixed; interval volatility
+  corrected and missing/contradictory browser touches made ineligible. Replay scores stay unknown.
+  Engine/browser formulas remain different and labelled, never forecast ROI.
+- `F-LAB-01`: prominent unverified-legacy label; missing settled close/P&L stay blank; seed/topic/
+  strategy filters now affect all summaries/synthesis. Runtime source and behavior regressions pass.
+- Real headless Chromium 138 offline fallback smoke: 31 desktop/mobile page-viewport cases
+  passed, with actual canvas and snapshot-trade refusal. Screenshots inspected; corrected a
+  canonical-dashboard notice stuck in probing and added its regression. Not a live-network test.
+- `npm test` and `build-site --check` pass on the combined checkpoint (22 generated pages;
+  90 scanned pages / 2,185 internal links / 0 broken; 331 external URLs listed, not fetched).
+  [Dated source/requirement/report](verification/2026-11-21-135bb43a.md) now exists. I5 stays open
+  until latest-main integration, final re-test, own PR merge and actual Pages confirmation.
+
+### Latest-main integration (through PR #90) — conflicts resolved before continuation
+
+- Incoming main `0c63ad2` includes newer engine guard/rescore tests, the fetch-snapshot signing/
+  undocumented-parameter repair, the data-writer rebuild repair, and the standalone alerts
+  probing/feed notice fix. Those owner implementations are kept, not recreated.
+- Conflicts were in the generated pages, the end of the flags table and book-summary formatting.
+  Kept both board histories. Kept main's newer F-71/F-75 wording plus this session's publisher
+  attribution, appended all incoming F-78–F-81 rows under their existing IDs, and retained our
+  namespaced findings. The stricter source gate found incoming F-79/F-81 had internal links only; added their actual
+  project-author implementation URLs without changing either finding. All 1,018 static rows
+  now have publisher links (field/project definitions, not 1,018 fresh data verifications).
+- Kept main's four-decimal subpenny book summary repair alongside our observation timestamp,
+  null-level filtering, source links and quantity precision. Generated HTML is rebuilt only.
+- API data is verified byte-for-byte equal to incoming main: feed/state
+  **2026-11-21T23:33:35.000Z**, snapshot **2026-11-21T23:21:00.999Z**. No older sample or offline
+  re-score overwrites a later capture. Full tests are rerun before committing this merge.
+
+### PR #84 integration / final release candidate
+
+- Reviewed all eight successful checks for PR #84 head `6acdc718` and explicitly merged the
+  completed PR as `dd735218` at 2026-11-21T23:42:47Z. It hardens the already-merged best-effort
+  writer repair: mandatory rebuild before staging, retry rebuild on conflict, and post-push
+  `--check`, plus 20 offline guard assertions with negative controls. It is not a replacement
+  for another owner's work; its F-80 row credits the prior repair.
+- Merge conflicts: unioned `test:writers` with all paper/chart/demo/source tests and preserved
+  both board histories. Kept F-80 follow-up content verbatim but moved its long explanation
+  from the ID cell into the description cell for readable shared-table layout. Kept every
+  other finding including F-81's added publisher pointer. Regenerated `flagged.html` only.
+- Minor already-scoped quantity contract: a combined touch count is now blank when either
+  side's count is unknown, while the explicitly project-authored liquidity component scores
+  missing evidence zero. The existing missing-touch regression now pins both distinctions.
+- No feed/state/snapshot change is introduced by this merge. Full combined tests are rerun.
+
+### PR #91 release candidate
+
+- Created [PR #91](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/91) from the assigned branch;
+  first head `7e13f39` passed build/site/suite/alerts/live-sample checks. Real Chromium 31-case
+  desktop/mobile fallback suite also passed after PR #84 integration.
+- Merged main's newer official engine commit `557421e` cleanly before release: feed/state
+  `2026-11-21T23:43:29.000Z` verbatim, still 40 alerts / 3 model-selected high-ROI / 0 resolutions /
+  4 awaiting / 60 markets / 8 books. Snapshot remains `2026-11-21T23:21:00.999Z`.
+- Full `npm test`, read-only build, freshness 81, workflow syntax 9, concurrency 31, keepalive 27
+  pass again; 1,018 publisher-linked static rows / zero missing; 2,198 internal links / zero
+  broken; 336 external URLs listed (not fetched). I5 awaits actual own merge/deployment evidence.
+
+### Initial evidence and limits
+
+- Official [demo environment](https://docs.kalshi.com/getting_started/demo_env) re-read: recommended
+  and alternate REST/WebSocket URLs match the brief; mock funds and separate credentials confirmed.
+- Official [orderbook](https://docs.kalshi.com/api-reference/market/get-market-orderbook.md) re-read:
+  book publishes bids only; YES bid at X is NO ask at 1-X, with identical contract quantity.
+  Existing `assets/app.js` buys NO at `no_bid_dollars` and falls back to last trade price if a touch
+  is missing (reproduced by code inspection; regression test to follow).
+- Official [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets.md) re-read:
+  prices/status can be cached; missing data cannot be treated as a confirmed executable quote.
+- `data/account.json` currently says `connected: false`, `captured_at: null`; no account balances,
+  fills or performance can be verified. `gh secret list` is denied with HTTP 403 by integration
+  permissions, so actual repository-secret configuration is **unverified**, not asserted absent.
+  No credentials requested, exposed, or fabricated. Account trade execution stays gated.
+
+---
+
 ## Session session-75d8eb9c — final integration: verify PR #72, merge, confirm Pages (2026-11-21)
 
 Branch: `arena/75d8eb9c-kalshidash1` (base `b81f9f2` on `main`).
@@ -365,6 +553,8 @@ Reproduction detail is in `verification/2026-11-21-7dc87913.md` §4.
 | ID | Defect | Where | Outcome |
 |---|---|---|---|
 | V-01 | Unresolved git merge-conflict markers (`| V-03 | Imprecise wording: hero text said "122 matching series" but 122 is the number *tracked* (top 30/topic + culture's 2); the total *matching* series is 3,298 (`series_count_kept`). | `templates/index.tpl`, `templates/executive-summary.tpl`, `scripts/build-site.mjs` | **Unique to this session — retained.** Changed to "122 tracked series (top 30 per topic)" and wired a new `{{SERIES_KEPT_PER_TOPIC}}` placeholder. `main` did not have this fix. |
+| V-01 | Unresolved git merge-conflict markers (`| V-02 | Duplicate HTML ids on the Flagged page: the alert session appended five rows (F-27…F-31) that duplicated IDs already used by the first integration batch (F-01…F-33), producing invalid HTML and breaking `#F-28` anchor links. | `templates/flagged.tpl` | **Independently reconciled on `main` by session dd012e26** (flag list now F-01…F-56, no duplicates). My branch converged to `main`'s authoritative reconciliation. |
+| V-03 | Imprecise wording: hero text said "122 matching series" but 122 is the number *tracked* (top 30/topic + culture's 2); the total *matching* series is 3,298 (`series_count_kept`). | `templates/index.tpl`, `templates/executive-summary.tpl`, `scripts/build-site.mjs` | **Unique to this session — retained.** Changed to "122 tracked series (top 30 per topic)" and wired a new `{{SERIES_KEPT_PER_TOPIC}}` placeholder. `main` did not have this fix. |
 
 ### Unique contributions retained after convergence
 
@@ -2405,6 +2595,48 @@ session's `awaiting` key was regenerated from the committed `state.json` by its 
 - **Pages:** build for merge commit `b4f357f` — `status: built`, `error.message: null`, created 2026-11-21T20:39:18Z → updated 20:39:47Z ([Pages build API](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest)).
 - **Live-site spot check post-deploy:** `https://kanlerxz87-cyber.github.io/KalshiDash1/catalyst.html` serves the corrected text ("Get Events documents no `category` parameter… flag F-62") and the relabelled S9 source row with the official Get Events parameter-list link.
 - **Irregularities:** none new. F-62 is now marked "Corrected 2026-11-21" on `flagged.html`. The previously flagged stale-feed item was independently cleared by session-96019ad5 dispatching `live-alerts.yml` (run 44946124127 → commit `25885b9`); freshness at this session's final QA was FRESHNESS OK. Observations left open for a future scope (recorded in `verification/2026-11-21-c144ad6a.md`): undocumented `limit` on `/series` in `alerts/js/alerts-live.js` (`limit=200`) and `scripts/fetch_snapshot.mjs` (`limit=50`, some URLs published in `sources.html`); superseded `dash/`/`docs/` builds retain the old F-01 wording; dated K1 records keep the original text.
+## Session `arena/e7260519-kalshidash1` — live-alert credibility pass (claim, 2026-11-21)
+
+- Session ID: `session-e7260519`. Branch: `arena/e7260519-kalshidash1` (Arena-pinned; status `active`), base `f52ad08`.
+- Read the whole board first. `session-93edc454` is running a final-integration pass (`coord(93edc454): claim final
+  integration + verification pass (V1-V4)`, push 2026-11-21T~20:5xZ) and its commit is documentation-only
+  (`COORDINATION.md` / `verification/`) — it does **not** claim `tools/live_engine.mjs`, `alerts/js/*`,
+  `templates/flagged.tpl` or `verification/2026-11-21-e7260519.md`. The scopes below are therefore non-overlapping,
+  and this session will not edit workflow files, `templates/flagged.tpl`'s existing rows, or any other session's report.
+- If `session-93edc454`'s integration branch needs to absorb this work, the handoff is: merge this branch to `main`
+  after its PR, or cite this section. No files it owns are touched.
+
+### Task board — session-e7260519
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| L1 | Measure whether the alert feed's high-ROI chat is trustworthy. Finding: `data/live/feed.json` has 6 `model.highROI` rows; **5 are unfillable swings** (the published ask at detection was the opposite end of the book, e.g. `yes_ask $0.01` on a `$0.01 → $0.97` "up" alert), so the model's top-ranked signal is a phantom. Publish the measurement. | in progress | session-e7260519 | `verification/2026-11-21-e7260519.md` |
+| L2 | Fix the engine so a swing is only scoreable when the post-swing quote is **tradeable at the recorded price** (follow-through against the published bid/ask), and stop ranking non-public markets. Offline regression tests, negative-checked. | in progress | session-e7260519 | `tools/live_engine.mjs`, `scripts/check_alerts.mjs` |
+| L3 | Make every page state the **as-of time and measured age** of the feed in text (the badge ages client-side only, so a reader of a screenshot, a PDF or a frozen copy cannot tell a 3-minute-old sample from a 4-hour-old one). | in progress | session-e7260519 | `assets/freshness.js`, `templates/*.tpl` (header block only), regenerated HTML |
+| L4 | Publish the new irregularity + the reconcile note on the Flagged page, with source links, without disturbing any existing row. | in progress | session-e7260519 | `templates/flagged.tpl` (append rows only), regenerated `flagged.html` |
+| L5 | Rebuild the site, run the full QA battery, open the PR to `main`, merge, confirm the Pages build, and record PR + merge + deploy here. | in progress | session-e7260519 | this board, PR via `gh` |
+
+### Evidence gathered before claiming (official sources only)
+
+- Demo REST root `https://demo-api.kalshi.co/trade-api/v2` answers from this sandbox through the platform fetch
+  tool; `curl` is blocked by the sandbox egress policy (recorded in earlier sessions as R-02). Live probes used here:
+  [`/exchange/status`](https://demo-api.kalshi.co/trade-api/v2/exchange/status),
+  [`/markets/KXBTCY-27JAN0100-B97500`](https://demo-api.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500),
+  [`/markets/KXBTCY-27JAN0100-B97500/orderbook`](https://demo-api.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500/orderbook),
+  [`/markets/trades?ticker=KXBTCY-27JAN0100-B97500`](https://demo-api.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B97500&limit=8).
+- Reproduction (2026-11-21T19:34Z, official trade stream): 1–2 contract trades print **both** $0.0100 and $0.9700
+  inside one second, `no_price_dollars` 0.9900↔0.0300, `yes_bid_dollars` = 0.0000, and the orderbook holds only
+  `no_dollars` [0.0300 × 2,991,498.81 …] with `yes_dollars: []`. So the $0.01→$0.97 prints in the feed are
+  millisecond noise on an untraded book, not a move a trader could act on — and the committed high-ROI rows rank them.
+- `/markets/{ticker}` returns `exchange_index: 0`; brawl markets returned by `GET /markets` on the demo host carry
+  other exchange indices. Cross-check in progress before any claim about "public vs internal" is published.
+
+### Baseline QA on the claim commit's parent (so a later regression is attributable)
+
+`node scripts/build-site.mjs --check` PASS · `npm test` PASS (engine, feed 38 alerts, guard, page, 89 files / 549 ids,
+813 sourced rows, lab, links 90 pages / 2,124 links, 0 broken) · `python3 tools/linkcheck.py` PASS ·
+`node scripts/check_links.js` PASS. Feed sample at claim time: `generated_at 2026-11-21T17:42:16Z` (≈3 h old ⇒ beyond
+the project's own 45-minute stale limit; already flagged by session-549a3b66, not re-flagged here).
 
 ---
 

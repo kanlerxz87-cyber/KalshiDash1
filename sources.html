@@ -16,24 +16,23 @@
       <span id="clock" class="mono small muted"></span>
     </div>
   </div>
-  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
+  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Browser research dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
 </header>
 
 <main><div class="wrap">
   <div class="page-head">
     <div class="grow">
       <h1>Sources</h1>
-      <p class="sub">Every value on this site comes from one of these sources. <strong>16</strong> official
+      <p class="sub">Exchange field definitions and historical captures use this register; project rules and calculations are separately labelled. <strong>16</strong> official
       documentation pages, <strong>15</strong> demo API endpoints and
-      <strong>4</strong> third-party official sources named by the exchange itself.
-      Verified 2026-11-21 23:21:00 UTC.</p>
+      <strong>4</strong> external references named by the exchange (publisher authenticity is not automatically verified).
+      Snapshot captured 2026-11-21 23:21:00 UTC; each source below has its own verification date.</p>
     </div>
   </div>
 
   <div class="notice good">
     <strong>How to audit any number.</strong> Open the endpoint, read the row, and compare it with the value on the page.
-    The captured responses are committed in <code>data/snapshot.json</code>, so every table row on this site can be traced to the
-    exact response it came from without re-running anything.
+    Normalized captured values and request URLs are in <code>data/snapshot.json</code>, not the original raw HTTP bodies. Re-fetching a live endpoint may return changed values. Official definitions do not verify browser-local trades or a news cause.
   </div>
 
   <div class="table-wrap">
@@ -166,7 +165,7 @@
 <tr>
       <td><strong>GET /series?category=Culture</strong></td>
       <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&amp;include_volume=true" target="_blank" rel="noopener" class="srcline">https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&amp;include_volume=true</a></td>
-      <td>Culture series (for example &quot;Will Grok be banned this year&quot;) whose settlement sources are the named news organisations that decide the outcome.</td>
+      <td>Culture series returned by the official category query. Their API-published settlement-source strings include search/social URLs and must not automatically be treated as official publications; see F-34/F-35.</td>
       <td class="small muted">Called live on 2026-11-20; stored in data/snapshot.json under topics.culture.series.</td>
     </tr>
 <tr>
@@ -261,7 +260,7 @@
   <h2>Rules this site follows</h2>
   <div class="panel">
     <ol>
-      <li><strong>Nothing is inferred.</strong> If a value cannot be confirmed from one of the sources above, the cell is left
+      <li><strong>Missing exchange fields stay missing.</strong> If a value cannot be confirmed, the cell is left
       blank and the gap is listed on the <a href="flagged.html">Flagged for Review</a> page.</li>
       <li><strong>Every row carries its own provenance.</strong> Tables show the endpoint URL that produced the row, so a row can
       be re-fetched and compared directly.</li>
@@ -275,10 +274,10 @@
   <h2>Data capture</h2>
   <div class="panel">
     <p>The committed snapshot was produced by <code>scripts/fetch-snapshot.mjs</code>, which calls the public demo endpoints
-    directly and stores each response together with the exact request URL. It uses
+    directly and stores normalized fields with the exact request URL. It uses
     <strong>185</strong> endpoint calls and covers <strong>2975</strong> open markets across the five
     focus topics. A GitHub Actions job
-    (<code>.github/workflows/refresh-data.yml</code>) re-runs it on a schedule so the fallback data stays close to the live market.</p>
+    (<code>.github/workflows/refresh-data.yml</code>) re-runs it on a schedule on a best-effort basis; the published age, not the schedule, determines freshness.</p>
     <p class="small muted">To refresh it yourself on a machine that can reach the API:
     <code>node scripts/fetch-snapshot.mjs</code>. To rebuild the site from the templates:
     <code>node scripts/build-site.mjs</code>. To check internal links:
@@ -297,12 +296,13 @@
        <a href="sources.html">Sources</a> ·
        <a href="flagged.html">Flagged for review</a> ·
        <a href="COORDINATION.md">Coordination board</a></p>
-    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
-    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+    <p class="muted">Table rows link the relevant publisher or field definitions. Exchange observations, computed metrics and project rules are distinct; a source link does not verify a hypothetical fill or news cause.
+    Browser trades are local paper records, not exchange orders. Actual demo-account access is separate and credential-gated.</p>
     <p class="muted small">Canonical site: the pages in the navigation above. Two earlier builds are still published for
     reference only and are not kept up to date:
     <a href="dash/index.html">dash/</a> · <a href="docs/index.html">docs/</a>.</p>
   </div></footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/freshness.js"></script>
 </body>

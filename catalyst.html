@@ -17,7 +17,7 @@
       <span id="clock" class="mono small muted"></span>
     </div>
   </div>
-  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
+  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Browser research dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
 </header>
 
 <main><div class="wrap">
@@ -56,7 +56,7 @@ Get Events documents no <code>category</code> parameter, so no server-side categ
 <h2>Events &amp; official settlement sources</h2>
 <p class="muted small">These links come from the API's <code>settlement_sources</code> field on each event
 (<a href="https://docs.kalshi.com/api-reference/events/get-events" target="_blank" rel="noopener">Get Events ↗</a>) —
-they are the official sources tied to resolution, not inferred causes.</p>
+they are exchange-published source strings, not independently verified publishers or inferred causes. Search/social/placeholder URLs are flagged on <a href="flagged.html#F-34">Flagged for Review</a>.</p>
 <div id="event-sources"></div>
 
 <h2>How swings are detected (methodology)</h2>
@@ -84,12 +84,12 @@ they are the official sources tied to resolution, not inferred causes.</p>
 <tr><td>S3</td><td>Single-market endpoint <code>GET /markets/{ticker}</code></td><td><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">docs.kalshi.com/api-reference/market/get-market ↗</a></td></tr>
 <tr><td>S4</td><td>Events carry <code>title</code>, <code>category</code>, <code>settlement_sources[{name,url}]</code>, nested <code>markets</code></td><td><a href="https://docs.kalshi.com/api-reference/events/get-events" target="_blank" rel="noopener">docs.kalshi.com/api-reference/events/get-events ↗</a></td></tr>
 <tr><td>S5</td><td>1/60/1440-minute candles with <code>price.close_dollars</code></td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">docs.kalshi.com/api-reference/market/get-market-candlesticks ↗</a></td></tr>
-<tr><td>S6</td><td>Settlement pays $1 per winning contract; <code>result</code> = yes/no</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">docs.kalshi.com/getting_started/market_settlement ↗</a></td></tr>
+<tr><td>S6</td><td>Simple $1 binary settlement pays $1 per winning contract; scalar results follow different payout bounds</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">docs.kalshi.com/getting_started/market_settlement ↗</a></td></tr>
 <tr><td>S7</td><td>Demo environment: mock funds; prices may not reflect real markets; endpoint table (REST + WebSocket hosts)</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">docs.kalshi.com/getting_started/demo_env ↗</a></td></tr>
 <tr><td>S8</td><td>Back off on 429; unauthenticated requests have separate limits</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">docs.kalshi.com/getting_started/rate_limits ↗</a></td></tr>
 <tr><td>S9</td><td>Undocumented-parameter probe (2026-11-20): <code>/events?category=Crypto</code> — <code>category</code> is not a Get Events parameter, so the result proved nothing about a documented filter (reclassified as F-62; corrected 2026-11-21)</td><td><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener">docs.kalshi.com/api-reference/events/get-events (parameter list) ↗</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/events?category=Crypto&amp;status=open&amp;limit=3&amp;with_nested_markets=true" target="_blank" rel="noopener">earlier probe URL (undocumented parameter) ↗</a></td></tr>
 <tr><td>S10</td><td>Live probe: <code>/markets?limit=5&amp;status=open</code> response shape (fixed-point fields as documented)</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?limit=5&amp;status=open" target="_blank" rel="noopener">external-api.demo.kalshi.co … /markets?limit=5&amp;status=open ↗</a></td></tr>
-<tr><td>S11</td><td>Gas series map (AAA gasoline: Economics + "Oil and energy", <code>KXAAAGAS*</code>/<code>AAAGAS*</code>; diesel excluded)</td><td><a href="verification/2026-11-20-e6c3b3b6.md">verification/2026-11-20-e6c3b3b6.md</a> (V5–V9, with per-row live URLs)</td></tr>
+<tr><td>S11</td><td>Gas series map (AAA gasoline: Economics + "Oil and energy", <code>KXAAAGAS*</code>/<code>AAAGAS*</code>; diesel excluded)</td><td><a href="verification/2026-11-20-e6c3b3b6.md">verification/2026-11-20-e6c3b3b6.md</a> (historical mapping V5–V9) · <a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true">official series query</a></td></tr>
 </tbody></table></div>
 
 <p class="muted small">Unverified / blank by design: what <em>caused</em> any price move (the API has no news feed —
@@ -110,12 +110,13 @@ browser CORS behaviour varies — if live reads fail the page says so and falls 
        <a href="sources.html">Sources</a> ·
        <a href="flagged.html">Flagged for review</a> ·
        <a href="COORDINATION.md">Coordination board</a></p>
-    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
-    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+    <p class="muted">Table rows link the relevant publisher or field definitions. Exchange observations, computed metrics and project rules are distinct; a source link does not verify a hypothetical fill or news cause.
+    Browser trades are local paper records, not exchange orders. Actual demo-account access is separate and credential-gated.</p>
     <p class="muted small">Canonical site: the pages in the navigation above. Two earlier builds are still published for
     reference only and are not kept up to date:
     <a href="dash/index.html">dash/</a> · <a href="docs/index.html">docs/</a>.</p>
   </div></footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/catalyst.js" defer></script>
 <script src="assets/freshness.js"></script>

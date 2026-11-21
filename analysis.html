@@ -16,7 +16,7 @@
       <span id="clock" class="mono small muted"></span>
     </div>
   </div>
-  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
+  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Browser research dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
 </header>
 
 <main><div class="wrap">
@@ -31,18 +31,19 @@
 
   <div id="mode-notice" class="notice">Probing the official demo API…</div>
 
+  <div id="analysis-notice" class="notice" role="status"></div>
   <div class="grid cols-2">
     <div class="panel pad-0">
       <div style="padding:12px 14px 4px"><h3 style="margin:0">Performance by strategy</h3></div>
       <div class="table-wrap" style="border:0;border-radius:0">
-        <table class="compact"><thead><tr><th>Strategy</th><th class="num">Closed</th><th class="num">Open</th><th class="num">Win rate</th><th class="num">Total P&amp;L</th><th class="num">Avg trade</th></tr></thead>
+        <table class="compact"><thead><tr><th>Strategy</th><th class="num">Closed</th><th class="num">Open</th><th class="num">Win rate</th><th class="num">Total P&amp;L</th><th class="num">Avg gross trade</th><th>Source</th></tr></thead>
         <tbody id="strategy-stats"></tbody></table>
       </div>
     </div>
     <div class="panel pad-0">
       <div style="padding:12px 14px 4px"><h3 style="margin:0">Performance by topic</h3></div>
       <div class="table-wrap" style="border:0;border-radius:0">
-        <table class="compact"><thead><tr><th>Topic</th><th class="num">Closed</th><th class="num">Open</th><th class="num">Win rate</th><th class="num">Total P&amp;L</th></tr></thead>
+        <table class="compact"><thead><tr><th>Topic</th><th class="num">Closed</th><th class="num">Open</th><th class="num">Win rate</th><th class="num">Gross P&amp;L</th><th>Source</th></tr></thead>
         <tbody id="topic-stats"></tbody></table>
       </div>
     </div>
@@ -51,14 +52,14 @@
   <h2>Every simulated trade</h2>
   <div class="table-wrap">
     <table class="compact">
-      <thead><tr><th>Time</th><th>Market</th><th>Topic</th><th>Strategy</th><th>Side</th><th class="num">Contracts</th><th class="num">Entry</th><th>P&amp;L</th><th>Result</th><th>Why it was taken</th></tr></thead>
+      <thead><tr><th>Time</th><th>Market</th><th>Topic</th><th>Strategy</th><th>Side</th><th class="num">Contracts</th><th class="num">Entry</th><th>P&amp;L</th><th>Result</th><th>Why it was taken</th><th>Source</th></tr></thead>
       <tbody id="analysis-body"></tbody>
     </table>
   </div>
 
   <h2>Trade categories used by this page</h2>
   <div class="panel">
-    <p>A trade is categorised twice, and both tags come from public API fields:</p>
+    <p>A paper trade is categorised twice. These are project tags, not exchange recommendations:</p>
     <ul>
       <li><strong>Strategy</strong> — which rule fired (momentum, mean reversion, favorite, longshot, volume catalyst, or manual).</li>
       <li><strong>Topic</strong> — the focus topic of the series the market belongs to, taken from the series query that
@@ -83,12 +84,13 @@
        <a href="sources.html">Sources</a> ·
        <a href="flagged.html">Flagged for review</a> ·
        <a href="COORDINATION.md">Coordination board</a></p>
-    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
-    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+    <p class="muted">Table rows link the relevant publisher or field definitions. Exchange observations, computed metrics and project rules are distinct; a source link does not verify a hypothetical fill or news cause.
+    Browser trades are local paper records, not exchange orders. Actual demo-account access is separate and credential-gated.</p>
     <p class="muted small">Canonical site: the pages in the navigation above. Two earlier builds are still published for
     reference only and are not kept up to date:
     <a href="dash/index.html">dash/</a> · <a href="docs/index.html">docs/</a>.</p>
   </div></footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/freshness.js"></script>
 </body>

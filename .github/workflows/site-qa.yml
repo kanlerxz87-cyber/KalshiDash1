@@ -38,8 +38,8 @@ jobs:
         run: node scripts/check-links.mjs
 
       # The brief's rule: every published data row carries a source link. Measured, not assumed.
-      - name: Every enforced data row has a source link
-        run: node scripts/check-row-sources.mjs
+      - name: Every canonical table row has a publisher link (with negative controls)
+        run: npm run test:rows
 
       # Duplicate element ids are invalid HTML and break in-page anchors. Three copies reached
       # production before this check existed (F-64).
@@ -94,6 +94,7 @@ jobs:
       - name: Retained alerts are re-scored with the current model
         run: node scripts/check_rescore_retained.mjs
 
+
       # session-4b5ddd87: the feed is what the published site reads. If MODEL_VERSION moves and the
       # scheduled engine does not run (F-55/F-58), the site would keep publishing old verdicts under
       # a new version label. This re-scores the committed files offline and fails on any drift.
@@ -105,6 +106,12 @@ jobs:
 
       - name: Catalyst + strategy lab render tests (jsdom)
         run: node scripts/check_lab.mjs
+
+      - name: Canonical paper execution and chart provenance regressions (offline)
+        run: npm run test:paper && npm run test:chart
+
+      - name: Demo-only execution boundary and signing (offline; no keys or orders)
+        run: npm run test:demo-safety
 
       - name: Python tool syntax
         run: python -m py_compile tools/*.py

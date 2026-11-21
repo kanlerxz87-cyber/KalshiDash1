@@ -37,17 +37,22 @@
 
   <h2>Price over time</h2>
   <p class="sub">X axis is time, Y axis is the contract price in dollars. The window buttons change the time span;
-  the dashed lines mark the swing-alert threshold and its mirror image.</p>
+  gold markers flag an observed change of at least $0.10, not an absolute $0.10 price level.</p>
   <div class="chart-box">
     <div class="toolbar" style="margin:0 0 10px" id="window-btns"></div>
-    <canvas id="price-chart" class="tall"></canvas>
+    <canvas id="price-chart" class="tall" role="img" aria-label="YES contract price over UTC time; sourced jump rows follow"></canvas>
+    <p id="chart-status" class="small muted" role="status"></p>
     <div class="chart-legend">
       <span><i style="background:#00dd94"></i>YES contract price</span>
-      <span><i style="background:#f5a524"></i>alert threshold</span>
+      <span><i style="background:#f5a524"></i>observed ≥ $0.10 change</span>
       <span class="muted" id="m-liquidity">—</span>
       <span class="muted">ROI score: <b id="m-roi">—</b></span>
     </div>
   </div>
+
+  <h3>Price-jump observations and event links</h3>
+  <p class="small muted">Computed differences between published observations, not verified news causes. A line between samples does not reveal what happened between them. Settlement-source links identify rule sources, not explanations of a move. <a href="flagged.html#F-22">Causation remains unverified</a>.</p>
+  <div class="table-wrap"><table class="compact"><thead><tr><th>Time (UTC)</th><th class="num">From → To</th><th class="num">Change ($)</th><th>Observation basis</th><th>Verified cause</th><th>Sources / research</th></tr></thead><tbody id="price-events"></tbody></table></div>
 
   <div class="grid cols-2">
     <div class="panel pad-0">
@@ -56,12 +61,10 @@
       <div class="table-wrap" style="border:0;border-radius:0">
         <table class="ladder"><thead><tr>
           <th>YES bid</th><th class="num">Contracts</th><th>→ NO ask <span class="muted">(1 − YES bid)</span></th>
-          <th>NO bid</th><th class="num">Contracts</th><th>→ YES ask <span class="muted">(1 − NO bid)</span></th><th></th></tr></thead>
+          <th>NO bid</th><th class="num">Contracts</th><th>→ YES ask <span class="muted">(1 − NO bid)</span></th><th></th><th>Source</th></tr></thead>
           <tbody id="book-body"></tbody></table>
         <p class="small muted" style="padding:0 14px 12px">A YES ask is <code>1 − NO bid</code>, which is the
-        relation the exchange documents for a binary book. Both executable sides are shown because a
-        one-sided book (a bid with no offer, or an offer with no bid) means the headline price cannot be
-        traded — that is exactly the condition the high-ROI model now refuses to score.</p>
+        relation the exchange documents for a binary book. Each derived ask shares the quantity of its complementary bid. A one-sided book may expose only one direction: do not assume missing opposite-side depth. A point-in-time book is not a guaranteed fill. <a href="https://docs.kalshi.com/getting_started/orderbook_responses">Official book mechanics</a>.</p>
       </div>
     </div>
     <div class="panel">
@@ -73,11 +76,11 @@
       <div class="table-wrap">
         <table>
           <tbody>
-            <tr><th>Result</th><td id="m-result-cell">—</td></tr>
-            <tr><th>Settlement value</th><td id="m-settle-value">—</td></tr>
-            <tr><th>Settled at</th><td id="m-settle-ts">—</td></tr>
-            <tr><th>Rules</th><td class="small"><span id="m-rule-text">—</span></td></tr>
-            <tr><th>Source</th><td id="m-settle-src" class="src">—</td></tr>
+            <tr><th>Result</th><td id="m-result-cell">—</td><td class="market-field-source src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">field definition; value unverified</a></td></tr>
+            <tr><th>Settlement value</th><td id="m-settle-value">—</td><td class="market-field-source src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">field definition; value unverified</a></td></tr>
+            <tr><th>Settled at</th><td id="m-settle-ts">—</td><td class="market-field-source src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">field definition; value unverified</a></td></tr>
+            <tr><th>Rules</th><td class="small"><span id="m-rule-text">—</span></td><td class="market-field-source src"><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">field definition; value unverified</a></td></tr>
+            <tr><th>Source</th><td id="m-settle-src" class="src"><a href="https://docs.kalshi.com/api-reference/market/get-market">field definition; value unverified</a></td></tr>
           </tbody>
         </table>
       </div>
@@ -102,19 +105,20 @@
   <h2>Simulated trade</h2>
   <div class="panel">
     <p class="small muted">This records a <strong>paper</strong> trade in your browser against the live price. It never sends an
-    order to Kalshi. To place a real order on the demo exchange, use the
-    <a href="demo-account.html">Demo account</a> page with your own API key.</p>
+    order to Kalshi. It requires a fresh live ask and enough observed contracts; snapshot data cannot create a fill.
+    The <a href="demo-account.html">Demo account</a> page is a separate, read-only account snapshot; signing keys never enter this browser.</p>
     <form id="trade-form" class="row" style="margin-top:10px">
       <div><label for="t-side">Side</label><select id="t-side"><option value="yes">Yes</option><option value="no">No</option></select></div>
-      <div><label for="t-qty">Contracts</label><input type="number" id="t-qty" value="10" min="1" step="1"></div>
+      <div><label for="t-qty">Contracts</label><input type="number" id="t-qty" value="10" min="1" max="1000" step="1" required></div>
       <div><label for="t-strategy">Strategy</label><select id="t-strategy"></select></div>
       <div class="shrink"><button class="btn primary" type="submit">Record paper trade</button></div>
     </form>
-    <p id="trade-msg" class="small"></p>
+    <p id="trade-msg" class="small" role="status" aria-live="polite"></p>
   </div>
 </div></main>
 
 <footer class="site">{{FOOTER}}</footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/chart.js"></script>
 <script src="{{BASE}}assets/freshness.js"></script>

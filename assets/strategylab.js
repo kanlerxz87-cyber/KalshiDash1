@@ -30,7 +30,7 @@
         return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
       });
   }
-  function num(v) { if (v === '' || v === null || v === undefined) return null; var n = parseFloat(v); return Number.isFinite(n) ? n : null; }
+  function num(v) { if (v === null || v === undefined || typeof v === 'boolean' || (typeof v === 'string' && !v.trim())) return null; var n = Number(v); return Number.isFinite(n) ? n : null; }
   function usd(v, d) {
     var n = num(v);
     return n === null ? '<span class="muted">—</span>' : (n < 0 ? '-$' : '$') + Math.abs(n).toFixed(d === undefined ? 2 : d);
@@ -54,7 +54,7 @@
     return {
       id: String(t.id || ''),
       ts_open: t.ts || t.entry_ts || '',
-      ts_close: (t.status === 'settled' || t.status === 'closed') ? (t.ts_close || '') : '',
+      ts_close: (t.status === 'settled' || t.status === 'closed') ? (t.ts_close || t.settled_ts || '') : '',
       ticker: String(t.ticker || ''),
       event_ticker: String(t.event_ticker || ''),
       series_ticker: String(t.series_ticker || ''),
@@ -71,7 +71,8 @@
       result: String(t.result || ''),
       pnl_recorded: num(t.pnl),
       fees_recorded: num(t.fee),
-      engine: t.auto ? 'dash-store-v1 (auto-trade engine, session-815b546d)' : 'dash-store-v1',
+      engine: t.execution_model || (t.auto ? 'legacy local v1 auto record (unverified)' : 'legacy local v1 record (unverified)'),
+      source_url: t.quote && t.quote.source_url || t.source_url || '',
       seed: !!t.seed,
       notes: ''
     };
@@ -99,6 +100,7 @@
       pnl_recorded: num(t.pnl_dollars !== undefined ? t.pnl_dollars : t.pnl_recorded),
       fees_recorded: num(t.fees_dollars !== undefined ? t.fees_dollars : t.fees_recorded),
       engine: String(t.engine || 'unknown'),
+      source_url: String(t.source_url || ''),
       seed: !!t.seed,
       notes: String(t.notes || '')
     };
@@ -151,9 +153,10 @@
     if (!t.ts_open) return null;
     var a = Date.parse(t.ts_open);
     if (isNaN(a)) return null;
+    if ((t.status === 'settled' || t.status === 'closed') && !t.ts_close) return null;
     var b = t.ts_close ? Date.parse(t.ts_close) : Date.now();
-    if (isNaN(b)) b = Date.now();
-    return Math.max(0, (b - a) / 3600000);
+    if (!Number.isFinite(b) || b < a) return null;
+    return (b - a) / 3600000;
   }
   function priceBand(p) {
     if (p === null) return 'unknown';
@@ -180,7 +183,7 @@
        else $0 (Market Settlement doc) → (payout − entry) × count
      Fees are NOT folded in unless recorded separately. */
   function pnlComputed(t) {
-    if (t.entry === null || t.count === null) return null;
+    if (t.entry === null || t.entry < 0 || t.entry > 1 || t.count === null || t.count <= 0) return null;
     if (t.exit !== null) return (t.exit - t.entry) * t.count;
     if (t.status === 'settled' && (t.result === 'yes' || t.result === 'no') && t.outcome) {
       var win = t.result === t.outcome ? 1 : 0;
@@ -236,16 +239,16 @@
       return '<tr><td>' + esc(g.key) + '</td><td class="num">' + g.n + '</td><td class="num">' + g.settled + '</td>' +
         '<td class="num">' + g.wins + '</td><td class="num">' + g.losses + '</td>' +
         '<td class="num">' + pct(g.winRate) + '</td>' +
-        '<td class="num">' + usd(g.pnl_rec) + (g.rec_n ? '' : ' <span class="muted">(none recorded)</span>') + '</td>' +
-        '<td class="num">' + usd(g.pnl_comp) + ' <span class="badge neutral">computed</span></td>' +
+        '<td class="num">' + usd(g.rec_n ? g.pnl_rec : null) + (g.rec_n ? '' : ' <span class="muted">(none recorded)</span>') + '</td>' +
+        '<td class="num">' + usd(g.comp_n ? g.pnl_comp : null) + ' <span class="badge neutral">computed</span></td>' +
         '<td class="num">' + usd(g.avgEntry) + '</td>' +
-        '<td class="num">' + (g.avgHold === null ? '—' : g.avgHold.toFixed(1) + ' h') + '</td></tr>';
+        '<td class="num">' + (g.avgHold === null ? '—' : g.avgHold.toFixed(1) + ' h') + '</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement">payout definition only</a> · local arithmetic, unverified fills</td></tr>';
     }).join('');
     return '<h3>' + esc(caption) + '</h3><div class="table-wrap"><table><thead><tr>' +
       '<th>' + esc(keyLabel) + '</th><th class="num">Trades</th><th class="num">Settled</th><th class="num">Wins</th>' +
       '<th class="num">Losses</th><th class="num">Win rate</th><th class="num">P&amp;L (recorded)</th>' +
-      '<th class="num">P&amp;L (computed)</th><th class="num">Avg entry</th><th class="num">Avg hold</th>' +
-      '</tr></thead><tbody>' + (body || '<tr><td colspan="10" class="muted">No trades in this group.</td></tr>') + '</tbody></table></div>' +
+      '<th class="num">P&amp;L (computed)</th><th class="num">Avg entry</th><th class="num">Avg hold</th><th>Field semantics, not trade verification</th>' +
+      '</tr></thead><tbody>' + (body || '<tr><td colspan="11" class="muted">No trades in this group.</td></tr>') + '</tbody></table></div>' +
       '<p class="muted small">Metrics computed from simulated trades in this browser. P&amp;L (computed) = (exit − entry) × count when an exit price is recorded, ' +
       'else ($1 payout if the held outcome matches <code>result</code>, else $0 − entry) × count for settled trades ' +
       '(settlement semantics: <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement ↗</a>).</p>';
@@ -297,22 +300,24 @@
   /* ---------------- trade table ---------------- */
   var filterState = { topic: '', strategy: '', includeSeed: true };
 
+  function filtered(trades) {
+    return trades.filter(function (t) {
+      return (filterState.includeSeed || !t.seed) && (!filterState.topic || t.topic === filterState.topic)
+        && (!filterState.strategy || t.strategy === filterState.strategy);
+    });
+  }
   function renderTrades(trades) {
     var host = $('#trade-table');
     if (!host) return;
-    var rows = trades.filter(function (t) {
-      if (!filterState.includeSeed && t.seed) return false;
-      if (filterState.topic && t.topic !== filterState.topic) return false;
-      if (filterState.strategy && t.strategy !== filterState.strategy) return false;
-      return true;
-    });
+    var rows = filtered(trades);
     host.innerHTML = '<div class="table-wrap"><table><thead><tr>' +
       '<th>Opened</th><th>Ticker</th><th>Title</th><th>Topic</th><th>Strategy</th><th>Outcome held</th>' +
       '<th class="num">Count</th><th class="num">Entry</th><th class="num">Exit</th><th>Status</th><th>Result</th>' +
       '<th class="num">P&amp;L recorded</th><th class="num">P&amp;L computed</th><th>Band tags</th><th>Provenance</th><th>Source</th>' +
       '</tr></thead><tbody>' +
       (rows.map(function (t) {
-        var src = 'https://external-api.demo.kalshi.co/trade-api/v2/markets/' + encodeURIComponent(t.ticker);
+        var hasSource = window.KDPaper && window.KDPaper.official(t.source_url);
+        var src = hasSource ? t.source_url : 'https://docs.kalshi.com/api-reference/market/get-market';
         return '<tr>' +
           '<td>' + esc(t.ts_open || '—') + '</td>' +
           '<td>' + esc(t.ticker || '—') + '</td>' +
@@ -329,7 +334,7 @@
           '<td class="num">' + usd(t.pnl_computed) + (t.pnl_mismatch ? ' <span class="badge warn">differs from recorded</span>' : '') + '</td>' +
           '<td class="small">' + esc(t.price_band) + ' · ' + esc(t.hold_band) + ' · ' + esc(t.size_band) + '</td>' +
           '<td class="small">' + esc(t.engine) + (t.seed ? ' <span class="badge warn">seed</span>' : '') + '</td>' +
-          '<td><a href="' + esc(src) + '" target="_blank" rel="noopener" title="Official Kalshi demo API market endpoint for this ticker">market ↗</a></td>' +
+          '<td><a href="' + esc(src) + '" target="_blank" rel="noopener" title="Field definitions never verify a local trade">' + (hasSource ? 'stored API pointer; fill unverified' : 'field definition; no fill evidence') + '</a></td>' +
           '</tr>';
       }).join('') || '<tr><td colspan="16" class="muted">No trades match the filters (or none stored yet).</td></tr>') +
       '</tbody></table></div>';
@@ -339,10 +344,10 @@
   function renderSources(sources) {
     var host = $('#stores');
     if (!host) return;
-    host.innerHTML = '<div class="table-wrap"><table><thead><tr><th>localStorage key</th><th class="num">Trades found</th><th>Notes</th></tr></thead><tbody>' +
+    host.innerHTML = '<div class="table-wrap"><table><thead><tr><th>localStorage key</th><th class="num">Trades found</th><th>Notes</th><th>Project source (not exchange data)</th></tr></thead><tbody>' +
       (sources.map(function (s) {
-        return '<tr><td><code>' + esc(s.key) + '</code></td><td class="num">' + s.n + '</td><td>' + esc(s.note) + '</td></tr>';
-      }).join('') || '<tr><td colspan="3" class="muted">No trade stores present in this browser.</td></tr>') +
+        return '<tr><td><code>' + esc(s.key) + '</code></td><td class="num">' + s.n + '</td><td>' + esc(s.note) + '</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/assets/strategylab.js">ingestion code</a></td></tr>';
+      }).join('') || '<tr><td colspan="4" class="muted">No trade stores present in this browser.</td></tr>') +
       '</tbody></table></div>' +
       '<p class="muted small">The page re-reads these keys whenever it loads and every 15 s while open, so trades produced by an auto-trade engine appear automatically.</p>';
   }
@@ -350,7 +355,8 @@
   /* ---------------- boot ---------------- */
   function render() {
     var collected = collect();
-    var trades = collected.trades.map(enrich);
+    var allTrades = collected.trades.map(enrich);
+    var trades = filtered(allTrades);
     renderSources(collected.sources);
 
     // filter options
@@ -363,7 +369,7 @@
     }
     if (fs && !fs.options.length) {
       var seen = {};
-      trades.forEach(function (t) { seen[t.strategy] = true; });
+      allTrades.forEach(function (t) { seen[t.strategy] = true; });
       fs.innerHTML = '<option value="">All strategies</option>' + Object.keys(seen).map(function (k) {
         return '<option value="' + esc(k) + '">' + esc(k) + '</option>';
       }).join('');
@@ -385,9 +391,9 @@
       var pnlRec = 0, recN = 0;
       settled.forEach(function (t) { if (t.pnl_recorded !== null) { pnlRec += t.pnl_recorded; recN++; } });
       counts.innerHTML =
-        stat('Trades ingested', String(trades.length), 'from all localStorage stores in this browser') +
+        stat('Trades ingested', String(trades.length), 'filtered local records, not verified exchange fills') +
         stat('Settled / closed', String(settled.length), wins + ' wins · ' + losses + ' losses (by recorded P&amp;L sign)') +
-        stat('Realized P&amp;L (recorded)', usd(pnlRec), recN ? 'sum of recorded P&amp;L on settled trades' : 'no recorded P&amp;L values yet') +
+        stat('Local P&amp;L (recorded, unverified)', usd(recN ? pnlRec : null), recN ? 'sum of recorded P&amp;L on settled trades' : 'no recorded P&amp;L values yet') +
         stat('Strategy hypotheses', String(synthesize(trades).length), 'cells with ≥3 settled, ≥60% wins, avg P&amp;L &gt; 0');
     }
 

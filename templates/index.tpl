@@ -25,7 +25,7 @@
       <h1>Kalshi demo dashboard</h1>
       <p class="sub">Tracks the highest-dollar live events on the Kalshi <strong>demo</strong> exchange across five focus topics —
       gas prices, elections, culture, crypto and golf — until each market resolves <strong>yes</strong> or <strong>no</strong>.
-      Two scrolling chat panes turn any move of at least <strong>$0.10</strong> into a live alert, and every number on the site
+      Two scrolling chat panes record observed moves of at least <strong>$0.10</strong> into a live alert, and every number on the site
       links to the official endpoint or document it came from.</p>
     </div>
     <div class="btnrow">
@@ -62,10 +62,10 @@
       allowed to send those signed headers (measured preflight, <a href="flagged.html#F-66">F-66</a>).
       The <a href="demo-account.html">Demo account</a> page shows only what a GitHub Actions job wrote to
       <code>data/account.json</code>; no key ever reaches your browser, and nothing here asks you to paste one.</li>
-      <li>Markets resolve with <code>result</code> of <code>yes</code>, <code>no</code> or <code>scalar</code>, and the winning side is paid <strong>$1.00 per contract</strong>
+      <li>Binary markets resolve yes/no (other markets can have <code>scalar</code> results); the winning binary side is paid <strong>$1.00 per contract</strong>
       (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>,
       <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a>).
-      The tracker follows each market from active → determined → finalized and announces the resolution in the chat.</li>
+      The tracker follows sampled/alerted markets toward finalization. REST sampling can miss moves between polls; this is not a guaranteed tick feed.</li>
       <li>The demo environment uses mock funds and separate credentials, and Kalshi warns that demo prices may not reflect real markets —
       <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo_env</a>. Nothing on this site is a trading recommendation.</li>
     </ul>
@@ -97,8 +97,8 @@
     </table>
   </div>
 
-  <h2>Highest-dollar live rows right now</h2>
-  <p class="sub">Ranked by 24-hour dollar volume (contracts × the contract's settlement value). The live feed replaces this table in place when your browser can reach the demo API.</p>
+  <h2>Highest-dollar rows — live or timestamped snapshot</h2>
+  <p class="sub">Ranked within the sampled universe by estimated 24-hour notional turnover (contracts × published contract notional). This is not actual traded dollars or an exchange-wide census. The live feed replaces this table in place when your browser can reach the demo API.</p>
   <div class="table-wrap">
     <table>
       <thead><tr><th>Market</th><th>Topic</th><th class="num">Last</th><th class="num">Bid / Ask</th><th class="num">Spread</th><th class="num">24h vol ($)</th><th class="num">Total vol ($)</th><th class="num">Open int ($)</th><th>Status</th><th>Result</th><th>Source</th></tr></thead>
@@ -135,6 +135,7 @@
 </div></main>
 
 <footer class="site">{{FOOTER}}</footer>
+<script src="assets/paper.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/chart.js"></script>
 <script src="{{BASE}}assets/freshness.js"></script>

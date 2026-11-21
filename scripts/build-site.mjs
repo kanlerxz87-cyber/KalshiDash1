@@ -96,7 +96,7 @@ const SERIES_KEPT_PER_TOPIC = 30;
 const NAV_GROUPS = [
   ['Start', [
     ['alerts/index.html', 'Live alerts · 2 chats'],
-    ['dashboard.html', 'Dashboard'],
+    ['dashboard.html', 'Browser research dashboard'],
     ['executive-summary.html', 'Executive summary']
   ]],
   ['Topics', TOPICS.map((t) => [`categories/${t.id}.html?topic=${t.id}`, t.label])],
@@ -147,8 +147,8 @@ function footerHtml(base = '') {
        <a href="${base}sources.html">Sources</a> ·
        <a href="${base}flagged.html">Flagged for review</a> ·
        <a href="${base}COORDINATION.md">Coordination board</a></p>
-    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
-    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+    <p class="muted">Table rows link the relevant publisher or field definitions. Exchange observations, computed metrics and project rules are distinct; a source link does not verify a hypothetical fill or news cause.
+    Browser trades are local paper records, not exchange orders. Actual demo-account access is separate and credential-gated.</p>
     <p class="muted small">Canonical site: the pages in the navigation above. Two earlier builds are still published for
     reference only and are not kept up to date:
     <a href="${base}dash/index.html">dash/</a> · <a href="${base}docs/index.html">docs/</a>.</p>
@@ -369,6 +369,7 @@ const CATEGORY_PAGES = TOPICS.map((t) => ({
   </div>
 </div></main>
 <footer class="site">{{FOOTER}}</footer>
+<script src="{{BASE}}assets/paper.js"></script>
 <script src="{{BASE}}assets/app.js"></script>
 <script src="{{BASE}}assets/freshness.js"></script>
 </body>
