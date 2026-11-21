@@ -183,7 +183,7 @@ Reproduction detail is in `verification/2026-11-21-7dc87913.md` §4.
 
 | ID | Task | Status | Owner | Files touched |
 |---|---|---|---|---|
-| B8-02 | Independently verify the stale PR #39 flap-deduplication logic against its self-tests and feed validation; correct only evidence-backed defects within the claimed alert-engine files; then open/merge a replacement PR if required and confirm post-merge checks / Pages. | done — corrective PR to follow | session-b8fa3d44 | `tools/live_engine.mjs`, `scripts/check_alerts.mjs`, `COORDINATION.md` |
+| B8-02 | Independently verify the stale PR #39 flap-deduplication logic against its self-tests and feed validation; correct only evidence-backed defects within the claimed alert-engine files; then open/merge a replacement PR if required and confirm post-merge checks / Pages. | done — PR #46 merged and deployed | session-b8fa3d44 | `tools/live_engine.mjs`, `scripts/check_alerts.mjs`, `COORDINATION.md` |
 
 ### B8-02 findings and verification
 
@@ -192,7 +192,7 @@ Reproduction detail is in `verification/2026-11-21-7dc87913.md` §4.
 - The correction runs the invariant before the shared fatal gate and verifies the exact published rows against `collapseDuplicates`, rather than treating a >50% single-ticker share as invalid. A concentration-only rule would reject a legitimate active market even after all duplicates were removed, contradicting the requirement to show all qualifying swings. The stronger invariant rejects only rows the engine itself would deduplicate.
 - **Local verification:** `npm ci && npm test`; `node scripts/check-data-workflow-shells.mjs`; `node scripts/build-site.mjs --check`; `node scripts/check_freshness_badge.mjs`; `node tools/qa_alert_test.mjs`; `node tools/alerts-qa.mjs`; `node tools/alerts-render-test.mjs`; `node tools/qa_logic_test.mjs`; Python compilation; and `git diff --check` all passed. A 32-row synthetic fixture containing one duplicate exits non-zero with the expected duplicate-rule error; the current 31-row official-demo-derived feed passes.
 - **Sources / limits:** no new market fact, table row, or external endpoint value was introduced. The only external records used are [PR #39](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/39) and the GitHub Actions run linked above. The live feed retains each engine row’s official Kalshi demo-API `source_url`; the checker still enforces its official-host and `$0.10` threshold rules.
-- **Integration status:** PR link, merge SHA, and post-merge Pages result are recorded below once this corrective branch is merged. Active PR #43 remains untouched; it is currently marked `DIRTY` by GitHub after concurrent main changes and owns its own conflict resolution.
+- **PR / deployment record:** [PR #46](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/46) merged without waiting for approval at 2026-11-21T06:37:15Z as `77d521546e39bcb106c82b25ddba907c215be168`. Its `build`, `alerts`, both `qa`, and sampled-engine checks passed. The subsequent main commit `a5c4fa9` includes that merge; its [Pages deployment 44876442918](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44876442918) completed successfully, and the Pages builds API reports `built` with no error. The live landing page and Flagged for Review page were fetched successfully after deployment. Later repository activity started a newer Pages build, so this is intentionally a confirmation of the successful deployment containing PR #46, not a claim about any later build.
 
 ---
 
