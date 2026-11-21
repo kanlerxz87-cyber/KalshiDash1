@@ -15,11 +15,14 @@
  *  5. Every resolution has result in {yes,no,scalar} and a source_url.
  *  6. The high-ROI flag is consistent with the model score and the threshold.
  *  7. Every sample timestamp is a real ISO date in the past.
+ *  8. The published feed is a FIXED POINT of the engine's own de-duplication rule, so the
+ *     scrolling chat can never carry a row the rule would have merged (see §8 in the file).
  *
  * Exit code 1 on any violation, so a bad sample can never be committed.
  */
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { collapseDuplicates } from '../tools/live_engine.mjs';
 
 const FEED = process.env.ALERTS_FEED || 'data/live/feed.json';
 const OFFICIAL_HOSTS = ['external-api.demo.kalshi.co', 'demo-api.kalshi.co'];
@@ -181,6 +184,42 @@ async function main() {
     }
   }
 
+  /* §8 — Chat readability: the published feed must be a FIXED POINT of the engine's own
+   * de-duplication rule.
+   *
+   * Observed on the live feed 2026-11-20: one market flipping $0.80 <-> $0.00 produced 99 of
+   * 99 rows, so the "scrolling chat" carried exactly one event repeated 99 times. The detector
+   * fix (one swing per ticker per 15 minutes, direction-independent) lives in
+   * tools/live_engine.mjs as collapseDuplicates().
+   *
+   * The guard re-applies that same exported function to the rows that are actually published
+   * and requires the result to be identical. This is the exact invariant the rule promises, so
+   * it needs no threshold of its own: if any published row would be merged away, the feed is
+   * stale or flooded and must not be published.
+   *
+   * A "more than half the alerts come from one ticker" heuristic was tried here first and
+   * rejected: it is wrong. After the fix a genuinely active contract legitimately owns 12 of
+   * 12 rows over three hours, so that heuristic flags correct feeds.
+   *
+   * PLACEMENT MATTERS: this must run BEFORE the problems report below. The version carried by
+   * PR #39 sat after it, where `fail()` only pushes onto an array that is never read again — so
+   * that guard could never fail the run (verified: it did not fire on the 99-row flood it was
+   * written for). It is here, ahead of the report, so `fail()` really does exit non-zero. */
+  {
+    const rows = feed.alerts || [];
+    const reCollapsed = collapseDuplicates(rows);
+    if (reCollapsed.length !== rows.length) {
+      const dropped = rows.length - reCollapsed.length;
+      const byTicker = {};
+      for (const a of rows) byTicker[a.ticker] = (byTicker[a.ticker] || 0) + 1;
+      const worst = Object.entries(byTicker).sort((x, y) => y[1] - x[1])[0];
+      fail(`chat readability: ${dropped} of ${rows.length} published alerts would be merged by the `
+        + `engine's own de-duplication rule`
+        + (worst ? ` (worst ticker ${worst[0]} has ${worst[1]} row(s))` : '')
+        + '; the feed is not a fixed point of collapseDuplicates()');
+    }
+  }
+
   // report
   const nA = (feed.alerts || []).length;
   const nR = (feed.resolutions || []).length;
@@ -195,20 +234,6 @@ async function main() {
     for (const p of problems) console.error('  ✗ ' + p);
     process.exit(1);
   }
-  
-/* Chat readability regression guard. Observed on the live feed 2026-11-20: a single market
- * flipping $0.80 <-> $0.00 produced 99 of 99 rows, so the "scrolling chat" carried one event.
- * A feed where more than half of all alerts come from one ticker is a detector bug, not news. */
-{
-  const rows = feed.alerts || [];
-  const byTicker = {};
-  for (const a of rows) byTicker[a.ticker] = (byTicker[a.ticker] || 0) + 1;
-  const worst = Object.entries(byTicker).sort((x, y) => y[1] - x[1])[0];
-  if (rows.length >= 10 && worst && worst[1] > rows.length / 2) {
-    fail(`chat readability: ${worst[1]} of ${rows.length} alerts come from one ticker (${worst[0]}); `
-      + 'collapseDuplicates should have merged the repeated swings');
-  }
-}
 
 console.log('OK: every alert, market, resolution and orderbook row passed the source and threshold checks.');
 }
