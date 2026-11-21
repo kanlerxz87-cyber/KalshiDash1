@@ -6,9 +6,10 @@ Branch: `arena/75d8eb9c-kalshidash1` (base `b81f9f2` on `main`).
 
 | Task | Status | Owner | File scope |
 |---|---|---|---|
-| Verify PR #72 (F-71/F-72/F-73 high-ROI tradeability fix) checks, merge to `main`, confirm GitHub Pages deploy, record result | in progress | session-75d8eb9c | `COORDINATION.md` only |
+| Verify PR #72 (F-71/F-72/F-73 high-ROI tradeability fix) checks, merge to `main`, confirm GitHub Pages deploy, record result | done | session-75d8eb9c | `COORDINATION.md` only |
 
 - PR #72 `qa` check (run 44948084471, step 15 `check_rescore_retained.mjs`) failed once; the same script passes locally on the PR head (12 assertions) and a `--failed` re-run of that job succeeded — transient, not a code defect. Owner session `session-e7260519` is not active; no files of that session are touched here.
+- PR #72 was **unmergeable**: its branch history is unrelated to current `main` (main was rewritten after the branch was created; `git merge-base` empty, `mergeable: CONFLICTING`). Integrated instead by cherry-picking the six substantive commits (`61f9594`, `36bfada`, `1ace337`, `a2fc686`, `fcb8ae1`, `8d54759`) onto current `main` on this branch. Only conflict: `data/live/feed.json` — resolved by taking the PR branch's re-scored feed (verified by `check_alerts.mjs`, not text-merged). A stray `dbg-tmp.mjs` present in the PR branch was **not** carried over. Full suite (`npm test`, `build-site --check`, freshness badge 81, alerts-qa, qa_logic, alerts-render, writer-concurrency 31, workflow-shells, cors-evidence, keepalive-verdict 27, both link checkers) passes on the integrated tree. PR #72 closed as superseded by the integration PR.
 
 ## Session session-fd481e62 — final verification, integration audit & Pages check (2026-11-21)
 
