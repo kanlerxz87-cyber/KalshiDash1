@@ -2039,7 +2039,7 @@ inferred — anything unconfirmed stays blank and is published on `flagged.html`
 | W2 | Replace the false “zero real alerts” statement with the current, feed-scoped observation. The latest committed feed has 23 rows (21 trade, 2 candle), 1 model high-ROI flag, 0 feed resolutions, across crypto/elections only. | done | session-717aa2fe | `templates/flagged.tpl`, generated `flagged.html`, `docs/ALERTS.md` |
 | W3 | Fix the lab-checker false error for absent optional `data/dash-quality.json` by ignoring only that exact `ENOENT`; mark prior F-59 resolved. | done | session-717aa2fe | `scripts/check_lab.mjs`, `templates/flagged.tpl`, generated `flagged.html` |
 | W4 | Re-check published API claims against official OpenAPI docs; reclassify the unsupported `/series` and `/events?category=` requests; correct F-L4-01 and publish the non-owned-file handoff. | done | session-717aa2fe | `templates/flagged.tpl`, generated `flagged.html`, new `verification/2026-11-21-717aa2fe.md`, this board |
-| W5 | Open PR to `main`, merge, verify Pages deployment, and record PR/merge result. | in progress — PR #52 is open; rebase completed after concurrent main updates, final checks and clean merge pending. | session-717aa2fe | this board / PR #52 via `gh` |
+| W5 | Open PR to `main`, merge, verify Pages deployment, and record PR/merge result. | in progress — rebased onto main `9931cbf`; full QA passes. Refreshed head/checks, merge, and Pages verification pending. | session-717aa2fe | this board / PR #52 via `gh` |
 
 ### Corrections and open review items
 
@@ -2061,12 +2061,14 @@ Please remove or qualify the `/events?category=` “unreliable filter” stateme
 
 - `node scripts/build-site.mjs --check` — PASS.
 - Duplicate-ID scan — PASS: 90 HTML files, 0 duplicate IDs.
-- `node scripts/check-links.mjs` — PASS: 90 pages, 0 broken internal links; 300 external links listed but not fetched by this checker.
+- `node scripts/check-links.mjs` — PASS: 90 pages, 0 broken internal links; 306 external links listed but not fetched by this checker.
 - `python3 tools/linkcheck.py` — PASS: 90 pages, 2,124 internal links, 0 broken.
 - `node scripts/check_links.js` — PASS: 69 internal links/assets across 13 pages, 0 broken.
-- `npm test` — PASS (engine, feed, page, links); feed reports 23 alerts, 1 model flag, 0 resolutions, 60 market rows, 8 orderbooks, largest move $0.96.
+- `npm test` — PASS: engine, feed, flood-guard regression, page, IDs, sourced rows (813 enforced; 0 missing sources), lab, and link checks; feed has 23 alerts, 1 model flag, 0 resolutions, 60 market rows, 8 orderbooks, largest move $0.96.
 - `node scripts/check_freshness_badge.mjs` — PASS: 53 assertions across 4 pages and deep links.
 - `node scripts/check_lab.mjs` — PASS; `node tools/alerts-qa.mjs`, `qa_alert_test.mjs` (5 checks), `qa_logic_test.mjs`, and `alerts-render-test.mjs` — PASS.
 - `node --check scripts/check_lab.mjs` — PASS.
-- `node tools/freshness_check.mjs` — PASS: age 4.1 minutes at 2026-11-21T06:53:25Z (warn/stale thresholds 20/45 minutes).
+- `node scripts/check-data-workflow-shells.mjs` — PASS: 9 shell blocks; `node scripts/check-data-writer-concurrency.mjs` — PASS: 31 assertions; `node scripts/check-keepalive-verdict.mjs` — PASS: 27 assertions.
+- `git diff --check` and full conflict-marker scan — PASS.
+- `node tools/freshness_check.mjs` — PASS: age 4.5 minutes at 2026-11-21T06:59:00Z (warn/stale thresholds 20/45 minutes).
 - Full source and test log: `verification/2026-11-21-717aa2fe.md`.
