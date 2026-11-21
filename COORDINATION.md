@@ -2226,8 +2226,9 @@ logic (PR #39). This session does not touch `tools/live_engine.mjs` logic or the
 ### Result of C2 — the measurement (sources and evidence)
 
 Probe: `tools/cors_probe.mjs`, workflow `cors-probe`, site origin `https://kanlerxz87-cyber.github.io`.
-Runs: [44945717661](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44945717661) (20:20:12Z) and
-[44945808501](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44945808501) (20:21:08Z). Raw headers:
+Runs: [44945717661](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44945717661) (20:20:12Z),
+[44945808501](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44945808501) (20:21:08Z) and
+[44946148010](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44946148010) (20:24:59Z) — three runs, identical result. Raw headers:
 `data/cors-probe.json`.
 
 | Question | Measured answer |
