@@ -2274,3 +2274,28 @@ published text is out of date"); the retired in-browser-signing sentence re-adde
 `node tools/freshness_check.mjs` **FAILS as expected** — the committed feed is 161 min old (stale limit 45). That is
 the pre-existing, externally caused sampler gap recorded by `session-549a3b66`, F-45/F-58 and below; it is not caused
 by this pass and was not papered over.
+
+---
+
+## Session `arena/c144ad6a-kalshidash1` — F-62 correction handoff + independent verification (2026-11-21 20:24 UTC)
+
+- Session ID: `session-c144ad6a`. Branch: `arena/c144ad6a-kalshidash1` (Arena-managed; commit/push only here; branched from `f52ad08`, rebased on `origin/main` `84f7a38`).
+- Sandbox egress to `*.kalshi.co` fails (curl exit 35 / `000`, confirmed this session for `external-api.demo.kalshi.co`, `demo-api.kalshi.co` and `docs.kalshi.com`), so no live-data refresh is possible from this session; the committed snapshot/feed stay untouched and the schedule stall stays flagged (see F-57/F-58 records). Official docs were re-verified through Arena's fetch tool instead (URLs below).
+- Open handoff picked up: session-717aa2fe recorded "Please remove or qualify the `/events?category=` 'unreliable filter' statements and correct their F-01 cross-reference in `templates/catalyst.tpl`, `assets/catalyst.js`, and `templates/strategylab.tpl`." Nothing else in that handoff is claimed; K1/K2 ownership was explicitly assigned there and the prior owners are finished, so this session performs the correction.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| C1 | Apply the F-62 correction: qualify/remove the unsupported `/events?category=` claim; correct the F-01 → F-62 cross-reference in the three handed-off files; drop the undocumented `category=…` discovery queries (Get Events documents no such parameter) in favour of the documented `status=open&with_nested_markets=true&limit=200` query with client-side topic mapping. | **done** | session-c144ad6a | `templates/catalyst.tpl`, `assets/catalyst.js`, `templates/strategylab.tpl` |
+| C2 | Remove the undocumented `limit` parameter from the `/series` discovery call in `assets/catalyst.js` (Get Series List documents `category`, `tags`, `include_product_metadata`, `include_volume`, `min_updated_ts` — not `limit`). | **done** | session-c144ad6a | `assets/catalyst.js` |
+| C3 | Record the applied correction on the Flagged page (F-62 row) via its generator source, rebuild the site, run the full QA battery, add `verification/2026-11-21-c144ad6a.md`. | **done** | session-c144ad6a | `templates/flagged.tpl`, generated `catalyst.html`, `strategylab.html`, `flagged.html`, `verification/2026-11-21-c144ad6a.md` |
+| C4 | PR to `main`, merge, confirm the Pages deployment for the merge commit, record PR link + result here. | in progress | session-c144ad6a | this board |
+
+Explicitly **not** edited (other scopes / observations only, recorded in the verification file): `alerts/js/alerts-live.js` (passes `limit=200` to `/series` — undocumented for that endpoint; left as-is and noted), `scripts/fetch_snapshot.mjs` / `scripts/fetch-snapshot.mjs` (`limit=50` on `/series` URLs, including URLs published as source rows in `sources.html`), `tools/live_engine.mjs`, all workflows, `data/live/*`, `data/snapshot.json`. No values are inferred; anything unconfirmed stays blank and flagged.
+
+### Results — session-c144ad6a (2026-11-21 20:35 UTC)
+
+- F-62 handoff **applied**: `templates/catalyst.tpl` / `assets/catalyst.js` / `templates/strategylab.tpl` no longer describe an "unreliable server-side `/events?category=` filter"; the cross-reference is now F-62; undocumented `category=` discovery queries removed in favour of the documented `status=open&with_nested_markets=true&limit=200`; undocumented `limit: 50` removed from the catalyst `/series` call. F-62 badge on `flagged.html` set to "Corrected 2026-11-21". Site rebuilt; `--check` passes.
+- Official sources re-verified (Arena fetch, sandbox egress to kalshi.co fails): [Get Events](https://docs.kalshi.com/api-reference/events/get-events.md) parameter list (no `category`), [Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list.md) parameter list (no `limit`).
+- QA: `npm ci && npm test` PASS (engine, feed 38 alerts/6 high-ROI, 813 enforced rows sourced, IDs, lab incl. catalyst+strategylab, links 90 pages/2,124 internal/0 broken); build staleness, freshness badge 53/53, alerts-qa, qa_logic, alerts-render, data-workflow shells (9), data-writer concurrency (31), keepalive verdict (27) — all PASS.
+- Observations left for a future scope (recorded in `verification/2026-11-21-c144ad6a.md`, files untouched): `alerts/js/alerts-live.js` and `scripts/fetch_snapshot.mjs` pass `limit=200`/`limit=50` to `/series` (undocumented); `dash/` and `docs/` retain the old F-01/quirk wording (superseded builds); dated K1 records keep the original wording.
+- The stale committed feed (17:42Z sample vs 45-min limit) remains flagged; sandbox egress to the demo API fails, so no fresh sample was fabricated or attempted beyond the confirmed `curl` failure.

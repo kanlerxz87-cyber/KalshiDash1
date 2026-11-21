@@ -49,9 +49,8 @@ Persisted in this browser (<code>localStorage</code>, key <code>kalshidash:catal
 <h2>Highest-dollar focus-topic markets (watchlist)</h2>
 <p class="muted small">Ranked by the derived 24 h dollar-volume estimate <code>volume_24h_fp × last_price_dollars</code>
 (the API has no dollar-volume field — derived, labelled <span class="badge warn">est.</span>; see flag F-03).
-Topic classification is a documented client-side heuristic on the API's category/title/series fields —
-the server-side <code>/events?category=</code> filter is unreliable (verified 2026-11-20: a <code>category=Crypto</code>
-query returned <code>World</code> and <code>Elections</code> events; flag F-01).</p>
+Topic classification is a documented client-side heuristic on the API's category/title/series fields;
+Get Events documents no <code>category</code> parameter, so no server-side category filtering is used or claimed (flag F-62).</p>
 <div id="watch-table"></div>
 
 <h2>Events &amp; official settlement sources</h2>
@@ -88,7 +87,7 @@ they are the official sources tied to resolution, not inferred causes.</p>
 <tr><td>S6</td><td>Settlement pays $1 per winning contract; <code>result</code> = yes/no</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">docs.kalshi.com/getting_started/market_settlement ↗</a></td></tr>
 <tr><td>S7</td><td>Demo environment: mock funds; prices may not reflect real markets; endpoint table (REST + WebSocket hosts)</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">docs.kalshi.com/getting_started/demo_env ↗</a></td></tr>
 <tr><td>S8</td><td>Back off on 429; unauthenticated requests have separate limits</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">docs.kalshi.com/getting_started/rate_limits ↗</a></td></tr>
-<tr><td>S9</td><td>Live probe: <code>/events?category=Crypto&amp;status=open…</code> returned World and Elections categories (filter quirk)</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?category=Crypto&amp;status=open&amp;limit=3&amp;with_nested_markets=true" target="_blank" rel="noopener">external-api.demo.kalshi.co … /events?category=Crypto ↗</a></td></tr>
+<tr><td>S9</td><td>Undocumented-parameter probe (2026-11-20): <code>/events?category=Crypto</code> — <code>category</code> is not a Get Events parameter, so the result proved nothing about a documented filter (reclassified as F-62; corrected 2026-11-21)</td><td><a href="https://docs.kalshi.com/api-reference/events/get-events.md" target="_blank" rel="noopener">docs.kalshi.com/api-reference/events/get-events (parameter list) ↗</a> · <a href="https://external-api.demo.kalshi.co/trade-api/v2/events?category=Crypto&amp;status=open&amp;limit=3&amp;with_nested_markets=true" target="_blank" rel="noopener">earlier probe URL (undocumented parameter) ↗</a></td></tr>
 <tr><td>S10</td><td>Live probe: <code>/markets?limit=5&amp;status=open</code> response shape (fixed-point fields as documented)</td><td><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?limit=5&amp;status=open" target="_blank" rel="noopener">external-api.demo.kalshi.co … /markets?limit=5&amp;status=open ↗</a></td></tr>
 <tr><td>S11</td><td>Gas series map (AAA gasoline: Economics + "Oil and energy", <code>KXAAAGAS*</code>/<code>AAAGAS*</code>; diesel excluded)</td><td><a href="verification/2026-11-20-e6c3b3b6.md">verification/2026-11-20-e6c3b3b6.md</a> (V5–V9, with per-row live URLs)</td></tr>
 </tbody></table></div>

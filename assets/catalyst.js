@@ -24,10 +24,15 @@
  *
  * Live checks run 2026-11-20 with the fetch tool (re-run any of these URLs to verify):
  * - https://external-api.demo.kalshi.co/trade-api/v2/markets?limit=5&status=open
- * - https://external-api.demo.kalshi.co/trade-api/v2/events?category=Crypto&status=open&limit=3&with_nested_markets=true
- *   (CONFIRMED QUIRK: the server-side category filter is unreliable — that query returned
- *   events with category "World" and "Elections". Topic mapping below is therefore done
- *   client-side on the returned category/title/series fields. See flagged.html F-01.)
+ * - Get Events documents NO category parameter (re-verified 2026-11-21 against
+ *   https://docs.kalshi.com/api-reference/events/get-events.md — the parameters are limit,
+ *   cursor, with_nested_markets, with_milestones, status, series_ticker, tickers,
+ *   min_close_ts, min_updated_ts). The earlier 2026-11-20 "unreliable filter" probe used
+ *   that undocumented parameter and proved nothing about a documented filter; it is
+ *   reclassified on flagged.html as F-62. Topic mapping below is client-side on the
+ *   returned category/title/series fields and relies on no server-side category filter.
+ * - F-62 correction applied 2026-11-21 (session-c144ad6a): the undocumented category=
+ *   discovery queries were removed; see verification/2026-11-21-c144ad6a.md.
  * - Session record: verification/2026-11-20-e6c3b3b6.md (series/category map).
  */
 (function () {
@@ -83,7 +88,7 @@
     return '<a href="' + esc(url) + '" target="_blank" rel="noopener" title="Official Kalshi documentation">' + esc(label) + ' ↗</a>';
   }
 
-  /* ---------------- topic classification (client-side; category filter is unreliable) --------- */
+  /* ---------------- topic classification (client-side heuristic; Get Events documents no category parameter — F-62) --- */
   /* Map verified in verification/2026-11-20-e6c3b3b6.md and refined here:
      gas = AAA gasoline series (KXAAAGAS*, AAAGAS*); diesel excluded (flag F-18);
      culture = category "Culture" or "Entertainment"; golf = golf-tagged Sports series/titles. */
@@ -297,15 +302,11 @@
 
   function discover() {
     // Events (verified shape: events[] with category, series_ticker, title, settlement_sources,
-    // markets[] when with_nested_markets=true). NOTE: server-side category filter is unreliable
-    // (verified), so each response is re-filtered client-side.
+    // markets[] when with_nested_markets=true). Get Events documents NO category parameter
+    // (see F-62), so a single documented discovery query is used and every response is
+    // topic-filtered client-side below.
     var eventQueries = [
-      { params: { status: 'open', limit: 25, with_nested_markets: 'true', category: 'Elections' }, src: 'events?category=Elections' },
-      { params: { status: 'open', limit: 25, with_nested_markets: 'true', category: 'Crypto' }, src: 'events?category=Crypto' },
-      { params: { status: 'open', limit: 25, with_nested_markets: 'true', category: 'Entertainment' }, src: 'events?category=Entertainment' },
-      { params: { status: 'open', limit: 25, with_nested_markets: 'true', category: 'Culture' }, src: 'events?category=Culture' },
-      { params: { status: 'open', limit: 25, with_nested_markets: 'true', category: 'Sports' }, src: 'events?category=Sports' },
-      { params: { status: 'open', limit: 25, with_nested_markets: 'true' }, src: 'events?status=open' }
+      { params: { status: 'open', limit: 200, with_nested_markets: 'true' }, src: 'events?status=open&with_nested_markets=true&limit=200' }
     ];
     var jobs = eventQueries.map(function (q) {
       return api('/events', q.params).then(function (j) {
@@ -332,7 +333,7 @@
     });
 
     // Gas prices: AAA gasoline series (verified map: Economics + "Oil and energy", KXAAAGAS*/AAAGAS*)
-    jobs.push(api('/series', { category: 'Economics', tags: 'Oil and energy', include_volume: 'true', limit: 50 }).then(function (j) {
+    jobs.push(api('/series', { category: 'Economics', tags: 'Oil and energy', include_volume: 'true' }).then(function (j) {
       var series = (j.series || []).filter(function (s) {
         var t = String(s.ticker || '');
         return /^(KX)?AAAGAS/.test(t) && !/diesel/i.test(t + (s.title || ''));
