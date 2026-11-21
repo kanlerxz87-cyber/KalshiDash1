@@ -105,6 +105,9 @@ jobs:
       - name: Canonical paper execution and chart provenance regressions (offline)
         run: npm run test:paper && npm run test:chart
 
+      - name: Demo-only execution boundary and signing (offline; no keys or orders)
+        run: npm run test:demo-safety
+
       - name: Python tool syntax
         run: python -m py_compile tools/*.py
 
