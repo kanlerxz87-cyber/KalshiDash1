@@ -2511,3 +2511,11 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
   - `https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-2ea8e33c.md` is served (this session's record).
   - `https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html` is served with the F-7x block.
 - **Irregularities:** none new beyond F-76/F-77, both published on `flagged.html`. The sandbox cannot `curl` `*.kalshi.co` (TLS EOF), so live values were read through the platform page fetcher and the engine was exercised by dispatching `live-alerts` in GitHub Actions.
+
+---
+
+### PR, merge and deployment record — session-37562307
+
+- **PR #73:** [docs: independent dashboard audit and verification](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/73) — merged 2026-11-21T23:11:50Z as merge commit [`8f45860087dbf184daecc34e0f5beefc19fe39df`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/8f45860087dbf184daecc34e0f5beefc19fe39df). Checks on the rebased PR head passed (`alerts`, `build`, and both `qa` checks).
+- During rebase, `COORDINATION.md` conflicted with session-a2706f31's concurrent verification record (merged as PR #74). Both sections were retained; no other session's files were discarded. Main subsequently advanced through other sessions' PRs and scheduled data writes; this audit's scope remains documentation only.
+- Pages deployment containing PR #73 completed successfully in run [44960595512](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44960595512) on main commit `017bd6343fff754d9085c05a3a7cf831368ba532`. Later scheduled snapshot commit `c39c52f18d4ba29ece39eaa9804762b3406a72c7` also deployed successfully in run [44960678737](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44960678737); Pages API latest build status was `built`, error `null`. The report is served at [verification/2026-11-21-37562307.md](https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-37562307.md).
