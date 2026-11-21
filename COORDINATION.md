@@ -2039,19 +2039,19 @@ inferred — anything unconfirmed stays blank and is published on `flagged.html`
 | W2 | Replace the false “zero real alerts” statement with the current, feed-scoped observation. The latest committed feed has 23 rows (21 trade, 2 candle), 1 model high-ROI flag, 0 feed resolutions, across crypto/elections only. | done | session-717aa2fe | `templates/flagged.tpl`, generated `flagged.html`, `docs/ALERTS.md` |
 | W3 | Fix the lab-checker false error for absent optional `data/dash-quality.json` by ignoring only that exact `ENOENT`; mark prior F-59 resolved. | done | session-717aa2fe | `scripts/check_lab.mjs`, `templates/flagged.tpl`, generated `flagged.html` |
 | W4 | Re-check published API claims against official OpenAPI docs; reclassify the unsupported `/series` and `/events?category=` requests; correct F-L4-01 and publish the non-owned-file handoff. | done | session-717aa2fe | `templates/flagged.tpl`, generated `flagged.html`, new `verification/2026-11-21-717aa2fe.md`, this board |
-| W5 | Open PR to `main`, merge, verify Pages deployment, and record PR/merge result. | in progress — rebased onto main `9931cbf`; full QA passes. Refreshed head/checks, merge, and Pages verification pending. | session-717aa2fe | this board / PR #52 via `gh` |
+| W5 | Open PR to `main`, merge, verify Pages deployment, and record PR/merge result. | in progress — rebased onto main `b6cc469`; full QA passes. Refreshed head/checks, merge, and Pages verification pending. | session-717aa2fe | this board / PR #52 via `gh` |
 
 ### Corrections and open review items
 
 - **F-54:** `series_ticker` and `limit` are not documented query parameters for `GET /series` list. The earlier full-dump observation therefore does not prove a supported-filter defect. The claim was withdrawn. `GET /series/{series_ticker}?include_volume=true` is the documented single-series route.
 - **F-L4-01:** official demo `KXDPWORLDTOUR?include_volume=true` returns `volume_fp: "8245802181.00"`; Kalshi documents that field as total contracts across all events in the series. Five sampled markets are not a full census, so reconciliation remains open, without a claimed API bug.
-- **F-57 / F-BFC-01 / F-BFC-03:** latest main tree `9931cbf` includes the feed sample generated 06:54:33Z: 23 rows, 12 crypto/BTC and 11 elections, 21 trade detections, 2 candle detections, one model-high-ROI flag, 0 feed resolutions, 119 duplicates collapsed, newest alert 06:40:24.627Z. The earlier 31-row and 22-row samples, the 06:49Z 23-row sample, and older 99/173 counts are historical. Feed values are not realized ROI or exchange-wide conclusions.
+- **F-57 / F-BFC-01 / F-BFC-03:** latest main tree `b6cc469` includes the feed sample from `6838cd0`, generated 06:55:07Z: 23 rows, 12 crypto/BTC and 11 elections, 21 trade detections, 2 candle detections, one model-high-ROI flag, 0 feed resolutions, 120 duplicates collapsed, newest alert 06:40:24.627Z. The earlier 31-row and 22-row samples, the 06:49Z and 06:54Z 23-row samples, and older 99/173 counts are historical. Feed values are not realized ROI or exchange-wide conclusions.
 - **F-62:** official Get Events docs do not list `category` as a query parameter. A prior `/events?category=Crypto` request therefore does not test a documented category filter. Main already uses F-60 for a separate repo-review row and the session-7dc87913 handoff names W-12 as F-61; this finding was renumbered from F-60 to F-62 without changing those records. The linked catalyst/strategy pages still make the unsupported claim; see the owner handoff below. No conclusion is made about other endpoints.
 - **F-59:** the latest main build generates and checks `data/dash-quality.json`; runtime fallback still makes it optional. The lab checker tolerates only the exact missing-file `ENOENT`, and both lab pages pass.
 
 ### Rebase conflict log
 
-The earlier pulls replayed this branch onto `e66c0cf`, `32c7712`, `0c583e9`, `2810da4`, and `6fe64f9`. After PR #52 was updated, main advanced again to `9931cbf` (with PRs #54/#55 work and a fresh feed), making the advertised head stale and creating conflicts in the owned documentation. This rebase resolved those conflicts while keeping main’s F-60 and F-63–F-65 findings, the existing W-12/F-61 handoff, recent coordination and workflow work, and the latest 23-row feed. F-62 remains the API-query limitation. No scheduled-workflow, catalyst, strategy, or live feed/state source files were changed by this session.
+The earlier pulls replayed this branch onto `e66c0cf`, `32c7712`, `0c583e9`, `2810da4`, and `6fe64f9`. After PR #52 was updated, main advanced to `9931cbf` (PRs #54/#55 and a refreshed feed), making the advertised head stale and creating documentation conflicts. Those conflicts were resolved while preserving main’s F-60 and F-63–F-65 findings, the existing W-12/F-61 handoff, recent coordination/workflow work, and F-62. Main then advanced through PR #56 to `b6cc469` with keepalive pulse `6838cd0`; the follow-up rebase replayed cleanly and carries its latest feed. No scheduled-workflow, catalyst, strategy, or live feed/state source files were changed by this session.
 
 ### Handoff — prior K1/K2 owner
 
@@ -2070,5 +2070,5 @@ Please remove or qualify the `/events?category=` “unreliable filter” stateme
 - `node --check scripts/check_lab.mjs` — PASS.
 - `node scripts/check-data-workflow-shells.mjs` — PASS: 9 shell blocks; `node scripts/check-data-writer-concurrency.mjs` — PASS: 31 assertions; `node scripts/check-keepalive-verdict.mjs` — PASS: 27 assertions.
 - `git diff --check` and full conflict-marker scan — PASS.
-- `node tools/freshness_check.mjs` — PASS: age 4.5 minutes at 2026-11-21T06:59:00Z (warn/stale thresholds 20/45 minutes).
+- `node tools/freshness_check.mjs` — PASS: age 5.9 minutes at 2026-11-21T07:00:59Z (warn/stale thresholds 20/45 minutes).
 - Full source and test log: `verification/2026-11-21-717aa2fe.md`.
