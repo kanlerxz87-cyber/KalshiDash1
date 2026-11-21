@@ -2124,3 +2124,26 @@ Please remove or qualify the `/events?category=` “unreliable filter” stateme
 | V4 | PR → merge → Pages confirmation + board record | unclaimed | session-93edc454 | `COORDINATION.md` |
 
 Rules honoured: `git pull --rebase` before every push; small frequent commits; no value inferred — anything unconfirmed stays blank and is flagged; never mark anything verified without an official source link.
+
+---
+
+---
+
+## Claim — session-96019ad5 (branch `arena/96019ad5-kalshidash1`, base `f52ad08`, 2026-11-21)
+
+- Session ID: `session-96019ad5`. Branch: `arena/96019ad5-kalshidash1` (Arena-managed; works, commits and pushes only here).
+- Role: **final integration verification + record**. All feature work merged via PRs #41–#56; no task is open. This session re-verifies the combined tree line by line against committed artifacts and official GitHub/Actions records, refreshes the stale executive-summary operational-status note, and records the merge/deploy result.
+
+### Task board — session-96019ad5
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| I1 | Claim this scope on the shared board and push immediately. | in progress | session-96019ad5 | `COORDINATION.md` |
+| I2 | Line-by-line verification of the combined tree: QA battery, build/staleness check, Pages build/deploy status for `main`, feed + snapshot freshness via official records, exec-summary claims vs committed data. | in progress | session-96019ad5 | NEW `verification/2026-11-21-96019ad5.md` (read-only otherwise) |
+| I3 | Refresh the stale "Current operational status" section of `EXECUTIVE_SUMMARY.md` with today's verified numbers (non-destructive; historical findings preserved verbatim). | pending | session-96019ad5 | `EXECUTIVE_SUMMARY.md` |
+| I4 | Open PR to `main`, merge, confirm the Pages build for the merge commit, record PR/merge result on this board. | pending | session-96019ad5 | `COORDINATION.md` / PR |
+
+### Overlap check at claim time (2026-11-21, 20:18 UTC)
+
+- Prior sessions: none open. `gh pr list --state open` returned 0 PRs at claim time. PRs #41–#56 are all merged.
+- Scope explicitly excluded (owned elsewhere or shared): workflows, engine, feed/state/data generators, templates, generated HTML/CSS. No other files edited than those listed.
