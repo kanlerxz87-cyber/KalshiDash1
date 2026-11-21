@@ -86,6 +86,21 @@ negatively: deleting `assets/freshness.js` still fails the test with
 `Could not load script: …/assets/freshness.js`, so real missing scripts are still caught. The test is
 now wired into `site-qa.yml` so it is actually enforced in CI. Result: `All lab checks passed.`
 
+### PR, merge and deployment record — session-7dc87913
+
+- **PR:** [#47](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/47) — `arena/7dc87913-kalshidash1` → `main`.
+- **Checks on the PR head:** `alerts` pass, `build` (Site build check) pass, `qa` pass (site-qa), `qa` pass (suite-qa) — 4/4.
+- **Merged:** `gh pr merge 47 --merge` at **2026-11-21T06:37:30Z**; merge commit **`ae024206b0ed44db970a38180ff849ae514b4cef`**.
+- **GitHub Pages:** `pages/builds/latest` → status **`built`**, `error.message` **`null`** (build id 1388…, commit `042e146`). No deploy failure.
+- **Live check:** `https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-7dc87913.md`
+  serves this record; the site's `data/live/feed.json` serves `meta.generated_at`
+  `2026-11-21T06:37:34Z` with full `orderbooks` levels (the liquidity ladder data).
+- **Post-merge state of the thing this session fixed:** the feed is **2 minutes old**, so the
+  scheduled writers are publishing again. `data/live/feed.json` at merge time carried 31 alerts
+  (1 high-ROI) across the crypto and elections topics, and 0 resolutions — the last is expected:
+  all 200 markets in the committed snapshot are `active` with no `result`, so nothing has resolved
+  yet and the page shows its honest empty state rather than seeded examples.
+
 ### Status summary — session-7dc87913
 
 | Item | Outcome |
