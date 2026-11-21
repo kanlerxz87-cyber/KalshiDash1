@@ -2221,7 +2221,7 @@ logic (PR #39). This session does not touch `tools/live_engine.mjs` logic or the
 | C1 | Claim this scope on the shared board and push immediately. | done | session-c85ee474 | `COORDINATION.md` |
 | C2 | Measure browser-equivalent CORS to the demo API from a GitHub runner (GET with `Origin`, preflight `OPTIONS`, and the authenticated routes) so F-01/F-51 get a measured answer instead of "untested". | **done** — 2 runs, consistent; evidence committed | session-c85ee474 | `tools/cors_probe.mjs`, `.github/workflows/cors-probe.yml` (both new), `data/cors-probe.json` (runner-written) |
 | C3 | Update F-01/F-51, the questions page and any site copy that depends on the answer, using only the measured result; publish the newly discovered limitation as F-66; add an offline guard so the claim cannot drift from the evidence. | **done** | session-c85ee474 | `templates/{flagged,questions,index,executive-summary}.tpl` + generated pages, `README.md`, `scripts/check-cors-evidence.mjs` (new), `package.json`, `.github/workflows/site-qa.yml`, `verification/2026-11-21-c85ee474.md` (new) |
-| C4 | Full QA battery, then PR to `main`, merge, verify the Pages build, record PR link + result here. | in progress | session-c85ee474 | this board section, `verification/2026-11-21-c85ee474.md` |
+| C4 | Full QA battery, then PR to `main`, merge, verify the Pages build, record PR link + result here. | **done** — merged, Pages built, live pages fetched | session-c85ee474 | this board section, `verification/2026-11-21-c85ee474.md` |
 
 ### Result of C2 — the measurement (sources and evidence)
 
@@ -2240,6 +2240,23 @@ Runs: [44945717661](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs
 Consequence: `F-01` and `F-51` are **Resolved**; copy that implied in-browser signing/account reads
 (`index.html`, `executive-summary.html`, `questions.html`, `README.md`) was corrected in the same commit, and
 execution stays in GitHub Actions with repository secrets (as it already was).
+
+### PR, merge and deployment — session-c85ee474
+
+| Item | Detail |
+|---|---|
+| PR | [#62](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/62) — `arena/c85ee474-kalshidash1` → `main` |
+| Checks on the PR head | `alerts` pass · `qa` (site-qa) pass · `qa` (suite-qa) pass — plus the branch-run `Site build check` and `cors-probe` runs |
+| Merged | 2026-11-21T20:35:25Z, merge commit `f214738ab0c98023c62124a7b684da176e252298` |
+| Merge conflicts | `main` advanced three times while this PR was open (PRs #59/#61/#63/#64/#65). Each time the branch was rebased and the single `COORDINATION.md` conflict was resolved by **keeping both sessions' sections** — no other session's text was removed. Nothing else conflicted. |
+| Main push runs for `f214738` | `Site build check`, `site-qa`, `suite-qa`, `alerts-qa`, `cors-probe` — all **success** |
+| Write-back proven on `main` | the `cors-probe` job's commit step pushed `caf5c13` ("data(cors): browser-CORS probe 2026-11-21T20:35:34Z") to `main`; a fourth measurement is therefore published from `main`, with the same result |
+| GitHub Pages | `pages/builds/latest` → `status: built`, `error: null` for `caf5c13` (the build for `f214738` was `cancelled`, superseded by the newer commit — the normal Pages behaviour, not a failure) |
+| Live verification | `https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html` serves F-01 marked **Resolved** with the measured headers; `…/data/cors-probe.json` serves the `main`-run measurement (`workflow_run 44947086345`) |
+
+A follow-up record commit corrects one inconsistency found *after* the merge: the published F-01 row still said "two
+independent runs" while this board and the verification record cite three (plus the post-merge fourth). The row now
+says three and names the fourth; the evidence guard keeps it tied to the file.
 
 ### QA actually run for C3 (all on the rebased tree)
 
