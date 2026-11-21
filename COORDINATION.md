@@ -2469,3 +2469,33 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 - Full local battery: engine selftest, feed, feed-current, rescore (17 assertions), guard, resolution, page, ids, rows (813 sourced), lab, CORS (21/21), links (90 pages, 0 broken), freshness badge (81), qa_logic, alerts-qa, alerts-render, writer-concurrency (31), workflow-shells (9), py_compile, merge-marker scan, `build-site --check` — all PASS.
 - No value is inferred: every alert keeps its own `source_url`; the new F-75 row cites the committed feed, the code and the verification record.
 
+
+---
+
+## Session `arena/2ea8e33c-kalshidash1` — final integration, verification & Pages publish (2026-11-21 UTC)
+
+- Session ID: `session-2ea8e33c`. Branch `arena/2ea8e33c-kalshidash1` (Arena-pinned, status `active`),
+  rebased onto `main` at `9761bf5`.
+- Read the board before claiming. PR #72 was already integrated by sessions `75d8eb9c` / `a2706f31`
+  (PRs #73/#75/#76) and its own reopened work was integrated by `4b5ddd87` (PR #78), so this session
+  **did not re-integrate either**; it verified the combined result and fixed what the combined result
+  actually broke.
+- Overlap handled, not discarded: `4b5ddd87` independently fixed the same `check_rescore_retained`
+  ordering flake this session had found (id-sorted fingerprint). During the rebase this session took
+  **their** fix and dropped its duplicate, and published no separate flag row for the flake. Their
+  F-75 (age penalty) was kept as published; this session's new rows were renumbered **F-76/F-77** to
+  avoid reusing an ID.
+- Claimed scope (non-overlapping): `scripts/build-site.mjs`, `scripts/check_build_staleness.mjs`
+  (new), `.github/workflows/pages.yml`, `.github/workflows/site-qa.yml`, `package.json`,
+  `templates/flagged.tpl` (append rows only), regenerated root HTML,
+  `verification/2026-11-21-2ea8e33c.md`, this board. No data file was hand-edited; the only data
+  change came from dispatching the engine.
+
+### Task board — session-2ea8e33c
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| V1 | Verify the combined site against official sources; record each source and result | done — 8 sources in `verification/2026-11-21-2ea8e33c.md` §1 | session-2ea8e33c | `verification/2026-11-21-2ea8e33c.md` |
+| V2 | **F-76**: every ~10-minute data commit made all 22 pages "stale" (as-of clock vs byte comparison); the Pages gate would fail the next push. Fix + regression test, negative-checked | done | session-2ea8e33c | `scripts/build-site.mjs`, `scripts/check_build_staleness.mjs`, `.github/workflows/pages.yml`, `.github/workflows/site-qa.yml`, `package.json` |
+| V3 | **F-77**: main's feed had regressed from `22:26:12Z` (14 alerts) to `17:42:16Z` (38 alerts) through the PR #75 merge — 5.5 h old, past the 45-min STALE limit. Corrected by dispatching the engine, not by editing data | done — feed `23:13:08Z`, v2 model, 1 executable high-ROI row | session-2ea8e33c | `data/live/feed.json` (via workflow), board |
+| V4 | Full QA battery, PR to `main`, merge, confirm Pages, record PR + deploy | done — see below | session-2ea8e33c | this board |
