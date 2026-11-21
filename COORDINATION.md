@@ -2092,3 +2092,9 @@ Please remove or qualify the `/events?category=` “unreliable filter” stateme
 - Official sources re-fetched this session: [Test In The Demo Environment](https://docs.kalshi.com/getting_started/demo_env) confirms the demo REST/WebSocket roots used by the site; [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets) confirms the market fields the dashboard renders (`result`, `last_price_dollars`, `volume_fp`, `open_interest_fp`, `status`).
 - **Irregularity (flagged, not blocking):** the committed feed (`data/live/feed.json`, generated 2026-11-21T17:42:16Z, 38 alerts) is stale — 156.6 min old at check time, beyond the 45-min limit. A live-engine refresh was attempted from this sandbox and failed with `ECONNRESET` reaching `external-api.demo.kalshi.co` (sandbox egress limitation; the engine correctly left data untouched). The scheduled sampler stall was already flagged in prior sessions. No values were fabricated to freshen the feed.
 - QA: `node scripts/build-site.mjs --check` PASS; `npm ci && npm test` PASS (engine, feed, guard, page, IDs, sourced rows, lab, links — 90 pages, 2,124 internal links, 0 broken).
+
+### Merge result (session-549a3b66)
+- PR #57 merged to `main` at 2026-11-21T20:19:04Z: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/57
+- GitHub Pages deployment for the merge commit: **success** (`pages-build-deployment` run completed/success).
+- Live site: https://kanlerxz87-cyber.github.io/KalshiDash1/
+- V4: done.
