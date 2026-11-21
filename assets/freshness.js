@@ -223,28 +223,29 @@
          * tick is the visitor's own clock and the committed timestamp — no network call, no
          * third party. Re-classifying means a page left open for an hour starts saying STALE on
          * its own, instead of staying green forever. */
-        var ticker = setInterval(function () {
+        var ticker = null;
+        var tick = function () {
           if (!lastStamp) return;
           var next = { min: ageMinutes(lastStamp.iso), iso: lastStamp.iso };
           if (next.min === null) return;
           lastStamp = next;
           lastState = classify(next.min);
           paint(next, lastState);
-        }, 30 * 1000);
+        };
+        var start = function () { if (!ticker) ticker = setInterval(tick, 30 * 1000); };
+        var stop = function () { if (ticker) { clearInterval(ticker); ticker = null; } };
+        start();
         /* Stop the tick as soon as the page is hidden or torn down: nothing on screen needs it,
          * and an abandoned timer is what keeps an automated harness (jsdom) alive. A real browser
          * tab also gets the battery saving from not repainting a hidden page. */
-        var stop = function () { if (ticker) { clearInterval(ticker); ticker = null; } };
         window.addEventListener('pagehide', stop);
         document.addEventListener('visibilitychange', function () {
-          if (document.visibilityState === 'hidden') stop();
-          else if (!ticker) {
-            ticker = setInterval(function () { /* re-armed below */ }, 0);
-            stop();
-            /* Re-arm on return: simplest correct behaviour is a fresh measurement right away. */
-            var next = { min: ageMinutes(lastStamp.iso), iso: lastStamp.iso };
-            if (next.min !== null) { lastStamp = next; lastState = classify(next.min); paint(next, lastState); }
-          }
+          if (document.visibilityState === 'hidden') { stop(); return; }
+          /* Re-arm on return: measure once right away, then resume the 30-second tick. (The first
+           * version of this block armed a 0 ms interval and immediately cleared it, so the age
+           * stopped advancing after a tab was revisited. Fixed here.) */
+          tick();
+          start();
         });
       });
     });

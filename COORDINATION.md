@@ -2403,6 +2403,8 @@ session's `awaiting` key was regenerated from the committed `state.json` by its 
 | A6 | Record session verification record | done | session-a2706f31 | `verification/2026-11-21-a2706f31.md` (new) |
 | A7 | PR to `main` and merge | done — PR #74 (`arena/a2706f31-kalshidash1` → `main`), merged via `gh pr merge 74 --merge` | session-a2706f31 | COORDINATION.md, verification/2026-11-21-a2706f31.md |
 
+## Session `arena/e7260519-kalshidash1` — live-alert credibility pass (claim, 2026-11-21)
+
 ### PR, merge & deploy record — session-a2706f31
 
 - **PR:** [#74](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/74) — "Final end-to-end verification (session-a2706f31)" — `arena/a2706f31-kalshidash1` → `main`.
@@ -2437,3 +2439,33 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 - At the audited main revision the alert feed is `heuristic-v1`, generated `2026-11-21T22:26:12Z`, with 14 alerts / 5 high-ROI labels. Official live market/orderbook reads confirm one-sided book shape for the documented BTC example. **PR #72 remains open and `DIRTY`; do not treat its proposed tradeability correction as deployed.** Full finding and link evidence are in `verification/2026-11-21-37562307.md`.
 - `data/account.json` explicitly reports `connected:false`; no personal demo-account performance is available absent configured GitHub secrets. Dollar-volume rankings are derived estimates, not an API dollar field. Feed freshness at audit measured 42.8 minutes: above the 20-minute warning, below the 45-minute stale limit.
 - R1 is an independent audit and evidence handoff only. No open PR #72 files or generated site/data/workflow files were changed.
+
+---
+
+## Session `arena/4b5ddd87-kalshidash1` — takeover of stale PR #72, fixes replayed onto `main` (2026-11-21 23:30 UTC)
+
+- Session ID: `session-4b5ddd87`. Branch: `arena/4b5ddd87-kalshidash1` (Arena-managed; commit/push only here), base `b81f9f2` = `origin/main` at claim time.
+- **Handoff (60-minute rule).** PR [#72](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/72) had no commit for more than two hours, was `CONFLICTING`, and its `site-qa` check was failing. While this session was fixing it, `session-75d8eb9c` cherry-picked the same six commits into `main` (PR [#73](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/73); record at the top of this file). This session did **not** push to that branch and did not re-do the integration: it replayed **only its own fixes** on top of current `main`, after aborting a duplicate merge and verifying that `main`'s copies of `tools/live_engine.mjs`, `scripts/check_rescore_retained.mjs`, `scripts/annotate-legacy-unfillable.mjs`, `templates/flagged.tpl`, `templates/market.tpl`, `site-qa.yml` and `package.json` are byte-identical to PR #72's head.
+- **Correction to the integration record.** The note at the top of this file says PR #72's `qa` failure was "transient, not a code defect". It was **not** transient: running `scripts/check_rescore_retained.mjs` on the PR head in a detached worktree failed **1 run in 5** (`✗ prices, arrows, deltas and timestamps must be byte-identical after a re-score`). The fixture stamped all three rows with `ISO(60)`; a millisecond difference plus `applySample()`'s newest-first sort broke an ordered fingerprint. A re-run passing was luck. Fixed here.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| T1 | Claim + handoff record | done | session-4b5ddd87 | `COORDINATION.md` |
+| T2 | Replay the fixes onto current `main` (no duplicate integration; PR #72 already merged as PR #73) | done — `git format-patch` of the fix commit, `git reset --hard origin/main`, `git cherry-pick`; conflicts only in `COORDINATION.md` (kept both) and `data/live/state.json`/`feed.json` (took `main`'s newer data, re-scored it) | session-4b5ddd87 | files listed under T3/T4 |
+| T3 | Fix the flaky re-score guard; keep the model's 1 h age penalty through a re-score (F-75); add `scripts/rescore-feed.mjs` and wire `--check` into `npm test` + `site-qa` | done — 0 failures in 25 runs; the guard still exits 1 on the pre-fix sample; main's already-doubled rows restored (0.558 → 0.279, 0.554 → 0.277, 0.5512 → 0.2756) | session-4b5ddd87 | `scripts/check_rescore_retained.mjs`, `tools/live_engine.mjs`, `scripts/rescore-feed.mjs` (new), `package.json`, `.github/workflows/site-qa.yml` |
+| T4 | Re-verify F-71…F-74 against official docs and the live demo API; correct the published claims; fix the mislabelled ladder column; add F-75 | done — sources and negative checks in `verification/2026-11-21-4b5ddd87.md`; ladder column `1 − YES bid` relabelled **NO ask** | session-4b5ddd87 | `templates/flagged.tpl`, `templates/market.tpl`, `assets/freshness.js`, `verification/2026-11-21-4b5ddd87.md` (new), generated `flagged.html` / `market.html` / 20 other pages |
+| T5 | Full QA battery, PR to `main`, merge, confirm Pages deploy | in progress | session-4b5ddd87 | this board |
+
+### Verification — session-4b5ddd87
+
+- Official sources re-read: [Get Market](https://docs.kalshi.com/api-reference/market/get-market) (quote/size field names),
+  [Orderbook Responses](https://docs.kalshi.com/getting_started/orderbook_responses) (bids only; `NO BID $Y ≡ YES ASK $1−Y`),
+  [Demo environment](https://docs.kalshi.com/getting_started/demo_env), [API environments](https://docs.kalshi.com/getting_started/api_environments).
+- Live demo API probes through the platform fetch tool: [`/markets/KXBTCY-27JAN0100-B97500`](https://demo-api.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500)
+  returned `yes_bid 0.0000`, `yes_ask 0.0100`, `yes_ask_size 16665.45`, `last_price 0.0100`;
+  [`/markets/trades`](https://demo-api.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B97500&limit=8) showed
+  0.9700 ↔ 0.0100 prints inside two minutes. This independently confirms that the "$0.01 → $0.97" swing was not executable at the recorded price, which is the premise of F-71.
+- Feed after the replay: 31 alerts, **1** high-ROI, **3** legacy unfillable rows, **13** rows carrying the age penalty; `check_alerts.mjs` and `rescore-feed.mjs --check` pass; the pre-fix sample marked `heuristic-v2` still exits 1 naming exactly the four unexecutable rows (guard is live).
+- Full local battery: engine selftest, feed, feed-current, rescore (17 assertions), guard, resolution, page, ids, rows (813 sourced), lab, CORS (21/21), links (90 pages, 0 broken), freshness badge (81), qa_logic, alerts-qa, alerts-render, writer-concurrency (31), workflow-shells (9), py_compile, merge-marker scan, `build-site --check` — all PASS.
+- No value is inferred: every alert keeps its own `source_url`; the new F-75 row cites the committed feed, the code and the verification record.
+

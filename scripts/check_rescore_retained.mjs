@@ -31,7 +31,7 @@ import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { applySample, EMPTY_STATE, MODEL_VERSION } from '../tools/live_engine.mjs';
+import { applySample, EMPTY_STATE, MODEL_VERSION, modelScore, rescoreAlerts } from '../tools/live_engine.mjs';
 
 const BASE = 'https://external-api.demo.kalshi.co/trade-api/v2';
 let pass = 0;
@@ -50,8 +50,12 @@ const market = (ticker, bid, ask, price) => ({
   est_traded_dollars: null, close_time: '2027-01-01T00:00:00Z', rules_primary: 'rule',
   settlement_sources: [], contract_terms_url: null, source_url: `${BASE}/markets/${ticker}`,
 });
-const alertRow = (id, ticker, from, to, direction, bid, ask) => ({
-  id, ts: ISO(60), ticker, topic: 'crypto', title: ticker, direction, from, to,
+/* Distinct, deterministic timestamps. Using one `ISO(60)` for every row made this test
+ * FLAKY on CI: each call has its own millisecond, and `applySample()` sorts alerts newest-first,
+ * so the ordered fingerprint below changed while no value had. (Reproduced before the fix:
+ * exit 1 on run 4 of 5 with `prices, arrows, deltas and timestamps must be byte-identical`.) */
+const alertRow = (id, ticker, from, to, direction, bid, ask, minutesAgo = 60) => ({
+  id, ts: ISO(minutesAgo), ticker, topic: 'crypto', title: ticker, direction, from, to,
   delta: Math.round((to - from) * 10000) / 10000, abs_delta: Math.abs(Math.round((to - from) * 10000) / 10000),
   threshold: 0.1, baseline_kind: 'previous trade within 30 min', detection: 'trade',
   yes_bid_dollars: bid, yes_ask_dollars: ask, volume_24h_fp: '500.00', volume_fp: '1000.00',
@@ -63,9 +67,9 @@ const alertRow = (id, ticker, from, to, direction, bid, ask) => ({
 const state = structuredClone(EMPTY_STATE);
 state.meta = { ...(state.meta || {}), generated_at: ISO(60), model_version: 'heuristic-v1', base_url: BASE };
 state.alerts = [
-  alertRow('trade:KXA@1', 'KXA-1', 0.802, 0.003, 'down', '0.0000', '0.8020'),  // the CI failure shape
-  alertRow('trade:KXB@1', 'KXB-1', 0.802, 0.003, 'down', '0.0000', '0.8020'),  // x2, as three rows failed
-  alertRow('trade:KXC@1', 'KXC-1', 0.44, 0.55, 'up', '0.5400', '0.5500'),      // a genuinely tradeable move
+  alertRow('trade:KXA@1', 'KXA-1', 0.802, 0.003, 'down', '0.0000', '0.8020', 61),  // the CI failure shape
+  alertRow('trade:KXB@1', 'KXB-1', 0.802, 0.003, 'down', '0.0000', '0.8020', 62),  // x2, as three rows failed
+  alertRow('trade:KXC@1', 'KXC-1', 0.44, 0.55, 'up', '0.5400', '0.5500', 59),      // a genuinely tradeable move
 ];
 state.markets = {
   'KXA-1': market('KXA-1', '0.0000', '0.8020', 0.003),
@@ -121,11 +125,52 @@ const after = validate(asFeed(next));
 ok(after.code === 0, `the validator must PASS once the rows carry the current verdict (exit ${after.code})\n${after.out}`);
 
 /* ---- 3. nothing about the recorded market data may change -------------------------------- */
-const fingerprint = (s) => JSON.stringify((s.alerts || []).map((a) => [a.id, a.ticker, a.from, a.to, a.delta, a.ts]));
+/* Compare VALUES, not array order: the re-score sorts the rows newest-first by design, so an
+ * ordered comparison fails on a correct run whenever two fixture timestamps differ. */
+const fingerprint = (s) => JSON.stringify([...(s.alerts || [])]
+  .sort((x, y) => String(x.id).localeCompare(String(y.id)))
+  .map((a) => [a.id, a.ticker, a.from, a.to, a.delta, a.ts]));
 ok(fingerprint(state) === fingerprint(next), 'prices, arrows, deltas and timestamps must be byte-identical after a re-score');
 ok(JSON.stringify(Object.keys(state.markets)) === JSON.stringify(Object.keys(next.markets)), 'the re-score must not add or drop markets');
 
-/* ---- 4. idempotent: a second sample changes nothing ------------------------------------- */
+/* ---- 4. the published AGE PENALTY survives a re-score ------------------------------------ */
+/* `modelScore()` halves a score when the quote it scored was more than an hour old. Several rows
+ * were published that way (a 0.554 base published as 0.277). Re-scoring those with a fresh-sample
+ * assumption would double the published score although the stored quote is still the old one.
+ * This is checked with both shapes: a row that already records `age_penalised`, and a legacy row
+ * that predates the field (reconstructed from the two possible verdicts). */
+const penalInputs = { from: 0.80, delta: 0.10, direction: 'down', to: 0.70, bid: 0.69, ask: 0.71, volume24h: 500 };
+const freshScore = modelScore({ ...penalInputs, sampleAgeSeconds: 0 });
+const penalScore = modelScore({ ...penalInputs, sampleAgeSeconds: 7200 });
+ok(Math.abs(penalScore.score - freshScore.score / 2) <= 1e-4,
+  `the age penalty must still halve a score (${freshScore.score} -> ${penalScore.score})`);
+const legacyPenalised = [{
+  id: 'trade:OLD@1', ticker: 'OLD-1', ts: ISO(400), direction: 'down', from: 0.80, to: 0.70, delta: -0.10,
+  yes_bid_dollars: '0.6900', yes_ask_dollars: '0.7100', volume_24h_fp: '500.00',
+  model: { score: penalScore.score, highROI: penalScore.highROI, reasons: ['v1 incl. the 1h penalty'] },
+}];
+const legacyChanged = rescoreAlerts(legacyPenalised);
+ok(legacyChanged === 0 && legacyPenalised[0].model.score === penalScore.score,
+  `a legacy row published with the 1h penalty must keep its score (got ${legacyPenalised[0].model.score}, was ${penalScore.score})`);
+ok(legacyPenalised[0].model.original_score === undefined,
+  'preserving an unchanged verdict must not fabricate an original_score');
+const tagged = [{ ...structuredClone(legacyPenalised[0]), model: { ...penalScore } }];
+rescoreAlerts(tagged);
+ok(tagged[0].model.score === penalScore.score && tagged[0].model.age_penalised === true,
+  'a row that records age_penalised is re-scored with the penalty applied');
+const doubled = [{
+  ...structuredClone(legacyPenalised[0]),
+  model: {
+    score: freshScore.score, highROI: freshScore.highROI, tradeable: true,
+    original_score: penalScore.score, original_highROI: penalScore.highROI,
+    reasons: ['doubled by a fresh-sample re-score (the shape observed on main, 2026-11-21T23:13Z)'],
+  },
+}];
+const doubledChanged = rescoreAlerts(doubled);
+ok(doubledChanged === 1 && doubled[0].model.score === penalScore.score,
+  `a row already doubled must be restored to its published score (got ${doubled[0].model.score}, want ${penalScore.score})`);
+
+/* ---- 5. idempotent: a second sample changes nothing ------------------------------------- */
 const again = applySample(next, { nowSeconds: Math.floor(Date.now() / 1000) + 60, markets: [], runId: 'rescore-test-2' });
 ok(again.meta.rescored_by_current_model === 0, 'a second sample must not re-score anything (idempotent)');
 ok(fingerprint(again) === fingerprint(next), 'the second sample must leave the rows untouched');
