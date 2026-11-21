@@ -23,17 +23,16 @@
   <div class="page-head">
     <div class="grow">
       <h1>Sources</h1>
-      <p class="sub">Every value on this site comes from one of these sources. <strong>{{SOURCE_COUNT_DOCS}}</strong> official
+      <p class="sub">Exchange field definitions and historical captures use this register; project rules and calculations are separately labelled. <strong>{{SOURCE_COUNT_DOCS}}</strong> official
       documentation pages, <strong>{{SOURCE_COUNT_API}}</strong> demo API endpoints and
-      <strong>{{SOURCE_COUNT_EXTERNAL}}</strong> third-party official sources named by the exchange itself.
-      Verified {{SNAPSHOT_CAPTURED}}.</p>
+      <strong>{{SOURCE_COUNT_EXTERNAL}}</strong> external references named by the exchange (publisher authenticity is not automatically verified).
+      Snapshot captured {{SNAPSHOT_CAPTURED}}; each source below has its own verification date.</p>
     </div>
   </div>
 
   <div class="notice good">
     <strong>How to audit any number.</strong> Open the endpoint, read the row, and compare it with the value on the page.
-    The captured responses are committed in <code>data/snapshot.json</code>, so every table row on this site can be traced to the
-    exact response it came from without re-running anything.
+    Normalized captured values and request URLs are in <code>data/snapshot.json</code>, not the original raw HTTP bodies. Re-fetching a live endpoint may return changed values. Official definitions do not verify browser-local trades or a news cause.
   </div>
 
   <div class="table-wrap">
@@ -46,7 +45,7 @@
   <h2>Rules this site follows</h2>
   <div class="panel">
     <ol>
-      <li><strong>Nothing is inferred.</strong> If a value cannot be confirmed from one of the sources above, the cell is left
+      <li><strong>Missing exchange fields stay missing.</strong> If a value cannot be confirmed, the cell is left
       blank and the gap is listed on the <a href="flagged.html">Flagged for Review</a> page.</li>
       <li><strong>Every row carries its own provenance.</strong> Tables show the endpoint URL that produced the row, so a row can
       be re-fetched and compared directly.</li>
@@ -60,10 +59,10 @@
   <h2>Data capture</h2>
   <div class="panel">
     <p>The committed snapshot was produced by <code>scripts/fetch-snapshot.mjs</code>, which calls the public demo endpoints
-    directly and stores each response together with the exact request URL. It uses
+    directly and stores normalized fields with the exact request URL. It uses
     <strong>{{ENDPOINT_COUNT}}</strong> endpoint calls and covers <strong>{{MARKET_COUNT}}</strong> open markets across the five
     focus topics. A GitHub Actions job
-    (<code>.github/workflows/refresh-data.yml</code>) re-runs it on a schedule so the fallback data stays close to the live market.</p>
+    (<code>.github/workflows/refresh-data.yml</code>) re-runs it on a schedule on a best-effort basis; the published age, not the schedule, determines freshness.</p>
     <p class="small muted">To refresh it yourself on a machine that can reach the API:
     <code>node scripts/fetch-snapshot.mjs</code>. To rebuild the site from the templates:
     <code>node scripts/build-site.mjs</code>. To check internal links:

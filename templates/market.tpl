@@ -64,9 +64,7 @@
           <th>NO bid</th><th class="num">Contracts</th><th>→ YES ask <span class="muted">(1 − NO bid)</span></th><th></th><th>Source</th></tr></thead>
           <tbody id="book-body"></tbody></table>
         <p class="small muted" style="padding:0 14px 12px">A YES ask is <code>1 − NO bid</code>, which is the
-        relation the exchange documents for a binary book. Both executable sides are shown because a
-        one-sided book (a bid with no offer, or an offer with no bid) means the headline price cannot be
-        traded — that is exactly the condition the high-ROI model now refuses to score.</p>
+        relation the exchange documents for a binary book. Each derived ask shares the quantity of its complementary bid. A one-sided book may expose only one direction: do not assume missing opposite-side depth. A point-in-time book is not a guaranteed fill. <a href="https://docs.kalshi.com/getting_started/orderbook_responses">Official book mechanics</a>.</p>
       </div>
     </div>
     <div class="panel">

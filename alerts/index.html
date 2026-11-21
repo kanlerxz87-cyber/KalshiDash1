@@ -118,13 +118,13 @@
     </p>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Weight</th><th>Term</th><th>How it is computed</th><th>Why</th></tr></thead>
+        <thead><tr><th>Weight</th><th>Term</th><th>How it is computed</th><th>Why (project judgment)</th><th>Official fields, not weights</th></tr></thead>
         <tbody>
-          <tr><td class="num">0.20</td><td>Headroom</td><td><code>min(price_before, 1 − price_before) / 0.50</code></td><td>A move near $0.50 leaves room in both directions; near $0.02 it is mostly noise.</td></tr>
-          <tr><td class="num">0.20</td><td>Move size</td><td><code>|delta| / 0.50</code>, capped at 1</td><td>Bigger moves are bigger signals.</td></tr>
-          <tr><td class="num">0.35</td><td>Liquidity</td><td><code>min(1, volume_24h_fp / 1000)</code></td><td>A move on an empty book cannot be traded, so it is not a high-ROI signal. Largest weight.</td></tr>
-          <tr><td class="num">0.25</td><td>Spread</td><td><code>max(0, 1 − (yes_ask − yes_bid) × 10)</code></td><td>A penny-wide book is cheap to enter and exit; a $0.10 spread eats the move.</td></tr>
-          <tr><td class="num">×0.5</td><td>Staleness</td><td>applied when the sample is over an hour old</td><td>REST market data is cached and can lag the exchange.</td></tr>
+          <tr><td class="num">0.20</td><td>Headroom</td><td><code>min(price_before, 1 − price_before) / 0.50</code></td><td>A move near $0.50 leaves room in both directions; near $0.02 it is mostly noise.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market">Price fields; project weight</a></td></tr>
+          <tr><td class="num">0.20</td><td>Move size</td><td><code>|delta| / 0.50</code>, capped at 1</td><td>Bigger moves are bigger signals.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-trades">Trade fields; project weight</a></td></tr>
+          <tr><td class="num">0.35</td><td>Liquidity</td><td><code>min(1, volume_24h_fp / 1000)</code></td><td>24-hour contracts are an activity proxy, not currently available liquidity. Executability is gated separately; this term alone cannot prove a fill.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market">Volume is not available book size</a></td></tr>
+          <tr><td class="num">0.25</td><td>Spread</td><td><code>max(0, 1 − (yes_ask − yes_bid) × 10)</code></td><td>A penny-wide book is cheap to enter and exit; a $0.10 spread eats the move.</td><td><a href="https://docs.kalshi.com/getting_started/orderbook_responses">Book semantics; project weight</a></td></tr>
+          <tr><td class="num">×0.5</td><td>Staleness</td><td>applied when the sample is over an hour old</td><td>REST market data is cached and can lag the exchange.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-market">Cached fields; project age policy</a></td></tr>
         </tbody>
       </table>
     </div>

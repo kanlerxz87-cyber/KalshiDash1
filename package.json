@@ -12,7 +12,7 @@
     "test:resolution": "node tools/check_resolution_logic_test.mjs",
     "test:page": "node scripts/check_alerts_page.mjs",
     "test:ids": "node scripts/check-html-ids.mjs",
-    "test:rows": "node scripts/check-row-sources.mjs",
+    "test:rows": "node scripts/check-row-sources.mjs --selftest && node scripts/check-row-sources.mjs",
     "test:lab": "node scripts/check_lab.mjs",
     "test:cors": "node scripts/check-cors-evidence.mjs",
     "test:links": "node scripts/check-links.mjs && python3 tools/linkcheck.py",

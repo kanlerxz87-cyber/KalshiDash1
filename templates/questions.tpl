@@ -43,8 +43,7 @@
           <td>Yes. Series, events, markets, order books and candlesticks are public endpoints that need no authentication.</td>
           <td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Quick Start: Market Data</a></td></tr>
         <tr><td>How does a market resolve, and how is a winner paid?</td>
-          <td><code>result</code> becomes <code>yes</code>, <code>no</code> or <code>scalar</code>. The winning side receives $1.00
-          per contract; only net positions are settled.</td>
+          <td><code>result</code> becomes <code>yes</code>, <code>no</code> or <code>scalar</code>. For a simple $1 binary contract the winning side receives $1.00 after <code>finalized</code>; <code>determined</code> is provisional. Scalar payouts follow their own settlement bounds and are not modeled as yes/no here.</td>
           <td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a> ·
           <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a></td></tr>
         <tr><td>How do I read my demo account?</td>
@@ -94,14 +93,14 @@
       <tbody>
 
         <tr><td>What does a real demo order cost in fees?</td>
-          <td>It changes the expected value of every strategy, so the simulator's P&amp;L is currently an upper bound.</td>
+          <td>It changes the expected value of every strategy, so gross paper P&amp;L cannot be treated as a net return or a proven upper bound.</td>
           <td>Read the fee schedule for your account and the <code>fee_type</code> on the series
           (<a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a>),
           then compare one settled paper trade with the matching fill in your demo account.</td></tr>
-        <tr><td>Which market actually caused a swing?</td>
-          <td>The API has no news feed, so the dashboard can only show the official settlement source as a candidate.</td>
+        <tr><td>Which news or event caused a swing?</td>
+          <td>These market-data responses do not establish causation. A published settlement-source string may itself be unverified; it is not evidence of a news catalyst.</td>
           <td>Open the Kalshi market page for the contract and read the linked settlement source for the underlying at the time of
-          the move, then check the trade tape.</td></tr>
+          the move, then check the <a href="https://docs.kalshi.com/api-reference/market/get-trades">official trade observations</a>. Leave the cause blank until independently verified.</td></tr>
         <tr><td>How long do settled markets stay queryable?</td>
           <td>Older resolutions drop out of the public endpoints, which shortens the back-testable history.</td>
           <td>Use <code>GET /historical/markets</code> and the historical candlestick route described in
@@ -109,7 +108,7 @@
         <tr><td>Does the demo exchange have a real order book for the busiest contracts?</td>
           <td>Empty books make the liquidity view and the depth term of the ROI score unusable for those rows.</td>
           <td>Call <code>GET /markets/{ticker}/orderbook?depth=20</code> for the contract and look at
-          <code>orderbook_fp.yes_dollars</code> and <code>orderbook_fp.no_dollars</code>.</td></tr>
+          <code>orderbook_fp.yes_dollars</code> and <code>orderbook_fp.no_dollars</code> (<a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook">official book schema</a>). An empty book alone does not prove a market exists.</td></tr>
         <tr><td>How often can the dashboard poll without hitting a limit?</td>
           <td>Polling too fast is throttled; the answer determines the right refresh interval for the alert feed.</td>
           <td>Read the token-bucket rules in
@@ -122,7 +121,7 @@
   <h2>Known gaps in this build</h2>
   <div class="panel">
     <ul>
-      <li>No demo API key is stored, so no real order has been placed and the signed-request path is unverified against the exchange.</li>
+      <li>The committed account snapshot is disconnected with no capture time. This session made no authenticated exchange call or order. Repository-secret configuration could not be enumerated (403); it is unverified, not asserted absent. Signing/safety tests are offline only.</li>
       <li>Sub-minute price history only exists while a page is open — the REST candle period is 1, 60 or 1440 minutes.</li>
       <li>The ROI score, the strategies and the swing alerts are this project's own heuristics; each formula is published so it can be
       checked or replaced.</li>

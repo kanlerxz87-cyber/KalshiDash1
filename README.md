@@ -4,9 +4,8 @@ A public-data dashboard with an explicitly hypothetical paper model for the **Ka
 
 **Live site:** <https://kanlerxz87-cyber.github.io/KalshiDash1/>
 
-It tracks the highest-dollar live events in five focus topics — **gas prices, elections, culture, crypto and golf** —
-until each market resolves **yes** or **no**, records observed contract moves of **$0.10 or more** as alerts in two
-scrolling chats, and links every number on the page to the official Kalshi document or endpoint it came from.
+It ranks sampled demo markets by labelled dollar/notional estimates in five focus topics — **gas prices, elections, culture, crypto and golf** —
+and follows tracked binary markets to final **yes**/**no** outcomes. Observed contract moves of **$0.10 or more** feed two scrolling chats. Sampling is capped and can miss intervening moves; this is not an exchange-wide census. Source links distinguish exchange observations/definitions from project rules and calculations, not proof of actual execution or a news cause.
 
 - Demo REST root: `https://external-api.demo.kalshi.co/trade-api/v2`
   (also supported: `https://demo-api.kalshi.co/trade-api/v2`)
@@ -27,18 +26,18 @@ Everything below is reachable from the navigation on every page.
 |---|---|
 | [`index.html`](index.html) | Landing page: focus-topic cards, topic summary table, the highest-dollar live rows, and how to use the site. |
 | [`executive-summary.html`](executive-summary.html) | Executive summary: verified platform facts, what the site covers, key findings, and what is deliberately blank. |
-| [`dashboard.html`](dashboard.html) | **Live dashboard** — two scrolling chats (every move ≥ $0.10, and only the moves the ROI model likes), live movers, ROI ranking, liquidity. Polls the public demo API from your browser. |
-| [`alerts/index.html`](alerts/index.html) | **Live alerts console** — the same two chats, fed by the background engine (`tools/live_engine.mjs`), so the record keeps running when no browser is open. |
+| [`dashboard.html`](dashboard.html) | **Browser research dashboard** — observed ≥ $0.10 moves and a 0–100 research-filtered subset, movers and liquidity. Its formula differs from the background console's 0–1 score; neither forecasts ROI. Polls the public demo API from your browser. |
+| [`alerts/index.html`](alerts/index.html) | **Primary Live alerts console** — raw/model-filtered observed moves, fed by the background engine (`tools/live_engine.mjs`), so the record keeps running when no browser is open. |
 | [`markets.html`](markets.html) | Every tracked market, filterable by topic and by open/resolved, with each market's `result`. |
 | [`market.html`](market.html) | Market detail: price chart (X = time, seconds → 24 h; Y = contract price), order-book ladder (contracts available at each price), settlement rules, paper trade. |
 | [`portfolio.html`](portfolio.html) | Simulated portfolio: P&L, equity curve, exposure, and the auto-trader that runs the published strategies. |
 | [`analysis.html`](analysis.html) | Trades categorised by strategy and topic, so a strategy can be built from the results. |
 | [`strategies.html`](strategies.html) | The exact rule behind every strategy and behind the ROI score, with the sources for the exchange mechanics each rule uses. |
-| [`catalyst.html`](catalyst.html) | Swing catalysts: every ≥ $0.10 move with the official event link and the settlement sources the API names, plus clearly-labelled discovery links for a possible cause. |
-| [`strategylab.html`](strategylab.html) | Trade categorisation and strategy-rule synthesis from the recorded trades. |
+| [`catalyst.html`](catalyst.html) | Swing research: sampled ≥ $0.10 moves with the official event link and the settlement sources the API names, plus clearly-labelled discovery links for a possible cause. |
+| [`strategylab.html`](strategylab.html) | Unverified legacy/exploratory local-record categorisation and hypotheses, with optional seeds. Not canonical or actual account performance. |
 | [`demo-account.html`](demo-account.html) | Demo-account snapshot: balance, positions, fills and settlements captured by a GitHub Actions job from repository secrets. The browser only reads `data/account.json` — it cannot sign requests itself (measured CORS limitation, [F-66](flagged.html#F-66)). |
 | [`categories/gas.html`](categories/gas.html) · [`elections`](categories/elections.html) · [`culture`](categories/culture.html) · [`crypto`](categories/crypto.html) · [`golf`](categories/golf.html) | One page per focus topic: the series, the open markets, the liquidity and the resolved events for that topic only. Topics stay separate; events inside a topic stay grouped together. |
-| [`sources.html`](sources.html) | Source register — every table row on the site points at one of these. |
+| [`sources.html`](sources.html) | Exchange publisher/field register. Project-only schemas, weights and suggestions cite their author definitions instead of pretending to be official exchange claims. |
 | [`flagged.html`](flagged.html) | **Flagged for review** — every unverified value, limitation and irregularity, with the source to check it against. |
 | [`questions.html`](questions.html) · [`suggestions.html`](suggestions.html) · [`api.html`](api.html) | Questions and open gaps · the reviewable suggestions board · the verified API reference. |
 
@@ -54,8 +53,8 @@ Their page-by-page index is at the end of this file, under *Earlier builds — p
 |---|---|
 | `templates/*.tpl` | Page templates for the canonical site. They are stored with a `.tpl` extension so the whole-tree link checker never treats them as published pages. |
 | `scripts/build-site.mjs` | The site generator: fills the templates from `data/snapshot.json` + `data/sources.json` and writes the root pages and `categories/`. |
-| `assets/` | Browser code for the canonical site: `style.css`, `app.js` (live feed, tables, paper trading), `chart.js` (price chart), `catalyst.js`, `strategylab.js`, `demo-account.js`. |
-| `data/snapshot.json` | Verified point-in-time capture of the official demo API — the committed fallback used when the browser cannot reach the API. Every row carries its `source_url`. |
+| `assets/` | Browser code for the canonical site: `style.css`, `app.js` (live feed, tables, paper trading), `paper.js` (corrected execution/accounting), `chart.js` (price chart), `catalyst.js`, `strategylab.js`, `demo-account.js`. |
+| `data/snapshot.json` | Normalized point-in-time capture of the official demo API (not original raw HTTP bodies) — the committed fallback used when the browser cannot reach the API. Every row carries its `source_url`. |
 | `data/sources.json` | The source registry rendered into `sources.html`. |
 | `data/live/` | The alert engine's committed output (`feed.json`, `state.json`), refreshed by the scheduled engine job. |
 | `alerts/` | The standalone live-alerts console (own markup, own CSS/JS). |
@@ -89,8 +88,7 @@ node scripts/check-links.mjs     # offline check: internal links, nav, titles
 npm ci && npm test               # engine selftest + feed schema + jsdom page render + both link checks
 ```
 
-`npm ci` installs the one declared dev dependency (`jsdom`) used by the page-render tests. The published site
-itself has **no build step and no runtime dependencies** — Node 22 or later is enough.
+`npm ci` installs the one declared dev dependency (`jsdom`) used by the page-render tests. The published assets have **no browser package dependencies**. Changes to templates/data must be generated before publication; the static HTML then serves without Node. Node 22 or later runs the tooling.
 
 More checkers used by CI:
 
@@ -115,19 +113,18 @@ build sandbox they may not — in that case the committed snapshot is used and t
 ## How the live data works
 
 - **In the browser.** The canonical site and the alert console read the public demo endpoints
-  (`/series`, `/markets`, `/markets/{ticker}/orderbook`, `/markets/{ticker}/candlesticks`, `/markets/trades`) with no
+  (`/series`, `/markets`, `/markets/{ticker}/orderbook`, `/series/{series}/markets/{ticker}/candlesticks`, `/markets/trades`) with no
   credentials. If the browser cannot reach the API, the pages fall back to the committed snapshot and say so.
   See [Quick Start: Market Data](https://docs.kalshi.com/getting_started/quick_start_market_data).
 - **In the background.** GitHub Pages is static, so nothing on the site can sample the exchange while nobody is
   looking. `.github/workflows/live-alerts.yml` runs `tools/live_engine.mjs` on a schedule and commits
   `data/live/feed.json`; the console reads that feed and additionally polls the public API while it is open.
 - **Data freshness.** `.github/workflows/refresh-data.yml` re-captures `data/snapshot.json` from the official demo
-  API and regenerates the site, so the committed fallback never drifts from the published pages.
+  API and regenerates the site on a best-effort schedule. Delays/failures are possible: displayed sample ages, not a successful page load or promised cadence, determine freshness.
 - **What it will not do.** Place orders or read a portfolio on its own. Those endpoints need a request signed with
-  the account holder's key; this repository holds no credentials and never asks for them. It cannot be done from the
+  the account holder's key. This session requested no credentials; repository-secret configuration could not be enumerated (403) and is unverified. The committed account snapshot is disconnected, with no capture time. It cannot be done from the
   browser either: the demo host's CORS preflight does not allow the `KALSHI-ACCESS-*` headers a signed request needs
-  (measured 2026-11-21, [F-66](flagged.html#F-66)). Signed reads and order placement run in GitHub Actions with
-  repository secrets, and the browser only reads the resulting `data/account.json`.
+  (measured 2026-11-21, [F-66](flagged.html#F-66)). Signed reads can run in GitHub Actions with repository secrets; explicit order placement uses the separate demo-only CLI, and the browser only reads the resulting `data/account.json`.
 
 ---
 
@@ -137,7 +134,8 @@ build sandbox they may not — in that case the committed snapshot is used and t
 |---|---|
 | [`sources.html`](sources.html) · [`data/sources.json`](data/sources.json) | Every source the site uses: official documentation pages, exact demo API queries and external references. |
 | [`flagged.html`](flagged.html) | Every unverified value, limitation and irregularity, each with the source to check it against. Nothing here blocks the site. |
-| [`audit/index.html`](audit/index.html) | Line-by-line audit of the repository facts. |
+| [`audit/index.html`](audit/index.html) | Historical 2026-11-20 audit ledger, with superseded claims identified; not a current re-verification. |
+| [`verification/2026-11-21-135bb43a.md`](verification/2026-11-21-135bb43a.md) | Corrected paper/chart/demo-only safety and canonical source audit, exact test scope and release evidence. |
 | [`VERIFICATION.md`](VERIFICATION.md) · [`verification/`](verification) | Dated verification records, one per session, with the method and the outcome of each check. |
 | [`SOURCES.md`](SOURCES.md) · [`REVIEW.md`](REVIEW.md) · [`EXECUTIVE_SUMMARY.md`](EXECUTIVE_SUMMARY.md) | Source register, repository review, and the executive summary of the brief. |
 | [`docs/ALERTS.md`](docs/ALERTS.md) | The alert engine's method: discovery, sampling, the ≥ $0.10 rule, the price-coherence check, the ROI heuristic, and every irregularity it can hit. |
@@ -152,9 +150,9 @@ build sandbox they may not — in that case the committed snapshot is used and t
   ([Get Markets](https://docs.kalshi.com/api-reference/market/get-markets)).
 - Kalshi publishes no traded-dollar field, so "highest dollar amount" is an estimate (contracts × the contract's
   settlement value) and is labelled as an estimate wherever it appears.
-- Markets resolve with `result` of `yes`, `no` or `scalar`; the winning side is paid $1.00 per contract
+- Markets may return `yes`, `no` or `scalar`. After `finalized`, a winning simple $1 binary contract pays $1.00; scalar/bounded contracts follow their own payout rules and are excluded from this binary simulator
   ([Market Settlement](https://docs.kalshi.com/getting_started/market_settlement)).
-- No credential is stored in this repository or sent anywhere except the demo API origin.
+- The separate signed tool allowlists only the two official demo roots before reading a key or making a request, refuses redirects and defaults to dry-run. Production/arbitrary roots and invalid quantities/prices are rejected. `npm run test:demo-safety` verifies this offline; it does not prove live authentication.
 - Nothing here is financial advice.
 
 ---
@@ -242,7 +240,7 @@ trade/portfolio engine, and a suggestions review queue.
 
 | Path | Purpose |
 |------|---------|
-| `dash/data/snapshot.json` | Verified point-in-time capture of the official demo API (2026-11-20) — the only market data committed in the repo; every row carries its `source_url`. Used only as fallback when the browser cannot reach the API, and clearly labeled. |
+| `dash/data/snapshot.json` | Normalized point-in-time capture of the official demo API (not original raw HTTP bodies) (2026-11-20) — the only market data committed in the repo; every row carries its `source_url`. Used only as fallback when the browser cannot reach the API, and clearly labeled. |
 | `scripts/refresh_snapshot.py` | Rebuilds the `dash/` snapshot from the latest verified captures (merges rows in place; keeps prior rows and blanks for unconfirmed values) |
 | `EXECUTIVE_SUMMARY.md` | Executive summary of the brief, verified platform facts, findings, blank policy |
 | `SOURCES.md` | Source register (D1–D16 docs rows, A1–A18 live API captures) |

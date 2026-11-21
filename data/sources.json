@@ -1,6 +1,6 @@
 {
   "verified_on": "2026-11-20",
-  "note": "Every row on every table in this site points at one of these sources. 'Verified' means the source was opened and read in this session, or the endpoint was called directly against the official demo host and the captured payload is stored in data/snapshot.json. Nothing on this site is inferred: a value that could not be confirmed from one of these sources is left blank and listed on the Flagged for Review page.",
+  "note": "Publisher register with historical verification dates preserved. Official links define exchange fields; project-defined strategies, suggestions and computed metrics are separately labelled. data/snapshot.json is a normalized point-in-time capture, not the original raw HTTP bodies. Published settlement-source strings are reproduced as API data, not independently authenticated authorities or proven causes. Missing confirmed values stay blank and are flagged.",
   "docs": [
     {
       "id": "demo_env",
@@ -148,7 +148,7 @@
       "id": "series_culture",
       "title": "GET /series?category=Culture",
       "url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true",
-      "confirms": "Culture series (for example \"Will Grok be banned this year\") whose settlement sources are the named news organisations that decide the outcome.",
+      "confirms": "Culture series returned by the official category query. Their API-published settlement-source strings include search/social URLs and must not automatically be treated as official publications; see F-34/F-35.",
       "verification": "Called live on 2026-11-20; stored in data/snapshot.json under topics.culture.series."
     },
     {

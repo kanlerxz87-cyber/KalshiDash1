@@ -16,7 +16,7 @@
       <span id="clock" class="mono small muted"></span>
     </div>
   </div>
-  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
+  <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="alerts/index.html">Live alerts · 2 chats</a><a href="dashboard.html">Browser research dashboard</a><a href="executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="categories/gas.html?topic=gas">Gas Prices</a><a href="categories/elections.html?topic=elections">Elections</a><a href="categories/culture.html?topic=culture">Culture</a><a href="categories/crypto.html?topic=crypto">Crypto</a><a href="categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="markets.html">Markets</a><a href="market.html">Market detail</a><a href="portfolio.html">Portfolio</a><a href="analysis.html">Trade analysis</a><a href="strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="strategies.html">Strategies &amp; ROI model</a><a href="catalyst.html">Swing catalysts</a><a href="suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="sources.html">Sources</a><a href="flagged.html">Flagged for review</a><a href="questions.html">Questions</a><a href="api.html">API reference</a><a href="demo-account.html">Demo account</a><a href="dash/index.html">Legacy suite (dash/)</a><a href="docs/index.html">Legacy suite (docs/)</a></span></div></nav>
 </header>
 
 <main><div class="wrap">
@@ -64,9 +64,7 @@
           <th>NO bid</th><th class="num">Contracts</th><th>→ YES ask <span class="muted">(1 − NO bid)</span></th><th></th><th>Source</th></tr></thead>
           <tbody id="book-body"></tbody></table>
         <p class="small muted" style="padding:0 14px 12px">A YES ask is <code>1 − NO bid</code>, which is the
-        relation the exchange documents for a binary book. Both executable sides are shown because a
-        one-sided book (a bid with no offer, or an offer with no bid) means the headline price cannot be
-        traded — that is exactly the condition the high-ROI model now refuses to score.</p>
+        relation the exchange documents for a binary book. Each derived ask shares the quantity of its complementary bid. A one-sided book may expose only one direction: do not assume missing opposite-side depth. A point-in-time book is not a guaranteed fill. <a href="https://docs.kalshi.com/getting_started/orderbook_responses">Official book mechanics</a>.</p>
       </div>
     </div>
     <div class="panel">
@@ -130,8 +128,8 @@
        <a href="sources.html">Sources</a> ·
        <a href="flagged.html">Flagged for review</a> ·
        <a href="COORDINATION.md">Coordination board</a></p>
-    <p class="muted">Every table row links to the endpoint or document it came from. Nothing on this site is inferred.
-    Simulated trades are paper trades in your browser — no real order is ever placed by this site.</p>
+    <p class="muted">Table rows link the relevant publisher or field definitions. Exchange observations, computed metrics and project rules are distinct; a source link does not verify a hypothetical fill or news cause.
+    Browser trades are local paper records, not exchange orders. Actual demo-account access is separate and credential-gated.</p>
     <p class="muted small">Canonical site: the pages in the navigation above. Two earlier builds are still published for
     reference only and are not kept up to date:
     <a href="dash/index.html">dash/</a> · <a href="docs/index.html">docs/</a>.</p>
