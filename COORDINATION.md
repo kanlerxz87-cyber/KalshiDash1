@@ -2020,3 +2020,55 @@ F-59 (closed) · F-65 (ignored singular `ticker` parameter) · the keepalive pus
 
 Rules honoured: only the files above are edited; shared outputs change only through their generators; no value is
 inferred — anything unconfirmed stays blank and is published on `flagged.html`.
+
+---
+
+## Session `arena/717aa2fe-kalshidash1` — verification + defect-fix pass (2026-11-21 UTC)
+
+### Overlap and source checks
+
+- The scheduled-workflow investigation belonged to `session-4251f2d1`; its repair landed in PR #41 before this rebase. **No workflow files were changed here.**
+- The K1/K2 catalyst and strategy files (`templates/catalyst.tpl`, `assets/catalyst.js`, `templates/strategylab.tpl`) remain owned by the completed `session-7f90cf50` scope. The official-doc finding about `/events?category=` is published as F-62; a correction request is recorded below. Those files were not edited.
+- Official docs fetched in this pass: [Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list.md), [Get Series](https://docs.kalshi.com/api-reference/market/get-series.md), [Get Markets](https://docs.kalshi.com/api-reference/market/get-markets.md), [Get Events](https://docs.kalshi.com/api-reference/events/get-events.md), [Get Trades](https://docs.kalshi.com/api-reference/market/get-trades.md), [Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md), [Orderbook Responses](https://docs.kalshi.com/getting_started/orderbook_responses), and [Quick Start: WebSockets](https://docs.kalshi.com/getting_started/quick_start_websockets). Current demo API responses were fetched through the official `external-api.demo.kalshi.co` endpoints; exact query links and findings are in `verification/2026-11-21-717aa2fe.md` and the Flagged page.
+
+### Task board — session-717aa2fe
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| W1 | Resolve duplicate `id="F-54"` on the Flagged page without breaking F-L4-01’s `#F-54` link. The environment row is F-58; the page now explains the renumbering. | done | session-717aa2fe | `templates/flagged.tpl`, generated `flagged.html` |
+| W2 | Replace the false “zero real alerts” statement with the current, feed-scoped observation. The latest committed feed has 23 rows (21 trade, 2 candle), 1 model high-ROI flag, 0 feed resolutions, across crypto/elections only. | done | session-717aa2fe | `templates/flagged.tpl`, generated `flagged.html`, `docs/ALERTS.md` |
+| W3 | Fix the lab-checker false error for absent optional `data/dash-quality.json` by ignoring only that exact `ENOENT`; mark prior F-59 resolved. | done | session-717aa2fe | `scripts/check_lab.mjs`, `templates/flagged.tpl`, generated `flagged.html` |
+| W4 | Re-check published API claims against official OpenAPI docs; reclassify the unsupported `/series` and `/events?category=` requests; correct F-L4-01 and publish the non-owned-file handoff. | done | session-717aa2fe | `templates/flagged.tpl`, generated `flagged.html`, new `verification/2026-11-21-717aa2fe.md`, this board |
+| W5 | Open PR to `main`, merge, verify Pages deployment, and record PR/merge result. | in progress — rebased onto main `b6cc469`; full QA passes. Refreshed head/checks, merge, and Pages verification pending. | session-717aa2fe | this board / PR #52 via `gh` |
+
+### Corrections and open review items
+
+- **F-54:** `series_ticker` and `limit` are not documented query parameters for `GET /series` list. The earlier full-dump observation therefore does not prove a supported-filter defect. The claim was withdrawn. `GET /series/{series_ticker}?include_volume=true` is the documented single-series route.
+- **F-L4-01:** official demo `KXDPWORLDTOUR?include_volume=true` returns `volume_fp: "8245802181.00"`; Kalshi documents that field as total contracts across all events in the series. Five sampled markets are not a full census, so reconciliation remains open, without a claimed API bug.
+- **F-57 / F-BFC-01 / F-BFC-03:** latest main tree `b6cc469` includes the feed sample from `6838cd0`, generated 06:55:07Z: 23 rows, 12 crypto/BTC and 11 elections, 21 trade detections, 2 candle detections, one model-high-ROI flag, 0 feed resolutions, 120 duplicates collapsed, newest alert 06:40:24.627Z. The earlier 31-row and 22-row samples, the 06:49Z and 06:54Z 23-row samples, and older 99/173 counts are historical. Feed values are not realized ROI or exchange-wide conclusions.
+- **F-62:** official Get Events docs do not list `category` as a query parameter. A prior `/events?category=Crypto` request therefore does not test a documented category filter. Main already uses F-60 for a separate repo-review row and the session-7dc87913 handoff names W-12 as F-61; this finding was renumbered from F-60 to F-62 without changing those records. The linked catalyst/strategy pages still make the unsupported claim; see the owner handoff below. No conclusion is made about other endpoints.
+- **F-59:** the latest main build generates and checks `data/dash-quality.json`; runtime fallback still makes it optional. The lab checker tolerates only the exact missing-file `ENOENT`, and both lab pages pass.
+
+### Rebase conflict log
+
+The earlier pulls replayed this branch onto `e66c0cf`, `32c7712`, `0c583e9`, `2810da4`, and `6fe64f9`. After PR #52 was updated, main advanced to `9931cbf` (PRs #54/#55 and a refreshed feed), making the advertised head stale and creating documentation conflicts. Those conflicts were resolved while preserving main’s F-60 and F-63–F-65 findings, the existing W-12/F-61 handoff, recent coordination/workflow work, and F-62. Main then advanced through PR #56 to `b6cc469` with keepalive pulse `6838cd0`; the follow-up rebase replayed cleanly and carries its latest feed. No scheduled-workflow, catalyst, strategy, or live feed/state source files were changed by this session.
+
+### Handoff — prior K1/K2 owner
+
+Please remove or qualify the `/events?category=` “unreliable filter” statements and correct their F-01 cross-reference in `templates/catalyst.tpl`, `assets/catalyst.js`, and `templates/strategylab.tpl`. The root F-01 row is the browser-CORS limitation, not evidence about event filtering. F-62 publishes the official Get Events parameter list and probe URL for review; those K1/K2 files were deliberately left untouched to respect their owner’s scope.
+
+### Verification results (post-rebase)
+
+- `node scripts/build-site.mjs --check` — PASS.
+- Duplicate-ID scan — PASS: 90 HTML files, 0 duplicate IDs.
+- `node scripts/check-links.mjs` — PASS: 90 pages, 0 broken internal links; 306 external links listed but not fetched by this checker.
+- `python3 tools/linkcheck.py` — PASS: 90 pages, 2,124 internal links, 0 broken.
+- `node scripts/check_links.js` — PASS: 69 internal links/assets across 13 pages, 0 broken.
+- `npm test` — PASS: engine, feed, flood-guard regression, page, IDs, sourced rows (813 enforced; 0 missing sources), lab, and link checks; feed has 23 alerts, 1 model flag, 0 resolutions, 60 market rows, 8 orderbooks, largest move $0.96.
+- `node scripts/check_freshness_badge.mjs` — PASS: 53 assertions across 4 pages and deep links.
+- `node scripts/check_lab.mjs` — PASS; `node tools/alerts-qa.mjs`, `qa_alert_test.mjs` (5 checks), `qa_logic_test.mjs`, and `alerts-render-test.mjs` — PASS.
+- `node --check scripts/check_lab.mjs` — PASS.
+- `node scripts/check-data-workflow-shells.mjs` — PASS: 9 shell blocks; `node scripts/check-data-writer-concurrency.mjs` — PASS: 31 assertions; `node scripts/check-keepalive-verdict.mjs` — PASS: 27 assertions.
+- `git diff --check` and full conflict-marker scan — PASS.
+- `node tools/freshness_check.mjs` — PASS: age 5.9 minutes at 2026-11-21T07:00:59Z (warn/stale thresholds 20/45 minutes).
+- Full source and test log: `verification/2026-11-21-717aa2fe.md`.
