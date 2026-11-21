@@ -30,6 +30,19 @@
       n.className = 'notice ok';
       n.innerHTML = 'Browser polling of the official demo API is working, so new swings appear within seconds. ' +
         'The engine feed is merged in underneath, which is what keeps the history when this page is closed.';
+    } else if (A.state.mode === 'probing') {
+      /* MEASURED 2026-11-21 23:24Z on the live site: with a readable engine feed but a browser
+       * poll that had not finished yet (8 series, each one request), the notice said "No data
+       * available. Neither the engine feed nor the demo API could be read from this page" while
+       * 32 real alerts were already rendered underneath. Mode starts as 'probing', and the old
+       * code grouped 'probing' with 'offline'. It now says what is actually true — the feed is
+       * being read — and the feed branch below takes over as soon as loadFeed() resolves. */
+      b.className = 'badge neutral';
+      b.textContent = 'reading…';
+      n.className = 'notice';
+      n.innerHTML = '<strong>Reading the engine feed.</strong> The committed sample of the alert engine is loading. ' +
+        'Browser polling of the demo API, if your network allows it, starts at the same time and upgrades this ' +
+        'page to second-by-second updates.';
     } else if (A.state.mode === 'feed') {
       b.className = 'badge warn';
       b.textContent = 'engine feed only';
@@ -588,7 +601,12 @@
     wireControls();
     renderAll();
 
-    A.loadFeed().then(function () {
+    A.loadFeed().then(function (f) {
+      /* A readable feed is a data mode in its own right. Until now the mode stayed 'probing'
+       * until the browser poll finished or failed, which is what produced the false "No data
+       * available" notice above the alert rows (measured on the live site 2026-11-21T23:24Z).
+       * A successful browser poll still upgrades this to 'live' below. */
+      if (f && A.state.mode === 'probing') A.state.mode = 'feed';
       renderAll();
       // Try a browser poll; if it fails the feed already covers the page.
       return A.pollLive({ maxSeries: 8 }).then(function () {

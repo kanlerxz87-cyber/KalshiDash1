@@ -29,7 +29,7 @@
  * Offline: no network, no clock.
  */
 import { readFile, writeFile } from 'node:fs/promises';
-import { rescoreAlerts, MODEL_VERSION } from '../tools/live_engine.mjs';
+import { rescoreAlerts, deriveLegacyUnfillable, MODEL_VERSION } from '../tools/live_engine.mjs';
 
 const args = process.argv.slice(2);
 const checkOnly = args.includes('--check');
@@ -70,6 +70,9 @@ for (const file of targets) {
   const versionChanged = previousVersion !== MODEL_VERSION;
   if (versionChanged && previousVersion) next.meta.model_version_previous = previousVersion;
   next.meta.model_version = MODEL_VERSION;
+  /* The provenance list travels with the rows (F-79): state.json is what the engine copies forward,
+   * so it has to be here as well as in feed.json or the next sample would drop it. */
+  next.meta.legacy_unfillable_high_roi = deriveLegacyUnfillable(next.alerts, next.meta.legacy_unfillable_high_roi);
 
   const after = next.alerts.map((a) => JSON.stringify(a.model ?? null));
   const changedRows = diffOf(before, after);

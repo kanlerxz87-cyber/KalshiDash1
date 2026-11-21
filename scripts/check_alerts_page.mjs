@@ -258,6 +258,46 @@ check(text('#mode-badge').includes('live') || text('#mode-badge').includes('engi
 const firstRow = doc.querySelector('#markets-table tbody tr');
 check(firstRow && firstRow.textContent.includes('KXHIGH-1'), 'markets are ranked by estimated traded dollars');
 
+/* ---- feed-only mode (added 2026-11-21, session-2ea8e33c) --------------------------------
+ * MEASURED ON THE LIVE SITE at 2026-11-21T23:24Z: with a readable engine feed but a browser poll
+ * that had not resolved yet, the notice read "No data available. Neither the engine feed nor the
+ * demo API could be read from this page" while 32 real alerts were already rendered underneath
+ * it. Mode starts as 'probing' and the old notice treated 'probing' like 'offline'. This scenario
+ * blocks the demo API entirely (as a restrictive network would) and requires the page to say the
+ * truthful thing: the engine feed is being shown. */
+const dom2 = new JSDOM(html, {
+  url: 'https://kanlerxz87-cyber.github.io/KalshiDash1/alerts/index.html',
+  runScripts: 'outside-only',
+  pretendToBeVisual: true,
+  virtualConsole: new VirtualConsole()
+});
+dom2.window.fetch = async (url) => {
+  const u = String(url);
+  if (u.includes('data/live/feed.json')) {
+    check(u.startsWith('../data/live/feed.json'), 'feed-only: feed path is relative to the page');
+    return { ok: true, status: 200, json: async () => JSON.parse(JSON.stringify(feed)), text: async () => JSON.stringify(feed) };
+  }
+  /* A slow or blocked network does not fail instantly in a real browser; it leaves the page in
+   * the 'probing' state for as long as the requests take. That is the exact window in which the
+   * false "No data available" notice was measured, so the stub must reproduce the window rather
+   * than fail fast. */
+  return new Promise(function () {});
+};
+dom2.window.AbortController = dom2.window.AbortController || class { constructor() { this.signal = null; } abort() {} };
+for (const src of ['alerts/js/alerts-live.js', 'alerts/js/alerts-page.js']) {
+  dom2.window.eval(await readFile(src, 'utf8'));
+}
+await new Promise((r) => setTimeout(r, 900));
+const doc2 = dom2.window.document;
+const text2 = (sel) => ((doc2.querySelector(sel) || {}).textContent || '');
+check(doc2.querySelectorAll('#log-all .msg').length >= 2, 'feed-only: alerts still render from the engine feed');
+check(text2('#mode-badge').includes('engine feed only'),
+  'feed-only: the badge names the mode it is actually in, got "' + text2('#mode-badge') + '"');
+check(!text2('#mode-notice').includes('No data available'),
+  'feed-only: the page must never say "No data available" while it is showing alert rows');
+check(/engine feed/i.test(text2('#mode-notice')), 'feed-only: the notice explains that the engine feed is being shown');
+dom2.window.close();
+
 // The page runs 10 s / 30 s timers; close the DOM so this process can exit.
 dom.window.close();
 

@@ -1305,10 +1305,11 @@
       var tot = yes.concat(no).reduce(function (s, l) { return s + l[1]; }, 0);
       var totEl = $('#book-total');
       if (totEl) {
+        // Preserve main's subpenny formatting repair alongside observation-time/invalid-level provenance.
         totEl.innerHTML = (ob.data_mode === 'live' ? 'API book observed ' : 'SNAPSHOT book captured ') +
           (ob.observed_at ? dt(new Date(ob.observed_at).toISOString()) : 'time unverified') + '. ' + (invalidLevels ? invalidLevels + ' malformed level(s) omitted; values unverified. ' : '') + num(tot, 2) + ' contracts across ' + (yes.length + no.length) + ' price levels. ' +
-          'Best YES bid <b>' + (bestYesBid ? '$' + bestYesBid[0].toFixed(2) + ' × ' + num(bestYesBid[1]) : 'none') + '</b> · ' +
-          'Best YES ask <b>' + (yesAsk ? '$' + yesAsk[0].toFixed(2) + ' × ' + num(yesAsk[1]) + ' (from the NO bid)' : 'none') + '</b>. ' +
+          'Best YES bid <b>' + (bestYesBid ? cents(bestYesBid[0]) + ' × ' + num(bestYesBid[1], 2) : 'none') + '</b> · ' +
+          'Best YES ask <b>' + (yesAsk ? cents(yesAsk[0]) + ' × ' + num(yesAsk[1], 2) + ' (from the NO bid)' : 'none') + '</b>. ' +
           (yesAsk ? '' : '<span class="warn">No YES offer is visible in this captured book; execution is unverified.</span>');
       }
     }
