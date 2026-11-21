@@ -65,6 +65,18 @@
           <td>The AAA gasoline series (ticker prefix <code>KXAAAGAS</code>, or a title containing "gas price"). Each settles
           against AAA. Crude-oil and coal series in the broader "Oil and energy" tag are excluded by that rule.</td>
           <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">Live series query</a></td></tr>
+        <tr><td>Can a browser call the demo API directly?</td>
+          <td><strong>Yes for public reads; no for signed requests</strong> — measured 2026-11-21, not assumed.
+          The demo host echoes the page origin in <code>Access-Control-Allow-Origin</code> (with
+          <code>allow-credentials: true</code>) on every public endpoint the site uses, so the live tables and charts
+          work from the browser. Its preflight does not allow the <code>KALSHI-ACCESS-KEY</code> /
+          <code>-SIGNATURE</code> / <code>-TIMESTAMP</code> headers, so a portfolio read or an order must run
+          server-side (here: GitHub Actions with repository secrets). A visitor whose network blocks the host still
+          falls back to the committed snapshot, and the pages say so.</td>
+          <td><a href="data/cors-probe.json" target="_blank" rel="noopener">Raw measured headers</a> ·
+          <a href="verification/2026-11-21-c85ee474.md">verification record</a> ·
+          <a href="https://fetch.spec.whatwg.org/#http-cors-protocol" target="_blank" rel="noopener">WHATWG Fetch</a> ·
+          <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">Auth headers</a></td></tr>
         <tr><td>Does Kalshi have a "Culture" category?</td>
           <td>Yes, as a series category. <code>GET /series?category=Culture</code> returns series such as
           "Will Grok be banned this year". The official tag taxonomy has no Culture entry, which is what caused an earlier page in
@@ -80,18 +92,7 @@
     <table>
       <thead><tr><th style="width:300px">Question</th><th>Why it matters</th><th style="width:300px">How to find out</th></tr></thead>
       <tbody>
-        <tr><td>Can a browser call the demo API directly?</td>
-          <td><strong>Answered by measurement on 2026-11-21 — yes for public reads, no for signed requests.</strong>
-          The demo host echoes the page origin in <code>Access-Control-Allow-Origin</code> (with
-          <code>allow-credentials: true</code>) on every public endpoint the site uses, so the live tables and charts work
-          from the browser. Its preflight does <em>not</em> allow the <code>KALSHI-ACCESS-KEY</code> /
-          <code>-SIGNATURE</code> / <code>-TIMESTAMP</code> headers, so a portfolio read or an order must run server-side
-          (here: GitHub Actions with repository secrets).</td>
-          <td>Raw response headers: <a href="data/cors-probe.json">data/cors-probe.json</a> (re-runnable:
-          <code>tools/cors_probe.mjs</code>, workflow <code>cors-probe</code>). Method and both runs:
-          <a href="verification/2026-11-21-c85ee474.md">verification record</a>. Spec:
-          <a href="https://fetch.spec.whatwg.org/#http-cors-protocol" target="_blank" rel="noopener">WHATWG Fetch</a>.
-          Per-visitor networks can still block the host; the pages report that at runtime.</td></tr>
+
         <tr><td>What does a real demo order cost in fees?</td>
           <td>It changes the expected value of every strategy, so the simulator's P&amp;L is currently an upper bound.</td>
           <td>Read the fee schedule for your account and the <code>fee_type</code> on the series

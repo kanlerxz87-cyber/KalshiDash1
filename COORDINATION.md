@@ -2256,6 +2256,12 @@ execution stays in GitHub Actions with repository secrets (as it already was).
 
 | Follow-up record PR | [#67](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/67) — **merged** 2026-11-21T20:37:24Z as `dcb647f340dd67c9bc5f3ffbe7838109fb9f08cb`; checks `alerts`/`build`/`qa`/`qa` pass; Pages `built`, `error: null`; main runs for `dcb647f` all `success` |
 
+| Ledger-closing record | [#68](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/68) — **merged** 2026-11-21T20:39:06Z as `132b1b93`; `alerts`/`build`/`qa`/`qa` pass; Pages `built`, `error: null` |
+
+The unresolved question this session answered is now also listed under **Resolved questions** on
+`questions.html` (it had been answered in the "Open questions" table, which read as if it were still open), and that
+move is the last content change in this scope. Later board entries only need to link this section.
+
 A follow-up record commit corrects one inconsistency found *after* the merge: the published F-01 row still said "two
 independent runs" while this board and the verification record cite three (plus the post-merge fourth). The row now
 says three and names the fourth; the evidence guard keeps it tied to the file.
