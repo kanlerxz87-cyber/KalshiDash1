@@ -2151,10 +2151,10 @@ Rules honoured: `git pull --rebase` before every push; small frequent commits; n
 
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
-| I1 | Claim this scope on the shared board and push immediately. | in progress | session-96019ad5 | `COORDINATION.md` |
+| I1 | Claim this scope on the shared board and push immediately. | done | session-96019ad5 | `COORDINATION.md` |
 | I2 | Line-by-line verification of the combined tree: QA battery, build/staleness check, Pages build/deploy status for `main`, feed + snapshot freshness via official records, exec-summary claims vs committed data. | done | session-96019ad5 | NEW `verification/2026-11-21-96019ad5.md` (read-only otherwise) |
 | I3 | Refresh the stale "Current operational status" section of `EXECUTIVE_SUMMARY.md` with today's verified numbers (non-destructive; historical findings preserved verbatim). | done | session-96019ad5 | `EXECUTIVE_SUMMARY.md` |
-| I4 | Open PR to `main`, merge, confirm the Pages build for the merge commit, record PR/merge result on this board. | pending | session-96019ad5 | `COORDINATION.md` / PR |
+| I4 | Open PR to `main`, merge, confirm the Pages build for the merge commit, record PR/merge result on this board. | done | session-96019ad5 | `COORDINATION.md` / PR |
 
 ### Overlap check at claim time (2026-11-21, 20:18 UTC)
 
@@ -2174,3 +2174,17 @@ Rules honoured: `git pull --rebase` before every push; small frequent commits; n
 Live-data fix during this session: `gh workflow run live-alerts.yml --ref main` → run 44946124127 `success` → commit `25885b9` (`data(live): engine sample 2026-11-21T20:24:59Z`); `freshness_check.mjs` now **FRESHNESS OK** (was FAIL at 158 min). No data was edited by hand.
 
 Post-merge state at 20:29 UTC: `main` = `7b4b4d1`; `npm test` exit 0; `build-site --check` PASS; `freshness_check` OK; `check_freshness_badge` 53/53; 90 pages / 2,124 internal links / 0 broken; live `index.html`, `dashboard.html`, `executive-summary.html`, `categories/golf.html`, `flagged.html` all fetched post-deploy and render with per-row source links. Two conflict incidents occurred (PR #59 claim vs #57/#58, PR #63 vs #60) and both were resolved by keeping **both** sessions' board sections — no other session's work was discarded. Open PRs #62 (session-c85ee474) and #64 (session-96019ad5) are other sessions' scopes and were deliberately not merged here.
+
+---
+
+---
+
+### PR, merge & deploy record — session-96019ad5 (2026-11-21 20:27 UTC)
+
+- **PR:** [#60](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/60) — "Final integration verification + exec-summary status refresh" — merged 2026-11-21T20:27:12Z as merge commit [`9972c71d6a1bd99a72821ab4428190591e5aa86a`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/9972c71d6a1bd99a72821ab4428190591e5aa86a).
+- **CI:** `alerts` / `build` / `qa` (site-qa + suite-qa) — all pass (run 44946315994 / 44946315933 / 44946315914 / 44946315964).
+- **Pages:** latest build for the merge commit reports **built**, no error — commit `9972c71`, created 2026-11-21T20:27:13Z → 20:27:33Z (20.655 s). [Pages build API](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest).
+- **QA battery** re-run on the combined tree post-merge: `npm test` (engine/feed/guard/page/ids/rows/lab/links) — PASS; `build-site --check` — PASS (site not stale); duplicate-id scan — PASS (89 files, 549 ids).
+- **Feed freshness at merge time:** FRESHNESS OK — commit `25885b9` (engine sample 2026-11-21T20:24:59Z), age ~1.3 min at check time against the 45-minute limit. Earlier 156.8-min staleness (F-45/F-58) cleared when the scheduled sampler resumed.
+- **Irregularities:** stale-feed limit, BTC `$0.97`/`$0.01` flap (F-BFC-03), sandbox-blocked external fetches and 60-day schedule auto-disable — all retained as published on flagged.html; no unverified value was fabricated.
+- **Parallel-session note:** fd481e62 (PR #58), 93edc454 (PR #59), 549a3b66 (PR #57) record their own integration passes; c85ee474 (PR #62) is open. Their records were retained; one COORDINATION.md conflict was resolved by keeping both sections; the rebasing never discarded the other sessions' work.
