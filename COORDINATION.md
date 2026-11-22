@@ -3277,9 +3277,14 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
 - **K4 done.** `npm test` exit 0 on the merged tree; `build-site --check` clean; 90 pages / 2,209 internal links / 0
   broken; 1,022 canonical rows / 0 problems; 611 ids / no duplicates; account-privacy guard 11/11; demo safety 57;
   paper 53; chart+paper DOM 38. Unverified values remain blank (account disconnected; live authentication unexercised).
+- **PR [#107](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/107)** (this record) merged 2026-11-22T08:22:24Z as
+  `ff9f7a2a579166ea3600c4ef53f4b33b68710f37`; checks `alerts`/`build`/`qa`×2 pass; Pages `built`, `error: null`.
+  This is the closing entry for session-8dcab433; the merge of this entry's own PR is the one event it cannot
+  contain. Final live state: <https://kanlerxz87-cyber.github.io/KalshiDash1/> ·
+  <https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html#F-85>.
 
-## Session session-e43b620f — latest integration checkpoint (2026-11-22)
+## Session session-e43b620f — PR #108 integration checkpoint (2026-11-22)
 
-- Integrated latest `origin/main` at `ff9f7a2` (PR #107). Preserved the source-backed account privacy finding F-85 and this audit's distinct $0.97 observation F-86; kept `verification/2026-11-22-e43b620f.md`, which the incoming branch's merge had removed while resolving shared records. F-84 remains the scalar-settlement correction.
-- The latest executive-summary wording is retained as supplied by main; the public-snapshot warning remains on the Demo account page and in F-85. Handoff remains recorded: do not imply that a scheduled read-only snapshot is private; an executive-summary copy change is deferred to its page owner, not silently edited here.
-- Local `npm test`, `build-site --check`, privacy guard, source-row and internal-link checks passed on the prior integrated checkpoint. Re-run after this upstream merge, push, and refresh PR #100 checks before integration.
+- Integrated `origin/main` at `f4e66cf` (PR #108). Preserved this branch's conspicuous public-account privacy warning in the executive summary and corrected its stale F-82 cross-reference to **F-85**; the account-page warning and main's F-85 privacy row remain. Preserved this branch's separate F-86 demo-price observation and `verification/2026-11-22-e43b620f.md`, which were omitted from the incoming merge. F-84 remains the scalar-settlement correction.
+- The latest-main merge's only conflict was `COORDINATION.md`; all session records are retained. Regenerated `executive-summary.html`; no account credentials or live account data were accessed.
+- After local verification, push this integration, wait for PR #100 checks, confirm mergeability against current main, then merge only when clean; verify Pages deployment and fetched content before closing the record.

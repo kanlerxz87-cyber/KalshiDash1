@@ -52,7 +52,7 @@
       (<code>tools/demo_trader.mjs</code>) is designed to sign account reads with repository secrets and write
       <code>data/account.json</code>, but GitHub Pages serves that file publicly. If enabled now, balances, positions, fills and settlements
       would be published. The current snapshot remains <code>connected: false</code> with no capture time. Do not add account secrets
-      until an access-controlled private data path is in place; see <a href="flagged.html#F-82">Flagged for Review F-82</a>.
+      until an access-controlled private data path is in place; see <a href="flagged.html#F-85">Flagged for Review F-85</a>.
       The browser cannot sign requests itself because the demo API's preflight does not allow the three
       <code>KALSHI-ACCESS-*</code> headers (measured, <a href="flagged.html#F-66">F-66</a>).</li>
     </ul>
