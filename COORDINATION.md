@@ -2991,9 +2991,9 @@ Egress: only github.com / api.github.com / codeload / npm registry / PyPI are re
 | ID | Task | Status | Owner | File scope (only these) |
 |---|---|---|---|---|
 | J1 | Read the board, claim this section, commit and push before any other edit. | in progress | session-401144df | this section of `COORDINATION.md` |
-| J2 | Line-by-line review of the requirements against the shipped site: alerting threshold, dual chats, topics, resolution, simulated trading, portfolio, graph axes/timeframe/liquidity, catalyst links, executability, navigation. | unclaimed | session-401144df | read-only; findings go to `verification/2026-11-22-401144df.md` |
-| J3 | Verify every published data/finding claim that this session re-checks against official Kalshi documentation via the page fetcher; flag, never infer. | unclaimed | session-401144df | same |
-| J4 | Run the repository's full QA suite locally, reproduce any failure before fixing it, and only edit files inside a claimed scope. | unclaimed | session-401144df | `scripts/`, `assets/` (only if a defect is reproduced), tests |
+| J2 | Line-by-line review of the requirements against the shipped site: alerting threshold, dual chats, topics, resolution, simulated trading, portfolio, graph axes/timeframe/liquidity, catalyst links, executability, navigation. | in progress | session-401144df | read-only; findings go to `verification/2026-11-22-401144df.md` |
+| J3 | Verify every published data/finding claim that this session re-checks against official Kalshi documentation via the page fetcher; flag, never infer. | in progress — 9 official pages read, 3 defects reproduced | session-401144df | same |
+| J4 | Run the repository's full QA suite locally, reproduce any failure before fixing it, and only edit files inside a claimed scope. | done — `npm test` green (18 suites) + `--check` green | session-401144df | `scripts/`, `assets/` (only if a defect is reproduced), tests |
 | J5 | Confirm the deployed Pages site is live, its pages load, and its data timestamps are consistent with the committed engine sample. | unclaimed | session-401144df | read-only + deployment record |
 | J6 | Final integration: PR this branch to `main`, merge, confirm the Pages build, record PR/merge/deploy here. | unclaimed | session-401144df | this board, `README.md` |
 
@@ -3021,3 +3021,17 @@ Egress: only github.com / api.github.com / codeload / npm registry / PyPI are re
   committed engine sample is correspondingly `02:27:14Z`. If the gap is reproducible on GitHub's side rather than a
   local artefact, every page is publishing a sample older than the 45-minute STALE threshold while the site still
   reads as live. Evidence is being collected before anything is published.
+
+### J2/J3 scope claim + reproduced defects — session-401144df (before edits)
+
+Claimed file scope for the corrections below: **`README.md`, `EXECUTIVE_SUMMARY.md`, `.github/workflows/live-alerts.yml` (comment
+text only), `templates/flagged.tpl` (one new row only), `scripts/check-workflow-site-consistency.mjs` (one new assertion),
+`verification/2026-11-22-401144df.md` (new), and this board.** No other session has an open claim on these files; no generated
+page other than the rebuild output of `templates/flagged.tpl` is edited by hand, and `data/` is not touched.
+
+| ID | Reproduced defect | Evidence | Fix |
+|---|---|---|---|
+| J-01 | "Runs every 10 minutes" / "the engine samples every 10 minutes" (README, EXECUTIVE_SUMMARY, F-67 row, S-01 row) is not what the recorded schedule does. Cron is `*/10`; GitHub documents that `schedule` runs "can be delayed during periods of high loads … some queued jobs may be dropped", and the repository's own `keepalive.yml` was written for exactly this reason. Measured: six consecutive scheduled `live-alerts` runs on 2026-11-21/22 are **4–6 h apart** (02:27, 22:25, 17:41, 10:26, 02:54, 21:52Z), never 10 min. | `gh api …/actions/runs?event=schedule` | reworded as a 10-minute cron whose observed cadence is 4–6 h, pointing at the measured gap and the fail-closed badge |
+| J-02 | EXECUTIVE_SUMMARY says "**Alerts so far: zero**" and lists only four topics captured; the committed feed carries **40 alerts** across elections and crypto. | `data/live/feed.json` | corrected to today's committed counts with the sample timestamp, still stating that the newest engine run created 0 new alerts |
+| J-03 | S-01 on the alert console says a WebSocket would "remov[e] the 10-minute delay entirely"; the same page's API reference and `executive-summary.tpl` correctly say a signed handshake is required. | official WebSocket docs | corrected to describe the measured gap and the documented delay/drop behaviour |
+| J-04 | Alerts console calls the engine feed "the engine's own 10-minute cadence" in a code comment. | `alerts/js/alerts-page.js` | reworded to the cron cadence + threshold semantics |
