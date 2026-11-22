@@ -42,7 +42,7 @@ Official sources: <a href="https://docs.github.com/en/repositories/creating-and-
 (<code>connected: false</code>, <code>captured_at: null</code>) &mdash; no account data has been published.
 Demo funds are mock funds and demo prices &ldquo;may not be reflective of those in real markets&rdquo;
 (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Kalshi demo environment ↗</a>).
-Tracked as <a href="flagged.html#F-85">F-82 on Flagged for review</a>.</span>
+Tracked as <a href="flagged.html#F-85">F-85 on Flagged for review</a>.</span>
 </div>
 
 <div class="notice" id="conn-status"><strong>Connection status: checking <code>data/account.json</code>…</strong></div>
