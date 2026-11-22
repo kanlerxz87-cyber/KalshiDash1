@@ -3076,6 +3076,36 @@ verification file carries an official source link.
 The pinned branch is fixed by the environment. Historical task rows are retained; the previous integration records PR #91 as completed. No source or generated pages are claimed by this session.
 
 - Independent check complete: `npm ci`, `npm test`, and generator `--check` pass; 90 pages / 2,198 internal links checked, external links not fetched. Kalshi's [demo documentation](https://docs.kalshi.com/getting_started/demo_env) was checked for the endpoints and mock-fund caveat. [Pages deployment](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44976170235) succeeded for `4f1de81`; current actual demo-account state remains disconnected and unverified. Full limits and evidence: `verification/2026-11-22-0d9df07c.md`. This is not a new line-by-line verification of the entire repo. Status: done.
+---
+
+## Session `arena/2a42fa01-kalshidash1` — independent verification of the live site and current sample (2026-11-22 UTC)
+
+**Session ID:** `session-2a42fa01`. Branch `arena/2a42fa01-kalshidash1` (Arena-pinned, status `active`), based on `main` @ `4f1de81`.
+
+- Read the board before claiming. The only open PR at claim time is [#86](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/86) (docs, session-37562307). No session claims the tasks below.
+- Claimed scope (non-overlapping): `verification/2026-11-22-2a42fa01.md` (new), plus targeted fixes **only if** a defect is reproduced against an official source/live API, and the generated pages rebuilt through `scripts/build-site.mjs`. No other session's file is edited.
+- The full requirement set (dashboard, alerts, portfolio, strategies, categories, flagged page, GitHub Pages) already exists on `main`; this session's job is to re-verify it line by line, find genuine gaps, and fix/re-flag what is reproduced.
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| B1 | Claim scope on `COORDINATION.md`, commit and push immediately | done | session-2a42fa01 | `COORDINATION.md` |
+| B2 | Run the full offline QA battery on this branch; record pass/fail per check | done — `npm test` exit 0; per-check table in `verification/2026-11-22-2a42fa01.md` §1 | session-2a42fa01 | `verification/2026-11-22-2a42fa01.md` |
+| B3 | Independently verify the live Pages site and the committed sample against the official demo API/docs; record every source and any irregularity | done — §2 live reads; §4 limitations | session-2a42fa01 | `verification/2026-11-22-2a42fa01.md` |
+| B4 | Fix reproduced defects; re-verify; publish findings; PR to `main`, merge, confirm Pages | in progress — **F-86** (settlement_ts) + **F-87** (F-A9 mapping) fixed, regenerated, suite green; PR #106 open | session-2a42fa01 | `scripts/fetch-snapshot.mjs`, new `scripts/check-settlement-ts.mjs`, `package.json`, `.github/workflows/site-qa.yml`, `templates/flagged.tpl`, `flagged.html`, `EXECUTIVE_SUMMARY.md` |
+
+### Merge conflict log — session-2a42fa01 (2026-11-22 ~08:2x UTC)
+
+- `main` advanced from `bb2cfec` to `39e5585` (PRs #96, #98, #99, #104, #105) while PR #106 was open.
+  Conflicts: `COORDINATION.md`, `templates/flagged.tpl`, generated `flagged.html`, `package.json`.
+  Resolved by keeping **both** sides: all concurrent board sections; main's new `test:privacy`
+  script and privacy site-qa step; main's F-82…F-85 rows. **No other session's row, script or
+  workflow step was removed.**
+- **Flag-ID collision, resolved without discarding either side:** this session had drafted its two
+  rows as F-82/F-83; concurrent sessions published F-82…F-85 on `main`. This session's rows were
+  renumbered to **F-86/F-87** (content unchanged). `check-html-ids` on the merged tree reports
+  613 ids, no duplicates.
+- `site-qa.yml` now runs both main's "Demo-account privacy warning" step and this session's
+  "Resolved events can show the official settlement time" step.
 
 ---
 
@@ -3089,14 +3119,21 @@ One pre-existing unmerged session branch (`f89b55f7`) edits the same engine area
 after its board claim; per the 60-minute rule this session takes the specific lines below and will record any overlap handoff.
 
 **Finding-id renumbering (integration, 2026-11-22).** This session's findings were written as F-84 (corroboration),
-F-85 (sample anomaly) and F-86 (live-signal UX), but ids moved under it twice while it worked: `main` published its own
-**F-84** (scalar settlement over-claim, session-736be760) and **F-85** (demo-account snapshot privacy,
-session-272b326f/8dcab433), and an **open PR** (not yet merged when this was written) publishes **F-86** for the same
-sample anomaly this session observed independently. Per the board's existing precedent (F-75→F-78/F-79, F-78→F-80,
-F-79→F-81) the ids already claimed elsewhere are kept and **this session's rows are published as F-87 (corroboration),
-F-88 (sample anomaly) and F-89 (live-signal UX)** in the template, code comments, test messages, cross-links and the
-verification record. No other session's text was rewritten, and the two independent observations of the sample anomaly
-(F-88 here, F-86 in that PR) agree on the measured facts; neither was copied from the other.
+F-85 (sample anomaly) and F-86 (live-signal UX), and ids kept moving while it worked: `main` published its own **F-84**
+(scalar settlement over-claim), **F-85** (demo-account snapshot privacy), **F-86** (dashboard feed), **F-87** (provenance
+defect) and **F-88** (contaminated candle replay); an open PR published **F-86** for the same sample anomaly this session
+observed independently. Per the board's existing precedent (F-75→F-78/F-79, F-78→F-80, F-79→F-81) the ids already
+claimed elsewhere are kept and **this session's rows are published as F-90 (corroboration), F-91 (sample anomaly) and
+F-92 (live-signal UX)** in the template, code comments, test messages, cross-links and the verification record. Each flag
+row records its own renumbering history. No other session's row was dropped, rewritten or renumbered — a resolution step
+that had briefly removed `main`'s F-87/F-88 rows was reverted before committing. The sample anomaly was observed
+independently here and in the open PR's F-86 row; the facts agree and neither was copied from the other.
+
+**Data note.** `main` produced a fresher official sample while this PR was open (`generated_at 2026-11-22T08:33:29Z`,
+49 alerts, 3 high-ROI). That sample was produced by the **pre-fix** corroboration code: 3 of its 49 alerts cite the day-old
+field and all 3 are exactly the same high-ROI rows as before. They are now recorded in `meta.legacy_day_old_corroboration`
+by the annotator (a `meta`-only change; no price, arrow, delta, timestamp or score touched), and every future sample is
+written by the fixed engine and enforced by the validator.
 
 **Why this session exists.** Every requirement is already implemented on `main` and the full suite passes, but the *substance*
 still has a reproducible, official-source-verifiable defect that directly corrupts the two user-facing alert chats, and the
@@ -3107,9 +3144,9 @@ public site still has weak live-signal UX. This session fixes those and nothing 
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
 | D1 | Claim, commit and push this section immediately. | done | session-f7ba69d5 | `COORDINATION.md` (this section) |
-| D2 | **F-87** (claimed as F-84; see renumbering note). `corroborate()` and the catalyst page use `previous_price_dollars` as a same-session reference. The official spec defines it as the last traded YES price **a day ago**, so a day-old price can "corroborate" an untradeable $0.75–$0.96 print and publish it as a verified, high-ROI swing. Remove it as a corroboration reading and from the swing models; regression tests must fail on the pre-fix code. | in progress | session-f7ba69d5 | `tools/live_engine.mjs` (`corroborate` + selftest), `scripts/check_alerts.mjs`, new `scripts/check-corroboration.mjs`, `assets/catalyst.js`, `templates/catalyst.tpl`, `templates/flagged.tpl` |
-| D3 | **F-88** (claimed as F-85). Publish an observed-sample anomaly on the Flagged page: all 40 alerts in the committed feed are ≥ $0.50 single-step oscillations on 4 tickers, 2 labelled high-ROI before the F-84 fix; state only what the official API shows at review time and what remains unverified. | in progress | session-f7ba69d5 | `templates/flagged.tpl` + generated `flagged.html` |
-| D4 | **F-89** (claimed as F-86). Live-signal UX: on the alert console and the dashboard, show for each watchlist row whether it is the *board leader* on estimated dollars and the price it moved from/to over the 24 h `previous_yes_*` fields — so an oscillating row is visible as oscillating instead of being presented as an opportunity. Official field definitions only; no inferred cause. | in progress | session-f7ba69d5 | `alerts/js/alerts-live.js`, `alerts/js/alerts-page.js`, `alerts/css/alerts.css`, `assets/app.js`, `assets/style.css`, `scripts/check_alerts_page.mjs`, new `scripts/check-live-signal.mjs`, `package.json` |
+| D2 | **F-90** (claimed as F-84; see renumbering note). `corroborate()` and the catalyst page use `previous_price_dollars` as a same-session reference. The official spec defines it as the last traded YES price **a day ago**, so a day-old price can "corroborate" an untradeable $0.75–$0.96 print and publish it as a verified, high-ROI swing. Remove it as a corroboration reading and from the swing models; regression tests must fail on the pre-fix code. | in progress | session-f7ba69d5 | `tools/live_engine.mjs` (`corroborate` + selftest), `scripts/check_alerts.mjs`, new `scripts/check-corroboration.mjs`, `assets/catalyst.js`, `templates/catalyst.tpl`, `templates/flagged.tpl` |
+| D3 | **F-91** (claimed as F-85). Publish an observed-sample anomaly on the Flagged page: all 40 alerts in the committed feed are ≥ $0.50 single-step oscillations on 4 tickers, 2 labelled high-ROI before the F-84 fix; state only what the official API shows at review time and what remains unverified. | in progress | session-f7ba69d5 | `templates/flagged.tpl` + generated `flagged.html` |
+| D4 | **F-92** (claimed as F-86). Live-signal UX: on the alert console and the dashboard, show for each watchlist row whether it is the *board leader* on estimated dollars and the price it moved from/to over the 24 h `previous_yes_*` fields — so an oscillating row is visible as oscillating instead of being presented as an opportunity. Official field definitions only; no inferred cause. | in progress | session-f7ba69d5 | `alerts/js/alerts-live.js`, `alerts/js/alerts-page.js`, `alerts/css/alerts.css`, `assets/app.js`, `assets/style.css`, `scripts/check_alerts_page.mjs`, new `scripts/check-live-signal.mjs`, `package.json` |
 | D5 | Full QA battery, dated verification record with official source links, PR to `main`, merge, confirm Pages deploy, record it here. | unclaimed | session-f7ba69d5 | `verification/2026-11-22-f7ba69d5.md` (new), `README.md` if copy is wrong, generated root/category pages via `scripts/build-site.mjs` only, this board |
 
 **Non-goals / not claimed:** no credentials, no authenticated call, no order, no exchange-wide census claim, no invented cause for
@@ -3132,7 +3169,7 @@ engine/derived scores may be regenerated, and any regeneration is labelled in th
 
 ### Progress (D2/D3/D4 implemented and tested; D5 in progress)
 
-- **D2 complete — F-87 (claimed as F-84) is fixed and guarded.** Official definition read live: [Get Market schema](https://docs.kalshi.com/api-reference/market/get-market.md)
+- **D2 complete — F-90 (claimed as F-84) is fixed and guarded.** Official definition read live: [Get Market schema](https://docs.kalshi.com/api-reference/market/get-market.md)
   — `previous_price_dollars` is the last traded YES price **a day ago**. `corroborate()` now accepts only the
   same-session book. Measured scope on the committed 2026-11-22T02:27:14Z sample: 3 of 40 alerts cited the day-old
   field and **all 3 were also corroborated by their own book**; **0** alerts were admitted by it alone, so the
@@ -3142,9 +3179,9 @@ engine/derived scores may be regenerated, and any regeneration is labelled in th
   feed without the provenance list (3 violations, naming exactly those 3 rows). A second consumer with the same wrong
   idea — `assets/catalyst.js` publishing the day-over-day change as an intraday `prev-close` swing — is relabelled
   `24h-change` and kept out of the intraday feed.
-- **D3 complete — F-88 (claimed as F-85) published** as an observed sample anomaly (needs review) with live API evidence and an explicit
+- **D3 complete — F-91 (claimed as F-85) published** as an observed sample anomaly (needs review) with live API evidence and an explicit
   "mechanism unverified" statement. Nothing about cause or executability is inferred.
-- **D4 complete — F-89 shipped** (claimed as F-86) Alert console board gains a **Board** leader column and a **24h change** column built
+- **D4 complete — F-92 shipped** (claimed as F-86) Alert console board gains a **Board** leader column and a **24h change** column built
   only from the published day-old fields, so an oscillating contract reads as oscillating instead of as repeated new
   opportunities. 5 jsdom assertions added and mutation-tested (leader map removed → 2 failures; fabricated `+$0.00` →
   2 failures).
@@ -3353,3 +3390,168 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
 - **K4 done.** `npm test` exit 0 on the merged tree; `build-site --check` clean; 90 pages / 2,209 internal links / 0
   broken; 1,022 canonical rows / 0 problems; 611 ids / no duplicates; account-privacy guard 11/11; demo safety 57;
   paper 53; chart+paper DOM 38. Unverified values remain blank (account disconnected; live authentication unexercised).
+- **PR [#107](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/107)** (this record) merged 2026-11-22T08:22:24Z as
+  `ff9f7a2a579166ea3600c4ef53f4b33b68710f37`; checks `alerts`/`build`/`qa`×2 pass; Pages `built`, `error: null`.
+  This is the closing entry for session-8dcab433; the merge of this entry's own PR is the one event it cannot
+  contain. Final live state: <https://kanlerxz87-cyber.github.io/KalshiDash1/> ·
+  <https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html#F-85>.
+
+---
+
+## Session `arena/401144df-kalshidash1` — line-by-line repo review, requirement audit, live-site verification (2026-11-22 08:05 UTC)
+
+**Session ID:** `session-401144df`. Arena-pinned branch `arena/401144df-kalshidash1`, base = current `main` tip `4f1de81`.
+**Constraints in force:** this platform allows only the single Arena-pinned branch, so `session-<id>/<task>` branches are
+not created; per-task file scopes on this branch are the equivalent control, as recorded by earlier sessions (R-03).
+Egress: only github.com / api.github.com / codeload / npm registry / PyPI are reachable from the shell; the
+`docs.kalshi.com` and demo-API reads in this session go through the platform page fetcher, exactly as logged before.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| J1 | Read the board, claim this section, commit and push before any other edit. | in progress | session-401144df | this section of `COORDINATION.md` |
+| J2 | Line-by-line review of the requirements against the shipped site: alerting threshold, dual chats, topics, resolution, simulated trading, portfolio, graph axes/timeframe/liquidity, catalyst links, executability, navigation. | done — 17 requirements mapped to implementation + test (§5 of the record) | session-401144df | read-only; findings go to `verification/2026-11-22-401144df.md` |
+| J3 | Verify every published data/finding claim that this session re-checks against official Kalshi documentation via the page fetcher; flag, never infer. | done — 7 official pages read, 11 claims adjudicated (10 confirmed verbatim, 1 rejected + corrected) | session-401144df | same |
+| J4 | Run the repository's full QA suite locally, reproduce any failure before fixing it, and only edit files inside a claimed scope. | done — `npm test` green (18 suites) + `--check` green | session-401144df | `scripts/`, `assets/` (only if a defect is reproduced), tests |
+| J5 | Confirm the deployed Pages site is live, its pages load, and its data timestamps are consistent with the committed engine sample. | unclaimed | session-401144df | read-only + deployment record |
+| J6 | Final integration: PR this branch to `main`, merge, confirm the Pages build, record PR/merge/deploy here. | unclaimed | session-401144df | this board, `README.md` |
+
+- **Stale-claim check at 08:05Z:** the only open PR is [#86](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/86)
+  (`arena/37562307-kalshidash1`, docs-only, created 2026-11-21T23:27Z — 8h38m old, i.e. >60 min with no new commit, and
+  `CONFLICTING`). Its task is already marked done on the board and its merge was recorded by that session; only its
+  board ledger is unmerged. Per the >60-minute rule this session **takes over closing that ledger** — it will be
+  preserved verbatim (never dropped) and reconciled in J6, and no other session's file is reverted.
+- No other active claim is older than 60 minutes. Historical merged sections above are records, not live locks.
+  Shared generated pages (`*.html` from `templates/`) will only be regenerated by this session's final build step,
+  after source edits pass their tests — the same rule earlier sessions followed.
+
+
+### Conflict + handoff log — session-401144df
+
+- Merging `origin/main` (`8f4e684`, session-0d9df07c's ledger + its `verification/` file) into this branch conflicted in
+  **`COORDINATION.md` only**. Resolved by keeping session-0d9df07c's section first, verbatim, followed by this
+  session's section, verbatim — nothing dropped or reworded. No source file, generated page or data file was touched
+  by the merge. The two sessions work in disjoint scopes (that session claims only its board row and its own
+  `verification/` file; this one claims the audit below), so there is no duplicate work.
+- **Concurrency observed:** `main` moved while this session was reading (PR #93 merged 08:04Z). This session therefore
+  re-fetches and rebases/merges before every push, and treats any commit it did not write as another session's work.
+- **Live-freshness finding under investigation (not yet a published claim):** the `live-alerts` workflow is scheduled
+  every 10 minutes, but the newest scheduled run at 08:05Z was `2026-11-22T02:27:01Z` (≈5h38m gap), and `main`'s
+  committed engine sample is correspondingly `02:27:14Z`. If the gap is reproducible on GitHub's side rather than a
+  local artefact, every page is publishing a sample older than the 45-minute STALE threshold while the site still
+  reads as live. Evidence is being collected before anything is published.
+
+### J2/J3 scope claim + reproduced defects — session-401144df (before edits)
+
+Claimed file scope for the corrections below: **`README.md`, `EXECUTIVE_SUMMARY.md`, `.github/workflows/live-alerts.yml` (comment
+text only), `templates/flagged.tpl` (one new row only), `scripts/check-workflow-site-consistency.mjs` (one new assertion),
+`verification/2026-11-22-401144df.md` (new), and this board.** No other session has an open claim on these files; no generated
+page other than the rebuild output of `templates/flagged.tpl` is edited by hand, and `data/` is not touched.
+
+| ID | Reproduced defect | Evidence | Fix |
+|---|---|---|---|
+| J-01 | "Runs every 10 minutes" / "the engine samples every 10 minutes" (README, EXECUTIVE_SUMMARY, F-67 row, S-01 row) is not what the recorded schedule does. Cron is `*/10`; GitHub documents that `schedule` runs "can be delayed during periods of high loads … some queued jobs may be dropped", and the repository's own `keepalive.yml` was written for exactly this reason. Measured: six consecutive scheduled `live-alerts` runs on 2026-11-21/22 are **4–6 h apart** (02:27, 22:25, 17:41, 10:26, 02:54, 21:52Z), never 10 min. | `gh api …/actions/runs?event=schedule` | reworded as a 10-minute cron whose observed cadence is 4–6 h, pointing at the measured gap and the fail-closed badge |
+| J-02 | EXECUTIVE_SUMMARY says "**Alerts so far: zero**" and lists only four topics captured; the committed feed carries **40 alerts** across elections and crypto. | `data/live/feed.json` | corrected to today's committed counts with the sample timestamp, still stating that the newest engine run created 0 new alerts |
+| J-03 | S-01 on the alert console says a WebSocket would "remov[e] the 10-minute delay entirely"; the same page's API reference and `executive-summary.tpl` correctly say a signed handshake is required. | official WebSocket docs | corrected to describe the measured gap and the documented delay/drop behaviour |
+| J-04 | Alerts console calls the engine feed "the engine's own 10-minute cadence" in a code comment. | `alerts/js/alerts-page.js` | reworded to the cron cadence + threshold semantics |
+
+### J2/J3 completion — session-401144df
+
+Record: [`verification/2026-11-22-401144df.md`](verification/2026-11-22-401144df.md). Full suite green
+(`npm test`, 18 suites; `build-site --check` clean; 2,201 internal links checked, 0 broken).
+
+- **Official sources read this session:** demo_env, get-exchange-status, market_lifecycle,
+  market_settlement, orderbook_responses, websocket-connection (all `docs.kalshi.com`), and GitHub's
+  `schedule` trigger reference. Ten published platform claims were confirmed **verbatim**; one was
+  **rejected and corrected** (F-82).
+- **F-82 (new row, published on `flagged.html`):** four places in the repository promised a fixed
+  10-minute sampling cadence. The cron is `*/10`, but GitHub documents that scheduled runs may be
+  delayed or dropped, and this repository's own history shows six consecutive scheduled
+  `live-alerts` runs **4–6 h apart** (also 4–5 h for `keepalive`'s 15-minute cron and the 2-hourly
+  snapshot job — the delay is repo-wide). Corrected in `README.md`, `EXECUTIVE_SUMMARY.md`,
+  `alerts/index.html` S-01 and a code comment. **No silent-staleness hazard exists:** the
+  freshness module was executed in a headless DOM and rendered `STALE · engine 5.7 h ago` with
+  "treat every feed as historical", and `engine unreadable` when the feed cannot be read.
+- **Second correction (no new row, recorded in F-82's evidence):** root `EXECUTIVE_SUMMARY.md` still
+  said "Alerts so far: zero" and listed four topics; the committed feed has **40 alerts** across
+  elections and crypto. Corrected with the sample timestamp and current counts.
+- **Regression guard:** `scripts/check-workflow-site-consistency.mjs` grew 10 assertions (44 total)
+  that reject the old cadence phrasing in `README.md`, `EXECUTIVE_SUMMARY.md` and `alerts/index.html`,
+  require the documented delay/drop caveat and the measured gap, require F-82 to keep its official
+  source link, and include two negative controls. Verified to **fail** when `README.md` is reverted
+  to the pre-fix text (1 failure) and to pass on the corrected text.
+- **Data consistency:** all five index topic cards reconcile exactly with `data/snapshot.json`
+  (143/326/0/1634/872). The engine's `topics.*.count` is a *series* count and is labelled "N series
+  matched in the last engine run" on the console — different measure, correctly labelled, not a defect.
+- **Not verified, flagged not guessed:** no live exchange read (shell egress blocked), no
+  authenticated read (`data/account.json` is `connected:false`), no causal claim for any swing.
+- **Stale-claim handoff logged, not acted on:** PR #86 (`arena/37562307-kalshidash1`) is a docs-only
+  board ledger that is >60 min stale and `CONFLICTING`. Its content is preserved in the branch it
+  targets; closing it is **not** needed for its recorded task, and this session will not force-push
+  or rewrite another session's branch. It is left for its owner and noted here so nobody re-does it.
+
+### J5 — new defect claimed before editing (session-401144df)
+
+| ID | Defect | Evidence | Fix scope |
+|---|---|---|---|
+| J-05 / **F-88** | The **browser research dashboard** (`dashboard.html`) seeds its two chat panes from the captured 1-minute candles by comparing **adjacent candle closes** (`assets/app.js` → `seedAlertsFromSnapshot`). In the committed capture, `KXPRESNOMD-28-JSTE` alternates between `$0.003/$0.004` and `$0.822/$0.823` in single minutes — **130 adjacent flips ≥ $0.10 in a 359-minute window** — so the live page renders hundreds of alternating "▲ +0.82 / ▼ −0.82" swing alerts for a market whose own capture shows it quoted at $0.002/$0.003 and whose engine feed contains **zero** alerts for that ticker. The headless test only used a synthetic 4-candle fixture, so it never exercised a contradictory series. | `data/snapshot.json` candle series; `alerts-page`/`feed.json` cross-check; live page text | `assets/app.js` (one filter + guard), `scripts/check-market-chart.mjs` (2 assertions incl. a fixture reproducing the real series) |
+
+Claimed scope: `assets/app.js`, `scripts/check-market-chart.mjs`, `templates/flagged.tpl` (row now F-88), `alerts/js/alerts-page.js`
+(consistency note only), this board, the verification record. No compiled/generated page is hand-edited; `build-site` regenerates them.
+
+**Not claimed, reported to the owner of that surface:** the same replay exists in `archive/legacy-root/assets/app.js`. The
+archive is a preserved earlier build; this session leaves it untouched and records the observation on F-88 instead.
+
+### Merge of `main` @ 76381fd — conflict resolution and flag renumbering (session-401144df)
+
+`main` advanced 62 commits while these fixes were being written; six files conflicted. Every conflict
+was resolved by **keeping the other session's work and layering only what was uniquely mine**:
+
+| File | Resolution |
+|---|---|
+| `README.md` | Took **main's** cadence paragraph verbatim (it measured 6 schedule runs in 34.6 h — stronger than this session's 4–6 h figure). My text dropped; no claim lost. |
+| `EXECUTIVE_SUMMARY.md` | Took **main's** two replacement sentences (measured cadence + a "superseded" note that already corrects the stale "Alerts so far: zero" paragraph). My duplicate correction dropped. |
+| `templates/flagged.tpl` | Kept **main's F-81…F-87** rows exactly. My cadence row was **withdrawn** — main publishes the same finding as **F-83**, and another session had already dropped its own duplicate for the same reason. My dashboard-replay finding was renumbered **F-83 → F-88** to avoid two rows with one id (the exact F-78 collision recorded earlier on this board). |
+| `flagged.html` | Generated file — conflict discarded and regenerated with `scripts/build-site.mjs`; `--check` is clean and `check-html-ids` reports no duplicate ids (89 files, 608 ids). |
+| `assets/app.js` | Kept **main's** alert-badge structure (engine-feed badge, `scoreBadge()`), re-applying only this session's explanatory `title` on the `snapshot replay` badge. Main's `seedAlertsFromSnapshot` and the sustained-move rule coexist; `check-market-chart` runs both sessions' tests together (**44 cases**). |
+| `scripts/check-market-chart.mjs` | Kept **both** test blocks (main's engine-feed replay tests + this session's F-88 tests), renumbered mine to F-88. |
+
+Post-merge `npm test`: **all suites green** — 44 chart/paper cases, 57 demo-safety, 43 workflow
+consistency, 11 account privacy, 0 broken internal links, `build-site --check` clean.
+
+**Cross-session duplicate-work note (not an error by either session):** three sessions independently
+found the cadence over-claim. Resolution follows the precedent already on this board: one published row
+(F-83) carries it, the others are withdrawn and their unique wording fixes retained. This session's
+own unique contribution to that thread is the S-01 correction on the alert console and the
+`live-alerts.yml` comment, both now pointing at F-83.
+
+### site-qa failure on this branch — reproduced and fixed (session-401144df)
+
+`site-qa` failed on `0335a7c`. Actions logs are blocked by this sandbox's egress, so the failure was
+reproduced by running every step of `.github/workflows/site-qa.yml` locally. Eight of nine passed; the
+ninth is the workflow's own **"No unresolved merge markers in published files"** step, which found
+`<<<<<<< HEAD` / `=======` / `>>>>>>> origin/main` markers in **`COORDINATION.md`** at lines ~3003 and
+~3082. Those markers were **not written by this session** — they came through the merge of `main`
+(they sit inside session-736be760's and session-8dcab433's sections). Any branch that merged that
+`main` state would have failed the same check.
+
+Fixed by resolving both blocks properly, keeping every session's text: the first had an empty ours-side
+(kept main's session-736be760 section), the second had this session's section on the ours-side and
+session-8dcab433's closing entry on theirs (kept both, theirs first). No sentence from any session was
+dropped. Verified: `grep` for markers across `*.html|*.tpl|*.md|*.css|*.js|*.mjs|*.yml` now returns
+**0**, and all nine local equivalents of the site-qa steps pass, as does the rest of `npm test`.
+
+### Flaky gate found on refreshed data — session-401144df (F-89)
+
+Merging `main`'s new snapshot (`41f9420`, captured 2026-11-22T08:24:51Z) made **`npm run test:settlement`**
+fail: `negative control: a null settlement_ts still renders a blank, never an inferred time`.
+
+- **Cause (measured, not guessed):** the control nulled `topics.gas.settled_events[0].markets[0].settlement_ts`
+  only. In the refreshed capture **all 12** nested markets of `KXAAAGASW-26NOV16` legitimately carry the
+  same `settlement_ts` (`2026-11-16T14:32:51.060078Z` — they settle together), so the generated page
+  still contained the string and the control failed **even though the generator was correct**. The
+  earlier capture happened to have a single-market event first, so the control passed by accident.
+- **Fix:** the control now nulls the event's `settlement_ts` **and every nested market's**, which is the
+  only way to test "no official value ⇒ blank cell". No product code changed.
+- **Verified:** with the fix, 5/5 pass; reverting the test reproduces the 1 failure on the same data.
+  Full `npm test` is green on the merged tree.
+- **Published as F-89** (next free id; F-88 is this session's dashboard row).

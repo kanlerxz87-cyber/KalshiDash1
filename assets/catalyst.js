@@ -229,7 +229,7 @@
     renderChart();
   }
 
-  /* 24-hour change, as the API defines it (F-87).
+  /* 24-hour change, as the API defines it (F-90).
      The market object publishes previous_price_dollars / previous_yes_bid_dollars /
      previous_yes_ask_dollars, which the official spec defines as the same values "a day ago"
      (https://docs.kalshi.com/api-reference/market/get-market). That is a legitimate comparison,

@@ -161,7 +161,7 @@
     crowd the others out. The <strong>Board</strong> column marks the top-ranked row of each topic on that estimate,
     so a trader can see at a glance that several rows belong to one topic leader; and <strong>24h change</strong> is a
     day-over-day comparison (the API's <code>previous_price_dollars</code> is the same value a day ago — it is
-    <em>not</em> an intraday move and is never used to corroborate one, see <a href="../flagged.html#F-87">F-87</a>).
+    <em>not</em> an intraday move and is never used to corroborate one, see <a href="../flagged.html#F-90">F-90</a>).
     A contract that swings between two extremes within the day is visible as such in the 24h change next to the
     alert feeds above.
   </p>
@@ -229,7 +229,7 @@
         <tr>
           <td>S-01</td>
           <td><strong>Move from polling to the WebSocket ticker channel</strong></td>
-          <td>Removes the 10-minute delay entirely; every quote change arrives as an event, so a $0.10 swing is seen the moment it happens.</td>
+          <td>Replaces the sampling gap with a push: every quote change arrives as an event, so a $0.10 swing is seen when it happens instead of at the next sample. The gap is not a fixed 10 minutes &mdash; the cron is <code>*/10</code>, but GitHub documents that scheduled runs can be delayed or dropped under load, and the runs measured here started 4&ndash;6 h apart. See <a href="../flagged.html#F-83">F-83</a>.</td>
           <td>A server-side relay holding a demo API key, because the handshake is signed. Cannot be done from a static page.</td>
           <td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">Quick Start: WebSockets</a></td>
         </tr>

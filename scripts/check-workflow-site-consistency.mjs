@@ -183,6 +183,65 @@ ok(
   '`if ! node build-site.mjs; then exit 1` is accepted as mandatory',
 );
 
+/* ------------------------------------------------------------------ F-82: cadence wording
+ *
+ * The published copy used to promise a fixed cadence ("runs the engine every 10 minutes") that this
+ * repository's own scheduled runs do not keep: six consecutive `live-alerts` runs started 4-6 h
+ * apart, and GitHub documents that `schedule` runs can be delayed or dropped under load. The claim
+ * was corrected to state the declared cron, that documented behaviour and the measured gap. This
+ * guard fails if any of those files goes back to promising a fixed interval without the caveat.
+ * Source: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule
+ */
+
+/* NOTE: `templates/flagged.tpl` is deliberately NOT scanned for the banned phrases — the flagged
+ * page must be able to quote the old wording when it documents the defect (row F-82 does exactly
+ * that). It is asserted separately below instead. */
+const CADENCE_FILES = [
+  'README.md',
+  'EXECUTIVE_SUMMARY.md',
+  'alerts/index.html',
+];
+
+/* Phrases that assert an interval the scheduler does not guarantee. */
+const BANNED_CADENCE = [
+  /runs the engine every 10 minutes/i,
+  /runs every 10 minutes so the record/i,
+  /removes the 10-minute delay entirely/i,
+  /engine'?s own 10-minute cadence/i,
+  /engine samples every 10 minutes/i,
+];
+
+for (const file of CADENCE_FILES) {
+  const text = read(file);
+  for (const re of BANNED_CADENCE) {
+    ok(!re.test(text), `${file}: no unqualified promise of a fixed cadence (${re})`);
+  }
+}
+
+/* The caveat must exist where a reader meets the cadence. README carries the full explanation; the
+ * ops summary carries the measured figure and links the published row. Both were written by other
+ * sessions, so this asserts the substance, not one exact sentence. */
+ok(/can be delayed/i.test(read('README.md')) && /dropped/i.test(read('README.md')),
+  'README.md: states GitHub\'s documented delay/drop behaviour');
+ok(/schedule runs in 34\.6|measured/i.test(read('README.md')),
+  'README.md: reports the gap as measured rather than assumed');
+ok(/measured delivery was 6 runs|F-83/.test(read('EXECUTIVE_SUMMARY.md')),
+  'EXECUTIVE_SUMMARY.md: reports the measured cadence and links the published row');
+
+/* The flagged page must still publish the defect itself, with its official source. */
+{
+  const flagged = read('templates/flagged.tpl');
+  ok(/id="F-83"/.test(flagged), 'templates/flagged.tpl publishes the cadence row (F-83)');
+  ok(/id="F-83"[\s\S]{0,6000}can be delayed/i.test(flagged), 'F-83 quotes the documented delay/drop behaviour');
+  ok(/id="F-83"[\s\S]{0,8000}events-that-trigger-workflows#schedule/.test(flagged), 'F-83 links the official GitHub source');
+}
+
+/* Negative control: the guard must actually reject the old wording. */
+const OLD = 'runs the engine every 10 minutes and commits `data/live/feed.json`';
+ok(BANNED_CADENCE.some((re) => re.test(OLD)), 'negative control: the pre-fix sentence is rejected');
+ok(!BANNED_CADENCE.some((re) => re.test('declares a 10-minute cron; scheduled runs can be delayed or dropped')),
+  'negative control: the corrected sentence is accepted');
+
 /* ----------------------------------------------------------------------------- verdict */
 
 console.log('');
