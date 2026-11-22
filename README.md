@@ -272,9 +272,15 @@ node scripts/check_alerts_page.mjs        # render + behaviour test of the page 
 ```
 
 * **Why a scheduled job:** GitHub Pages is static, so nothing on the site can sample the exchange
-  while nobody is looking. `.github/workflows/live-alerts.yml` runs the engine every 10 minutes and
-  commits `data/live/feed.json`; the page reads that and additionally polls the public API while it
-  is open.
+  while nobody is looking. `.github/workflows/live-alerts.yml` declares a 10-minute cron
+  (`*/10 * * * *`) and commits `data/live/feed.json`; the page reads that and additionally polls the
+  public API while it is open. **The declared cron is not the observed cadence.** GitHub may delay or
+  drop scheduled runs, and this repository's own run history is the evidence: 20 `schedule`-triggered
+  runs in total, and at 2026-11-22T08:20Z the newest engine sample
+  (`data/live/state.json` → `meta.generated_at 2026-11-22T02:27:14.000Z`) was 5.9 hours old while
+  `live-alerts` declares `*/10`. Treat the published sample age — the header badge and the
+  `#feed-asof` line on every page — as the truth, never the cron. Recorded as F-45/F-58 on
+  [`flagged.html`](flagged.html).
 * **What it will not do:** place orders or read a portfolio. Those endpoints need a signed request
   with the account holder's key; the site holds no credentials and never asks for them.
 * Method, sources and every irregularity: [`docs/ALERTS.md`](docs/ALERTS.md). Flagged items with

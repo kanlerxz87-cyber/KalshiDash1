@@ -118,8 +118,13 @@
       <a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Market data</a></li>
       <li>The demo endpoints in the brief match Kalshi's documentation exactly, and demo credentials are separate from production
       credentials. <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment</a></li>
-      <li>Markets resolve with <code>yes</code>, <code>no</code> or <code>scalar</code>; the winning side is paid $1.00 per contract.
+      <li>Markets resolve with <code>yes</code>, <code>no</code> or <code>scalar</code>. For a simple binary contract, a
+      <strong>yes</strong> outcome pays YES holders $1 per contract and a <strong>no</strong> outcome pays NO holders $1 per
+      contract. A <code>scalar</code> market pays the value it settles at (minus any settlement floor for YES), not a flat
+      $1.00, so this site never prices a scalar contract as a binary win/loss — see
+      <a href="flagged.html#F-82">F-82</a>.
       <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Settlement</a> ·
+      <a href="https://docs.kalshi.com/getting_started/settlement_bounds" target="_blank" rel="noopener">Settlement Bounds</a> ·
       <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Lifecycle</a></li>
       <li>The WebSocket feed requires API-key authentication during the handshake, so a keyless static site must poll REST — and REST
       quotes can lag the exchange by a few seconds.

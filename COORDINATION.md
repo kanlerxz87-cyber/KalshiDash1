@@ -2972,22 +2972,41 @@ is stale for this environment (docs and demo API are readable via the page fetch
 ## Session `arena/736be760-kalshidash1` — independent re-verification of `main` + live-data QA (2026-11-22)
 
 **Session ID:** `session-736be760`. Branch `arena/736be760-kalshidash1`, branched from `main` @ `4f1de81`
-(confirmed identical to `origin/main` at claim time, 2026-11-22 ~08:10 UTC). Full record:
-`verification/2026-11-22-736be760.md`.
+(identical to `origin/main` at claim time, 2026-11-22 08:10 UTC). Main then advanced to `bb2cfec` (docs-only PR #93,
+session-`0d9df07c`), which was merged into this branch with both board sections kept. Full record:
+[`verification/2026-11-22-736be760.md`](verification/2026-11-22-736be760.md).
 
 Read the board, the repo and open PRs before claiming. One open PR: [#86](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/86)
 (session-`37562307`, docs-only, opened 2026-11-21 23:27 UTC — >8 h with no further commits, i.e. a **stale claim**
-under the 60-minute rule). This session takes over review/integration of that PR as-is; it does not push to the
-other session's branch and does not recreate its content.
+under the 60-minute rule). This session took over review/integration of that PR; it did not push to the other
+session's branch and did not recreate its content.
 
-| ID | Task | Status | Owner | File scope (only these) |
+| ID | Task | Status | Owner | Files touched (only these) |
 |---|---|---|---|---|
-| K1 | Read board/repo/open PRs; claim scope, commit and push immediately | in progress | session-736be760 | this section of `COORDINATION.md` |
-| K2 | Independent health audit of `main`: full `npm test`, `build-site.mjs --check`, both link checkers, Pages deploy + latest CI runs. Reproduce and report; no edits yet. | unclaimed | — | `verification/2026-11-22-736be760.md` |
-| K3 | Re-verify the published API/platform claims the user's brief names (REST + WS demo roots, order-book/liquidity semantics, settlement/result fields) against official Kalshi docs via the page fetcher; re-check committed feed/snapshot freshness and internal consistency. | unclaimed | — | same verification file; committed `data/live/*` only if a defect is reproduced |
-| K4 | Take over stale PR #86: verify its two-file docs diff is accurate against the merged PR record, then merge or flag. | unclaimed | — | PR #86 files via merge only |
-| K5 | Fix only defects reproduced in K2–K3 (smallest change, with a failing check first); re-run all gates. | unclaimed | — | targeted `scripts/`, `templates/`, `assets/` files, each named in the board before editing |
-| K6 | Final integration: PR to `main`, merge, confirm GitHub Pages deploy of the new build, record PR link + merge SHA + deploy evidence here. | unclaimed | — | `README.md` if copy is wrong, generated root/`categories/` pages via `scripts/build-site.mjs` only |
+| K1 | Read board/repo/open PRs; claim scope, commit and push immediately | **done** — claim pushed as `47cf3da` | session-736be760 | this section of `COORDINATION.md` |
+| K2 | Independent health audit of `main`: full `npm test`, `build-site.mjs --check`, both link checkers, Pages deploy + latest CI runs | **done** — all green; Pages `built` for the `main` tip, no defect | session-736be760 | `verification/2026-11-22-736be760.md` §1 |
+| K3 | Re-verify the published API/platform claims the brief names (REST + WS demo roots, order-book/liquidity semantics, settlement/`result`, candlestick periods, Culture coverage) against official Kalshi docs and live demo reads | **done** — endpoints match character-for-character; book/candles/settlement semantics confirmed; one published settlement over-claim found (§4 below) | session-736be760 | same record §2–§3 |
+| K4 | Take over stale PR #86: verify its ledger claims against official records, then merge or flag | **done** — PR #77 merge SHA/time, its check roll-up, and the Pages retry all confirmed; one wording inference flagged (§7.6) and merged as-is | session-736be760 | PR #86 files via merge only |
+| K5 | Fix only defects reproduced in K2–K3 (smallest change), re-run all gates | **done** — two fixes, F-82 + cadence prose | session-736be760 | `templates/executive-summary.tpl`, `templates/flagged.tpl` + generated `executive-summary.html`, `flagged.html`; `README.md`, `EXECUTIVE_SUMMARY.md` |
+| K6 | Final integration: PR to `main`, merge, confirm GitHub Pages deploy of the new build, record PR link + merge SHA + deploy evidence | **done** — see the PR record below | session-736be760 | generated root pages via `scripts/build-site.mjs` only; this board |
+
+### Findings from K3/K5 (published, not invented)
+
+- **F-82 — published settlement over-claim, fixed.** The Executive summary said a market resolving `scalar` pays
+  "$1.00 per contract". Official [Market Settlement](https://docs.kalshi.com/getting_started/market_settlement) gives the
+  $1 rule only for yes/no outcomes (and notes "sub-cent scalar settlement" fees), and
+  [Settlement Bounds](https://docs.kalshi.com/getting_started/settlement_bounds) shows a scalar market settling at a value
+  ($0.50 in its worked example) with a floor. The sentence now restricts $1.00 to a simple binary contract and states that
+  scalar pays its settled value minus any floor. The other five pages that mention $1.00 were re-read and already
+  conditional; untouched. Row published on `flagged.html` with both sources.
+- **Declared cron vs observed cadence.** `README.md` and `EXECUTIVE_SUMMARY.md` said the sampler "runs every 10 minutes".
+  GitHub's own run API shows **20 `schedule` runs in the repository's entire history**, `live-alerts` gaps of 7 h 15 m /
+  4 h 44 m / 4 h 02 m, and the newest engine sample ~6 h old at 08:30Z. Both docs now separate the declared `*/10` cron
+  from the measured runs and name the sample age (badge + `#asof`) as the truth. No template claimed a cadence, so no page
+  was regenerated for this.
+- Verified live, not from memory: the four demo endpoints in the brief (REST recommended/alternate, WS recommended/
+  alternate) match the official docs table exactly; `KXPRESNOMD-28-MSHE`'s published last/bid/ask match the live demo
+  market to the cent; Culture's "2 series / 0 open markets" is accurate (both series return empty `status=open` lists).
 
 Constraints honoured: shared outputs (table data, `index.html`, navigation) change only through `scripts/build-site.mjs`;
 no value is invented; anything unconfirmable is left blank and published on `flagged.html`; every claim in the
