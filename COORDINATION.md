@@ -3092,6 +3092,18 @@ session claimed the files below, and no other session's file, data or row was re
 | B2 | **F-82**: the dashboard's two chats never read the committed engine feed, so a reader without demo-API access saw only a synthetic candle replay and an empty high-ROI pane while 40 sampled alerts sat unread. Fix + offline regression test. | done — 7 new DOM assertions (suite 31 → 38), negative-checked | session-b8913775 | `assets/app.js`, `scripts/check-market-chart.mjs` |
 | B3 | **F-83**: the published "runs every 10 minutes" cadence is not what the platform delivers (6 schedule runs in 34.6 h). Correct the claim with the measured interval; do not promise a cadence the repository cannot control. | done (copy corrected; cadence flagged, not fixable in-repo) | session-b8913775 | `templates/flagged.tpl` → `flagged.html` (regenerated), `README.md`, `docs/ALERTS.md`, `EXECUTIVE_SUMMARY.md` |
 
+| B4 | Privacy handoff from session-272b326f / session-736be760: the public-snapshot warning and its **F-85** row landed on `main` through concurrent work while this session was in flight, so no duplicate warning or row was published here. This session adds the missing offline guard and fixes a mislabelled cross-reference. Whether to publish account data at all stays an owner decision. | done — warning already on `main`; **new guard** `scripts/check-account-privacy.mjs` (11 checks incl. 4 negative controls) in `npm test` + `site-qa`; the page's `F-82`→`F-85` label corrected; note appended to F-85 | session-b8913775 | new `scripts/check-account-privacy.mjs`, `package.json`, `.github/workflows/site-qa.yml`, `templates/demo-account.tpl` → `demo-account.html` (label only, regenerated), `templates/flagged.tpl` → `flagged.html` (note appended to F-85, regenerated) |
+
+### PR, merge and deploy record — session-b8913775
+
+- **PR [#96](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/96)** — "fix(dashboard): show the committed engine feed in both alert chats (F-82); correct the published cadence claim (F-83)" — **merged** 2026-11-22T08:09:34Z as merge commit [`2f85ee60200810241bc30e023e843c60b347603a`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/2f85ee60200810241bc30e023e843c60b347603a).
+  - Checks on the PR head `ffcd6ad`: `alerts`, `build`, `site-qa`, `suite-qa` — **4/4 pass**.
+  - Pages: `pages/builds/latest` for `2f85ee6` → **`built`**, `error.message` **`null`**, updated 2026-11-22T08:09:58Z; post-merge `site-qa`/`suite-qa`/`Site build check`/`alerts-qa` all **success** on the merge SHA.
+  - **Live verification (cache-busted, via the platform page fetcher — the sandbox has no direct TLS egress to `*.github.io`):** `dashboard.html?v=0810` now renders engine rows with dated timestamps (`11-21 23:25:31 UTC`), an `engine feed` badge, `engine score 0.78 / 1 · high-ROI` and the exact API URL per row, instead of replay-only rows; `flagged.html?v=0810` serves **F-82** and **F-83**; `verification/2026-11-22-b8913775.md` is served.
+  - **Rebase conflict:** `main` advanced to `90d58b3` (session-272b326f's #93–#95) while this PR was open. Only `COORDINATION.md` conflicted; it was resolved by keeping **both** board sections in full and adding a note that their `templates/demo-account.tpl` handoff was not taken over. Nothing of theirs was dropped, and their `docs/DEMO_ACCOUNT.md` was not edited.
+
+**Overlap note — three sessions, one privacy finding (2026-11-22).** session-272b326f documented the public-snapshot risk in `docs/DEMO_ACCOUNT.md` (PR #94) and handed the page half to the integrator; session-736be760 published the page warning and its **F-85** row; this session measured the same risk independently, prepared a warning plus an `F-84` row, and then **did not publish either** because `main` already carried them. The row was renumbered twice during rebases (F-84 → F-85 → withdrawn) and the duplicate UI was dropped rather than merged; only the additive work was kept: the offline guard and the `F-82` → `F-85` cross-reference label fix on the demo-account page. Nothing of the other sessions' pages, rows or docs was reverted or rewritten.
+
 ### Sources re-verified this session (official)
 
 [demo environment](https://docs.kalshi.com/getting_started/demo_env) · [orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses) ·
@@ -3178,3 +3190,55 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
   `npm test` exit 0; `build-site --check` clean; 90 pages / 2,201 internal links / 0 broken; 342
   external URLs listed but **not fetched**; authenticated demo account still disconnected, so every
   account figure stays blank.
+
+
+## Session session-f134d89d — authenticated demo-account safety and API audit (2026-11-22)
+
+- Arena-pinned branch: `arena/f134d89d-kalshidash1`, based on `main` at `4f1de81`. Branch naming is fixed by Arena.
+- Read this board and the currently pushed claims of sessions `0d9df07c` (independent release check) and `2a42fa01` (independent site/feed verification) before claiming. Historical completed claims and stale rows are preserved; this task is distinct from their release/feed audits. No shared generated HTML, data or navigation is claimed.
+- This session owns only the account/CLI files listed below; any required changes outside that scope will be requested here, not made in another session's files. Real credentials will not be requested, and no authenticated order will be sent during verification.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| D1 | Verify demo-only signed CLI transport, order payload and account snapshot semantics against current official Kalshi API documentation; reproduce and repair only documented defects with offline tests. | done — offline regressions pass; live authentication and execution unverified | session-f134d89d | `tools/demo_trader.mjs`, `scripts/check-demo-safety.mjs`, `assets/demo-account.js`, `docs/DEMO_ACCOUNT.md`, new `verification/2026-11-22-f134d89d.md` |
+| D2 | Run QA, record sources and unresolved limitations; PR/merge and deployment confirmation if permitted and checks pass. | in progress | session-f134d89d | this section of `COORDINATION.md`, PR on the assigned branch |
+
+- Claim rebase conflict: PR #93 merged an independent release section at the same end-of-file location while this claim was being committed. Stopped, preserved both complete sections, and continued the rebase; no other session content was discarded.
+
+### Account audit scope and handoffs — 2026-11-22
+
+- The concurrent PR [#94](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/94) claims `docs/DEMO_ACCOUNT.md` for a public-account privacy warning. This session yields that file; no overlapping edits will be made while it is owned. The CLI's built-in usage and the dated report will describe any change, and a documentation handoff will be made.
+- **Reproduced locally with synthetic responses:** four HTTP-200 empty objects incorrectly set `connected=true` and a capture time; Kalshi documents required balance fields and list arrays. The V2 `cancel` command omits `market_ticker`, so a cancellation without an explicit exchange index defaults to shard 0 instead of auto-routing. This session is fixing both inside its already-claimed CLI/test scope only. Sources: [Get Balance](https://docs.kalshi.com/api-reference/portfolio/get-balance), [Get Positions](https://docs.kalshi.com/api-reference/portfolio/get-positions), [Get Fills](https://docs.kalshi.com/api-reference/portfolio/get-fills), [Get Settlements](https://docs.kalshi.com/api-reference/portfolio/get-settlements), [Cancel Order V2](https://docs.kalshi.com/api-reference/orders/cancel-order-v2).
+- **D1 scope extension, claimed before editing:** `assets/demo-account.js` for connected-account runtime tables only, with synthetic DOM tests in already-claimed `scripts/check-demo-safety.mjs`. Current runtime `kvTable`/`rowsTable` places an endpoint in a separate trailing row rather than on every data row; it also renders the documented list envelopes as giant JSON. This is not an index/navigation/shared data edit. Another session owns the shared template/Flagged-page integration. If source metadata is absent or not an exact official demo endpoint, data will remain withheld and flagged rather than inventing a source.
+- **Integration handoff:** please publish the reproduced empty-account-response and shard-routing issues as source-linked review findings, along with the independent public-snapshot privacy finding, on the Flagged for Review page. Live authentication, order placement, account values and successful shard-routed cancellation remain unverified; no real credentials or orders were used.
+
+### Verification and follow-up coordination
+
+- Rebase onto `main` after PR #96 merged encountered a second end-of-file `COORDINATION.md` conflict. Stopped and retained both the complete session-b8913775 section and this session's section; no other session's content was discarded.
+- PR #94 has merged and its O3 documentation scope is complete. **Re-claiming only the CLI usage and account-capture semantics in `docs/DEMO_ACCOUNT.md`**, preserving the privacy warning and other session's additions. The cancellation command now needs `--ticker`; the former one-argument example would otherwise be misleading.
+- Offline result: `npm test` passed all 17 suites, including 56 demo-safety/display checks; `build-site --check` and supplemental workflow, freshness, link and alert checks passed. The tests use synthetic fixtures only; no live authentication or order was performed. Source-by-source evidence and the post-rebase QA limitations are in `verification/2026-11-22-f134d89d.md`.
+- PR [#97](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/97) was given the privacy/Flagged-page handoff while its owner holds the shared templates. The account CLI findings remain pending publication, not claimed deployed.
+- After rebasing through merged PR #96, all 17 `npm test` suites passed again (1,020 canonical static rows source-linked; 38 chart cases; 56 account-safety cases). The documentation now matches the required ticker and preserves PR #94's privacy warning. GitHub still reports the actual account capture disconnected; secret configuration is unverified.
+- Rebase after PR #102 merged conflicted where both sessions appended their board entries. Stopped, retained both complete entries and continued; the F-85 privacy row and published page warning are preserved. The shared-page owners were notified of the link-label/staleness handoff and concurrent privacy-claim overlap. Latest account test now has 57 offline checks, including the disconnected display.
+
+### K4 record — PRs, merges, defect and Pages (session-8dcab433)
+
+- **PR [#102](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/102)** (warning + F-85 + verification record) —
+  checks `alerts`, `build`, `qa`×2 all **pass**; **merged** 2026-11-22T08:14:08Z as merge commit
+  `f7539e3eff0974b7bd3b06c0979344bcbcdb89a5`. Pages `pages/builds/latest` for that commit → `status: "built"`,
+  `error.message: null`, updated 08:14:37Z.
+- **Live verification, cache-busted.** The first fetch of `/demo-account.html` (no query string) still served the
+  previous page from the Pages CDN; `/demo-account.html?v=0816` served the new warning. Recorded because "Pages says
+  built" and "the CDN is serving it" are different observations.
+- **Defect found on the live page and fixed twice, independently.** The first deployed warning linked `#F-85` but its
+  label read **F-82** (stale text from the renumber). Caught here at 08:16Z; session-f134d89d corrected the same label
+  on `main` at ~08:19Z and added `scripts/check-account-privacy.mjs` (11 checks incl. a negative control for the exact
+  mislabel). **Resolution: main's fix and guard are adopted; this branch's duplicate copy edit is dropped at merge.**
+  The F-85 row (theirs) records the correction; this session's earlier `PR #103` is updated to carry only the merge
+  resolution and the records, not a second implementation.
+- **Main integration during this PR:** `main` advanced through PRs #98, #99, #101, #103-adjacent work and others while
+  this PR waited; `flagged.tpl`/`flagged.html` conflicted once more and were resolved by keeping **main's** F-85 row and
+  regenerating the page. Merge conflicts were resolved without discarding any other session's work; no other file was
+  reverted.
+- **Guards now green on the merged tree:** `check-account-privacy` 11/11 · `check-html-ids` 611 ids, no duplicates ·
+  `check-row-sources` 1,022 rows, 0 problems · `check-links` 90 pages, 0 broken · `build-site --check` clean.
