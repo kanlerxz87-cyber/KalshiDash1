@@ -2966,3 +2966,11 @@ The `$1.00 per contract` sentence on a line that also lists `scalar` (true only 
 `previous_price_dollars` · no demo API key, so no authenticated read was exercised · `Site build check` still cannot
 guard token-pushed commits (needs a GitHub App/PAT — a repository-settings decision) · the repo's sandbox-egress note
 is stale for this environment (docs and demo API are readable via the page fetcher).
+
+## Session session-0d9df07c — independent release check (2026-11-22)
+
+| Task | Status | Owner | File scope |
+|---|---|---|---|
+| Independently check current build, deployment and remaining limitations without duplicating completed work; report evidence. | in progress | session-0d9df07c | `COORDINATION.md` (this section only), `verification/2026-11-22-0d9df07c.md` |
+
+The pinned branch is fixed by the environment. Historical task rows are retained; the previous integration records PR #91 as completed. No source or generated pages are claimed by this session.
