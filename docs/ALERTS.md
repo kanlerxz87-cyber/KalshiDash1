@@ -167,9 +167,13 @@ their formula, by `scripts/check_alerts.mjs`.
 ### 3.7 How it is "live" on a static host
 Two layers, and the page always says which one it is showing:
 
-1. **Engine** (`.github/workflows/live-alerts.yml`): samples the API every 10 minutes, validates
-   the result, and commits `data/live/feed.json`. This is the layer that keeps the record while
-   nobody has the page open.
+1. **Engine** (`.github/workflows/live-alerts.yml`): declares a 10-minute cron, samples the API when
+   GitHub runs it, validates the result, and commits `data/live/feed.json`. This is the layer that
+   keeps the record while nobody has the page open. **Measured delivery is much lower than declared**
+   — 6 schedule runs in 34.6 h on 2026-11-20/22 (≈1 per 5.8 h), because GitHub delays or drops
+   scheduled runs ([schedule docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule));
+   the feed can therefore be hours old while the job is healthy, which is why the page shows the
+   measured sample age and marks it `STALE` past 45 minutes (F-83).
 2. **Browser**: while the page is open it polls the same public endpoints and merges the results,
    giving second-level freshness when the browser is allowed to make the cross-origin request.
    If it is not, the page says so and continues on the engine feed.

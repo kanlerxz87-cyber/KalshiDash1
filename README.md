@@ -272,13 +272,13 @@ node scripts/check_alerts_page.mjs        # render + behaviour test of the page 
 ```
 
 * **Why a scheduled job:** GitHub Pages is static, so nothing on the site can sample the exchange
-  while nobody is looking. `.github/workflows/live-alerts.yml` *declares* a 10-minute schedule and
-  commits `data/live/feed.json`; the page reads that and additionally polls the public API while it
-  is open. A declared cron is not a guaranteed cadence: [GitHub documents that `schedule` runs can be
-  delayed and queued jobs dropped](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule),
-  and the measured cadence here has been far sparser (2026-11-22: one scheduled run in 8.4 h —
-  flagged as [F-83](flagged.html#F-83)). Every page header therefore prints the *measured* age of the
-  newest sample instead of assuming it is current.
+  while nobody is looking. `.github/workflows/live-alerts.yml` declares a 10-minute cron and commits
+  `data/live/feed.json`; the page reads that and additionally polls the public API while it is open.
+  **The declared cadence is not the delivered one:** GitHub delays and drops scheduled runs, and this
+  repository's own history measured 6 schedule runs in 34.6 hours (≈1 per 5.8 h) between
+  2026-11-20T21:52Z and 2026-11-22T02:27Z — see [Flagged for review F-83](flagged.html#F-83) and
+  [events that trigger workflows § schedule](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+  Every page therefore prints the measured age of the newest sample, and says `STALE` past 45 minutes.
 * **What it will not do:** place orders or read a portfolio. Those endpoints need a signed request
   with the account holder's key; the site holds no credentials and never asks for them.
 * Method, sources and every irregularity: [`docs/ALERTS.md`](docs/ALERTS.md). Flagged items with
