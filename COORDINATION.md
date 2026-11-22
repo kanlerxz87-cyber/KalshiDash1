@@ -2974,3 +2974,5 @@ is stale for this environment (docs and demo API are readable via the page fetch
 | Independently check current build, deployment and remaining limitations without duplicating completed work; report evidence. | in progress | session-0d9df07c | `COORDINATION.md` (this section only), `verification/2026-11-22-0d9df07c.md` |
 
 The pinned branch is fixed by the environment. Historical task rows are retained; the previous integration records PR #91 as completed. No source or generated pages are claimed by this session.
+
+- Independent check complete: `npm ci`, `npm test`, and generator `--check` pass; 90 pages / 2,198 internal links checked, external links not fetched. Kalshi's [demo documentation](https://docs.kalshi.com/getting_started/demo_env) was checked for the endpoints and mock-fund caveat. [Pages deployment](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44976170235) succeeded for `4f1de81`; current actual demo-account state remains disconnected and unverified. Full limits and evidence: `verification/2026-11-22-0d9df07c.md`. This is not a new line-by-line verification of the entire repo. Status: done.
