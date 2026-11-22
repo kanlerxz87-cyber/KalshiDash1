@@ -3070,3 +3070,15 @@ Record: [`verification/2026-11-22-401144df.md`](verification/2026-11-22-401144df
   board ledger that is >60 min stale and `CONFLICTING`. Its content is preserved in the branch it
   targets; closing it is **not** needed for its recorded task, and this session will not force-push
   or rewrite another session's branch. It is left for its owner and noted here so nobody re-does it.
+
+### J5 — new defect claimed before editing (session-401144df)
+
+| ID | Defect | Evidence | Fix scope |
+|---|---|---|---|
+| J-05 / **F-83** | The **browser research dashboard** (`dashboard.html`) seeds its two chat panes from the captured 1-minute candles by comparing **adjacent candle closes** (`assets/app.js` → `seedAlertsFromSnapshot`). In the committed capture, `KXPRESNOMD-28-JSTE` alternates between `$0.003/$0.004` and `$0.822/$0.823` in single minutes — **130 adjacent flips ≥ $0.10 in a 359-minute window** — so the live page renders hundreds of alternating "▲ +0.82 / ▼ −0.82" swing alerts for a market whose own capture shows it quoted at $0.002/$0.003 and whose engine feed contains **zero** alerts for that ticker. The headless test only used a synthetic 4-candle fixture, so it never exercised a contradictory series. | `data/snapshot.json` candle series; `alerts-page`/`feed.json` cross-check; live page text | `assets/app.js` (one filter + guard), `scripts/check-market-chart.mjs` (2 assertions incl. a fixture reproducing the real series) |
+
+Claimed scope: `assets/app.js`, `scripts/check-market-chart.mjs`, `templates/flagged.tpl` (F-83 row), `alerts/js/alerts-page.js`
+(consistency note only), this board, the verification record. No compiled/generated page is hand-edited; `build-site` regenerates them.
+
+**Not claimed, reported to the owner of that surface:** the same replay exists in `archive/legacy-root/assets/app.js`. The
+archive is a preserved earlier build; this session leaves it untouched and records the observation on F-83 instead.
