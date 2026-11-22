@@ -3242,3 +3242,25 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
 - The first Pages run [45001985592](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/45001985592) for that merge was **cancelled**: its deployment log says a higher-priority request was waiting. The subsequent Pages run [45002061011](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/45002061011) for commit [`5ef623ab3b2930ee424a4196a65bb4a74d91c3e2`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/5ef623ab3b2930ee424a4196a65bb4a74d91c3e2), which includes PR #99, **succeeded** (build, report and deploy). Pages build API reported `built`, error `null`. A cache-busted live fetch of `assets/demo-account.js` returned this session's new renderer, and the live account page showed the privacy warning and disconnected status. GitHub emitted a Node 20 action-deprecation warning; it did not fail the deployment.
 - The combined tree after PR #98 passed all **18** `npm test` groups: 57 demo-account/safety checks, 11 privacy checks, 38 chart/paper UI cases, 1,022 static source-linked rows and no broken internal links. `build-site --check` and duplicate-ID check also passed. External links were not exhaustively fetched, and these gates do not prove semantic verification of the whole repo.
 - **Remaining handoff:** F-85 now publishes the privacy risk. PR [#103](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/103)'s template owner has been asked to time-bound the static account-status sentence and to add the specific source-linked account-envelope/cancellation findings to the Flagged page. These two details have not yet been confirmed individually on that page. The [dated verification report](verification/2026-11-22-f134d89d.md) already records them. The committed account is disconnected; actual credentials, account values, execution and returns remain unverified.
+
+### K4 record — PRs, merges, defect and Pages (session-8dcab433)
+
+- **PR [#102](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/102)** (warning + F-85 + verification record) —
+  checks `alerts`, `build`, `qa`×2 all **pass**; **merged** 2026-11-22T08:14:08Z as merge commit
+  `f7539e3eff0974b7bd3b06c0979344bcbcdb89a5`. Pages `pages/builds/latest` for that commit → `status: "built"`,
+  `error.message: null`, updated 08:14:37Z.
+- **Live verification, cache-busted.** The first fetch of `/demo-account.html` (no query string) still served the
+  previous page from the Pages CDN; `/demo-account.html?v=0816` served the new warning. Recorded because "Pages says
+  built" and "the CDN is serving it" are different observations.
+- **Defect found on the live page and fixed twice, independently.** The first deployed warning linked `#F-85` but its
+  label read **F-82** (stale text from the renumber). Caught here at 08:16Z; session-f134d89d corrected the same label
+  on `main` at ~08:19Z and added `scripts/check-account-privacy.mjs` (11 checks incl. a negative control for the exact
+  mislabel). **Resolution: main's fix and guard are adopted; this branch's duplicate copy edit is dropped at merge.**
+  The F-85 row (theirs) records the correction; this session's earlier `PR #103` is updated to carry only the merge
+  resolution and the records, not a second implementation.
+- **Main integration during this PR:** `main` advanced through PRs #98, #99, #101, #103-adjacent work and others while
+  this PR waited; `flagged.tpl`/`flagged.html` conflicted once more and were resolved by keeping **main's** F-85 row and
+  regenerating the page. Merge conflicts were resolved without discarding any other session's work; no other file was
+  reverted.
+- **Guards now green on the merged tree:** `check-account-privacy` 11/11 · `check-html-ids` 611 ids, no duplicates ·
+  `check-row-sources` 1,022 rows, 0 problems · `check-links` 90 pages, 0 broken · `build-site --check` clean.
