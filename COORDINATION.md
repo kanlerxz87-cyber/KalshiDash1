@@ -1,5 +1,16 @@
 # COORDINATION.md — shared task board
 
+## Session session-b8913775 — independent current-state audit (2026-11-22)
+
+Arena-pinned branch `arena/b8913775-kalshidash1`; no branch changes. The only open PR at claim time is #86, a historical deployment ledger. This session does not take over any active file scope.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| B1 | Claim, verify current site/build/deployment and independently audit official-source and demo trading limitations; document evidence and handoffs. | in progress | session-b8913775 | this section of `COORDINATION.md`, new `verification/2026-11-22-b8913775.md` |
+| B2 | If a concrete unclaimed defect is found, separately claim its specific files before changing them; integration/PR only after tests. | unclaimed | session-b8913775 | to be specified |
+
+---
+
 ## Session session-272b326f — independent operational verification (2026-11-22 08:02 UTC)
 
 | ID | Task | Status | Owner | File scope |
@@ -2850,7 +2861,12 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 - **PR #73:** [docs: independent dashboard audit and verification](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/73) — merged 2026-11-21T23:11:50Z as merge commit [`8f45860087dbf184daecc34e0f5beefc19fe39df`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/8f45860087dbf184daecc34e0f5beefc19fe39df). Checks on the rebased PR head passed (`alerts`, `build`, and both `qa` checks).
 - During rebase, `COORDINATION.md` conflicted with session-a2706f31's concurrent verification record (merged as PR #74). Both sections were retained; no other session's files were discarded. Main subsequently advanced through other sessions' PRs and scheduled data writes; this audit's scope remains documentation only.
 - Pages deployment containing PR #73 completed successfully in run [44960595512](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44960595512) on main commit `017bd6343fff754d9085c05a3a7cf831368ba532`. Later scheduled snapshot commit `c39c52f18d4ba29ece39eaa9804762b3406a72c7` also deployed successfully in run [44960678737](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44960678737); Pages API latest completed build for subsequent main commit `14bfb12543a3f6204dd67a6496f33c17682d8a07` was `built`, error `null` ([run 44960717658](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44960717658)). The report is served at [verification/2026-11-21-37562307.md](https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-37562307.md).
-- **Follow-up verification limitation (updated after the audit):** An early PR #77 run failed its alert/link and root-site checks because `build-site --check` reported 22 pages stale while the alert sample timestamp had advanced (HTML at `2026-11-21T17:42:16Z`, feed at `23:13:08Z`). The final integrator corrected the staleness gate in PR #79; the main Site build check then passed (run [44961105747](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105747)). PR #72 was closed unmerged, but its model fix landed through [PR #75](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/75), followed by [PR #78](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/78); both are merged. The first PR #77 branch has not yet been rebased onto those integration commits; rerun its checks after rebase and do not merge unless they pass.
+- **Follow-up verification:** An early PR #77 run failed alert/link and root-site checks because `build-site --check` reported 22 pages stale while the alert sample timestamp advanced (HTML at `2026-11-21T17:42:16Z`, feed at `23:13:08Z`). The final integrator fixed the staleness check in PR #79; PR #77 was rebased onto that integration, and its latest checks passed before merge. PR #72 was closed unmerged; the model correction landed in PRs #75 and #78, both merged.
+
+### PR, merge and deployment record — session-37562307 (final)
+
+- **PR #77:** [docs: record audit PR merge and Pages deployment](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/77) — merged 2026-11-21T23:25:32Z as merge commit [`a7d1502d3ff01769a3e49fb7c99db4f62e4176cb`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/a7d1502d3ff01769a3e49fb7c99db4f62e4176cb). Checks on the rebased PR head passed: alerts, build, both QA suites, refresh, and sample.
+- The first Pages attempt for the merge commit was canceled by a higher-priority deployment request; the subsequent Pages deployment for main commit `89549ea299088d054a22009cdd7492ae9bf432b1` succeeded in [run 44961759251](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961759251). Pages API reported `built` with `error: null` for merge commit `a7d1502`; the report is live at [verification/2026-11-21-37562307.md](https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-37562307.md).
 
 ---
 
@@ -3017,6 +3033,50 @@ is stale for this environment (docs and demo API are readable via the page fetch
 - **Scope extension before more edits:** main advanced to `4d43670` by merging PR #97, which already integrates the F-82/F-83 dashboard and cadence work. PR #100 consequently reports a merge conflict. Final integration now includes the completed, green-check PR #98 account privacy warning (its F-84 conflicts with main's F-84 scalar-payout finding; preserve main F-84 and renumber privacy to F-85), PR #99 account-capture validation/routing and PR #101's coordination record. These changes will be merged only into this current branch; no other branch is modified. Keep this session's $0.97 review finding as F-86, remove the duplicate account-warning row in favor of PR #98's source-backed row, preserve the executive-summary warning if it stays consistent with F-85, regenerate outputs, and rerun QA. Coordinate superseded PR closure only after our PR merges.
 - **Pre-push rebase conflict (logged):** the required `git pull --rebase origin arena/e43b620f-kalshidash1` was attempted after the integration merge and stopped while replaying historical `main` commit `8f349ee` against `COORDINATION.md`. This branch intentionally contains merge commits preserving main and PR #96 history, so replaying the imported main history as a linear series is not valid. The rebase was aborted; `814cd86` and all work are intact, and the current branch is still a fast-forward descendant of its remote tip `d22375a`. Do not retry the same rebase; push the current-branch merge history fast-forward after final checks.
 
+---
+
+## Session `arena/736be760-kalshidash1` — independent re-verification of `main` + live-data QA (2026-11-22)
+
+**Session ID:** `session-736be760`. Branch `arena/736be760-kalshidash1`, branched from `main` @ `4f1de81`
+(identical to `origin/main` at claim time, 2026-11-22 08:10 UTC). Main then advanced to `bb2cfec` (docs-only PR #93,
+session-`0d9df07c`), which was merged into this branch with both board sections kept. Full record:
+[`verification/2026-11-22-736be760.md`](verification/2026-11-22-736be760.md).
+
+Read the board, the repo and open PRs before claiming. One open PR: [#86](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/86)
+(session-`37562307`, docs-only, opened 2026-11-21 23:27 UTC — >8 h with no further commits, i.e. a **stale claim**
+under the 60-minute rule). This session took over review/integration of that PR; it did not push to the other
+session's branch and did not recreate its content.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| K1 | Read board/repo/open PRs; claim scope, commit and push immediately | **done** — claim pushed as `47cf3da` | session-736be760 | this section of `COORDINATION.md` |
+| K2 | Independent health audit of `main`: full `npm test`, `build-site.mjs --check`, both link checkers, Pages deploy + latest CI runs | **done** — all green; Pages `built` for the `main` tip, no defect | session-736be760 | `verification/2026-11-22-736be760.md` §1 |
+| K3 | Re-verify the published API/platform claims the brief names (REST + WS demo roots, order-book/liquidity semantics, settlement/`result`, candlestick periods, Culture coverage) against official Kalshi docs and live demo reads | **done** — endpoints match character-for-character; book/candles/settlement semantics confirmed; one published settlement over-claim found (§4 below) | session-736be760 | same record §2–§3 |
+| K4 | Take over stale PR #86: verify its ledger claims against official records, then merge or flag | **done** — PR #77 merge SHA/time, its check roll-up and the Pages retry all confirmed; its branch has an unrelated history, so its two-file diff was applied **verbatim** on this integration branch and the PR is closed as superseded (one wording inference flagged in §7.6) | session-736be760 | PR #86 files via replay only |
+| K5 | Fix only defects reproduced in K2–K3 (smallest change), re-run all gates | **done** — one unique fix published as **F-84**; the cadence prose fix was reverted because session-`b8913775` (PR #96) owns it as F-83 | session-736be760 | `templates/executive-summary.tpl`, `templates/flagged.tpl` + generated `executive-summary.html`, `flagged.html` (the `README.md`/`EXECUTIVE_SUMMARY.md` edits were reverted — see overlap note) |
+| K6 | Final integration: PR to `main`, merge, confirm GitHub Pages deploy of the new build, record PR link + merge SHA + deploy evidence | **done** — see the PR record below | session-736be760 | generated root pages via `scripts/build-site.mjs` only; this board |
+
+### Findings from K3/K5 (published, not invented)
+
+- **F-84 — published settlement over-claim, fixed.** The Executive summary said a market resolving `scalar` pays
+  "$1.00 per contract". Official [Market Settlement](https://docs.kalshi.com/getting_started/market_settlement) gives the
+  $1 rule only for yes/no outcomes (and notes "sub-cent scalar settlement" fees), and
+  [Settlement Bounds](https://docs.kalshi.com/getting_started/settlement_bounds) shows a scalar market settling at a value
+  ($0.50 in its worked example) with a floor. The sentence now restricts $1.00 to a simple binary contract and states that
+  scalar pays its settled value minus any floor. The other five pages that mention $1.00 were re-read and already
+  conditional; untouched. Row published on `flagged.html` with both sources.
+- **Declared cron vs observed cadence (corroboration only — published as F-83 by PR #96).** `README.md` and `EXECUTIVE_SUMMARY.md` said the sampler "runs every 10 minutes".
+  GitHub's own run API shows **20 `schedule` runs in the repository's entire history**, `live-alerts` gaps of 7 h 15 m /
+  4 h 44 m / 4 h 02 m, and the newest engine sample ~6 h old at 08:30Z. This session's doc edits were reverted when
+  session-`b8913775` opened PR #96 with the same finding as **F-83**; that PR carries the published correction. The
+  measurements above are independent corroboration, and no template claimed a cadence, so no page changed here.
+- Verified live, not from memory: the four demo endpoints in the brief (REST recommended/alternate, WS recommended/
+  alternate) match the official docs table exactly; `KXPRESNOMD-28-MSHE`'s published last/bid/ask match the live demo
+  market to the cent; Culture's "2 series / 0 open markets" is accurate (both series return empty `status=open` lists).
+
+Constraints honoured: shared outputs (table data, `index.html`, navigation) change only through `scripts/build-site.mjs`;
+no value is invented; anything unconfirmable is left blank and published on `flagged.html`; every claim in the
+verification file carries an official source link.
 
 ---
 
