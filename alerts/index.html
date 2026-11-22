@@ -158,18 +158,24 @@
     traded dollars per market in this response, so this column is <em>our estimate</em> from two published fields
     (<a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">Get Market</a>);
     it is never presented as exchange data. Each topic keeps its own board so a single high-volume category cannot
-    crowd the others out.
+    crowd the others out. The <strong>Board</strong> column marks the top-ranked row of each topic on that estimate,
+    so a trader can see at a glance that several rows belong to one topic leader; and <strong>24h change</strong> is a
+    day-over-day comparison (the API's <code>previous_price_dollars</code> is the same value a day ago — it is
+    <em>not</em> an intraday move and is never used to corroborate one, see <a href="../flagged.html#F-84">F-84</a>).
+    A contract that swings between two extremes within the day is visible as such in the 24h change next to the
+    alert feeds above.
   </p>
   <div class="controls" id="topic-tabs"></div>
   <div class="table-wrap">
     <table id="markets-table">
       <thead><tr>
-        <th>Event / contract</th><th class="num">Price</th>
+        <th>Board</th><th>Event / contract</th><th class="num">Price</th>
         <th class="num">Bid (size)</th><th class="num">Ask (size)</th>
         <th class="num">24h vol</th><th class="num">Total vol</th><th class="num">Est. $ traded</th>
+        <th class="num" title="last_price_dollars vs previous_price_dollars, which the official schema defines as the same value a day ago">24h change</th>
         <th>Closes</th><th>Status</th><th>Source</th>
       </tr></thead>
-      <tbody><tr><td colspan="10" class="empty">Loading…</td></tr></tbody>
+      <tbody><tr><td colspan="12" class="empty">Loading…</td></tr></tbody>
     </table>
   </div>
   <p class="small muted" id="topic-note"></p>

@@ -327,6 +327,11 @@
         yes_bid_size_fp: m.yes_bid_size_fp, yes_ask_size_fp: m.yes_ask_size_fp,
         volume_fp: m.volume_fp, volume_24h_fp: m.volume_24h_fp, open_interest_fp: m.open_interest_fp,
         est_traded_dollars: (num(m.volume_fp) !== null && tp.price !== null) ? round(num(m.volume_fp) * tp.price, 2) : null,
+        /* F-86. Both fields are the official "a day ago" pair, taken as published and never
+         * rescaled: they drive the board's 24h-change column, which lets a reader see that a
+         * contract swings between extremes instead of reading each print as a new opportunity. */
+        last_price_dollars: num(m.last_price_dollars),
+        previous_price_dollars: num(m.previous_price_dollars),
         close_time: m.close_time, rules_primary: m.rules_primary,
         book_inconsistent: !!tp.book_inconsistent,
         source_url: e.source_url, sampled_at: new Date(now * 1000).toISOString(), from_browser: true

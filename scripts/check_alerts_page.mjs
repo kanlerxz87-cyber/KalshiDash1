@@ -296,6 +296,28 @@ check(text2('#mode-badge').includes('engine feed only'),
 check(!text2('#mode-notice').includes('No data available'),
   'feed-only: the page must never say "No data available" while it is showing alert rows');
 check(/engine feed/i.test(text2('#mode-notice')), 'feed-only: the notice explains that the engine feed is being shown');
+
+/* ---------------- F-86: board leader + 24h change ---------------- */
+/* The two new columns must show only published fields: the leader badge marks the top-ranked
+ * row of a topic, and the 24h change compares last_price_dollars with previous_price_dollars,
+ * which the official schema defines as the same value a day ago. Nothing is inferred. */
+const boardText = text('#markets-table');
+check(boardText.includes('leader'), 'F-86: the board marks each topic leader on estimated traded dollars');
+const leaderRows = [...doc.querySelectorAll('#markets-table tbody tr')].filter((tr) => /leader/.test(tr.textContent));
+check(leaderRows.length >= 1, 'F-86: at least one leader row is marked when estimates exist');
+check(leaderRows.every((tr) => /\$[\d,]+/.test(tr.textContent)), 'F-86: a leader row always carries its estimate');
+const changedRows = [...doc.querySelectorAll('#markets-table tbody tr')]
+  .filter((tr) => /^[+−]?\$0\.\d\d$/.test((tr.children[8] && tr.children[8].textContent || '').trim()));
+check(changedRows.length === 0, 'F-86: no 24h change is shown for a row that did not publish both day-old fields');
+check(/24h change/i.test(html), 'F-86: the table header names the 24h change column');
+check(/not.*intraday|is <em>not<\/em> an intraday|never used to corroborate/i.test(html),
+  'F-86: the page states that the day-old field is not an intraday move');
+// and the rendered 24h cell of the price-less row must be blank, never a fabricated 0.00
+const noPriceRow = [...doc.querySelectorAll('#markets-table tbody tr')].find((tr) => /KXNOPRICE-9/.test(tr.textContent));
+if (noPriceRow) {
+  check((noPriceRow.children[8].textContent || '').trim() === '—',
+    'F-86: a row with no published day-old price shows an em dash, not a made-up change');
+}
 dom2.window.close();
 
 // The page runs 10 s / 30 s timers; close the DOM so this process can exit.

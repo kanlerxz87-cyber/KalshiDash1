@@ -125,3 +125,11 @@ label.chk { display: inline-flex; gap: 5px; align-items: center; font-size: 12.5
 canvas { display: block; width: 100%; height: 260px; }
 .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
 .legend i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+
+/* F-86 (session-f7ba69d5): board-leader badge and the day-over-day change column.
+   Colour is informational only: the sign is always printed too, so the column is readable
+   without colour vision and in a screen reader. */
+#markets-table td.num.up, #markets-table td.num.down { font-variant-numeric: tabular-nums; font-weight: 600; }
+#markets-table td.num.up { color: var(--good); }
+#markets-table td.num.down { color: var(--bad); }
+#markets-table td .badge.accent { white-space: nowrap; }

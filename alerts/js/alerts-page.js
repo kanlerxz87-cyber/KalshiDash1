@@ -284,6 +284,40 @@
     });
   }
 
+  /* F-86: the topic leader on the board's own ranking, so a reader can tell which rows the
+   * "highest-dollar" heading actually ranks first instead of having to sort the table mentally.
+   * Ranking basis is unchanged (estimated traded dollars); when every row's estimate is unknown
+   * the column honestly says so instead of crowning an arbitrary row. */
+  function boardLeaders(rows) {
+    var best = {};
+    rows.forEach(function (m) {
+      if (m.est_traded_dollars === null || m.est_traded_dollars === undefined) return;
+      if (ui.boardTopic !== 'all' && m.topic !== ui.boardTopic) return;
+      var cur = best[m.topic];
+      if (!cur || m.est_traded_dollars > cur) best[m.topic] = m.est_traded_dollars;
+    });
+    var leaders = {};
+    rows.forEach(function (m) {
+      if (m.est_traded_dollars === null || m.est_traded_dollars === undefined) return;
+      if (best[m.topic] !== m.est_traded_dollars) return;
+      /* A tie is real data, so every tied row is marked rather than the first one only. */
+      leaders[m.ticker] = true;
+    });
+    return leaders;
+  }
+
+  /* F-86: day-over-day change from the two fields the API publishes, both defined "a day ago"
+   * (previous_*) — a comparison, never an intraday detection. Missing values print nothing. */
+  function change24h(m) {
+    var last = A.num(m.last_price_dollars);
+    var prev = A.num(m.previous_price_dollars);
+    if (last === null || prev === null || prev <= 0) return { text: '—', cls: 'muted', delta: null };
+    var d = Math.round((last - prev) * 10000) / 10000;
+    var cls = d > 0 ? 'up' : (d < 0 ? 'down' : 'muted');
+    var sign = d > 0 ? '+' : (d < 0 ? '−' : '');
+    return { text: sign + '$' + Math.abs(d).toFixed(2), cls: cls, delta: d };
+  }
+
   function renderMarkets(id) {
     var tb = document.querySelector('#' + id + ' tbody');
     var rows;
@@ -304,11 +338,14 @@
       }
     }
     if (!rows.length) {
-      tb.innerHTML = '<tr><td colspan="10" class="empty">No live market with a readable price for this selection. Nothing is filled in on its behalf.</td></tr>';
+      tb.innerHTML = '<tr><td colspan="12" class="empty">No live market with a readable price for this selection. Nothing is filled in on its behalf.</td></tr>';
       return;
     }
+    var leaders = boardLeaders(rows);
     tb.innerHTML = rows.map(function (m) {
+      var ch = change24h(m);
       return '<tr>' +
+        '<td>' + (leaders[m.ticker] ? '<span class="badge accent" title="Highest estimated traded dollars in this topic on this board">leader</span>' : '<span class="muted small">—</span>') + '</td>' +
         '<td><a href="../dashboard.html?ticker=' + encodeURIComponent(m.ticker) + '">' + A.esc(m.title || m.ticker) + '</a>' +
           '<br><code class="small muted">' + A.esc(m.ticker) + '</code></td>' +
         '<td class="num">' + A.usd(m.price, 2) + '</td>' +
@@ -317,6 +354,7 @@
         '<td class="num">' + (m.volume_24h_fp === undefined || m.volume_24h_fp === null ? '—' : A.esc(m.volume_24h_fp)) + '</td>' +
         '<td class="num">' + (m.volume_fp === undefined || m.volume_fp === null ? '—' : A.esc(m.volume_fp)) + '</td>' +
         '<td class="num">' + (m.est_traded_dollars === null || m.est_traded_dollars === undefined ? '—' : '$' + m.est_traded_dollars.toLocaleString()) + '</td>' +
+        '<td class="num ' + ch.cls + '" title="last_price_dollars vs previous_price_dollars (a day ago)">' + ch.text + '</td>' +
         '<td class="small nowrap">' + A.esc((m.close_time || '').replace('T', ' ').replace(/\.\d+Z$/, 'Z') || '—') + '</td>' +
         '<td>' + (m.result ? '<span class="badge ' + (m.result === 'yes' ? 'yes' : 'no') + '">' + A.esc(m.result) + '</span>' : '<span class="badge live">' + A.esc(m.status || '—') + '</span>') +
           (m.book_inconsistent ? ' <span class="badge warn" title="The API row contradicted itself; price taken from the NO side (F-49)">quotes inconsistent</span>' : '') + '</td>' +

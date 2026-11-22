@@ -3020,4 +3020,27 @@ engine/derived scores may be regenerated, and any regeneration is labelled in th
   (last `0.0400`, `previous_yes_bid` `0.0300`, `previous_yes_ask` `0.0400`, `previous_price_dollars` `0.0400`,
   `updated_time` `2026-04-28T02:27:21Z`).
 
-Status: **in progress** — D2/D3/D4 claimed before any edit.
+### Progress (D2/D3/D4 implemented and tested; D5 in progress)
+
+- **D2 complete — F-84 is fixed and guarded.** Official definition read live: [Get Market schema](https://docs.kalshi.com/api-reference/market/get-market.md)
+  — `previous_price_dollars` is the last traded YES price **a day ago**. `corroborate()` now accepts only the
+  same-session book. Measured scope on the committed 2026-11-22T02:27:14Z sample: 3 of 40 alerts cited the day-old
+  field and **all 3 were also corroborated by their own book**; **0** alerts were admitted by it alone, so the
+  published finding says "false provenance claim + latent hole", not "fake alerts proven". Historical rows are kept
+  unchanged and listed in `meta.legacy_day_old_corroboration` with `book_also_corroborates` per row.
+  Negative controls executed: the new assertions fail on the pre-fix engine (2 failures) and the feed guard fails a
+  feed without the provenance list (3 violations, naming exactly those 3 rows). A second consumer with the same wrong
+  idea — `assets/catalyst.js` publishing the day-over-day change as an intraday `prev-close` swing — is relabelled
+  `24h-change` and kept out of the intraday feed.
+- **D3 complete — F-85 published** as an observed sample anomaly (needs review) with live API evidence and an explicit
+  "mechanism unverified" statement. Nothing about cause or executability is inferred.
+- **D4 complete — F-86 shipped.** Alert console board gains a **Board** leader column and a **24h change** column built
+  only from the published day-old fields, so an oscillating contract reads as oscillating instead of as repeated new
+  opportunities. 5 jsdom assertions added and mutation-tested (leader map removed → 2 failures; fabricated `+$0.00` →
+  2 failures).
+- **Evidence:** [verification/2026-11-22-f7ba69d5.md](verification/2026-11-22-f7ba69d5.md). `npm test` exit 0;
+  generator `--check` clean; 90 pages / 0 broken internal links; 1,020 canonical rows with publisher links.
+- **Not claimed:** no data refresh (the scheduled engine is late, and no sample or timestamp was fabricated), no
+  authenticated call, no order, no causal news attribution.
+
+Status: D2/D3/D4 **done** — D5 (PR, merge, Pages confirmation) in progress.
