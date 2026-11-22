@@ -27,22 +27,11 @@ and documents the credential-gated trade-execution code. Live authentication/exe
 <a href="verification/2026-11-20-d5b935f4.md">verification/2026-11-20-d5b935f4.md</a> · setup guide:
 <a href="docs/DEMO_ACCOUNT.md">docs/DEMO_ACCOUNT.md</a>.</p>
 
-<div class="notice bad" id="public-snapshot-warning">
-<strong>Read this before you connect an account: the snapshot is public.</strong>
-This site is served by GitHub Pages from a <strong>public</strong> repository, and the demo-account workflow
-commits what it reads (<code>data/account.json</code>: balance, positions, fills, settlements) to that
-repository. Anyone can read those values in the repository and on this page. Keeping API keys out of the
-browser keeps the <em>keys</em> secret; it does not make the resulting <em>account data</em> private.
-If you would not publish a balance and a fill history, do not enable this workflow on this site &mdash; it
-needs private storage and a private backend instead.
-Official sources: <a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories#about-repository-visibility" target="_blank" rel="noopener">GitHub: public repositories are accessible to everyone on the internet ↗</a> ·
-<a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages" target="_blank" rel="noopener">GitHub Pages ↗</a> ·
-<a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository" target="_blank" rel="noopener">removing sensitive data later is limited (clones, forks, cached views) ↗</a>.
-<br><span class="small">Current state: <code>data/account.json</code> is a disconnected placeholder
-(<code>connected: false</code>, <code>captured_at: null</code>) &mdash; no account data has been published.
-Demo funds are mock funds and demo prices &ldquo;may not be reflective of those in real markets&rdquo;
-(<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Kalshi demo environment ↗</a>).
-Tracked as <a href="flagged.html#F-85">F-82 on Flagged for review</a>.</span>
+<div class="notice warn" id="privacy-warning">
+  <strong>Privacy: the account snapshot is published, not private. Do not enable account secrets or run this workflow until you accept that exposure.</strong>
+  This site is served by GitHub Pages from a public repository. If enabled, the demo-account workflow commits the verbatim balance, positions, fills and settlements to <code>data/account.json</code>, and this page renders that data. Keeping the API key out of the browser protects the key, not the resulting account data. If you would not publish account activity, do not enable this workflow; a private dashboard needs private storage and an authenticated backend.
+  GitHub documents that <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/securing-your-github-pages-site-with-https#about-https-and-github-pages" target="_blank" rel="noopener">Pages sites are publicly available</a>, and that <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository" target="_blank" rel="noopener">removing sensitive data later does not remove history, clones or forks</a>. See <a href="docs/DEMO_ACCOUNT.md">docs/DEMO_ACCOUNT.md</a> before any setup.
+  <br><span class="small">Current state: <code>data/account.json</code> is a disconnected placeholder (<code>connected: false</code>, no capture time, no balance); no account data has been verified. Demo funds are mock funds and prices &ldquo;may not be reflective of those in real markets&rdquo; (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Kalshi demo environment</a>). See <a href="flagged.html#F-85">F-85 on Flagged for Review</a>.</span>
 </div>
 
 <div class="notice" id="conn-status"><strong>Connection status: checking <code>data/account.json</code>…</strong></div>
@@ -76,7 +65,7 @@ This repository and its GitHub Pages site are public. If enabled, the scheduled 
 <li>Create a demo API key pair: account page or <code>POST /trade-api/v2/api_keys/generate</code>
 (<a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener">API Keys ↗</a>).</li>
 <li>Add repository secrets <code>KALSHI_KEY_ID</code> and <code>KALSHI_PRIVATE_KEY</code> (Settings → Secrets → Actions).</li>
-<li>Run <strong>Actions → demo-account → Run workflow</strong> (or wait for the 6-hour schedule). The page above fills in automatically.</li>
+<li>Run <strong>Actions → demo-account → Run workflow</strong> (or wait for the scheduled run). The page above fills in automatically &mdash; and, as the warning above says, <strong>every value it writes becomes public</strong>. Use a dedicated demo account, not a personal one.</li>
 </ol>
 <p class="muted small">Without secrets this tool is a no-op. Keys are never stored in the repository or sent anywhere
 except the official demo API host, and mutating commands require an explicit <code>--confirm-live</code>
