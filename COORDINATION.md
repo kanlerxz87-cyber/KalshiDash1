@@ -3265,9 +3265,21 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
 - **Guards now green on the merged tree:** `check-account-privacy` 11/11 · `check-html-ids` 611 ids, no duplicates ·
   `check-row-sources` 1,022 rows, 0 problems · `check-links` 90 pages, 0 broken · `build-site --check` clean.
 
-## Session session-e43b620f — final integration continuation (2026-11-22)
+### Final release record (session-8dcab433)
 
-- Integrated latest `origin/main` at `33d8f89` (PR #103) after PRs #102/#103 and account-status corrections landed. Preserved main's page warning and F-85 privacy finding, plus this branch's independent F-86 $0.97 anomaly and dated verification report; F-84 remains main's scalar-settlement finding. Generated HTML is rebuilt from templates, never hand-edited.
-- `verification/2026-11-22-e43b620f.md` was updated to match the integrated finding IDs. No credentials or account data were accessed; no order was sent.
-- Handoff (no edit to another session's executive-summary scope): the newly integrated executive-summary copy describes the account snapshot as read-only/scheduled but does not repeat that enabling it makes the snapshot public. The explicit warning remains on the Demo account page and F-85; if executive-summary wording is changed, preserve that privacy distinction and cross-reference F-85.
-- PR #100 remains open pending latest-main checks and final mergeability/deployment confirmation. No completion is claimed until those are verified.
+- **PR [#102](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/102)** merged 2026-11-22T08:14:08Z as
+  `f7539e3eff0974b7bd3b06c0979344bcbcdb89a5`; checks `alerts`/`build`/`qa`×2 pass; Pages `built`, `error: null` (08:14:37Z).
+- **PR [#103](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/103)** merged 2026-11-22T08:20:23Z as
+  `33d8f89b004f55a031fe302ce423da3e86add309`; checks pass; Pages `built`, `error: null`.
+- **Live verification (cache-busted):** `demo-account.html?v=0821` renders the public-snapshot warning **above** the
+  account data and its cross-reference reads *F-85* and links `flagged.html#F-85`. A plain fetch earlier had served the
+  previous page from the CDN, which is why both are recorded.
+- **K4 done.** `npm test` exit 0 on the merged tree; `build-site --check` clean; 90 pages / 2,209 internal links / 0
+  broken; 1,022 canonical rows / 0 problems; 611 ids / no duplicates; account-privacy guard 11/11; demo safety 57;
+  paper 53; chart+paper DOM 38. Unverified values remain blank (account disconnected; live authentication unexercised).
+
+## Session session-e43b620f — latest integration checkpoint (2026-11-22)
+
+- Integrated latest `origin/main` at `ff9f7a2` (PR #107). Preserved the source-backed account privacy finding F-85 and this audit's distinct $0.97 observation F-86; kept `verification/2026-11-22-e43b620f.md`, which the incoming branch's merge had removed while resolving shared records. F-84 remains the scalar-settlement correction.
+- The latest executive-summary wording is retained as supplied by main; the public-snapshot warning remains on the Demo account page and in F-85. Handoff remains recorded: do not imply that a scheduled read-only snapshot is private; an executive-summary copy change is deferred to its page owner, not silently edited here.
+- Local `npm test`, `build-site --check`, privacy guard, source-row and internal-link checks passed on the prior integrated checkpoint. Re-run after this upstream merge, push, and refresh PR #100 checks before integration.
