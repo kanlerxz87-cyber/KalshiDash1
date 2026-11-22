@@ -2,7 +2,7 @@
 /* annotate-legacy-day-old-corroboration.mjs — record, in the committed feed, every PRE-FIX row
  * whose published corroboration came from `previous_price_dollars`.
  *
- * WHY (F-86, session-f7ba69d5, 2026-11-22)
+ * WHY (F-87, session-f7ba69d5, 2026-11-22)
  * ----------------------------------------
  * `tools/live_engine.mjs` accepted `previous_price_dollars` as a second "published field" that
  * could corroborate a sampled swing, and a code comment described it as "the price of the trade
@@ -85,7 +85,7 @@ for (const file of files) {
   if (merged.length) {
     doc.meta.legacy_day_old_corroboration = merged;
     doc.meta.legacy_day_old_corroboration_note =
-      'F-86: these rows were published before 2026-11-22 with corroboration.by = previous_price_dollars, '
+      'F-87: these rows were published before 2026-11-22 with corroboration.by = previous_price_dollars, '
       + 'which the official schema defines as the last traded YES price a day ago '
       + '(https://docs.kalshi.com/api-reference/market/get-market). The engine now corroborates only with '
       + 'the same-session book. Prices, arrows, deltas, timestamps and scores are unchanged.';

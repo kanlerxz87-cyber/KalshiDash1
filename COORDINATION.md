@@ -3088,12 +3088,15 @@ as `dae85cb`. Concurrent sessions active at claim time (`2a42fa01`, `736be760`, 
 One pre-existing unmerged session branch (`f89b55f7`) edits the same engine area, but its claim is >60 min stale with no commits
 after its board claim; per the 60-minute rule this session takes the specific lines below and will record any overlap handoff.
 
-**Finding-id renumbering (integration, 2026-11-22).** This session's two published findings were written as F-84/F-85, but
-`main` published its own **F-84** (scalar settlement over-claim, session-736be760) and **F-85** (demo-account snapshot privacy,
-session-272b326f/8dcab433) while this work was in flight. Per the board's existing precedent (F-75→F-78/F-79, F-78→F-80,
-F-79→F-81) the *already-merged* ids are kept and **this session's rows are renumbered F-86 (corroboration) and F-87 (sample
-anomaly)** in the template, code comments, test messages, cross-links and the verification record. No other session's text was
-rewritten. The UX item keeps its own id **F-88**.
+**Finding-id renumbering (integration, 2026-11-22).** This session's findings were written as F-84 (corroboration),
+F-85 (sample anomaly) and F-86 (live-signal UX), but ids moved under it twice while it worked: `main` published its own
+**F-84** (scalar settlement over-claim, session-736be760) and **F-85** (demo-account snapshot privacy,
+session-272b326f/8dcab433), and an **open PR** (not yet merged when this was written) publishes **F-86** for the same
+sample anomaly this session observed independently. Per the board's existing precedent (F-75→F-78/F-79, F-78→F-80,
+F-79→F-81) the ids already claimed elsewhere are kept and **this session's rows are published as F-87 (corroboration),
+F-88 (sample anomaly) and F-89 (live-signal UX)** in the template, code comments, test messages, cross-links and the
+verification record. No other session's text was rewritten, and the two independent observations of the sample anomaly
+(F-88 here, F-86 in that PR) agree on the measured facts; neither was copied from the other.
 
 **Why this session exists.** Every requirement is already implemented on `main` and the full suite passes, but the *substance*
 still has a reproducible, official-source-verifiable defect that directly corrupts the two user-facing alert chats, and the
@@ -3104,9 +3107,9 @@ public site still has weak live-signal UX. This session fixes those and nothing 
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
 | D1 | Claim, commit and push this section immediately. | done | session-f7ba69d5 | `COORDINATION.md` (this section) |
-| D2 | **F-86** (claimed as F-84). `corroborate()` and the catalyst page use `previous_price_dollars` as a same-session reference. The official spec defines it as the last traded YES price **a day ago**, so a day-old price can "corroborate" an untradeable $0.75–$0.96 print and publish it as a verified, high-ROI swing. Remove it as a corroboration reading and from the swing models; regression tests must fail on the pre-fix code. | in progress | session-f7ba69d5 | `tools/live_engine.mjs` (`corroborate` + selftest), `scripts/check_alerts.mjs`, new `scripts/check-corroboration.mjs`, `assets/catalyst.js`, `templates/catalyst.tpl`, `templates/flagged.tpl` |
-| D3 | **F-87** (claimed as F-85). Publish an observed-sample anomaly on the Flagged page: all 40 alerts in the committed feed are ≥ $0.50 single-step oscillations on 4 tickers, 2 labelled high-ROI before the F-84 fix; state only what the official API shows at review time and what remains unverified. | in progress | session-f7ba69d5 | `templates/flagged.tpl` + generated `flagged.html` |
-| D4 | **F-88** (claimed as F-86). Live-signal UX: on the alert console and the dashboard, show for each watchlist row whether it is the *board leader* on estimated dollars and the price it moved from/to over the 24 h `previous_yes_*` fields — so an oscillating row is visible as oscillating instead of being presented as an opportunity. Official field definitions only; no inferred cause. | in progress | session-f7ba69d5 | `alerts/js/alerts-live.js`, `alerts/js/alerts-page.js`, `alerts/css/alerts.css`, `assets/app.js`, `assets/style.css`, `scripts/check_alerts_page.mjs`, new `scripts/check-live-signal.mjs`, `package.json` |
+| D2 | **F-87** (claimed as F-84; see renumbering note). `corroborate()` and the catalyst page use `previous_price_dollars` as a same-session reference. The official spec defines it as the last traded YES price **a day ago**, so a day-old price can "corroborate" an untradeable $0.75–$0.96 print and publish it as a verified, high-ROI swing. Remove it as a corroboration reading and from the swing models; regression tests must fail on the pre-fix code. | in progress | session-f7ba69d5 | `tools/live_engine.mjs` (`corroborate` + selftest), `scripts/check_alerts.mjs`, new `scripts/check-corroboration.mjs`, `assets/catalyst.js`, `templates/catalyst.tpl`, `templates/flagged.tpl` |
+| D3 | **F-88** (claimed as F-85). Publish an observed-sample anomaly on the Flagged page: all 40 alerts in the committed feed are ≥ $0.50 single-step oscillations on 4 tickers, 2 labelled high-ROI before the F-84 fix; state only what the official API shows at review time and what remains unverified. | in progress | session-f7ba69d5 | `templates/flagged.tpl` + generated `flagged.html` |
+| D4 | **F-89** (claimed as F-86). Live-signal UX: on the alert console and the dashboard, show for each watchlist row whether it is the *board leader* on estimated dollars and the price it moved from/to over the 24 h `previous_yes_*` fields — so an oscillating row is visible as oscillating instead of being presented as an opportunity. Official field definitions only; no inferred cause. | in progress | session-f7ba69d5 | `alerts/js/alerts-live.js`, `alerts/js/alerts-page.js`, `alerts/css/alerts.css`, `assets/app.js`, `assets/style.css`, `scripts/check_alerts_page.mjs`, new `scripts/check-live-signal.mjs`, `package.json` |
 | D5 | Full QA battery, dated verification record with official source links, PR to `main`, merge, confirm Pages deploy, record it here. | unclaimed | session-f7ba69d5 | `verification/2026-11-22-f7ba69d5.md` (new), `README.md` if copy is wrong, generated root/category pages via `scripts/build-site.mjs` only, this board |
 
 **Non-goals / not claimed:** no credentials, no authenticated call, no order, no exchange-wide census claim, no invented cause for
@@ -3129,7 +3132,7 @@ engine/derived scores may be regenerated, and any regeneration is labelled in th
 
 ### Progress (D2/D3/D4 implemented and tested; D5 in progress)
 
-- **D2 complete — F-86 (claimed as F-84) is fixed and guarded.** Official definition read live: [Get Market schema](https://docs.kalshi.com/api-reference/market/get-market.md)
+- **D2 complete — F-87 (claimed as F-84) is fixed and guarded.** Official definition read live: [Get Market schema](https://docs.kalshi.com/api-reference/market/get-market.md)
   — `previous_price_dollars` is the last traded YES price **a day ago**. `corroborate()` now accepts only the
   same-session book. Measured scope on the committed 2026-11-22T02:27:14Z sample: 3 of 40 alerts cited the day-old
   field and **all 3 were also corroborated by their own book**; **0** alerts were admitted by it alone, so the
@@ -3139,9 +3142,9 @@ engine/derived scores may be regenerated, and any regeneration is labelled in th
   feed without the provenance list (3 violations, naming exactly those 3 rows). A second consumer with the same wrong
   idea — `assets/catalyst.js` publishing the day-over-day change as an intraday `prev-close` swing — is relabelled
   `24h-change` and kept out of the intraday feed.
-- **D3 complete — F-87 (claimed as F-85) published** as an observed sample anomaly (needs review) with live API evidence and an explicit
+- **D3 complete — F-88 (claimed as F-85) published** as an observed sample anomaly (needs review) with live API evidence and an explicit
   "mechanism unverified" statement. Nothing about cause or executability is inferred.
-- **D4 complete — F-88 shipped** (claimed as F-86) Alert console board gains a **Board** leader column and a **24h change** column built
+- **D4 complete — F-89 shipped** (claimed as F-86) Alert console board gains a **Board** leader column and a **24h change** column built
   only from the published day-old fields, so an oscillating contract reads as oscillating instead of as repeated new
   opportunities. 5 jsdom assertions added and mutation-tested (leader map removed → 2 failures; fabricated `+$0.00` →
   2 failures).

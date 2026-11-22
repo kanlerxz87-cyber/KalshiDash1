@@ -18,7 +18,7 @@
  *     (followThrough gate, added 2026-11-21 after the pane was measured to be topped by
  *     unfillable $0.01 -> $0.97 prints).
  *  7. Every sample timestamp is a real ISO date in the past.
- *  8. F-86 (session-f7ba69d5, 2026-11-22): no published alert may cite
+ *  8. F-87 (session-f7ba69d5, 2026-11-22): no published alert may cite
  *     `previous_price_dollars` as its corroborating evidence. The official spec defines that
  *     field as the last traded YES price **a day ago**
  *     (https://docs.kalshi.com/api-reference/market/get-market), so it is a day-over-day
@@ -181,7 +181,7 @@ async function main() {
     }
   }
 
-  /* F-86: `previous_price_dollars` is the last traded YES price A DAY AGO per the official
+  /* F-87: `previous_price_dollars` is the last traded YES price A DAY AGO per the official
    * schema, so it can never be published as corroboration of an intraday swing. The assertion is
    * mechanical: whichever code path writes `a.corroboration`, the value must be the live book.
    *
@@ -198,12 +198,12 @@ async function main() {
     if (/book midpoint/.test(c.by)) continue;
     if (DAY_OLD_EVIDENCE.test(c.by)) {
       if (!legacyDayOld.has(a.id)) {
-        fail(`alert ${a.id}: corroboration.by names "${c.by}", a day-old field (F-86) and the row is not `
+        fail(`alert ${a.id}: corroboration.by names "${c.by}", a day-old field (F-87) and the row is not `
           + 'in meta.legacy_day_old_corroboration — run scripts/annotate-legacy-day-old-corroboration.mjs');
       }
       continue;
     }
-    fail(`alert ${a.id}: corroboration.by "${c.by}" is not a same-session book reading — F-86`);
+    fail(`alert ${a.id}: corroboration.by "${c.by}" is not a same-session book reading — F-87`);
   }
   /* The provenance list may not name a row that does not exist, and may not be used to excuse a
    * row whose evidence is in fact the book. */
