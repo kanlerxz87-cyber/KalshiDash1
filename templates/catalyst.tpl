@@ -67,7 +67,9 @@ they are exchange-published source strings, not independently verified publisher
   <li><strong>Observation bases</strong> (labelled on every record):
   <em>live-sample</em> (polled in this browser every 30 s), <em>candle-close</em> (1-min API candle closes,
   <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Get Market Candlesticks ↗</a>),
-  <em>prev-close</em> (vs the API's <code>previous_price_dollars</code> field when present).</li>
+  <em>24h-change</em> (the API's <code>previous_price_dollars</code> field, which the official spec defines as
+  the last traded YES price <strong>a day ago</strong> — a day-over-day comparison, kept separate from intraday
+  swings and never used to corroborate one; see <a href="flagged.html#F-84">F-84</a>).</li>
   <li><strong>Cooldown:</strong> 3 min per ticker + direction, so one move does not spam the feed.</li>
   <li><strong>Ranking:</strong> watchlist sorted by derived 24 h dollar-volume estimate (labelled; never presented as an official Kalshi figure).</li>
   <li><strong>Settlement:</strong> markets resolve <code>result</code> = <code>yes</code> or <code>no</code>; winning side receives $1 per contract
@@ -80,7 +82,7 @@ they are exchange-published source strings, not independently verified publisher
 <h2>Sources for this page (verified 2026-11-20)</h2>
 <div class="table-wrap"><table><thead><tr><th>#</th><th>Claim on this page</th><th>Official source (re-check link)</th></tr></thead><tbody>
 <tr><td>S1</td><td>Prices are fixed-point dollar strings (up to 4 decimals)</td><td><a href="https://docs.kalshi.com/getting_started/fixed_point_migration" target="_blank" rel="noopener">docs.kalshi.com/getting_started/fixed_point_migration ↗</a></td></tr>
-<tr><td>S2</td><td>Market object fields: <code>last_price_dollars</code>, <code>previous_price_dollars</code>, <code>volume_24h_fp</code>, <code>open_interest_fp</code>, <code>result</code>, <code>status</code></td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">docs.kalshi.com/api-reference/market/get-markets ↗</a></td></tr>
+<tr><td>S2</td><td>Market object fields: <code>last_price_dollars</code> (last traded YES contract), <code>previous_price_dollars</code> / <code>previous_yes_bid_dollars</code> / <code>previous_yes_ask_dollars</code> (the same values <strong>a day ago</strong>), <code>volume_24h_fp</code>, <code>open_interest_fp</code>, <code>result</code>, <code>status</code></td><td><a href="https://docs.kalshi.com/api-reference/market/get-market#schema" target="_blank" rel="noopener">docs.kalshi.com/api-reference/market/get-market ↗</a> · <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">get-markets ↗</a></td></tr>
 <tr><td>S3</td><td>Single-market endpoint <code>GET /markets/{ticker}</code></td><td><a href="https://docs.kalshi.com/api-reference/market/get-market" target="_blank" rel="noopener">docs.kalshi.com/api-reference/market/get-market ↗</a></td></tr>
 <tr><td>S4</td><td>Events carry <code>title</code>, <code>category</code>, <code>settlement_sources[{name,url}]</code>, nested <code>markets</code></td><td><a href="https://docs.kalshi.com/api-reference/events/get-events" target="_blank" rel="noopener">docs.kalshi.com/api-reference/events/get-events ↗</a></td></tr>
 <tr><td>S5</td><td>1/60/1440-minute candles with <code>price.close_dollars</code></td><td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">docs.kalshi.com/api-reference/market/get-market-candlesticks ↗</a></td></tr>

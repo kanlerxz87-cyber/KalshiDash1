@@ -2884,7 +2884,40 @@
     "detected_by": "scripts/annotate-legacy-unfillable.mjs (2026-11-21)"
    }
   ],
-  "legacy_unfillable_note": "High-ROI rows published by model heuristic-v1 before the follow-through gate existed. The published bid/ask at detection did not corroborate the swing price, so these rows are kept as recorded history but are marked \"not tradeable\" on the page and excluded from the live high-ROI ranking. Their score is the ORIGINAL v1 score and is labelled as such."
+  "legacy_unfillable_note": "High-ROI rows published by model heuristic-v1 before the follow-through gate existed. The published bid/ask at detection did not corroborate the swing price, so these rows are kept as recorded history but are marked \"not tradeable\" on the page and excluded from the live high-ROI ranking. Their score is the ORIGINAL v1 score and is labelled as such.",
+  "legacy_day_old_corroboration": [
+   {
+    "id": "KXBTCY-27JAN0100-B87500@1795303493",
+    "ticker": "KXBTCY-27JAN0100-B87500",
+    "recorded_corroboration": "previous_price_dollars",
+    "recorded_gap": 0,
+    "book_also_corroborates": true,
+    "book_reading": "book midpoint (yes quotes)",
+    "note": "The live book also corroborated this swing when re-checked; only the recorded evidence label was wrong.",
+    "model_highROI_at_publication": true
+   },
+   {
+    "id": "KXPRESPERSON-28-VRAM@1795303106",
+    "ticker": "KXPRESPERSON-28-VRAM",
+    "recorded_corroboration": "previous_price_dollars",
+    "recorded_gap": 0,
+    "book_also_corroborates": true,
+    "book_reading": "book midpoint (yes quotes)",
+    "note": "The live book also corroborated this swing when re-checked; only the recorded evidence label was wrong.",
+    "model_highROI_at_publication": true
+   },
+   {
+    "id": "KXBTCY-27JAN0100-B77500@1795302737",
+    "ticker": "KXBTCY-27JAN0100-B77500",
+    "recorded_corroboration": "previous_price_dollars",
+    "recorded_gap": 0,
+    "book_also_corroborates": true,
+    "book_reading": "book midpoint (yes quotes)",
+    "note": "The live book also corroborated this swing when re-checked; only the recorded evidence label was wrong.",
+    "model_highROI_at_publication": true
+   }
+  ],
+  "legacy_day_old_corroboration_note": "F-84: these rows were published before 2026-11-22 with corroboration.by = previous_price_dollars, which the official schema defines as the last traded YES price a day ago (https://docs.kalshi.com/api-reference/market/get-market). The engine now corroborates only with the same-session book. Prices, arrows, deltas, timestamps and scores are unchanged."
  },
  "markets": {
   "KXAAAGASW-26NOV23-3.6600": {

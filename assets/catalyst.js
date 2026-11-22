@@ -229,24 +229,30 @@
     renderChart();
   }
 
-  /* A swing may also be compared against the API's previous_price_dollars field
-     (previous settlement reference returned on the market object). Reported separately:
-     basis "prev-close", only when the API value is present and > 0. */
-  function detectPrevCloseSwing(row) {
+  /* 24-hour change, as the API defines it (F-84).
+     The market object publishes previous_price_dollars / previous_yes_bid_dollars /
+     previous_yes_ask_dollars, which the official spec defines as the same values "a day ago"
+     (https://docs.kalshi.com/api-reference/market/get-market). That is a legitimate comparison,
+     but it is NOT an intraday swing: a market that moved steadily all day shows a large number
+     with no sudden jump at all, and a stale day-old last price shows a large number with no
+     trade. So this is reported with basis "24h-change" and never folded into the >= $0.10
+     swing feed that the alert chats use. Reported only when the API value is present and > 0,
+     and ranked below intraday detections by the caller. */
+  function detect24hChange(row) {
     var prev = num(row.previous_price_dollars);
     var last = num(row.last_price_dollars);
     if (prev === null || last === null || prev <= 0 || prev === last) return;
     var delta = last - prev;
     if (Math.abs(delta) + 1e-9 < CFG.threshold) return;
     var dir = delta > 0 ? 'up' : 'down';
-    var key = row.ticker + '|' + dir + '|prev';
+    var key = row.ticker + '|' + dir + '|24h';
     var now = Math.floor(Date.now() / 1000);
     if (lastAlert[key] && now - lastAlert[key] < CFG.cooldownSec) return;
     lastAlert[key] = now;
     pushSwing({
-      id: row.ticker + '-prev-' + dir,
+      id: row.ticker + '-24h-' + dir,
       ts: new Date().toISOString(),
-      basis: 'prev-close',
+      basis: '24h-change',
       ticker: row.ticker,
       event_ticker: row.event_ticker || '',
       series_ticker: row.series_ticker || '',
@@ -394,7 +400,7 @@
           var t = Math.floor(Date.now() / 1000);
           var p = num(m.last_price_dollars);
           if (p !== null) detectSwing(row, t, p, 'live');
-          detectPrevCloseSwing(row);
+          detect24hChange(row);
         });
       }, function () { });
     });
