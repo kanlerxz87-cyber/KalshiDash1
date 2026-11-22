@@ -18,6 +18,13 @@
  *     (followThrough gate, added 2026-11-21 after the pane was measured to be topped by
  *     unfillable $0.01 -> $0.97 prints).
  *  7. Every sample timestamp is a real ISO date in the past.
+ *  8. F-90 (session-f7ba69d5, 2026-11-22): no published alert may cite
+ *     `previous_price_dollars` as its corroborating evidence. The official spec defines that
+ *     field as the last traded YES price **a day ago**
+ *     (https://docs.kalshi.com/api-reference/market/get-market), so it is a day-over-day
+ *     comparison, not a same-session observation, and it must never be presented as proof that
+ *     an intraday print was real. The gate is mechanical because the wrong definition survived
+ *     an earlier review in a source comment; a later edit cannot silently restore it.
  *
  * Exit code 1 on any violation, so a bad sample can never be committed.
  */
@@ -171,6 +178,43 @@ async function main() {
       const ft = followThrough({ direction: row.direction, to: row.to, bid: num(row.yes_bid_dollars), ask: num(row.yes_ask_dollars) });
       if (ft.ok !== false) fail(`meta.legacy_unfillable_high_roi lists ${x.id} but its book does corroborate the swing (${ft.note})`);
       if (row.model && row.model.highROI) fail(`meta.legacy_unfillable_high_roi lists ${x.id} but the row is still labelled highROI`);
+    }
+  }
+
+  /* F-90: `previous_price_dollars` is the last traded YES price A DAY AGO per the official
+   * schema, so it can never be published as corroboration of an intraday swing. The assertion is
+   * mechanical: whichever code path writes `a.corroboration`, the value must be the live book.
+   *
+   * Alerts published BEFORE the fix keep their recorded evidence — recorded data is never
+   * rewritten — but each one must be listed in `meta.legacy_day_old_corroboration` by
+   * scripts/annotate-legacy-day-old-corroboration.mjs, which also records, per row, whether the
+   * live book independently corroborates it. That keeps the published claim honest without
+   * deleting history. */
+  const DAY_OLD_EVIDENCE = /previous_price/i;
+  const legacyDayOld = new Set((feed.meta?.legacy_day_old_corroboration || []).map((x) => x.id));
+  for (const a of feed.alerts || []) {
+    const c = a.corroboration;
+    if (!c || typeof c.by !== 'string') continue;
+    if (/book midpoint/.test(c.by)) continue;
+    if (DAY_OLD_EVIDENCE.test(c.by)) {
+      if (!legacyDayOld.has(a.id)) {
+        fail(`alert ${a.id}: corroboration.by names "${c.by}", a day-old field (F-90) and the row is not `
+          + 'in meta.legacy_day_old_corroboration — run scripts/annotate-legacy-day-old-corroboration.mjs');
+      }
+      continue;
+    }
+    fail(`alert ${a.id}: corroboration.by "${c.by}" is not a same-session book reading — F-90`);
+  }
+  /* The provenance list may not name a row that does not exist, and may not be used to excuse a
+   * row whose evidence is in fact the book. */
+  for (const x of feed.meta?.legacy_day_old_corroboration || []) {
+    const row = (feed.alerts || []).find((a) => a.id === x.id);
+    if (!row) { warn(`meta.legacy_day_old_corroboration lists ${x.id}, which is not in this feed`); continue; }
+    if (!/previous_price/i.test(String(row.corroboration && row.corroboration.by))) {
+      fail(`meta.legacy_day_old_corroboration lists ${x.id} but the row does not cite the day-old field`);
+    }
+    if (typeof x.book_also_corroborates !== 'boolean') {
+      fail(`meta.legacy_day_old_corroboration entry ${x.id} must record book_also_corroborates (true/false)`);
     }
   }
 

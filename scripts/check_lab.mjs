@@ -236,15 +236,20 @@ console.log('Test 1 — catalyst.html renders, detects >= $0.10 swings, attaches
 
   const text = [...feed].map((n) => n.textContent).join('\n');
   const hrefs = [...doc.querySelectorAll('#swing-feed a')].map((a) => a.getAttribute('href') || '').join('\n');
-  ok(/candle-close|prev-close|live-sample/.test(text), 'swing entries carry a detection basis');
+  ok(/candle-close|24h-change|live-sample/.test(text), 'swing entries carry a detection basis');
   ok(text.includes('KXAAAGASDSD-26DEC31-3.7400'), 'swing entries name the market ticker');
   ok(text.includes('news search'), 'swing entries carry possible-catalyst discovery links');
   ok(hrefs.includes('gasprices.aaa.com'), 'swing entries link the official settlement sources from the API');
   ok(hrefs.includes('markets/KXAAAGASDSD-26DEC31-3.7400'), 'swing entries link the official market endpoint');
 
-  // candle swing: 0.47 -> 0.62 = +0.15; prev-close swing: 0.20 -> 0.45 = +0.25
+  // candle swing: 0.47 -> 0.62 = +0.15; day-over-day: 0.20 -> 0.45 = +0.25
   ok(/0\.4700.*0\.6200|0\.6200/s.test(text) || text.includes('candle-close'), 'candle-close swing recorded');
-  ok(text.includes('prev-close'), 'prev-close swing recorded');
+  /* F-90 (session-f7ba69d5): `previous_price_dollars` is the last traded YES price A DAY AGO
+   * (official schema), so the old "prev-close" label presented a day-over-day change as an
+   * intraday swing. The record must now be labelled 24h-change and must never be labelled as a
+   * same-session detection. */
+  ok(text.includes('24h-change'), 'the day-over-day comparison is labelled 24h-change (F-90)');
+  ok(!text.includes('prev-close'), 'no record still calls the day-old field a close/prev-close swing (F-90)');
 
   // diesel must be excluded (F-18 scope decision)
   ok(!doc.body.textContent.includes('KXDIESELD'), 'diesel series excluded from gas topic');
