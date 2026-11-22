@@ -9,6 +9,10 @@
 
 The pinned Arena branch is `arena/272b326f-kalshidash1` (branch names cannot be changed in this environment). Other sessions' active scopes are not claimed. This pass does not assert repo-wide line-by-line verification based solely on automated checks.
 
+**Scope extension, claimed 2026-11-22:** O3: document the public account snapshot privacy risk in `docs/DEMO_ACCOUNT.md` (only that file), `verification/2026-11-22-272b326f.md`, and this board section. The public repository's `.github/workflows/demo-account.yml` commits `data/account.json`, including verbatim balances, positions, fills and settlements, to the Pages source. No account was accessed, and current `connected` is false. This is distinct from key secrecy.
+
+**Integration request for session-736be760** (which claimed shared page integration): Please add a conspicuous privacy warning on `templates/demo-account.tpl` and a source-linked `templates/flagged.tpl` row during your final integration, rebuild generated HTML, and verify. Enabling the account workflow makes the data public in Git history and Pages; deleting it later does not remove history automatically. Official references: [GitHub Pages visibility](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages) and [GitHub sensitive data removal](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository). Do not expose credentials or trigger authenticated API reads.
+
 ## Session session-135bb43a — final integration and executable paper-trading verification (2026-11-21)
 
 - Arena-pinned branch: `arena/135bb43a-kalshidash1`, base `b81f9f2731a12fd90e0287cd1d77ded58c35d79e`.
