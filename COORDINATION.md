@@ -3076,6 +3076,36 @@ verification file carries an official source link.
 The pinned branch is fixed by the environment. Historical task rows are retained; the previous integration records PR #91 as completed. No source or generated pages are claimed by this session.
 
 - Independent check complete: `npm ci`, `npm test`, and generator `--check` pass; 90 pages / 2,198 internal links checked, external links not fetched. Kalshi's [demo documentation](https://docs.kalshi.com/getting_started/demo_env) was checked for the endpoints and mock-fund caveat. [Pages deployment](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44976170235) succeeded for `4f1de81`; current actual demo-account state remains disconnected and unverified. Full limits and evidence: `verification/2026-11-22-0d9df07c.md`. This is not a new line-by-line verification of the entire repo. Status: done.
+---
+
+## Session `arena/2a42fa01-kalshidash1` — independent verification of the live site and current sample (2026-11-22 UTC)
+
+**Session ID:** `session-2a42fa01`. Branch `arena/2a42fa01-kalshidash1` (Arena-pinned, status `active`), based on `main` @ `4f1de81`.
+
+- Read the board before claiming. The only open PR at claim time is [#86](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/86) (docs, session-37562307). No session claims the tasks below.
+- Claimed scope (non-overlapping): `verification/2026-11-22-2a42fa01.md` (new), plus targeted fixes **only if** a defect is reproduced against an official source/live API, and the generated pages rebuilt through `scripts/build-site.mjs`. No other session's file is edited.
+- The full requirement set (dashboard, alerts, portfolio, strategies, categories, flagged page, GitHub Pages) already exists on `main`; this session's job is to re-verify it line by line, find genuine gaps, and fix/re-flag what is reproduced.
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| B1 | Claim scope on `COORDINATION.md`, commit and push immediately | done | session-2a42fa01 | `COORDINATION.md` |
+| B2 | Run the full offline QA battery on this branch; record pass/fail per check | done — `npm test` exit 0; per-check table in `verification/2026-11-22-2a42fa01.md` §1 | session-2a42fa01 | `verification/2026-11-22-2a42fa01.md` |
+| B3 | Independently verify the live Pages site and the committed sample against the official demo API/docs; record every source and any irregularity | done — §2 live reads; §4 limitations | session-2a42fa01 | `verification/2026-11-22-2a42fa01.md` |
+| B4 | Fix reproduced defects; re-verify; publish findings; PR to `main`, merge, confirm Pages | in progress — **F-86** (settlement_ts) + **F-87** (F-A9 mapping) fixed, regenerated, suite green; PR #106 open | session-2a42fa01 | `scripts/fetch-snapshot.mjs`, new `scripts/check-settlement-ts.mjs`, `package.json`, `.github/workflows/site-qa.yml`, `templates/flagged.tpl`, `flagged.html`, `EXECUTIVE_SUMMARY.md` |
+
+### Merge conflict log — session-2a42fa01 (2026-11-22 ~08:2x UTC)
+
+- `main` advanced from `bb2cfec` to `39e5585` (PRs #96, #98, #99, #104, #105) while PR #106 was open.
+  Conflicts: `COORDINATION.md`, `templates/flagged.tpl`, generated `flagged.html`, `package.json`.
+  Resolved by keeping **both** sides: all concurrent board sections; main's new `test:privacy`
+  script and privacy site-qa step; main's F-82…F-85 rows. **No other session's row, script or
+  workflow step was removed.**
+- **Flag-ID collision, resolved without discarding either side:** this session had drafted its two
+  rows as F-82/F-83; concurrent sessions published F-82…F-85 on `main`. This session's rows were
+  renumbered to **F-86/F-87** (content unchanged). `check-html-ids` on the merged tree reports
+  613 ids, no duplicates.
+- `site-qa.yml` now runs both main's "Demo-account privacy warning" step and this session's
+  "Resolved events can show the official settlement time" step.
 
 ---
 
