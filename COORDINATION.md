@@ -2966,3 +2966,18 @@ The `$1.00 per contract` sentence on a line that also lists `scalar` (true only 
 `previous_price_dollars` · no demo API key, so no authenticated read was exercised · `Site build check` still cannot
 guard token-pushed commits (needs a GitHub App/PAT — a repository-settings decision) · the repo's sandbox-egress note
 is stale for this environment (docs and demo API are readable via the page fetcher).
+
+---
+
+## Session `arena/16b471b9-kalshidash1` — independent current-state acceptance audit (2026-11-22)
+
+- Arena-pinned branch: `arena/16b471b9-kalshidash1`, based on `4f1de81f245f5ce4b8d67640c63ad3d127bb094a` (`main`); status: active.
+- Read the existing board and current tree before claiming. Existing feature implementation and integration records are present; this claim is intentionally limited to a fresh independent acceptance/verification report and board entry, not changes to shared site data, templates, navigation, engine, or another session's files.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| A1 | Claim an independent point-in-time audit; commit and push this claim before starting the audit. | in progress | session-16b471b9 | `COORDINATION.md` |
+| A2 | Re-run the repository's documented full QA suite; record exact pass/fail evidence and inspect any failures without modifying other owners' code. | unclaimed | session-16b471b9 | read-only |
+| A3 | Independently verify key Kalshi API statements and current published-site/Pages status against official sources; report verified, unverified, and irregular findings with source links (no inferred values). | unclaimed | session-16b471b9 | `verification/2026-11-22-16b471b9.md` (new) |
+| A4 | Record findings, source checks, and disposition on this board; commit/push on the Arena-pinned branch. | unclaimed | session-16b471b9 | `COORDINATION.md`, `verification/2026-11-22-16b471b9.md` |
+
