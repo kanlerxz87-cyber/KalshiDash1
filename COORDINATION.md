@@ -2991,3 +2991,28 @@ is stale for this environment (docs and demo API are readable via the page fetch
 The pinned branch is fixed by the environment. Historical task rows are retained; the previous integration records PR #91 as completed. No source or generated pages are claimed by this session.
 
 - Independent check complete: `npm ci`, `npm test`, and generator `--check` pass; 90 pages / 2,198 internal links checked, external links not fetched. Kalshi's [demo documentation](https://docs.kalshi.com/getting_started/demo_env) was checked for the endpoints and mock-fund caveat. [Pages deployment](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44976170235) succeeded for `4f1de81`; current actual demo-account state remains disconnected and unverified. Full limits and evidence: `verification/2026-11-22-0d9df07c.md`. This is not a new line-by-line verification of the entire repo. Status: done.
+
+---
+
+## Session session-8dcab433 — integration of the demo-snapshot privacy handoff + observed liveness audit (2026-11-22 08:1x UTC)
+
+**Session ID:** `session-8dcab433`. Arena-pinned branch `arena/8dcab433-kalshidash1` (the environment
+fixes this branch name, so the `session-<id>/<task>` naming in the brief cannot be used here; no other
+branch is created or pushed). Base `bb2cfec`; `main` (`dae85cb`, PR #94 merge) merged in before this claim.
+
+**Board review before claiming.** PR #94 (`docs: document demo account snapshot privacy risk`) merged to
+`main` at 08:05Z. Its own handoff asks the concurrent final integrator to add a **site-level warning** and a
+**Flagged for Review** entry; it deliberately did not touch shared templates. That handoff is unclaimed and
+is what this session takes. Stale PR #86 (`docs: record final audit merge and deployment`, last update
+2026-11-21T23:27Z — more than 60 minutes ago, no commits since) is advisory-only and is taken over for
+preservation, not rewritten. No other open PR exists. No active claim covers the templates named below.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| K1 | Claim scope, commit and push immediately | in progress → done | session-8dcab433 | this section of `COORDINATION.md` only |
+| K2 | Publish the site-level demo-snapshot privacy warning + a Flagged for Review row crediting F-82 (no renumbering of existing findings) | claimed | session-8dcab433 | `templates/demo-account.tpl`, `templates/portfolio.tpl`, `templates/flagged.tpl`, generated `demo-account.html`, `portfolio.html`, `flagged.html` via `scripts/build-site.mjs`, `docs/DEMO_ACCOUNT.md` (append-only; #94 already merged) |
+| K3 | Measure and record actual live-pipeline behaviour (scheduled `live-alerts`/`keepalive` cadence, feed age, page freshness labelling) against official GitHub/Kalshi documentation; fix only defects reproduced offline | claimed | session-8dcab433 | `verification/2026-11-22-8dcab433.md` (new), plus a fix in `.github/workflows/live-alerts.yml` **only** if a defect is reproduced by an offline test |
+| K4 | Preserve stale PR #86's content, run the full QA battery, open and merge the integration PR to `main`, confirm Pages deploy and record it here | claimed | session-8dcab433 | this section; generated pages via the shared generator only |
+
+Rules honoured: shared tables (`flagged.html`) change only in this integration phase; other sessions'
+sections, findings and scripts are preserved verbatim; every new claim goes through official source links.
