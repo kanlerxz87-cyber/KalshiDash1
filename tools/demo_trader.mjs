@@ -21,7 +21,7 @@
  *   node tools/demo_trader.mjs status
  *   node tools/demo_trader.mjs account [--print] [--ci]
  *   node tools/demo_trader.mjs buy    --ticker T --side bid|ask --count N --price P [--dry-run|--confirm-live]
- *   node tools/demo_trader.mjs cancel --order-id ORDER_ID [--dry-run|--confirm-live]
+ *   node tools/demo_trader.mjs cancel --order-id ORDER_ID --ticker MARKET_TICKER [--dry-run|--confirm-live]
  *
  * Safety: `buy` and `cancel` are ALWAYS dry-run unless `--confirm-live` is passed.
  * `account` writes data/account.json (verbatim API responses + source URLs) when keys are present.
@@ -154,6 +154,28 @@ async function cmdAccount(args) {
   if (!out.connected) process.exitCode = 1;
 }
 
+/* Validate the minimum documented envelope, not the full semantics of individual trades.
+ * Empty arrays and zero balances are valid; missing, wrongly typed or unsafe numeric fields
+ * are not evidence of an authenticated account. Response bodies remain unmodified on success.
+ * https://docs.kalshi.com/api-reference/portfolio/get-balance
+ * https://docs.kalshi.com/api-reference/portfolio/get-positions
+ * https://docs.kalshi.com/api-reference/portfolio/get-fills
+ * https://docs.kalshi.com/api-reference/portfolio/get-settlements */
+function validAccountEnvelope(name, value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const objects = (x) => Array.isArray(x) && x.every((row) => row !== null && typeof row === "object" && !Array.isArray(row));
+  const optionalCursor = (x) => x === undefined || typeof x === "string";
+  if (name === "balance") {
+    return Number.isSafeInteger(value.balance) && typeof value.balance_dollars === "string"
+      && /^-?\d+(?:\.\d+)?$/.test(value.balance_dollars)
+      && Number.isSafeInteger(value.portfolio_value) && Number.isSafeInteger(value.updated_ts);
+  }
+  if (name === "positions") return objects(value.market_positions) && objects(value.event_positions) && optionalCursor(value.cursor);
+  if (name === "fills") return objects(value.fills) && typeof value.cursor === "string";
+  if (name === "settlements") return objects(value.settlements) && optionalCursor(value.cursor);
+  return false;
+}
+
 /* Separate the capture from persistence so HTTP failures can be tested entirely offline.
  * A timestamped attempt is not a successful authenticated account connection. */
 export async function captureAccount(creds, request = callAuth) {
@@ -169,11 +191,25 @@ export async function captureAccount(creds, request = callAuth) {
     disclaimer: "Verbatim demo-account API responses captured by tools/demo_trader.mjs. Each list is a first page, not a complete performance history. Demo environment only; values may not reflect real markets (https://docs.kalshi.com/getting_started/demo_env).",
   };
   for (const p of paths) {
-    const r = await request(creds, "GET", p);
     const name = p.split("?")[0].split("/").pop();
-    if (!r.ok || !r.json) {
-      console.error(`GET ${p} → ${r.status}: authenticated account data unverified`);
-      out[name] = { error: true, status: r.status, body: String(r.text).slice(0, 500) };
+    let r;
+    try {
+      r = await request(creds, "GET", p);
+    } catch {
+      // Do not echo transport exceptions: they could contain request details. Return a
+      // disconnected attempt for the CLI to write locally; workflow publication is separate.
+      console.error(`GET ${p} → transport failure: authenticated account data unverified`);
+      out[name] = { error: true, status: null, reason: "Request failed; account data unverified." };
+      continue;
+    }
+    if (!r || !r.ok || r.status !== 200) {
+      console.error(`GET ${p} → ${r?.status ?? "unknown"}: authenticated account data unverified`);
+      out[name] = { error: true, status: r?.status ?? null, body: String(r?.text ?? "").slice(0, 500) };
+      continue;
+    }
+    if (!validAccountEnvelope(name, r.json)) {
+      console.error(`GET ${p} → ${r.status}: required account response fields unverified`);
+      out[name] = { error: true, status: r.status, reason: "Missing or invalid required response fields; account data unverified." };
       continue;
     }
     out[name] = r.json;
@@ -181,7 +217,8 @@ export async function captureAccount(creds, request = callAuth) {
     if (request === callAuth) await new Promise((resolve) => setTimeout(resolve, 300));
   }
   out.connected = ["balance", "positions", "fills", "settlements"].every((key) => out[key] && !out[key].error);
-  if (out.connected) out.captured_at = out.attempted_at;
+  // The four calls are sequential, not an atomic account snapshot.
+  if (out.connected) out.captured_at = new Date().toISOString();
   return out;
 }
 
@@ -240,14 +277,22 @@ async function cmdBuy(args) {
 
 async function cmdCancel(args) {
   const live = mutationRequested(args);
-  const i = args.indexOf("--order-id");
-  const orderId = i >= 0 ? args[i + 1] : undefined;
-  if (!orderId) { console.error("cancel requires --order-id"); process.exit(2); }
-  console.log(`DELETE ${API_ROOT}/portfolio/events/orders/${encodeURIComponent(orderId)}`);
+  const get = (flag) => { const i = args.indexOf(flag); return i >= 0 ? args[i + 1] : undefined; };
+  const orderId = get("--order-id");
+  const ticker = get("--ticker");
+  const validArg = (v) => typeof v === "string" && v.trim() === v && v.length > 0 && !v.startsWith("--");
+  if (!validArg(orderId) || [".", ".."].includes(orderId) || !validArg(ticker)) {
+    throw new Error("cancel requires --order-id ORDER_ID and --ticker MARKET_TICKER; nothing sent.");
+  }
+  // Order creation auto-routes by ticker. Canceling by order ID alone defaults to shard 0;
+  // require the ticker as well so cancellation can route to the order's exchange shard.
+  // https://docs.kalshi.com/api-reference/orders/cancel-order-v2
+  const p = `/portfolio/events/orders/${encodeURIComponent(orderId)}?${new URLSearchParams({ market_ticker: ticker })}`;
+  console.log(`DELETE ${API_ROOT}${p}`);
   if (!live) { console.log("DRY RUN — nothing was sent. Re-run with --confirm-live to cancel on the demo exchange."); return; }
   const creds = loadKey();
   if (!creds) { console.error("no credentials in environment"); process.exit(1); }
-  const r = await callAuth(creds, "DELETE", `/portfolio/events/orders/${encodeURIComponent(orderId)}`);
+  const r = await callAuth(creds, "DELETE", p);
   console.log(`→ HTTP ${r.status} ${String(r.text).slice(0, 500)}`);
   if (!r.ok) process.exitCode = 1;
 }

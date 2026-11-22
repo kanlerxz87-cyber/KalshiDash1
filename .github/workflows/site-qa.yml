@@ -78,6 +78,9 @@ jobs:
       # enforced in CI instead of being skipped or red for an unrelated reason.
       # session-7dc87913: pins the data-writer publish path (one shared concurrency group, verify
       # the ref moved, regenerate rather than text-merge on conflict). Static, no network.
+      - name: Demo-account privacy warning (template + generated page, with negative controls)
+        run: node scripts/check-account-privacy.mjs
+
       - name: Data-writer publish path checks
         run: node scripts/check-data-writer-concurrency.mjs
 

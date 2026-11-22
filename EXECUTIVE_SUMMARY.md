@@ -1,11 +1,26 @@
 # Executive Summary — KalshiDash1
 
-**Updated:** 2026-11-21 20:28 UTC · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/96019ad5-kalshidash1` · **Session:** `session-96019ad5`
+**Updated:** 2026-11-22 08:10 UTC (session-b8913775; earlier 2026-11-21 20:28 UTC record kept below) · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/96019ad5-kalshidash1` · **Session:** `session-96019ad5`
 
 > **Scope and freshness note:** Sections 4–6 below preserve the historical findings from the explicitly dated
 > 2026-11-20 11:10 UTC snapshot; those numbers are not current-market claims. Current repository/feed checks and
 > the stale-feed discrepancy are recorded in [this session's dated verification report](verification/2026-11-21-96019ad5.md).
 > The canonical live site is the root GitHub Pages build linked from [README](README.md), not the older `dash/` suite.
+
+## Update — 2026-11-22 08:10 UTC (session-b8913775)
+
+> This block supersedes the numbers in the 2026-11-21 status table below where they differ; the
+> dated text is kept as history, not rewritten. Full evidence: [`verification/2026-11-22-b8913775.md`](verification/2026-11-22-b8913775.md).
+
+| Check | Measured state | Source |
+|---|---|---|
+| Committed engine feed | `generated_at` **2026-11-22T02:27:14Z**, **40 alerts** (3 high-ROI), **0 resolutions**, 4 awaiting resolution, 60 market rows, 8 orderbooks. Age at this check ≈ 5.7 h, i.e. past the 45-minute `STALE` limit, so every page prints a stale age rather than the word LIVE for the engine layer. | [`data/live/feed.json`](data/live/feed.json) |
+| Scheduled sampler delivery | **6 schedule-triggered runs in 34.6 h** (2026-11-20T21:52Z → 2026-11-22T02:27Z) against a declared `*/10` cron. Not a repository defect and not fixable from here; published as **F-83**. | [live-alerts run history](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/workflows/live-alerts.yml) · [GitHub schedule docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) |
+| Dashboard chats | Now read that committed feed, so both chats show the exchange-sampled record even when the visitor's browser cannot reach the demo API (previously they fell back to a synthetic candle replay). **F-82**, fixed and regression-tested. | [`assets/app.js`](assets/app.js) · [regression test](scripts/check-market-chart.mjs) |
+| Demo account | `data/account.json` is still the placeholder: **`connected: false`, no capture time** — repository secrets (`KALSHI_KEY_ID`, `KALSHI_PRIVATE_KEY`) are not configured, so no balance, position or fill from the account has been verified. The setting-up instructions are on [demo-account.html](demo-account.html); nothing on the site asks for a key. | [`data/account.json`](data/account.json) · [`docs/DEMO_ACCOUNT.md`](docs/DEMO_ACCOUNT.md) |
+| Culture topic | Still **0 open markets**: the demo API lists two Culture series (`KXXBANNEDGROK`, `KXXBANNEDMURRAYHILLGUY1`) and `GET /markets?status=open` returns none for both (checked 2026-11-22T08:04Z). The page says so instead of inventing rows. | [Culture series](https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true) · [open markets](https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXXBANNEDGROK&status=open&limit=20) |
+| GitHub Pages | `pages/builds/latest` → **`built`**, `error.message` `null`, commit `4f1de81`, 2026-11-22T02:27:27Z. | [Pages build API](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest) |
+| Offline suite | `npm test` — **17 suites pass** (engine, feed, retained re-score, chat guard, resolution logic, alerts page, ids, source rows, staleness, lab, CORS evidence, links, paper 53, chart+paper UI 38, demo safety 37, writers 20); `build-site --check` clean. | [`package.json`](package.json) |
 
 ## 1. The brief, in one paragraph
 
@@ -98,16 +113,17 @@ demo API.
 |---|---|---|
 | Alert engine | `tools/live_engine.mjs` | Discovers the five focus topics, samples prices, detects ≥ $0.10 moves (sample-to-sample **and** from 1-minute candles), tracks resolutions, scores alerts |
 | Live console | `alerts/index.html` | Two scrolling feeds: **All events** and **High ROI**; price chart (5 min → 7 days); per-topic highest-dollar boards; resolution log; liquidity ladders |
-| Scheduled sampler | `.github/workflows/live-alerts.yml` | Runs every 10 minutes so the record continues with no browser open |
+| Scheduled sampler | `.github/workflows/live-alerts.yml` | Declares a 10-minute cron so the record continues with no browser open; **measured delivery was 6 runs in 34.6 h** on 2026-11-20/22 — the declared cadence is not a promise (**F-83**) |
 | Feed validator | `scripts/check_alerts.mjs` | Blocks any published row that is below threshold, has an invented price, or cites a non-official source |
 | Page test | `scripts/check_alerts_page.mjs` | jsdom render test of both feeds, the filter and the no-invented-price rule |
 
 ## The honest state of the data
 
 The engine ran successfully against `https://external-api.demo.kalshi.co/trade-api/v2` and captured
-real markets for gas, elections, crypto and golf. **Alerts so far: zero.** The demo exchange is
-quiet — repeated samples of the top contracts returned identical prices. The feeds display that
-state instead of seeding example alerts, and the threshold, detection and rendering are covered by
+real markets for gas, elections, crypto and golf. **Superseded (2026-11-22): the committed feed now
+holds 40 sampled alerts, 3 of them high-ROI — see the update block at the top.** When this paragraph
+was written the exchange had produced no qualifying move; the feeds displayed that state instead of
+seeding example alerts, and the threshold, detection and rendering are covered by
 automated tests so the mechanism is proven independently of whether the demo happens to move.
 
 ## Verified platform facts (see `docs/ALERTS.md` §2 for links)
