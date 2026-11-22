@@ -2976,3 +2976,19 @@ is stale for this environment (docs and demo API are readable via the page fetch
 The pinned branch is fixed by the environment. Historical task rows are retained; the previous integration records PR #91 as completed. No source or generated pages are claimed by this session.
 
 - Independent check complete: `npm ci`, `npm test`, and generator `--check` pass; 90 pages / 2,198 internal links checked, external links not fetched. Kalshi's [demo documentation](https://docs.kalshi.com/getting_started/demo_env) was checked for the endpoints and mock-fund caveat. [Pages deployment](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44976170235) succeeded for `4f1de81`; current actual demo-account state remains disconnected and unverified. Full limits and evidence: `verification/2026-11-22-0d9df07c.md`. This is not a new line-by-line verification of the entire repo. Status: done.
+---
+
+## Session `arena/2a42fa01-kalshidash1` — independent verification of the live site and current sample (2026-11-22 UTC)
+
+**Session ID:** `session-2a42fa01`. Branch `arena/2a42fa01-kalshidash1` (Arena-pinned, status `active`), based on `main` @ `4f1de81`.
+
+- Read the board before claiming. The only open PR at claim time is [#86](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/86) (docs, session-37562307). No session claims the tasks below.
+- Claimed scope (non-overlapping): `verification/2026-11-22-2a42fa01.md` (new), plus targeted fixes **only if** a defect is reproduced against an official source/live API, and the generated pages rebuilt through `scripts/build-site.mjs`. No other session's file is edited.
+- The full requirement set (dashboard, alerts, portfolio, strategies, categories, flagged page, GitHub Pages) already exists on `main`; this session's job is to re-verify it line by line, find genuine gaps, and fix/re-flag what is reproduced.
+
+| ID | Task | Status | Owner | Files touched |
+|---|---|---|---|---|
+| B1 | Claim scope on `COORDINATION.md`, commit and push immediately | done | session-2a42fa01 | `COORDINATION.md` |
+| B2 | Run the full offline QA battery on this branch; record pass/fail per check | in progress | session-2a42fa01 | `verification/2026-11-22-2a42fa01.md` |
+| B3 | Independently verify the live Pages site and the committed sample against the official demo API/docs; record every source and any irregularity | unclaimed | session-2a42fa01 | `verification/2026-11-22-2a42fa01.md` |
+| B4 | Fix reproduced defects; re-verify; publish findings; PR to `main`, merge, confirm Pages | unclaimed | session-2a42fa01 | as evidenced |
