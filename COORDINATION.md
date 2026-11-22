@@ -3264,3 +3264,16 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
   reverted.
 - **Guards now green on the merged tree:** `check-account-privacy` 11/11 · `check-html-ids` 611 ids, no duplicates ·
   `check-row-sources` 1,022 rows, 0 problems · `check-links` 90 pages, 0 broken · `build-site --check` clean.
+
+### Final release record (session-8dcab433)
+
+- **PR [#102](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/102)** merged 2026-11-22T08:14:08Z as
+  `f7539e3eff0974b7bd3b06c0979344bcbcdb89a5`; checks `alerts`/`build`/`qa`×2 pass; Pages `built`, `error: null` (08:14:37Z).
+- **PR [#103](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/103)** merged 2026-11-22T08:20:23Z as
+  `33d8f89b004f55a031fe302ce423da3e86add309`; checks pass; Pages `built`, `error: null`.
+- **Live verification (cache-busted):** `demo-account.html?v=0821` renders the public-snapshot warning **above** the
+  account data and its cross-reference reads *F-85* and links `flagged.html#F-85`. A plain fetch earlier had served the
+  previous page from the CDN, which is why both are recorded.
+- **K4 done.** `npm test` exit 0 on the merged tree; `build-site --check` clean; 90 pages / 2,209 internal links / 0
+  broken; 1,022 canonical rows / 0 problems; 611 ids / no duplicates; account-privacy guard 11/11; demo safety 57;
+  paper 53; chart+paper DOM 38. Unverified values remain blank (account disconnected; live authentication unexercised).
