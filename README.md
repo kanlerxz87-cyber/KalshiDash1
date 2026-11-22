@@ -272,19 +272,13 @@ node scripts/check_alerts_page.mjs        # render + behaviour test of the page 
 ```
 
 * **Why a scheduled job:** GitHub Pages is static, so nothing on the site can sample the exchange
-  while nobody is looking. `.github/workflows/live-alerts.yml` declares a 10-minute cron
-  (`*/10 * * * *`) and commits `data/live/feed.json`; the page reads that and additionally polls the
-  public API while it is open.
-  **The declared cron is not the cadence you should expect.** GitHub documents that `schedule` runs
-  "can be delayed during periods of high loads of GitHub Actions workflow runs … If the load is
-  sufficiently high enough, some queued jobs may be dropped"
-  ([GitHub docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)).
-  Measured on this repository: six consecutive scheduled `live-alerts` runs between 2026-11-21 and
-  2026-11-22 started **4–6 hours apart**, not 10 minutes apart
-  (`gh api 'repos/kanlerxz87-cyber/KalshiDash1/actions/runs?event=schedule'`). Every page therefore
-  prints the *measured* age of the newest sample and marks the whole feed `STALE` past 45 minutes
-  (`assets/freshness.js`); it never shows a stale sample under a "live" label. `keepalive.yml`
-  exists because of this documented behaviour.
+  while nobody is looking. `.github/workflows/live-alerts.yml` declares a 10-minute cron and commits
+  `data/live/feed.json`; the page reads that and additionally polls the public API while it is open.
+  **The declared cadence is not the delivered one:** GitHub delays and drops scheduled runs, and this
+  repository's own history measured 6 schedule runs in 34.6 hours (≈1 per 5.8 h) between
+  2026-11-20T21:52Z and 2026-11-22T02:27Z — see [Flagged for review F-83](flagged.html#F-83) and
+  [events that trigger workflows § schedule](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+  Every page therefore prints the measured age of the newest sample, and says `STALE` past 45 minutes.
 * **What it will not do:** place orders or read a portfolio. Those endpoints need a signed request
   with the account holder's key; the site holds no credentials and never asks for them.
 * Method, sources and every irregularity: [`docs/ALERTS.md`](docs/ALERTS.md). Flagged items with

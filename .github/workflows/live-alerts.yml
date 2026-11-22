@@ -11,7 +11,7 @@ name: live-alerts
 on:
   # IMPORTANT: GitHub only fires `schedule` for the repository's DEFAULT branch. Once this is
   # merged to main the `*/10` cron starts (subject to GitHub's documented delay/drop behaviour,
-  # see F-82); on a feature branch only the
+  # see F-83); on a feature branch only the
   # manual dispatch and push triggers below can run it.
   schedule:
     - cron: '*/10 * * * *'

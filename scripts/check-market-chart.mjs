@@ -39,6 +39,11 @@ async function boot(page, live, fixture = {}) {
     url = String(url); requests.push(url);
     let data;
     if (url.includes('data/snapshot.json')) data = structuredClone(fixture.snapshot || snapshot);
+    /* The engine feed is same-origin committed data, so it is readable with no exchange access. */
+    else if (url.includes('data/live/feed.json')) {
+      if (!fixture.feed) throw new Error('NO FEED FIXTURE');
+      data = structuredClone(fixture.feed);
+    }
     else if (!live) throw new Error('TEST OFFLINE');
     else if (url.includes('/exchange/status')) data = { exchange_active: true, trading_active: true };
     else if (url.includes('/candlesticks?')) data = { candlesticks: [
@@ -187,7 +192,7 @@ try {
 const replay = await boot('dashboard', false, { snapshot: { ...snapshot, candlesticks: { FIXTURE: { m1: {
   source_url: BASE + '/series/TESTSERIES/markets/FIXTURE/candlesticks?period_interval=1',
   // close 3 stays at 0.30 for three more closes so the up leg is sustained; close 4 then falls
-  // 0.30 -> 0.20 with no later close to disprove it. Both legs must survive the F-83 rule.
+  // 0.30 -> 0.20 with no later close to disprove it. Both legs must survive the F-88 rule.
   candles: [[NOW / 1000 - 3600, null], [NOW / 1000 - 3540, 0.2], [NOW / 1000 - 3480, 0.3], [NOW / 1000 - 3420, 0.3], [NOW / 1000 - 3360, 0.3], [NOW / 1000 - 3300, 0.3], [NOW / 1000 - 3240, 0.2]],
 } } } } });
 try {
@@ -209,7 +214,84 @@ try {
   check('canonical dashboard has no unexpected script errors', () => assert.deepEqual(replay.errors, []));
 } finally { replay.dom.window.close(); }
 
-/* F-83. The committed capture keeps candle CLOSES only. One captured series (KXPRESNOMD-28-JSTE)
+/* ---------------------------------------------- dashboard + engine feed (offline)
+ * The dashboard chats must be able to show the engine's committed alerts, because the visitor's
+ * browser is not always allowed to reach the demo API. Every value below is a SYNTHETIC fixture. */
+const engineFeed = {
+  meta: { generated_at: new Date(NOW - 3 * 3600000).toISOString(), engine: 'tools/live_engine.mjs',
+    model_version: 'heuristic-v2', threshold: 0.1, high_roi_threshold: 0.62 },
+  alerts: [
+    { id: 'trade:FIXTURE@' + (NOW / 1000 - 10800), ts: new Date(NOW - 3 * 3600000).toISOString(),
+      ticker: 'FIXTURE', event_ticker: 'FIXTURE-EVENT', topic: 'crypto', title: 'SYNTHETIC ENGINE ALERT',
+      direction: 'up', from: 0.40, to: 0.55, delta: 0.15, threshold: 0.1,
+      model: { score: 0.78, highROI: true, tradeable: true },
+      source_url: BASE + '/markets?series_ticker=TESTSERIES&status=open&limit=200',
+      settlement_sources: [{ name: 'SYNTHETIC PUBLISHER', url: 'https://www.eia.gov/' }] },
+    { id: 'trade:FIXTURE@' + (NOW / 1000 - 7200), ts: new Date(NOW - 2 * 3600000).toISOString(),
+      ticker: 'FIXTURE', event_ticker: 'FIXTURE-EVENT', topic: 'crypto', title: 'SYNTHETIC ENGINE ALERT',
+      direction: 'down', from: 0.62, to: 0.48, delta: -0.14, threshold: 0.1,
+      model: { score: 0.31, highROI: false, tradeable: true },
+      source_url: BASE + '/markets?series_ticker=TESTSERIES&status=open&limit=200' },
+    /* the three rows below must be dropped, never repaired */
+    { id: 'below-threshold', ts: new Date(NOW - 1800000).toISOString(), ticker: 'FIXTURE', topic: 'crypto',
+      from: 0.50, to: 0.54, delta: 0.04, threshold: 0.1, model: { score: 0.9, highROI: true, tradeable: true } },
+    { id: 'bad-time', ts: 'not-a-time', ticker: 'FIXTURE', topic: 'crypto',
+      from: 0.40, to: 0.60, delta: 0.20, threshold: 0.1, model: { score: 0.9, highROI: true, tradeable: true } },
+    { id: 'no-price', ts: new Date(NOW - 900000).toISOString(), ticker: 'FIXTURE', topic: 'crypto',
+      from: 0.40, to: null, delta: 0.20, threshold: 0.1, model: { score: 0.9, highROI: true, tradeable: true } },
+  ],
+};
+const fed = await boot('dashboard', false, {
+  feed: engineFeed,
+  snapshot: { ...snapshot, candlesticks: { FIXTURE: { m1: {
+    source_url: BASE + '/series/TESTSERIES/markets/FIXTURE/candlesticks?period_interval=1',
+    candles: [[NOW / 1000 - 3600, 0.2], [NOW / 1000 - 3540, 0.35]],
+  } } } },
+});
+try {
+  const doc = fed.w.document;
+  check('engine feed alerts reach both chats with no browser access to the demo API', () => {
+    assert.equal(fed.w.KD.state.mode, 'snapshot');
+    assert.equal(fed.w.KD.state.engineAlerts.length, 2);
+    assert.match(doc.querySelector('#chat-all .log').textContent, /SYNTHETIC ENGINE ALERT/);
+    assert.match(doc.querySelector('#chat-all .log').textContent, /engine feed/);
+    assert.match(doc.querySelector('#mode-notice').textContent, /committed alerts/);
+  });
+  check('engine rows are copied verbatim and keep the exact API URL they were read from', () => {
+    const rows = fed.w.KD.state.engineAlerts;
+    const first = rows.find((r) => r.delta > 0);
+    assert.equal(first.from, 0.4);
+    assert.equal(first.to, 0.55);
+    assert.equal(first.source_url, BASE + '/markets?series_ticker=TESTSERIES&status=open&limit=200');
+    const links = [...doc.querySelectorAll('#chat-all .log .msg a')].map((a) => a.getAttribute('href'));
+    assert.ok(links.includes(BASE + '/markets?series_ticker=TESTSERIES&status=open&limit=200'));
+  });
+  check('sub-threshold, unparsable-time and price-less engine rows are dropped, not repaired', () => {
+    const ids = fed.w.KD.state.engineAlerts.map((r) => r.id);
+    assert.ok(!ids.some((id) => /below-threshold|bad-time|no-price/.test(id)));
+    assert.equal(fed.w.KD.state.engineAlerts.length, 2);
+  });
+  check('the high-ROI pane uses the engine verdict, not the browser cut', () => {
+    const roiMsgs = [...doc.querySelectorAll('#chat-roi .log .msg')];
+    assert.equal(roiMsgs.length, 1);
+    assert.match(roiMsgs[0].textContent, /\+0\.15/);
+    assert.match(roiMsgs[0].textContent, /0\.78 \/ 1/);
+    assert.doesNotMatch(roiMsgs[0].textContent, /research score 78/);
+  });
+  check('an engine sample hours old is dated on the row and never timestamped as now', () => {
+    const time = doc.querySelector('#chat-all .log .m-time').textContent;
+    assert.equal(time, '11-21 19:00:00 UTC');   /* the fixture sample, never the test's "now" */
+    const titles = [...doc.querySelectorAll('#chat-all .log .msg .badge')].map((b) => b.getAttribute('title') || '');
+    assert.ok(titles.some((t) => t.includes('sample of ' + engineFeed.meta.generated_at)));
+  });
+  check('a synthetic snapshot replay never displaces real engine alerts', () => {
+    assert.ok(!fed.w.KD.state.alerts.some((a) => a.replay));
+    assert.doesNotMatch(doc.querySelector('#chat-all .log').textContent, /snapshot replay/);
+  });
+  check('engine-fed dashboard has no unexpected script errors', () => assert.deepEqual(fed.errors, []));
+} finally { fed.dom.window.close(); }
+
+/* F-88. The committed capture keeps candle CLOSES only. One captured series (KXPRESNOMD-28-JSTE)
  * alternates between $0.003/$0.004 and $0.822/$0.823 on consecutive minutes -- 130 reversals
  * >= $0.10 -- while that market's own captured row is quoted $0.002/$0.003, and the engine recorded
  * zero alerts for it. Pairing adjacent closes published ~120 invented alternating alerts.
@@ -234,7 +316,7 @@ try {
       REALFIXTURE: { m1: { source_url: BASE + '/series/TESTSERIES/markets/REALFIXTURE/candlesticks?period_interval=1', candles: real } },
     } } });
   try {
-    check('F-83: an alternating series collapses from 11 legs to at most the one undisprovable tail', () => {
+    check('F-88: an alternating series collapses from 11 legs to at most the one undisprovable tail', () => {
       const legs = view.w.KD.state.alerts.filter((a) => a.ticker === 'FLIPFIXTURE');
       /* The very last close of a series has no later close to contradict it, so at most that single
        * leg can survive; before the fix all 11 were published. */
@@ -242,7 +324,7 @@ try {
       const counted = view.w.KD.state.replayUncorroborated.filter((x) => x.startsWith('FLIPFIXTURE')).length;
       assert.ok(counted >= 9, 'suppressed legs are counted, got ' + counted);
     });
-    check('F-83: a one-minute spike is not published as a swing', () => {
+    check('F-88: a one-minute spike is not published as a swing', () => {
       /* The spike UP (0.30 -> 0.70) is contradicted by the next three closes, so it is suppressed.
        * The fall back to 0.30 is a move that holds afterwards, and the two legs are alternatives:
        * exactly one of them can describe the sequence. Asserting zero would demand data the capture
@@ -251,24 +333,24 @@ try {
       assert.ok(legs.length <= 1, 'both legs of one spike were published: ' + legs.length);
       assert.ok(!legs.some((a) => a.from === 0.30 && a.to === 0.70), 'the disproved spike leg was published');
     });
-    check('F-83: a sustained move IS published, in both directions', () => {
+    check('F-88: a sustained move IS published, in both directions', () => {
       const alerts = view.w.KD.state.alerts.filter((a) => a.ticker === 'REALFIXTURE');
       assert.ok(alerts.length >= 2, 'expected at least an up and a down leg, got ' + alerts.length);
       assert.ok(alerts.some((a) => a.delta > 0), 'up leg kept');
       assert.ok(alerts.some((a) => a.delta < 0), 'down leg kept');
       assert.ok(alerts.every((a) => a.replay === true && a.roi === null));
     });
-    check('F-83: suppressed moves are counted, never silently dropped', () => {
+    check('F-88: suppressed moves are counted, never silently dropped', () => {
       assert.ok(Array.isArray(view.w.KD.state.replayUncorroborated));
       assert.ok(view.w.KD.state.replayUncorroborated.length >= 3,
         'expected the alternating and spike legs to be counted, got ' + view.w.KD.state.replayUncorroborated.length);
     });
-    check('F-83: the replay badge states the close-only evidence limit', () => {
+    check('F-88: the replay badge states the close-only evidence limit', () => {
       const badge = view.w.document.querySelector('#chat-all .badge.info');
       assert.ok(badge, 'replay badge present');
       assert.match(badge.getAttribute('title') || '', /captured 1-minute closes/i);
     });
-    check('F-83: no unexpected script errors on these payloads', () => assert.deepEqual(view.errors, []));
+    check('F-88: no unexpected script errors on these payloads', () => assert.deepEqual(view.errors, []));
   } finally { view.dom.window.close(); }
 }
 

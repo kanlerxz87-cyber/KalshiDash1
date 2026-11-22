@@ -214,6 +214,9 @@
     lastRefresh: null,
     charts: {},                 // ticker -> {points, candles}
     alerts: [],                 // in-memory alert log (session)
+    engineAlerts: [],           // alerts read from the committed engine feed (data/live/feed.json)
+    engineFeed: null,           // that feed's meta, for the sample time it actually describes
+    engineFeedError: null,
     seenAlerts: {},             // dedupe key -> ts
     quoteUsed: {},               // ticker+side -> consumption within a single observed quote
     paperStatus: 'Waiting for a fresh live quote with confirmed ask quantity.',
@@ -353,6 +356,8 @@
   var SUSTAIN_TOL = 0.05;   // half the $0.10 rule: a confirming close may drift by less than that
   function seedAlertsFromSnapshot(snap) {
     if (!snap || !snap.candlesticks) return;
+    /* Real, exchange-sampled alerts always win over a synthetic replay. */
+    if (state.engineAlerts.length) return;
     var existing = getAlerts();
     if (existing.length) { state.alerts = existing; return; }
     var s = settings();
@@ -396,6 +401,78 @@
     state.alerts = seeded;
     state.replayUncorroborated = uncorroborated;
     setAlerts(seeded);
+  }
+
+  /* ------------------------------------------------ committed engine feed ---
+   * The two alert chats are produced by `tools/live_engine.mjs` in GitHub Actions and committed
+   * to `data/live/feed.json`. Until now only the alerts console read that file: the dashboard
+   * chats were fed by the visitor's own API polling, and by a synthetic candle *replay* when the
+   * browser could not reach the demo API. So a reader behind a proxy, or on a network where the
+   * demo host is slow, saw a wall of reconstructed historical moves and an empty high-ROI pane
+   * while 40 genuinely sampled alerts sat unread in the same repository.
+   *
+   * HONESTY RULES for these rows:
+   *   * Prices, deltas and timestamps are copied from the feed; nothing is recomputed or filled in.
+   *   * A row without a usable price, a delta below the published threshold, or an unparsable
+   *     time is DROPPED, never repaired.
+   *   * The engine's own 0-1 score is shown as `engine score 0.78 / 1`, never rescaled into the
+   *     browser's 0-100 research score: they are different formulas (see flagged.html F-OBS-01).
+   *   * The high-ROI pane uses the engine's published `model.highROI` verdict at its own
+   *     threshold, not the browser's ROI cut, so the pane never claims the wrong model chose it.
+   *   * Every row keeps the exact API URL it was read from.
+   */
+  function engineAlertRows(feed) {
+    var rows = [];
+    if (!feed || !Array.isArray(feed.alerts)) return rows;
+    feed.alerts.forEach(function (a) {
+      if (!a || !a.ticker) return;
+      var ms = Date.parse(a.ts);
+      var from = nullableNumber(a.from), to = nullableNumber(a.to), delta = nullableNumber(a.delta);
+      if (!isFinite(ms) || from === null || to === null || delta === null) return;
+      if (from < 0 || from > 1 || to < 0 || to > 1) return;
+      var threshold = nullableNumber(a.threshold);
+      if (threshold === null) threshold = 0.10;
+      if (Math.round(Math.abs(delta) * 10000) < Math.round(threshold * 10000)) return;
+      var model = a.model || {};
+      rows.push({
+        id: 'engine:' + (a.id || (a.ticker + '@' + Math.floor(ms / 1000))),
+        type: 'swing',
+        ts: Math.floor(ms / 1000),
+        ticker: a.ticker,
+        topic: a.topic || null,
+        title: a.title || a.ticker,
+        from: from, to: to, delta: delta,
+        /* Deliberately NOT the browser research score. */
+        roi: null, roiParts: null, roiEligible: null,
+        engine: true,
+        engineScore: (typeof model.score === 'number' && isFinite(model.score)) ? model.score : null,
+        engineHighRoi: model.highROI === true && model.tradeable !== false,
+        engineSample: (feed.meta && feed.meta.generated_at) || null,
+        engineDetection: a.detection || a.baseline_kind || null,
+        links: candidateLinks(a),
+        source_url: a.source_url || null
+      });
+    });
+    return rows;
+  }
+
+  function loadEngineFeed() {
+    return fetchJSON(rootHref('data/live/feed.json'), 9000).then(function (feed) {
+      state.engineFeed = (feed && feed.meta) || null;
+      state.engineFeedError = null;
+      state.engineAlerts = engineAlertRows(feed);
+      if (state.engineAlerts.length) {
+        /* Drop the synthetic replay: it is a fallback, not a substitute for sampled alerts. */
+        var kept = state.alerts.filter(function (a) { return !a.replay; });
+        if (kept.length !== state.alerts.length) { state.alerts = kept; setAlerts(kept); }
+      }
+      emit('alerts');
+      return state.engineAlerts;
+    }).catch(function (e) {
+      state.engineFeedError = e && e.message ? e.message : 'unreadable';
+      emit('alerts');
+      return [];
+    });
   }
 
   /* Refresh the tracked universe from the live API (series + open markets). */
@@ -832,7 +909,12 @@
         el.className = 'notice warn';
         el.innerHTML = '<strong>Snapshot mode.</strong> This browser could not reach the demo API (' + esc(state.lastError || 'network or CORS policy') + '). ' +
           'Showing the timestamped capture in <code>data/snapshot.json</code> with per-row source links. ' +
-          'Captured replay may remain visible; new live alerts resume automatically after public API access recovers. No snapshot trade fill is assumed.';
+          (state.engineAlerts.length
+            ? '<strong>The two chats show the engine&rsquo;s committed alerts</strong> from <code>data/live/feed.json</code>' +
+              (state.engineFeed && state.engineFeed.generated_at ? ' (sample ' + esc(dt(state.engineFeed.generated_at)) + ')' : '') +
+              ', which were sampled by GitHub Actions, not by your browser. '
+            : 'Captured replay may remain visible; ') +
+          'New live alerts resume automatically after public API access recovers. No snapshot trade fill is assumed.';
       } else {
         el.className = 'notice';
         el.innerHTML = 'Probing the official demo API…';
@@ -905,14 +987,42 @@
 
     /* seed the feed from the persisted alert log so the panes are never empty */
     state.alerts = getAlerts();
+    /* and read the committed engine feed, the only source that works with no browser API access */
+    loadEngineFeed();
+
+    function msgTime(a) {
+      /* An engine sample can be hours old, so its row must carry the date as well as the time:
+       * "21:46:00 UTC" alone would read as today. Live rows keep their session clock. */
+      if (!a.engine) return clock(a.ts) + ' UTC';
+      var d = new Date(a.ts * 1000);
+      return String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0') + ' ' +
+        String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0') + ':' +
+        String(d.getUTCSeconds()).padStart(2, '0') + ' UTC';
+    }
+
+    function scoreBadge(a) {
+      if (a.engine) {
+        var label = a.engineScore === null ? 'engine score unreadable' : 'engine score ' + a.engineScore.toFixed(2) + ' / 1';
+        return '<span class="badge ' + (a.engineHighRoi ? 'accent' : 'neutral') + '" title="' +
+          esc('Published by tools/live_engine.mjs' + (a.engineSample ? ' in the sample of ' + a.engineSample : '') +
+            (a.engineDetection ? ' (' + a.engineDetection + ')' : '') +
+            '. This is the engine\'s 0-1 formula, not the browser\'s 0-100 research score.') + '">' +
+          esc(label) + (a.engineHighRoi ? ' · high-ROI' : '') + '</span>';
+      }
+      return (a.roiEligible !== undefined && a.roi !== null)
+        ? '<span class="badge neutral">research score ' + a.roi + (a.roiEligible ? '' : ' · ineligible') + '</span>'
+        : '<span class="badge warn">historical score unverified</span>';
+    }
 
     function msgHtml(a) {
       var t = topicOf(a.topic);
       var cls = a.type === 'resolve' ? 'resolve' : (a.type === 'system' ? 'system' : (a.delta > 0 ? 'up' : 'down'));
-      var head = '<div class="m-head"><span class="m-time">' + clock(a.ts) + ' UTC</span>' +
+      var head = '<div class="m-head"><span class="m-time">' + msgTime(a) + '</span>' +
         (a.topic ? '<span class="tag ' + esc(t.id) + '">' + esc(t.label) + '</span>' : '') +
-        (a.replay ? '<span class="badge info" title="Movement between two captured 1-minute closes. The capture keeps closes only, not per-minute high/low, so a move that reversed inside one minute is not shown as one swing.">snapshot replay</span>' : '') +
-        (a.roiEligible !== undefined && a.roi !== null ? '<span class="badge neutral">research score ' + a.roi + (a.roiEligible ? '' : ' · ineligible') + '</span>' : '<span class="badge warn">historical score unverified</span>') + '</div>';
+        (a.replay ? '<span class="badge info" title="' + esc('Movement between two captured 1-minute closes. The capture keeps closes only, not per-minute high/low, so a move that is undone within a minute is suppressed rather than shown as one swing (F-87).') + '">snapshot replay</span>' : '') +
+        (a.engine ? '<span class="badge info" title="' + esc('Committed by the alert engine in the sample of ' +
+          (a.engineSample || 'unknown time') + '. Read from data/live/feed.json.') + '">engine feed</span>' : '') +
+        scoreBadge(a) + '</div>';
       var body;
       if (a.type === 'resolve') {
         body = '<div class="m-title"><a href="' + rootHref('market.html?ticker=') + encodeURIComponent(a.ticker) + '">' + esc(a.title) + '</a> resolved <b class="' + (a.result === 'yes' ? 'up' : 'down') + '">' + esc(a.result).toUpperCase() + '</b></div>' +
@@ -937,17 +1047,26 @@
         if (feedState.dir === 'down' && a.delta >= 0) return false;
       }
       if (a.type === 'swing' && (nullableNumber(a.delta) === null || Math.round(Math.abs(a.delta) * 10000) < Math.round(feedState.minSwing * 10000))) return false;
-      if (useRoi && a.type === 'swing' && (a.replay || a.roiEligible !== true || a.roi === undefined || a.roi === null || a.roi < feedState.roiCut)) return false;
+      if (useRoi && a.type === 'swing') {
+        /* Two different models own two different panes. An engine row is selected by the engine's
+         * published verdict; a browser row by the browser's own cut. Never borrow one for the other. */
+        if (a.engine) { if (a.engineHighRoi !== true) return false; }
+        else if (a.replay || a.roiEligible !== true || a.roi === undefined || a.roi === null || a.roi < feedState.roiCut) return false;
+      }
       return true;
     }
 
     function paint() {
-      var all = state.alerts.filter(function (a) { return passes(a, false); });
-      var roi = state.alerts.filter(function (a) { return passes(a, true); });
+      var rows = state.alerts.concat(state.engineAlerts);
+      var all = rows.filter(function (a) { return passes(a, false); });
+      var roi = rows.filter(function (a) { return passes(a, true); });
       if (logA) logA.innerHTML = all.length ? all.slice(-120).map(msgHtml).join('') : '<div class="empty">Waiting for a move of at least ' + usd(feedState.minSwing, 2) + '…</div>';
-      if (logB) logB.innerHTML = roi.length ? roi.slice(-120).map(msgHtml).join('') : '<div class="empty">No market clears the ROI filter (' + feedState.roiCut + '+) yet.</div>';
+      var emptyRoi = state.engineAlerts.length
+        ? 'No engine alert carries the published high-ROI verdict at the ' + feedState.roiCut + '+ browser cut for this session.'
+        : 'No market clears the ROI filter (' + feedState.roiCut + '+) yet.';
+      if (logB) logB.innerHTML = roi.length ? roi.slice(-120).map(msgHtml).join('') : '<div class="empty">' + emptyRoi + '</div>';
       if (cntA) cntA.textContent = all.length + ' message' + (all.length === 1 ? '' : 's');
-      if (cntB) cntB.textContent = roi.length + ' message' + (all.length === 1 ? '' : 's');
+      if (cntB) cntB.textContent = roi.length + ' message' + (roi.length === 1 ? '' : 's');
       if (logA) logA.scrollTop = logA.scrollHeight;
       if (logB) logB.scrollTop = logB.scrollHeight;
       var hasData = !!state.snapshot || Object.keys(state.markets).length > 0;

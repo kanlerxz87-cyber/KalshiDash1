@@ -1,8 +1,7 @@
-// demo-account.js — renders data/account.json (verbatim demo-account API responses).
-// Session session-d5b935f4. No field names are invented: tables are built from the raw JSON
-// keys the API returned. Values that cannot be confirmed stay blank (never filled in).
+// Demo-account display: only a captured, authenticated DEMO response can populate these tables.
+// List records are first-page observations, not a complete account-performance history.
 const $ = (s) => document.querySelector(s);
-const esc = (v) => String(v ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const esc = (v) => String(v ?? "").replace(/[&<>\"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 function fmt(v) {
   if (v === null || v === undefined || v === "") return '<span class="muted">—</span>';
@@ -10,29 +9,71 @@ function fmt(v) {
   return esc(String(v));
 }
 
-// Generic table: columns = union of keys across items (order preserved from first appearance).
+// The collector only uses these exact endpoints. Do not turn an arbitrary stored string,
+// production URL, lookalike host or API root into a purported official per-row source.
+const ROUTES = {
+  balance: "/portfolio/balance",
+  positions: "/portfolio/positions",
+  fills: "/portfolio/fills?limit=200",
+  settlements: "/portfolio/settlements?limit=200",
+};
+const DEMO_ROOTS = [
+  "https://external-api.demo.kalshi.co/trade-api/v2",
+  "https://demo-api.kalshi.co/trade-api/v2",
+];
+function endpointSources(payload) {
+  if (!DEMO_ROOTS.includes(payload.api_root) || !Array.isArray(payload.source_urls)) return null;
+  const result = {};
+  for (const [name, suffix] of Object.entries(ROUTES)) {
+    const exact = payload.api_root + suffix;
+    if (!payload.source_urls.includes(exact)) return null;
+    result[name] = exact;
+  }
+  return result;
+}
+
+// Recheck the minimum required official envelopes so an older malformed snapshot cannot
+// masquerade as a connected account. Actual field values are never filled or backfilled.
+function validEnvelope(name, value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const objects = (x) => Array.isArray(x) && x.every((row) => row !== null && typeof row === "object" && !Array.isArray(row));
+  const optionalCursor = (x) => x === undefined || typeof x === "string";
+  if (name === "balance") {
+    return Number.isSafeInteger(value.balance) && typeof value.balance_dollars === "string"
+      && /^-?\d+(?:\.\d+)?$/.test(value.balance_dollars)
+      && Number.isSafeInteger(value.portfolio_value) && Number.isSafeInteger(value.updated_ts);
+  }
+  if (name === "positions") return objects(value.market_positions) && objects(value.event_positions) && optionalCursor(value.cursor);
+  if (name === "fills") return objects(value.fills) && typeof value.cursor === "string";
+  if (name === "settlements") return objects(value.settlements) && optionalCursor(value.cursor);
+  return false;
+}
+
+function sourceCell(url) {
+  return `<td><a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Official endpoint ↗</a></td>`;
+}
+
 function rowsTable(items, sourceUrl) {
   const cols = [];
-  for (const it of items) for (const k of Object.keys(it || {})) if (!cols.includes(k)) cols.push(k);
+  for (const item of items) for (const key of Object.keys(item)) if (!cols.includes(key)) cols.push(key);
   const head = cols.map((c) => `<th>${esc(c)}</th>`).join("");
-  const body = items.map((it) => `<tr>${cols.map((c) => `<td>${fmt(it ? it[c] : undefined)}</td>`).join("")}</tr>`).join("\n");
-  return `<div class="table-wrap"><table class="compact"><thead><tr>${head}<th>source</th></tr></thead><tbody>\n${body}\n<tr>${cols.map(() => "<td></td>").join("")}<td><a href="${esc(sourceUrl)}" target="_blank" rel="noopener">endpoint ↗</a></td></tr>\n</tbody></table></div>`;
+  const body = items.map((item) => `<tr>${cols.map((c) => `<td>${fmt(item[c])}</td>`).join("")}${sourceCell(sourceUrl)}</tr>`).join("\n");
+  return `<div class="table-wrap"><table class="compact"><thead><tr>${head}<th>source</th></tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
 function kvTable(obj, sourceUrl) {
-  const body = Object.entries(obj || {}).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${fmt(v)}</td></tr>`).join("\n");
-  return `<div class="table-wrap"><table class="compact"><thead><tr><th>API field</th><th>value</th></tr></thead><tbody>\n${body}\n<tr><td class="muted">source</td><td><a href="${esc(sourceUrl)}" target="_blank" rel="noopener">endpoint ↗</a></td></tr>\n</tbody></table></div>`;
+  const body = Object.entries(obj).map(([key, value]) => `<tr><td>${esc(key)}</td><td>${fmt(value)}</td>${sourceCell(sourceUrl)}</tr>`).join("\n");
+  return `<div class="table-wrap"><table class="compact"><thead><tr><th>API field</th><th>value</th><th>source</th></tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
-function sectionItems(payload, name, sourceUrl) {
-  const node = payload[name];
-  if (node && node.error) return `<h3>${esc(name)}</h3><p class="muted">API call failed (HTTP ${esc(node.status)}): <code>${esc(String(node.body || "").slice(0, 300))}</code></p>`;
-  if (Array.isArray(node)) {
-    if (!node.length) return `<h3>${esc(name)}</h3><p class="muted">Empty list returned.</p>`;
-    return `<h3>${esc(name)} <span class="muted small">(${node.length} rows, verbatim)</span></h3>` + rowsTable(node, sourceUrl);
-  }
-  if (node && typeof node === "object") return `<h3>${esc(name)}</h3>` + kvTable(node, sourceUrl);
-  return `<h3>${esc(name)}</h3><p class="muted">Not present in the snapshot.</p>`;
+function listSection(title, items, sourceUrl) {
+  const heading = `<h3>${esc(title)} <span class="muted small">(${items.length} captured rows)</span></h3>`;
+  if (!items.length) return heading + '<p class="muted">No entries in this captured page.</p>';
+  return heading + rowsTable(items, sourceUrl);
+}
+
+function paginationNote(cursor) {
+  return cursor ? '<p class="notice">Additional pages are available and are not included in this capture.</p>' : "";
 }
 
 async function main() {
@@ -42,30 +83,34 @@ async function main() {
   try {
     const r = await fetch("data/account.json", { headers: { accept: "application/json" } });
     if (r.ok) payload = await r.json();
-  } catch (e) { /* fall through to not-connected */ }
+  } catch { /* report unavailable instead of inventing account data */ }
 
   if (!payload || payload.connected !== true) {
-    status.innerHTML = `<strong>Connection status: not connected.</strong> No demo-account snapshot exists
-      (<code>data/account.json</code> missing or <code>connected: false</code>). The site never stores API keys —
-      add repository secrets as described in <a href="#setup">Setup</a> and run the
-      <code>demo-account</code> workflow. Nothing on this page is fabricated meanwhile.`;
-    host.innerHTML = `<p class="muted">No account data until the owner connects the demo account. Required endpoints and their verified contracts are listed below.</p>`;
+    status.innerHTML = '<strong>Account snapshot: not connected.</strong> Authenticated demo-account data is unavailable or unverified.';
+    host.innerHTML = '<p class="muted">No authenticated account values are displayed. The endpoint contracts and setup details are listed below.</p>';
+    return;
+  }
+  const sources = endpointSources(payload);
+  const valid = Object.keys(ROUTES).every((name) => validEnvelope(name, payload[name]));
+  if (!sources || !valid || typeof payload.captured_at !== "string" || !Number.isFinite(Date.parse(payload.captured_at))) {
+    status.innerHTML = '<strong>Account snapshot: unverified.</strong> Required response fields, capture time or official demo endpoint provenance are missing or invalid.';
+    host.innerHTML = '<p class="notice">Account values are withheld until the capture and its official sources can be verified.</p>';
     return;
   }
 
-  status.innerHTML = `<strong>Connection status: connected.</strong> Snapshot captured at
-    <code>${esc(payload.captured_at)}</code> from <code>${esc(payload.api_root)}</code>
-    (key ${esc(payload.key_fingerprint)}). Environment: ${esc(payload.environment)}.
-    Demo values “may not be reflective of those in real markets”
-    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment ↗</a>).`;
+  status.innerHTML = `<strong>Last authenticated demo snapshot:</strong> <code>${esc(payload.captured_at)}</code>
+    from <code>${esc(payload.api_root)}</code> (key ${esc(payload.key_fingerprint)}).
+    This records a completed capture, not a live connection. Demo values may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Kalshi demo environment ↗</a>).`;
 
-  const urls = payload.source_urls || [];
-  const u = (frag) => urls.find((x) => x.includes(frag)) || payload.api_root || "#";
   host.innerHTML =
-    sectionItems(payload, "balance", u("/portfolio/balance")) +
-    sectionItems(payload, "positions", u("/portfolio/positions")) +
-    sectionItems(payload, "fills", u("/portfolio/fills")) +
-    sectionItems(payload, "settlements", u("/portfolio/settlements"));
+    '<p class="notice"><strong>Public snapshot:</strong> account responses committed to this public repository and GitHub Pages are visible to visitors. Key secrecy does not make account data private. <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages">GitHub Pages visibility ↗</a></p>' +
+    '<p class="muted">These sequential reads are first-page snapshots, not an atomic or complete account history.</p>' +
+    '<h3>Balance (API fields)</h3>' + kvTable(payload.balance, sources.balance) +
+    listSection("Market positions", payload.positions.market_positions, sources.positions) +
+    listSection("Event positions", payload.positions.event_positions, sources.positions) + paginationNote(payload.positions.cursor) +
+    listSection("Fills", payload.fills.fills, sources.fills) + paginationNote(payload.fills.cursor) +
+    listSection("Settlements", payload.settlements.settlements, sources.settlements) + paginationNote(payload.settlements.cursor);
 }
 
 main();

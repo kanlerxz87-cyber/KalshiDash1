@@ -221,6 +221,10 @@ for (const t of TOPICS) {
           yes_sub_title: m.yes_sub_title ?? null,
           status: m.status ?? null,
           result: m.result && m.result !== '' ? m.result : null,
+          /* The event object itself carries no settlement_ts; the nested market does
+           * (verified live: GET /events/{ticker} returns settlement_ts only on the market).
+           * Store it here so the category pages can show "Settled at" instead of a blank. */
+          settlement_ts: m.settlement_ts ?? null,
           settlement_value_dollars: fp(m.settlement_value_dollars),
           last_price_dollars: fp(m.last_price_dollars),
           volume_fp: fp(m.volume_fp),
