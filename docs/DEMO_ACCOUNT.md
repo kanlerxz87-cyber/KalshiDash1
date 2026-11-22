@@ -21,6 +21,22 @@ headers; signature = base64(RSA-PSS SHA-256 or Ed25519) over `timestamp + METHOD
 timestamp is **milliseconds** and `path` includes `/trade-api/v2/…`. A `201` means *accepted*, not
 necessarily resting — check `remaining_count`.
 
+## Privacy warning before enabling account snapshots
+
+**The account snapshot is public, not just visible to you.** This is a public repository and
+its GitHub Pages publishing source is the `main` branch root. When enabled, the workflow commits
+`data/account.json` to that branch and the page reads that file. Its verbatim balance, positions,
+fills and settlements can therefore be read by anyone through the repository and the published
+site. Demo funds are mock funds, but the activity and account details may still be sensitive.
+Secrets staying out of the browser does **not** make the resulting account data private.
+[GitHub warns that Pages sites are publicly available](https://docs.github.com/en/pages/getting-started-with-github-pages/securing-your-github-pages-site-with-https#about-https-and-github-pages).
+
+Do not enable this workflow for account data you want to keep private. Removing a later snapshot
+from the current tree does not by itself remove earlier copies from Git history, clones or forks;
+[GitHub's sensitive-data removal guidance](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository)
+describes the limits and coordination needed. A private authenticated backend and private storage
+would be needed for a private dashboard; this static public site is not one.
+
 ## Enabling it (owner action — no manual input needed until you want live data)
 
 1. Create a **demo-environment** API key pair ([API Keys](https://docs.kalshi.com/getting_started/api_keys.md):
