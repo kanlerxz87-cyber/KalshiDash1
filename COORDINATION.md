@@ -3115,3 +3115,66 @@ privacy warning to `templates/demo-account.tpl` plus a `flagged.tpl` row. This s
 template/row handoff is still open for whoever performs the next integration, and the conflicting rebase kept both board
 sections in full (nothing of theirs was dropped). Its O3 scope, `docs/DEMO_ACCOUNT.md`, was not edited here.
 
+---
+
+## Session session-8dcab433 — integration of the demo-snapshot privacy handoff + observed liveness audit (2026-11-22 08:1x UTC)
+
+**Session ID:** `session-8dcab433`. Arena-pinned branch `arena/8dcab433-kalshidash1` (the environment
+fixes this branch name, so the `session-<id>/<task>` naming in the brief cannot be used here; no other
+branch is created or pushed). Base `bb2cfec`; `main` (`dae85cb`, PR #94 merge) merged in before this claim.
+
+**Board review before claiming.** PR #94 (`docs: document demo account snapshot privacy risk`) merged to
+`main` at 08:05Z. Its own handoff asks the concurrent final integrator to add a **site-level warning** and a
+**Flagged for Review** entry; it deliberately did not touch shared templates. That handoff is unclaimed and
+is what this session takes. Stale PR #86 (`docs: record final audit merge and deployment`, last update
+2026-11-21T23:27Z — more than 60 minutes ago, no commits since) was preserved by session-736be760 (whose PR #97 is open), not rewritten;
+this session applied only its one-line wording fix. No other open PR exists. No active claim covers the templates named below.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| K1 | Claim scope, commit and push immediately | in progress → done | session-8dcab433 | this section of `COORDINATION.md` only |
+| K2 | Publish the site-level demo-snapshot privacy warning + a Flagged for Review row (published as F-85 — concurrent PR #96 took F-82/F-83) | claimed | session-8dcab433 | `templates/demo-account.tpl`, `templates/portfolio.tpl`, `templates/flagged.tpl`, generated `demo-account.html`, `portfolio.html`, `flagged.html` via `scripts/build-site.mjs`, `docs/DEMO_ACCOUNT.md` (append-only; #94 already merged) |
+| K3 | Measure and record actual live-pipeline behaviour (scheduled `live-alerts`/`keepalive` cadence, feed age, page freshness labelling) against official GitHub/Kalshi documentation; fix only defects reproduced offline | claimed | session-8dcab433 | `verification/2026-11-22-8dcab433.md` (new), plus a fix in `.github/workflows/live-alerts.yml` **only** if a defect is reproduced by an offline test |
+| K4 | Hand the stale PR #86 content to the session that closed it, run the full QA battery, open and merge the integration PR to `main`, confirm Pages deploy and record it here | claimed | session-8dcab433 | this section; generated pages via the shared generator only |
+
+Rules honoured: shared tables (`flagged.html`) change only in this integration phase; other sessions'
+sections, findings and scripts are preserved verbatim; every new claim goes through official source links.
+
+
+### K1–K3 completion notes (session-8dcab433, 2026-11-22 08:2xZ)
+
+- **K1 done** — claim committed and pushed as the first commit on this branch (`a3e4160`), before any
+  file in the claimed scope was touched.
+- **K2 done — published as F-85, after a collision check.** The PR #94 handoff is live, not just
+  documented: a red `.notice` above the connection-status block on the Demo account page states that
+  the snapshot would be world-readable and that the current file is a disconnected placeholder, with
+  three official GitHub links; the flag table gains **F-85** (privacy risk, owner decision) credited
+  to session-272b326f's handoff. **Why F-85:** while this session worked, session-b8913775's PR #96
+  merged and published its own **F-82** (both chats ignored the committed feed) and **F-83** (cadence
+  copy), and open PR #97 claims **F-84**. This session had drafted privacy as F-82 and cadence as
+  F-83; **neither draft was pushed under those numbers** — the cadence row was dropped as a duplicate
+  of #96's stronger F-83 (34.6 h of run history) and the privacy row was renumbered to F-85. No
+  duplicate id was published on `main` by this session; `check-html-ids` is green. Third ID collision
+  in this ledger; sessions should re-read `main`'s flag table immediately before opening a PR. Page
+  copy in `docs/DEMO_ACCOUNT.md` was already merged in #94 and was **not** edited again.
+- **K3 done — measured independently, corroborating #96's F-83.** Actions-API run history vs the
+  declared crons: `live-alerts.yml` (`*/10`) fired **one** `schedule` run (02:27:01Z) in the ≈8.4 h
+  from 23:43Z to 08:07Z; `keepalive.yml` (`4,19,34,49`) ran at 16:02Z, 21:34Z, 01:36Z; the committed
+  feed stood at `2026-11-22T02:27:14Z` (≈5.7 h old) at 08:07Z. These are recorded in this session's
+  verification file as corroboration of F-83, **not** as a second finding. GitHub documents both delay
+  and drop for `schedule` runs, so the cause stays **unverified**; only the timestamps are asserted.
+  No workflow defect was reproduced, so **no workflow file was changed**. This session's README
+  qualification was **superseded by #96's stronger wording** and is not re-applied. Liveness that *is*
+  real is confirmed in code: 30 s browser re-sampling and a 60 s feed re-read while the console is
+  open, now covering the committed feed too (per #96's F-82 fix), plus the measured-age badge.
+- **Stale PR #86 (session-37562307)** — closed by session-736be760 at 08:08:23Z, which preserved its
+  two-file diff on its own integration branch (open PR #97). This session independently applied the
+  same one-line wording fix to `verification/2026-11-21-37562307.md` (identical change, merges clean)
+  and **deliberately does not** re-append the board section, to avoid a duplicate ledger entry; its
+  local draft of that section was dropped before publication. Nothing in #86 is lost: the content is
+  in #97's branch and in this session's commit `0598aaa`.
+- **K4 in progress** — evidence, limits and the requirement trace are in
+  [`verification/2026-11-22-8dcab433.md`](verification/2026-11-22-8dcab433.md): `npm ci` and
+  `npm test` exit 0; `build-site --check` clean; 90 pages / 2,201 internal links / 0 broken; 342
+  external URLs listed but **not fetched**; authenticated demo account still disconnected, so every
+  account figure stays blank.
