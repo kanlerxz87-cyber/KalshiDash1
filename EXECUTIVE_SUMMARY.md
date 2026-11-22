@@ -98,17 +98,21 @@ demo API.
 |---|---|---|
 | Alert engine | `tools/live_engine.mjs` | Discovers the five focus topics, samples prices, detects ≥ $0.10 moves (sample-to-sample **and** from 1-minute candles), tracks resolutions, scores alerts |
 | Live console | `alerts/index.html` | Two scrolling feeds: **All events** and **High ROI**; price chart (5 min → 7 days); per-topic highest-dollar boards; resolution log; liquidity ladders |
-| Scheduled sampler | `.github/workflows/live-alerts.yml` | Runs every 10 minutes so the record continues with no browser open |
+| Scheduled sampler | `.github/workflows/live-alerts.yml` | Declares a 10-minute cron so the record continues with no browser open. GitHub documents that scheduled runs can be delayed or dropped under load; measured runs of this workflow have started 4–6 h apart, and every page shows the measured sample age (see `README.md`). |
 | Feed validator | `scripts/check_alerts.mjs` | Blocks any published row that is below threshold, has an invented price, or cites a non-official source |
 | Page test | `scripts/check_alerts_page.mjs` | jsdom render test of both feeds, the filter and the no-invented-price rule |
 
 ## The honest state of the data
 
 The engine ran successfully against `https://external-api.demo.kalshi.co/trade-api/v2` and captured
-real markets for gas, elections, crypto and golf. **Alerts so far: zero.** The demo exchange is
-quiet — repeated samples of the top contracts returned identical prices. The feeds display that
-state instead of seeding example alerts, and the threshold, detection and rendering are covered by
-automated tests so the mechanism is proven independently of whether the demo happens to move.
+real markets for gas, elections, crypto and golf. **Today's committed sample
+(`data/live/feed.json`, 2026-11-22 02:27:14 UTC) carries 40 alerts**, all in elections and crypto,
+plus 60 tracked market rows, 4 contracts still followed to resolution and 8 order books. Those are
+the numbers on this page's tables; they are re-derived from the feed by the site generator, not from
+the counts in this paragraph. The newest run created **0** new alerts, so the demo exchange is quiet
+between samples. The feeds display that state instead of seeding example alerts, and the threshold,
+detection and rendering are covered by automated tests so the mechanism is proven independently of
+whether the demo happens to move.
 
 ## Verified platform facts (see `docs/ALERTS.md` §2 for links)
 

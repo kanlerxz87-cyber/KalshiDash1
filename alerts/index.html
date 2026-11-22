@@ -223,7 +223,7 @@
         <tr>
           <td>S-01</td>
           <td><strong>Move from polling to the WebSocket ticker channel</strong></td>
-          <td>Removes the 10-minute delay entirely; every quote change arrives as an event, so a $0.10 swing is seen the moment it happens.</td>
+          <td>Replaces the sampling gap with a push: every quote change arrives as an event, so a $0.10 swing is seen when it happens instead of at the next sample. The gap is not a fixed 10 minutes &mdash; the cron is <code>*/10</code>, but GitHub documents that scheduled runs can be delayed or dropped under load, and the runs measured here started 4&ndash;6 h apart. See <a href="../flagged.html#F-82">F-82</a>.</td>
           <td>A server-side relay holding a demo API key, because the handshake is signed. Cannot be done from a static page.</td>
           <td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">Quick Start: WebSockets</a></td>
         </tr>

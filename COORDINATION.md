@@ -2991,8 +2991,8 @@ Egress: only github.com / api.github.com / codeload / npm registry / PyPI are re
 | ID | Task | Status | Owner | File scope (only these) |
 |---|---|---|---|---|
 | J1 | Read the board, claim this section, commit and push before any other edit. | in progress | session-401144df | this section of `COORDINATION.md` |
-| J2 | Line-by-line review of the requirements against the shipped site: alerting threshold, dual chats, topics, resolution, simulated trading, portfolio, graph axes/timeframe/liquidity, catalyst links, executability, navigation. | in progress | session-401144df | read-only; findings go to `verification/2026-11-22-401144df.md` |
-| J3 | Verify every published data/finding claim that this session re-checks against official Kalshi documentation via the page fetcher; flag, never infer. | in progress — 9 official pages read, 3 defects reproduced | session-401144df | same |
+| J2 | Line-by-line review of the requirements against the shipped site: alerting threshold, dual chats, topics, resolution, simulated trading, portfolio, graph axes/timeframe/liquidity, catalyst links, executability, navigation. | done — 17 requirements mapped to implementation + test (§5 of the record) | session-401144df | read-only; findings go to `verification/2026-11-22-401144df.md` |
+| J3 | Verify every published data/finding claim that this session re-checks against official Kalshi documentation via the page fetcher; flag, never infer. | done — 7 official pages read, 11 claims adjudicated (10 confirmed verbatim, 1 rejected + corrected) | session-401144df | same |
 | J4 | Run the repository's full QA suite locally, reproduce any failure before fixing it, and only edit files inside a claimed scope. | done — `npm test` green (18 suites) + `--check` green | session-401144df | `scripts/`, `assets/` (only if a defect is reproduced), tests |
 | J5 | Confirm the deployed Pages site is live, its pages load, and its data timestamps are consistent with the committed engine sample. | unclaimed | session-401144df | read-only + deployment record |
 | J6 | Final integration: PR this branch to `main`, merge, confirm the Pages build, record PR/merge/deploy here. | unclaimed | session-401144df | this board, `README.md` |
@@ -3035,3 +3035,38 @@ page other than the rebuild output of `templates/flagged.tpl` is edited by hand,
 | J-02 | EXECUTIVE_SUMMARY says "**Alerts so far: zero**" and lists only four topics captured; the committed feed carries **40 alerts** across elections and crypto. | `data/live/feed.json` | corrected to today's committed counts with the sample timestamp, still stating that the newest engine run created 0 new alerts |
 | J-03 | S-01 on the alert console says a WebSocket would "remov[e] the 10-minute delay entirely"; the same page's API reference and `executive-summary.tpl` correctly say a signed handshake is required. | official WebSocket docs | corrected to describe the measured gap and the documented delay/drop behaviour |
 | J-04 | Alerts console calls the engine feed "the engine's own 10-minute cadence" in a code comment. | `alerts/js/alerts-page.js` | reworded to the cron cadence + threshold semantics |
+
+### J2/J3 completion — session-401144df
+
+Record: [`verification/2026-11-22-401144df.md`](verification/2026-11-22-401144df.md). Full suite green
+(`npm test`, 18 suites; `build-site --check` clean; 2,201 internal links checked, 0 broken).
+
+- **Official sources read this session:** demo_env, get-exchange-status, market_lifecycle,
+  market_settlement, orderbook_responses, websocket-connection (all `docs.kalshi.com`), and GitHub's
+  `schedule` trigger reference. Ten published platform claims were confirmed **verbatim**; one was
+  **rejected and corrected** (F-82).
+- **F-82 (new row, published on `flagged.html`):** four places in the repository promised a fixed
+  10-minute sampling cadence. The cron is `*/10`, but GitHub documents that scheduled runs may be
+  delayed or dropped, and this repository's own history shows six consecutive scheduled
+  `live-alerts` runs **4–6 h apart** (also 4–5 h for `keepalive`'s 15-minute cron and the 2-hourly
+  snapshot job — the delay is repo-wide). Corrected in `README.md`, `EXECUTIVE_SUMMARY.md`,
+  `alerts/index.html` S-01 and a code comment. **No silent-staleness hazard exists:** the
+  freshness module was executed in a headless DOM and rendered `STALE · engine 5.7 h ago` with
+  "treat every feed as historical", and `engine unreadable` when the feed cannot be read.
+- **Second correction (no new row, recorded in F-82's evidence):** root `EXECUTIVE_SUMMARY.md` still
+  said "Alerts so far: zero" and listed four topics; the committed feed has **40 alerts** across
+  elections and crypto. Corrected with the sample timestamp and current counts.
+- **Regression guard:** `scripts/check-workflow-site-consistency.mjs` grew 10 assertions (44 total)
+  that reject the old cadence phrasing in `README.md`, `EXECUTIVE_SUMMARY.md` and `alerts/index.html`,
+  require the documented delay/drop caveat and the measured gap, require F-82 to keep its official
+  source link, and include two negative controls. Verified to **fail** when `README.md` is reverted
+  to the pre-fix text (1 failure) and to pass on the corrected text.
+- **Data consistency:** all five index topic cards reconcile exactly with `data/snapshot.json`
+  (143/326/0/1634/872). The engine's `topics.*.count` is a *series* count and is labelled "N series
+  matched in the last engine run" on the console — different measure, correctly labelled, not a defect.
+- **Not verified, flagged not guessed:** no live exchange read (shell egress blocked), no
+  authenticated read (`data/account.json` is `connected:false`), no causal claim for any swing.
+- **Stale-claim handoff logged, not acted on:** PR #86 (`arena/37562307-kalshidash1`) is a docs-only
+  board ledger that is >60 min stale and `CONFLICTING`. Its content is preserved in the branch it
+  targets; closing it is **not** needed for its recorded task, and this session will not force-push
+  or rewrite another session's branch. It is left for its owner and noted here so nobody re-does it.
