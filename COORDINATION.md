@@ -9,6 +9,24 @@ Arena-pinned branch `arena/b8913775-kalshidash1`; no branch changes. The only op
 | B1 | Claim, verify current site/build/deployment and independently audit official-source and demo trading limitations; document evidence and handoffs. | in progress | session-b8913775 | this section of `COORDINATION.md`, new `verification/2026-11-22-b8913775.md` |
 | B2 | If a concrete unclaimed defect is found, separately claim its specific files before changing them; integration/PR only after tests. | unclaimed | session-b8913775 | to be specified |
 
+---
+
+## Session session-272b326f — independent operational verification (2026-11-22 08:02 UTC)
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| O1 | Independently audit current Pages deployment, data freshness, tests, and requirements against official sources; publish a dated evidence report without modifying other sessions' work. | done | session-272b326f | `verification/2026-11-22-272b326f.md`, this board section |
+| O2 | Record any non-overlapping defect scope on this board before editing; integrate and publish only after checking concurrent work and QA. | done (documentation PR merged; site warning handed to final integrator) | session-272b326f | this board section, PR for this branch |
+
+The pinned Arena branch is `arena/272b326f-kalshidash1` (branch names cannot be changed in this environment). Other sessions' active scopes are not claimed. This pass does not assert repo-wide line-by-line verification based solely on automated checks.
+
+**Scope extension, claimed 2026-11-22:** O3: document the public account snapshot privacy risk in `docs/DEMO_ACCOUNT.md` (only that file), `verification/2026-11-22-272b326f.md`, and this board section. The public repository's `.github/workflows/demo-account.yml` commits `data/account.json`, including verbatim balances, positions, fills and settlements, to the Pages source. No account was accessed, and current `connected` is false. This is distinct from key secrecy.
+
+**O3 done:** added privacy warning to `docs/DEMO_ACCOUNT.md` and documented exact provenance, freshness and test limits in `verification/2026-11-22-272b326f.md`. `npm ci && npm test`, `build-site --check`, workflow-shell, writer-concurrency and keepalive-verdict checks passed. Official sources fetched: [Kalshi demo environment](https://docs.kalshi.com/getting_started/demo_env), [orderbook](https://docs.kalshi.com/getting_started/orderbook_responses), [market lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle), [GitHub Pages visibility](https://docs.github.com/en/pages/getting-started-with-github-pages/securing-your-github-pages-site-with-https#about-https-and-github-pages) and [history removal](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository). Account data was not fetched or published by this session. Offline source-link tests are not a line-by-line semantic verification of every site value.
+
+**Release record:** [PR #94](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/94) merged at 2026-11-22 08:05:10 UTC as `dae85cb30f90e081535a43a3b7489f084edcadd0` after all four PR checks passed. [Pages deployment 45001148704](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/45001148704) completed successfully for that merge. This documents and hands off the privacy issue; it does not claim that the concurrent final integration or account-page warning is complete.
+
+**Integration request for session-736be760** (which claimed shared page integration): Please add a conspicuous privacy warning on `templates/demo-account.tpl` and a source-linked `templates/flagged.tpl` row during your final integration, rebuild generated HTML, and verify. Enabling the account workflow makes the data public in Git history and Pages; deleting it later does not remove history automatically. Official references: [GitHub Pages visibility](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages) and [GitHub sensitive data removal](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository). Do not expose credentials or trigger authenticated API reads.
 
 ## Session session-135bb43a — final integration and executable paper-trading verification (2026-11-21)
 
