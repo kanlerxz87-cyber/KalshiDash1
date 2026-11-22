@@ -51,7 +51,9 @@ endpoint under <code>source_urls</code>.</p>
 (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo environment ↗</a>).
 Fees are not modeled anywhere in this repo (flagged). Nothing here is financial advice.</p>
 
-<h2 id="setup">Optional future account setup (not required for public data or paper trading)</h2>
+<h2 id="setup">Account setup is paused pending a privacy fix</h2>
+<div class="notice"><strong>Do not add <code>KALSHI_KEY_ID</code> or <code>KALSHI_PRIVATE_KEY</code> to this workflow yet.</strong>
+This repository and its GitHub Pages site are public. If enabled, the scheduled job commits balance, positions, fills and settlements into <code>data/account.json</code>, and the public page serves that JSON. The current deployed file is only a disconnected placeholder, but enabling secrets would publish the resulting account data. See <a href="flagged.html#F-82">Flagged for Review F-82</a>. Use a private/authenticated account-data service or another reviewed access-controlled design before enabling account capture.</div>
 <ol>
 <li>Create a demo API key pair: account page or <code>POST /trade-api/v2/api_keys/generate</code>
 (<a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener">API Keys ↗</a>).</li>
