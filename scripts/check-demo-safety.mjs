@@ -173,6 +173,12 @@ async function renderAccount(payload) {
   await new Promise((resolve) => dom.window.setTimeout(resolve, 0));
   return dom;
 }
+const disconnectedDom = await renderAccount({ connected: false });
+check('disconnected snapshots show no invented account rows', () => {
+  assert.match(disconnectedDom.window.document.body.textContent, /not connected/i);
+  assert.equal(disconnectedDom.window.document.querySelectorAll('#account-data tbody tr').length, 0);
+});
+disconnectedDom.window.close();
 const dom = await renderAccount(fixture);
 check('each rendered account data row carries its exact official endpoint, including zero balances', () => {
   const rows = [...dom.window.document.querySelectorAll('#account-data tbody tr')];
