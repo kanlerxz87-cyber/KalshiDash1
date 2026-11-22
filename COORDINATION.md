@@ -3243,8 +3243,31 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
 - The combined tree after PR #98 passed all **18** `npm test` groups: 57 demo-account/safety checks, 11 privacy checks, 38 chart/paper UI cases, 1,022 static source-linked rows and no broken internal links. `build-site --check` and duplicate-ID check also passed. External links were not exhaustively fetched, and these gates do not prove semantic verification of the whole repo.
 - **Remaining handoff:** F-85 now publishes the privacy risk. PR [#103](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/103)'s template owner has been asked to time-bound the static account-status sentence and to add the specific source-linked account-envelope/cancellation findings to the Flagged page. These two details have not yet been confirmed individually on that page. The [dated verification report](verification/2026-11-22-f134d89d.md) already records them. The committed account is disconnected; actual credentials, account values, execution and returns remain unverified.
 
-## Session session-e43b620f — final upstream integration (2026-11-22)
+### K4 record — PRs, merges, defect and Pages (session-8dcab433)
 
-- Merged `origin/main` at `39e5585` (PR #105) after PR #99's account safeguards landed. The only conflict was the append-only coordination ledger; both the existing session records and account/deployment evidence are retained.
-- The page integration remains source tree tested: one F-85 privacy record/warning, the distinct audit observation F-86, no duplicate IDs. `npm test` and `build-site --check` passed before this documentation-only merge. This merge commit must be pushed and GitHub checks re-confirmed before PR #100 is eligible for integration.
-- PR #100 is still open. No merge of PR #100 or post-merge Pages deployment is claimed yet.
+- **PR [#102](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/102)** (warning + F-85 + verification record) —
+  checks `alerts`, `build`, `qa`×2 all **pass**; **merged** 2026-11-22T08:14:08Z as merge commit
+  `f7539e3eff0974b7bd3b06c0979344bcbcdb89a5`. Pages `pages/builds/latest` for that commit → `status: "built"`,
+  `error.message: null`, updated 08:14:37Z.
+- **Live verification, cache-busted.** The first fetch of `/demo-account.html` (no query string) still served the
+  previous page from the Pages CDN; `/demo-account.html?v=0816` served the new warning. Recorded because "Pages says
+  built" and "the CDN is serving it" are different observations.
+- **Defect found on the live page and fixed twice, independently.** The first deployed warning linked `#F-85` but its
+  label read **F-82** (stale text from the renumber). Caught here at 08:16Z; session-f134d89d corrected the same label
+  on `main` at ~08:19Z and added `scripts/check-account-privacy.mjs` (11 checks incl. a negative control for the exact
+  mislabel). **Resolution: main's fix and guard are adopted; this branch's duplicate copy edit is dropped at merge.**
+  The F-85 row (theirs) records the correction; this session's earlier `PR #103` is updated to carry only the merge
+  resolution and the records, not a second implementation.
+- **Main integration during this PR:** `main` advanced through PRs #98, #99, #101, #103-adjacent work and others while
+  this PR waited; `flagged.tpl`/`flagged.html` conflicted once more and were resolved by keeping **main's** F-85 row and
+  regenerating the page. Merge conflicts were resolved without discarding any other session's work; no other file was
+  reverted.
+- **Guards now green on the merged tree:** `check-account-privacy` 11/11 · `check-html-ids` 611 ids, no duplicates ·
+  `check-row-sources` 1,022 rows, 0 problems · `check-links` 90 pages, 0 broken · `build-site --check` clean.
+
+## Session session-e43b620f — final integration continuation (2026-11-22)
+
+- Integrated latest `origin/main` at `33d8f89` (PR #103) after PRs #102/#103 and account-status corrections landed. Preserved main's page warning and F-85 privacy finding, plus this branch's independent F-86 $0.97 anomaly and dated verification report; F-84 remains main's scalar-settlement finding. Generated HTML is rebuilt from templates, never hand-edited.
+- `verification/2026-11-22-e43b620f.md` was updated to match the integrated finding IDs. No credentials or account data were accessed; no order was sent.
+- Handoff (no edit to another session's executive-summary scope): the newly integrated executive-summary copy describes the account snapshot as read-only/scheduled but does not repeat that enabling it makes the snapshot public. The explicit warning remains on the Demo account page and F-85; if executive-summary wording is changed, preserve that privacy distinction and cross-reference F-85.
+- PR #100 remains open pending latest-main checks and final mergeability/deployment confirmation. No completion is claimed until those are verified.
