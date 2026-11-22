@@ -2966,3 +2966,29 @@ The `$1.00 per contract` sentence on a line that also lists `scalar` (true only 
 `previous_price_dollars` · no demo API key, so no authenticated read was exercised · `Site build check` still cannot
 guard token-pushed commits (needs a GitHub App/PAT — a repository-settings decision) · the repo's sandbox-egress note
 is stale for this environment (docs and demo API are readable via the page fetcher).
+
+---
+
+## Session `arena/736be760-kalshidash1` — independent re-verification of `main` + live-data QA (2026-11-22)
+
+**Session ID:** `session-736be760`. Branch `arena/736be760-kalshidash1`, branched from `main` @ `4f1de81`
+(confirmed identical to `origin/main` at claim time, 2026-11-22 ~08:10 UTC). Full record:
+`verification/2026-11-22-736be760.md`.
+
+Read the board, the repo and open PRs before claiming. One open PR: [#86](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/86)
+(session-`37562307`, docs-only, opened 2026-11-21 23:27 UTC — >8 h with no further commits, i.e. a **stale claim**
+under the 60-minute rule). This session takes over review/integration of that PR as-is; it does not push to the
+other session's branch and does not recreate its content.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| K1 | Read board/repo/open PRs; claim scope, commit and push immediately | in progress | session-736be760 | this section of `COORDINATION.md` |
+| K2 | Independent health audit of `main`: full `npm test`, `build-site.mjs --check`, both link checkers, Pages deploy + latest CI runs. Reproduce and report; no edits yet. | unclaimed | — | `verification/2026-11-22-736be760.md` |
+| K3 | Re-verify the published API/platform claims the user's brief names (REST + WS demo roots, order-book/liquidity semantics, settlement/result fields) against official Kalshi docs via the page fetcher; re-check committed feed/snapshot freshness and internal consistency. | unclaimed | — | same verification file; committed `data/live/*` only if a defect is reproduced |
+| K4 | Take over stale PR #86: verify its two-file docs diff is accurate against the merged PR record, then merge or flag. | unclaimed | — | PR #86 files via merge only |
+| K5 | Fix only defects reproduced in K2–K3 (smallest change, with a failing check first); re-run all gates. | unclaimed | — | targeted `scripts/`, `templates/`, `assets/` files, each named in the board before editing |
+| K6 | Final integration: PR to `main`, merge, confirm GitHub Pages deploy of the new build, record PR link + merge SHA + deploy evidence here. | unclaimed | — | `README.md` if copy is wrong, generated root/`categories/` pages via `scripts/build-site.mjs` only |
+
+Constraints honoured: shared outputs (table data, `index.html`, navigation) change only through `scripts/build-site.mjs`;
+no value is invented; anything unconfirmable is left blank and published on `flagged.html`; every claim in the
+verification file carries an official source link.
