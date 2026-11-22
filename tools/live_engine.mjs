@@ -272,7 +272,7 @@ export function trackedPrice(m) {
  * Trade- and candle-detected alerts are exempt: their price *is* a published trade, so
  * they are already corroborated by the trade record itself.
  *
- * F-84 (session-f7ba69d5, 2026-11-22). `previous_price_dollars` used to be accepted here as a
+ * F-86 (session-f7ba69d5, 2026-11-22). `previous_price_dollars` used to be accepted here as a
  * second reading, described in this comment as "the price of the trade before the last one".
  * The official spec says otherwise: "Price for the last traded YES contract on this market
  * **a day ago**" (https://docs.kalshi.com/api-reference/market/get-market). A day-old price is
@@ -2073,14 +2073,14 @@ export async function selftest() {
 
   // corroboration: the measured fake crash must be rejected, a genuine move kept
   const fakeMove = corroborate({ to: 0.803, m: { yes_bid_dollars: '0.0020', yes_ask_dollars: '0.0030', no_bid_dollars: '0.9970', no_ask_dollars: '0.9980', previous_price_dollars: '0.8030' } });
-  ok(fakeMove.ok === false, 'a price contradicted by the book is not corroborated even when the day-old previous price agrees with it (F-84)');
+  ok(fakeMove.ok === false, 'a price contradicted by the book is not corroborated even when the day-old previous price agrees with it (F-86)');
   const realMove = corroborate({ to: 0.943, m: { yes_bid_dollars: '0.9350', yes_ask_dollars: '0.9430', no_bid_dollars: '0.0570', no_ask_dollars: '0.0650' } });
   ok(realMove.ok === true, 'a real move is corroborated by its book');
   const dayOldTrap = corroborate({ to: 0.97, m: { yes_bid_dollars: '0.0100', yes_ask_dollars: '0.0200', no_bid_dollars: '0.9800', no_ask_dollars: '0.9900', previous_price_dollars: '0.9700' } });
-  ok(dayOldTrap.ok === false, 'previous_price_dollars (a day ago) can never corroborate a print the book contradicts (F-84)');
-  ok(dayOldTrap.how !== 'previous_price_dollars', 'the corroboration reason never names the day-old field (F-84)');
+  ok(dayOldTrap.ok === false, 'previous_price_dollars (a day ago) can never corroborate a print the book contradicts (F-86)');
+  ok(dayOldTrap.how !== 'previous_price_dollars', 'the corroboration reason never names the day-old field (F-86)');
   ok(corroborate({ to: 0.5, m: {} }).ok === false, 'no second field -> no corroboration -> not published');
-  ok(/day-old/.test(corroborate({ to: 0.5, m: { previous_price_dollars: '0.5000' } }).how), 'a row that only returns the day-old price reports why it cannot be used (F-84)');
+  ok(/day-old/.test(corroborate({ to: 0.5, m: { previous_price_dollars: '0.5000' } }).how), 'a row that only returns the day-old price reports why it cannot be used (F-86)');
   // and end to end: a fake sample swing never reaches the feed
   const stFake = applySample(structuredClone(EMPTY_STATE), { nowSeconds: 5000, markets: [mk('F1', 0.003, 100)], runId: 'r1' });
   const stFake2 = applySample(stFake, { nowSeconds: 5100, markets: [{ raw: { ...mk('F1', 0.003, 100).raw, last_price_dollars: '0.8030', previous_price_dollars: '0.0030' }, topic: 'crypto', series_ticker: 'SER', series: {}, source_url: BASE + '/x' }], runId: 'r1' });

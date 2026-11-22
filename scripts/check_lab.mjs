@@ -244,12 +244,12 @@ console.log('Test 1 — catalyst.html renders, detects >= $0.10 swings, attaches
 
   // candle swing: 0.47 -> 0.62 = +0.15; day-over-day: 0.20 -> 0.45 = +0.25
   ok(/0\.4700.*0\.6200|0\.6200/s.test(text) || text.includes('candle-close'), 'candle-close swing recorded');
-  /* F-84 (session-f7ba69d5): `previous_price_dollars` is the last traded YES price A DAY AGO
+  /* F-86 (session-f7ba69d5): `previous_price_dollars` is the last traded YES price A DAY AGO
    * (official schema), so the old "prev-close" label presented a day-over-day change as an
    * intraday swing. The record must now be labelled 24h-change and must never be labelled as a
    * same-session detection. */
-  ok(text.includes('24h-change'), 'the day-over-day comparison is labelled 24h-change (F-84)');
-  ok(!text.includes('prev-close'), 'no record still calls the day-old field a close/prev-close swing (F-84)');
+  ok(text.includes('24h-change'), 'the day-over-day comparison is labelled 24h-change (F-86)');
+  ok(!text.includes('prev-close'), 'no record still calls the day-old field a close/prev-close swing (F-86)');
 
   // diesel must be excluded (F-18 scope decision)
   ok(!doc.body.textContent.includes('KXDIESELD'), 'diesel series excluded from gas topic');

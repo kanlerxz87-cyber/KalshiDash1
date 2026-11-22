@@ -69,7 +69,7 @@ they are exchange-published source strings, not independently verified publisher
   <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Get Market Candlesticks ↗</a>),
   <em>24h-change</em> (the API's <code>previous_price_dollars</code> field, which the official spec defines as
   the last traded YES price <strong>a day ago</strong> — a day-over-day comparison, kept separate from intraday
-  swings and never used to corroborate one; see <a href="flagged.html#F-84">F-84</a>).</li>
+  swings and never used to corroborate one; see <a href="flagged.html#F-86">F-86</a>).</li>
   <li><strong>Cooldown:</strong> 3 min per ticker + direction, so one move does not spam the feed.</li>
   <li><strong>Ranking:</strong> watchlist sorted by derived 24 h dollar-volume estimate (labelled; never presented as an official Kalshi figure).</li>
   <li><strong>Settlement:</strong> markets resolve <code>result</code> = <code>yes</code> or <code>no</code>; winning side receives $1 per contract

@@ -1,5 +1,33 @@
 # COORDINATION.md — shared task board
 
+## Session session-b8913775 — independent current-state audit (2026-11-22)
+
+Arena-pinned branch `arena/b8913775-kalshidash1`; no branch changes. The only open PR at claim time is #86, a historical deployment ledger. This session does not take over any active file scope.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| B1 | Claim, verify current site/build/deployment and independently audit official-source and demo trading limitations; document evidence and handoffs. | in progress | session-b8913775 | this section of `COORDINATION.md`, new `verification/2026-11-22-b8913775.md` |
+| B2 | If a concrete unclaimed defect is found, separately claim its specific files before changing them; integration/PR only after tests. | unclaimed | session-b8913775 | to be specified |
+
+---
+
+## Session session-272b326f — independent operational verification (2026-11-22 08:02 UTC)
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| O1 | Independently audit current Pages deployment, data freshness, tests, and requirements against official sources; publish a dated evidence report without modifying other sessions' work. | done | session-272b326f | `verification/2026-11-22-272b326f.md`, this board section |
+| O2 | Record any non-overlapping defect scope on this board before editing; integrate and publish only after checking concurrent work and QA. | done (documentation PR merged; site warning handed to final integrator) | session-272b326f | this board section, PR for this branch |
+
+The pinned Arena branch is `arena/272b326f-kalshidash1` (branch names cannot be changed in this environment). Other sessions' active scopes are not claimed. This pass does not assert repo-wide line-by-line verification based solely on automated checks.
+
+**Scope extension, claimed 2026-11-22:** O3: document the public account snapshot privacy risk in `docs/DEMO_ACCOUNT.md` (only that file), `verification/2026-11-22-272b326f.md`, and this board section. The public repository's `.github/workflows/demo-account.yml` commits `data/account.json`, including verbatim balances, positions, fills and settlements, to the Pages source. No account was accessed, and current `connected` is false. This is distinct from key secrecy.
+
+**O3 done:** added privacy warning to `docs/DEMO_ACCOUNT.md` and documented exact provenance, freshness and test limits in `verification/2026-11-22-272b326f.md`. `npm ci && npm test`, `build-site --check`, workflow-shell, writer-concurrency and keepalive-verdict checks passed. Official sources fetched: [Kalshi demo environment](https://docs.kalshi.com/getting_started/demo_env), [orderbook](https://docs.kalshi.com/getting_started/orderbook_responses), [market lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle), [GitHub Pages visibility](https://docs.github.com/en/pages/getting-started-with-github-pages/securing-your-github-pages-site-with-https#about-https-and-github-pages) and [history removal](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository). Account data was not fetched or published by this session. Offline source-link tests are not a line-by-line semantic verification of every site value.
+
+**Release record:** [PR #94](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/94) merged at 2026-11-22 08:05:10 UTC as `dae85cb30f90e081535a43a3b7489f084edcadd0` after all four PR checks passed. [Pages deployment 45001148704](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/45001148704) completed successfully for that merge. This documents and hands off the privacy issue; it does not claim that the concurrent final integration or account-page warning is complete.
+
+**Integration request for session-736be760** (which claimed shared page integration): Please add a conspicuous privacy warning on `templates/demo-account.tpl` and a source-linked `templates/flagged.tpl` row during your final integration, rebuild generated HTML, and verify. Enabling the account workflow makes the data public in Git history and Pages; deleting it later does not remove history automatically. Official references: [GitHub Pages visibility](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages) and [GitHub sensitive data removal](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository). Do not expose credentials or trigger authenticated API reads.
+
 ## Session session-135bb43a — final integration and executable paper-trading verification (2026-11-21)
 
 - Arena-pinned branch: `arena/135bb43a-kalshidash1`, base `b81f9f2731a12fd90e0287cd1d77ded58c35d79e`.
@@ -2833,7 +2861,12 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 - **PR #73:** [docs: independent dashboard audit and verification](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/73) — merged 2026-11-21T23:11:50Z as merge commit [`8f45860087dbf184daecc34e0f5beefc19fe39df`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/8f45860087dbf184daecc34e0f5beefc19fe39df). Checks on the rebased PR head passed (`alerts`, `build`, and both `qa` checks).
 - During rebase, `COORDINATION.md` conflicted with session-a2706f31's concurrent verification record (merged as PR #74). Both sections were retained; no other session's files were discarded. Main subsequently advanced through other sessions' PRs and scheduled data writes; this audit's scope remains documentation only.
 - Pages deployment containing PR #73 completed successfully in run [44960595512](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44960595512) on main commit `017bd6343fff754d9085c05a3a7cf831368ba532`. Later scheduled snapshot commit `c39c52f18d4ba29ece39eaa9804762b3406a72c7` also deployed successfully in run [44960678737](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44960678737); Pages API latest completed build for subsequent main commit `14bfb12543a3f6204dd67a6496f33c17682d8a07` was `built`, error `null` ([run 44960717658](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44960717658)). The report is served at [verification/2026-11-21-37562307.md](https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-37562307.md).
-- **Follow-up verification limitation (updated after the audit):** An early PR #77 run failed its alert/link and root-site checks because `build-site --check` reported 22 pages stale while the alert sample timestamp had advanced (HTML at `2026-11-21T17:42:16Z`, feed at `23:13:08Z`). The final integrator corrected the staleness gate in PR #79; the main Site build check then passed (run [44961105747](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961105747)). PR #72 was closed unmerged, but its model fix landed through [PR #75](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/75), followed by [PR #78](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/78); both are merged. The first PR #77 branch has not yet been rebased onto those integration commits; rerun its checks after rebase and do not merge unless they pass.
+- **Follow-up verification:** An early PR #77 run failed alert/link and root-site checks because `build-site --check` reported 22 pages stale while the alert sample timestamp advanced (HTML at `2026-11-21T17:42:16Z`, feed at `23:13:08Z`). The final integrator fixed the staleness check in PR #79; PR #77 was rebased onto that integration, and its latest checks passed before merge. PR #72 was closed unmerged; the model correction landed in PRs #75 and #78, both merged.
+
+### PR, merge and deployment record — session-37562307 (final)
+
+- **PR #77:** [docs: record audit PR merge and Pages deployment](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/77) — merged 2026-11-21T23:25:32Z as merge commit [`a7d1502d3ff01769a3e49fb7c99db4f62e4176cb`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/a7d1502d3ff01769a3e49fb7c99db4f62e4176cb). Checks on the rebased PR head passed: alerts, build, both QA suites, refresh, and sample.
+- The first Pages attempt for the merge commit was canceled by a higher-priority deployment request; the subsequent Pages deployment for main commit `89549ea299088d054a22009cdd7492ae9bf432b1` succeeded in [run 44961759251](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961759251). Pages API reported `built` with `error: null` for merge commit `a7d1502`; the report is live at [verification/2026-11-21-37562307.md](https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-37562307.md).
 
 ---
 
@@ -2967,6 +3000,73 @@ The `$1.00 per contract` sentence on a line that also lists `scalar` (true only 
 guard token-pushed commits (needs a GitHub App/PAT — a repository-settings decision) · the repo's sandbox-egress note
 is stale for this environment (docs and demo API are readable via the page fetcher).
 
+---
+
+## Session `arena/736be760-kalshidash1` — independent re-verification of `main` + live-data QA (2026-11-22)
+
+**Session ID:** `session-736be760`. Branch `arena/736be760-kalshidash1`, branched from `main` @ `4f1de81`
+(identical to `origin/main` at claim time, 2026-11-22 08:10 UTC). Main then advanced to `bb2cfec` (docs-only PR #93,
+session-`0d9df07c`), which was merged into this branch with both board sections kept. Full record:
+[`verification/2026-11-22-736be760.md`](verification/2026-11-22-736be760.md).
+
+Read the board, the repo and open PRs before claiming. One open PR: [#86](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/86)
+(session-`37562307`, docs-only, opened 2026-11-21 23:27 UTC — >8 h with no further commits, i.e. a **stale claim**
+under the 60-minute rule). This session took over review/integration of that PR; it did not push to the other
+session's branch and did not recreate its content.
+
+| ID | Task | Status | Owner | Files touched (only these) |
+|---|---|---|---|---|
+| K1 | Read board/repo/open PRs; claim scope, commit and push immediately | **done** — claim pushed as `47cf3da` | session-736be760 | this section of `COORDINATION.md` |
+| K2 | Independent health audit of `main`: full `npm test`, `build-site.mjs --check`, both link checkers, Pages deploy + latest CI runs | **done** — all green; Pages `built` for the `main` tip, no defect | session-736be760 | `verification/2026-11-22-736be760.md` §1 |
+| K3 | Re-verify the published API/platform claims the brief names (REST + WS demo roots, order-book/liquidity semantics, settlement/`result`, candlestick periods, Culture coverage) against official Kalshi docs and live demo reads | **done** — endpoints match character-for-character; book/candles/settlement semantics confirmed; one published settlement over-claim found (§4 below) | session-736be760 | same record §2–§3 |
+| K4 | Take over stale PR #86: verify its ledger claims against official records, then merge or flag | **done** — PR #77 merge SHA/time, its check roll-up and the Pages retry all confirmed; its branch has an unrelated history, so its two-file diff was applied **verbatim** on this integration branch and the PR is closed as superseded (one wording inference flagged in §7.6) | session-736be760 | PR #86 files via replay only |
+| K5 | Fix only defects reproduced in K2–K3 (smallest change), re-run all gates | **done** — one unique fix published as **F-84**; the cadence prose fix was reverted because session-`b8913775` (PR #96) owns it as F-83 | session-736be760 | `templates/executive-summary.tpl`, `templates/flagged.tpl` + generated `executive-summary.html`, `flagged.html` (the `README.md`/`EXECUTIVE_SUMMARY.md` edits were reverted — see overlap note) |
+| K6 | Final integration: PR to `main`, merge, confirm GitHub Pages deploy of the new build, record PR link + merge SHA + deploy evidence | **done** — [PR #97](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/97) merged as `4d436709433175c847396a052fbc6fa63bd97317`; Pages build `built`, `error: null` ([run 45001679023](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/45001679023)); the live page was re-read and now shows the corrected settlement sentence linking F-84 | session-736be760 | generated root pages via `scripts/build-site.mjs` only; this board |
+
+
+### PR, merge and deployment record — session-736be760 (final)
+
+- **[PR #97](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/97)** — merged **2026-11-22T08:11:59Z** as merge commit
+  [`4d436709433175c847396a052fbc6fa63bd97317`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/4d436709433175c847396a052fbc6fa63bd97317).
+  Checks on the PR head before merge: `alerts`, `build`, `qa` ×2 — all **pass**.
+- **Pages:** build for `4d43670` reported `built` with `error: null` ([run 45001679023](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/45001679023)).
+  The published [executive summary](https://kanlerxz87-cyber.github.io/KalshiDash1/executive-summary.html) was then re-read: it carries the
+  corrected settlement sentence and the [F-84](https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html#F-84) link. Deployment confirmed,
+  not assumed.
+- **[PR #86](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/86)** (session-`37562307`, stale >8 h, docs-only): closed as **superseded**
+  after its ledger claims were verified against the official record (PR #77 merge SHA/time, its check roll-up, and the Pages retry). Its
+  two-file diff was replayed verbatim on the integration branch; nothing was rewritten, and one wording inference is flagged in
+  `verification/2026-11-22-736be760.md` §7.6.
+- **PR #96** (session-`b8913775`) merged to `main` as `2f85ee6` while this session was integrating; main was merged into this branch twice and
+  the only conflicts were the three flag rows appended at the same place, resolved by keeping F-82, F-83 and F-84 in one ordered block
+  (`check-html-ids` green — no duplicate anchors).
+- **Blocking issues:** none. Every open item in §7 of the verification record is published on `flagged.html` and, per the task rules, is
+  non-blocking.
+
+### Findings from K3/K5 (published, not invented)
+
+- **F-84 — published settlement over-claim, fixed.** The Executive summary said a market resolving `scalar` pays
+  "$1.00 per contract". Official [Market Settlement](https://docs.kalshi.com/getting_started/market_settlement) gives the
+  $1 rule only for yes/no outcomes (and notes "sub-cent scalar settlement" fees), and
+  [Settlement Bounds](https://docs.kalshi.com/getting_started/settlement_bounds) shows a scalar market settling at a value
+  ($0.50 in its worked example) with a floor. The sentence now restricts $1.00 to a simple binary contract and states that
+  scalar pays its settled value minus any floor. The other five pages that mention $1.00 were re-read and already
+  conditional; untouched. Row published on `flagged.html` with both sources.
+- **Declared cron vs observed cadence (corroboration only — published as F-83 by PR #96).** `README.md` and `EXECUTIVE_SUMMARY.md` said the sampler "runs every 10 minutes".
+  GitHub's own run API shows **20 `schedule` runs in the repository's entire history**, `live-alerts` gaps of 7 h 15 m /
+  4 h 44 m / 4 h 02 m, and the newest engine sample ~6 h old at 08:30Z. This session's doc edits were reverted when
+  session-`b8913775` opened PR #96 with the same finding as **F-83**; that PR carries the published correction. The
+  measurements above are independent corroboration, and no template claimed a cadence, so no page changed here.
+- Verified live, not from memory: the four demo endpoints in the brief (REST recommended/alternate, WS recommended/
+  alternate) match the official docs table exactly; `KXPRESNOMD-28-MSHE`'s published last/bid/ask match the live demo
+  market to the cent; Culture's "2 series / 0 open markets" is accurate (both series return empty `status=open` lists).
+
+Constraints honoured: shared outputs (table data, `index.html`, navigation) change only through `scripts/build-site.mjs`;
+no value is invented; anything unconfirmable is left blank and published on `flagged.html`; every claim in the
+verification file carries an official source link.
+
+---
+
 ## Session session-0d9df07c — independent release check (2026-11-22)
 
 | Task | Status | Owner | File scope |
@@ -2988,6 +3088,13 @@ as `dae85cb`. Concurrent sessions active at claim time (`2a42fa01`, `736be760`, 
 One pre-existing unmerged session branch (`f89b55f7`) edits the same engine area, but its claim is >60 min stale with no commits
 after its board claim; per the 60-minute rule this session takes the specific lines below and will record any overlap handoff.
 
+**Finding-id renumbering (integration, 2026-11-22).** This session's two published findings were written as F-84/F-85, but
+`main` published its own **F-84** (scalar settlement over-claim, session-736be760) and **F-85** (demo-account snapshot privacy,
+session-272b326f/8dcab433) while this work was in flight. Per the board's existing precedent (F-75→F-78/F-79, F-78→F-80,
+F-79→F-81) the *already-merged* ids are kept and **this session's rows are renumbered F-86 (corroboration) and F-87 (sample
+anomaly)** in the template, code comments, test messages, cross-links and the verification record. No other session's text was
+rewritten. The UX item keeps its own id **F-88**.
+
 **Why this session exists.** Every requirement is already implemented on `main` and the full suite passes, but the *substance*
 still has a reproducible, official-source-verifiable defect that directly corrupts the two user-facing alert chats, and the
 public site still has weak live-signal UX. This session fixes those and nothing else.
@@ -2997,9 +3104,9 @@ public site still has weak live-signal UX. This session fixes those and nothing 
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
 | D1 | Claim, commit and push this section immediately. | done | session-f7ba69d5 | `COORDINATION.md` (this section) |
-| D2 | **F-84.** `corroborate()` and the catalyst page use `previous_price_dollars` as a same-session reference. The official spec defines it as the last traded YES price **a day ago**, so a day-old price can "corroborate" an untradeable $0.75–$0.96 print and publish it as a verified, high-ROI swing. Remove it as a corroboration reading and from the swing models; regression tests must fail on the pre-fix code. | in progress | session-f7ba69d5 | `tools/live_engine.mjs` (`corroborate` + selftest), `scripts/check_alerts.mjs`, new `scripts/check-corroboration.mjs`, `assets/catalyst.js`, `templates/catalyst.tpl`, `templates/flagged.tpl` |
-| D3 | **F-85.** Publish an observed-sample anomaly on the Flagged page: all 40 alerts in the committed feed are ≥ $0.50 single-step oscillations on 4 tickers, 2 labelled high-ROI before the F-84 fix; state only what the official API shows at review time and what remains unverified. | in progress | session-f7ba69d5 | `templates/flagged.tpl` + generated `flagged.html` |
-| D4 | **F-86.** Live-signal UX: on the alert console and the dashboard, show for each watchlist row whether it is the *board leader* on estimated dollars and the price it moved from/to over the 24 h `previous_yes_*` fields — so an oscillating row is visible as oscillating instead of being presented as an opportunity. Official field definitions only; no inferred cause. | in progress | session-f7ba69d5 | `alerts/js/alerts-live.js`, `alerts/js/alerts-page.js`, `alerts/css/alerts.css`, `assets/app.js`, `assets/style.css`, `scripts/check_alerts_page.mjs`, new `scripts/check-live-signal.mjs`, `package.json` |
+| D2 | **F-86** (claimed as F-84). `corroborate()` and the catalyst page use `previous_price_dollars` as a same-session reference. The official spec defines it as the last traded YES price **a day ago**, so a day-old price can "corroborate" an untradeable $0.75–$0.96 print and publish it as a verified, high-ROI swing. Remove it as a corroboration reading and from the swing models; regression tests must fail on the pre-fix code. | in progress | session-f7ba69d5 | `tools/live_engine.mjs` (`corroborate` + selftest), `scripts/check_alerts.mjs`, new `scripts/check-corroboration.mjs`, `assets/catalyst.js`, `templates/catalyst.tpl`, `templates/flagged.tpl` |
+| D3 | **F-87** (claimed as F-85). Publish an observed-sample anomaly on the Flagged page: all 40 alerts in the committed feed are ≥ $0.50 single-step oscillations on 4 tickers, 2 labelled high-ROI before the F-84 fix; state only what the official API shows at review time and what remains unverified. | in progress | session-f7ba69d5 | `templates/flagged.tpl` + generated `flagged.html` |
+| D4 | **F-88** (claimed as F-86). Live-signal UX: on the alert console and the dashboard, show for each watchlist row whether it is the *board leader* on estimated dollars and the price it moved from/to over the 24 h `previous_yes_*` fields — so an oscillating row is visible as oscillating instead of being presented as an opportunity. Official field definitions only; no inferred cause. | in progress | session-f7ba69d5 | `alerts/js/alerts-live.js`, `alerts/js/alerts-page.js`, `alerts/css/alerts.css`, `assets/app.js`, `assets/style.css`, `scripts/check_alerts_page.mjs`, new `scripts/check-live-signal.mjs`, `package.json` |
 | D5 | Full QA battery, dated verification record with official source links, PR to `main`, merge, confirm Pages deploy, record it here. | unclaimed | session-f7ba69d5 | `verification/2026-11-22-f7ba69d5.md` (new), `README.md` if copy is wrong, generated root/category pages via `scripts/build-site.mjs` only, this board |
 
 **Non-goals / not claimed:** no credentials, no authenticated call, no order, no exchange-wide census claim, no invented cause for
@@ -3022,7 +3129,7 @@ engine/derived scores may be regenerated, and any regeneration is labelled in th
 
 ### Progress (D2/D3/D4 implemented and tested; D5 in progress)
 
-- **D2 complete — F-84 is fixed and guarded.** Official definition read live: [Get Market schema](https://docs.kalshi.com/api-reference/market/get-market.md)
+- **D2 complete — F-86 (claimed as F-84) is fixed and guarded.** Official definition read live: [Get Market schema](https://docs.kalshi.com/api-reference/market/get-market.md)
   — `previous_price_dollars` is the last traded YES price **a day ago**. `corroborate()` now accepts only the
   same-session book. Measured scope on the committed 2026-11-22T02:27:14Z sample: 3 of 40 alerts cited the day-old
   field and **all 3 were also corroborated by their own book**; **0** alerts were admitted by it alone, so the
@@ -3032,9 +3139,9 @@ engine/derived scores may be regenerated, and any regeneration is labelled in th
   feed without the provenance list (3 violations, naming exactly those 3 rows). A second consumer with the same wrong
   idea — `assets/catalyst.js` publishing the day-over-day change as an intraday `prev-close` swing — is relabelled
   `24h-change` and kept out of the intraday feed.
-- **D3 complete — F-85 published** as an observed sample anomaly (needs review) with live API evidence and an explicit
+- **D3 complete — F-87 (claimed as F-85) published** as an observed sample anomaly (needs review) with live API evidence and an explicit
   "mechanism unverified" statement. Nothing about cause or executability is inferred.
-- **D4 complete — F-86 shipped.** Alert console board gains a **Board** leader column and a **24h change** column built
+- **D4 complete — F-88 shipped** (claimed as F-86) Alert console board gains a **Board** leader column and a **24h change** column built
   only from the published day-old fields, so an oscillating contract reads as oscillating instead of as repeated new
   opportunities. 5 jsdom assertions added and mutation-tested (leader map removed → 2 failures; fabricated `+$0.00` →
   2 failures).
@@ -3044,3 +3151,133 @@ engine/derived scores may be regenerated, and any regeneration is labelled in th
   authenticated call, no order, no causal news attribution.
 
 Status: D2/D3/D4 **done** — D5 (PR, merge, Pages confirmation) in progress.
+
+## Session session-b8913775 — independent current-state audit + dashboard feed fix (2026-11-22 08:02 UTC)
+
+Branch `arena/b8913775-kalshidash1`, branched from `main` @ `4f1de81`. Claim written and pushed before any edit.
+Full evidence: [`verification/2026-11-22-b8913775.md`](verification/2026-11-22-b8913775.md).
+At claim time the only open PR was #86 (a board-only deployment ledger owned by session-37562307); no active
+session claimed the files below, and no other session's file, data or row was reverted or rewritten.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| B1 | Independently verify the published site, committed data, CI and Pages build against official sources; measure what the platform actually delivers. | done (this section + dated report) | session-b8913775 | this section of `COORDINATION.md`, `verification/2026-11-22-b8913775.md` |
+| B2 | **F-82**: the dashboard's two chats never read the committed engine feed, so a reader without demo-API access saw only a synthetic candle replay and an empty high-ROI pane while 40 sampled alerts sat unread. Fix + offline regression test. | done — 7 new DOM assertions (suite 31 → 38), negative-checked | session-b8913775 | `assets/app.js`, `scripts/check-market-chart.mjs` |
+| B3 | **F-83**: the published "runs every 10 minutes" cadence is not what the platform delivers (6 schedule runs in 34.6 h). Correct the claim with the measured interval; do not promise a cadence the repository cannot control. | done (copy corrected; cadence flagged, not fixable in-repo) | session-b8913775 | `templates/flagged.tpl` → `flagged.html` (regenerated), `README.md`, `docs/ALERTS.md`, `EXECUTIVE_SUMMARY.md` |
+
+### Sources re-verified this session (official)
+
+[demo environment](https://docs.kalshi.com/getting_started/demo_env) · [orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses) ·
+[market settlement](https://docs.kalshi.com/getting_started/market_settlement) · [WebSocket connection](https://docs.kalshi.com/websockets/websocket-connection) ·
+[GitHub schedule delays/drops](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+Live demo reads: `/series?category=Culture` (2 series, both `volume_fp 0.00`) and
+`/markets?series_ticker=KXXBANNEDGROK&status=open` (empty) — Culture still has no open market.
+
+### Measured current state (2026-11-22 08:0x UTC)
+
+- Feed `data/live/feed.json`: `generated_at 2026-11-22T02:27:14Z`, 40 alerts (3 high-ROI), 0 resolutions, 4 awaiting, 60 market rows, 8 orderbooks — **≈5.7 h old, past the 45-minute STALE limit**, so every page shows a stale age rather than LIVE for the engine layer.
+- `live-alerts` schedule runs: **6 in 34.6 h** (2026-11-20T21:52Z → 2026-11-22T02:27Z) against a declared `*/10` cron → **F-83**.
+- `data/account.json`: `connected: false`, `captured_at: null`; no demo-credential secrets, so no account figure is verified. No key was requested and no authenticated request or order was made.
+- Pages: `builds/latest` → `built`, `error.message null`, commit `4f1de81`.
+- `npm test`: all 17 suites pass; `build-site --check` clean; source gate 1,020 rows / 100 % publisher links.
+
+### Overlap note (concurrent session-272b326f)
+
+That session's #93–#95 landed `docs/DEMO_ACCOUNT.md` privacy documentation and asked the *final integrator* to add a
+privacy warning to `templates/demo-account.tpl` plus a `flagged.tpl` row. This session did **not** take that over: the
+template/row handoff is still open for whoever performs the next integration, and the conflicting rebase kept both board
+sections in full (nothing of theirs was dropped). Its O3 scope, `docs/DEMO_ACCOUNT.md`, was not edited here.
+
+---
+
+## Session session-8dcab433 — integration of the demo-snapshot privacy handoff + observed liveness audit (2026-11-22 08:1x UTC)
+
+**Session ID:** `session-8dcab433`. Arena-pinned branch `arena/8dcab433-kalshidash1` (the environment
+fixes this branch name, so the `session-<id>/<task>` naming in the brief cannot be used here; no other
+branch is created or pushed). Base `bb2cfec`; `main` (`dae85cb`, PR #94 merge) merged in before this claim.
+
+**Board review before claiming.** PR #94 (`docs: document demo account snapshot privacy risk`) merged to
+`main` at 08:05Z. Its own handoff asks the concurrent final integrator to add a **site-level warning** and a
+**Flagged for Review** entry; it deliberately did not touch shared templates. That handoff is unclaimed and
+is what this session takes. Stale PR #86 (`docs: record final audit merge and deployment`, last update
+2026-11-21T23:27Z — more than 60 minutes ago, no commits since) was preserved by session-736be760 (whose PR #97 is open), not rewritten;
+this session applied only its one-line wording fix. No other open PR exists. No active claim covers the templates named below.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| K1 | Claim scope, commit and push immediately | in progress → done | session-8dcab433 | this section of `COORDINATION.md` only |
+| K2 | Publish the site-level demo-snapshot privacy warning + a Flagged for Review row (published as F-85 — concurrent PR #96 took F-82/F-83) | claimed | session-8dcab433 | `templates/demo-account.tpl`, `templates/portfolio.tpl`, `templates/flagged.tpl`, generated `demo-account.html`, `portfolio.html`, `flagged.html` via `scripts/build-site.mjs`, `docs/DEMO_ACCOUNT.md` (append-only; #94 already merged) |
+| K3 | Measure and record actual live-pipeline behaviour (scheduled `live-alerts`/`keepalive` cadence, feed age, page freshness labelling) against official GitHub/Kalshi documentation; fix only defects reproduced offline | claimed | session-8dcab433 | `verification/2026-11-22-8dcab433.md` (new), plus a fix in `.github/workflows/live-alerts.yml` **only** if a defect is reproduced by an offline test |
+| K4 | Hand the stale PR #86 content to the session that closed it, run the full QA battery, open and merge the integration PR to `main`, confirm Pages deploy and record it here | claimed | session-8dcab433 | this section; generated pages via the shared generator only |
+
+Rules honoured: shared tables (`flagged.html`) change only in this integration phase; other sessions'
+sections, findings and scripts are preserved verbatim; every new claim goes through official source links.
+
+
+### K1–K3 completion notes (session-8dcab433, 2026-11-22 08:2xZ)
+
+- **K1 done** — claim committed and pushed as the first commit on this branch (`a3e4160`), before any
+  file in the claimed scope was touched.
+- **K2 done — published as F-85, after a collision check.** The PR #94 handoff is live, not just
+  documented: a red `.notice` above the connection-status block on the Demo account page states that
+  the snapshot would be world-readable and that the current file is a disconnected placeholder, with
+  three official GitHub links; the flag table gains **F-85** (privacy risk, owner decision) credited
+  to session-272b326f's handoff. **Why F-85:** while this session worked, session-b8913775's PR #96
+  merged and published its own **F-82** (both chats ignored the committed feed) and **F-83** (cadence
+  copy), and open PR #97 claims **F-84**. This session had drafted privacy as F-82 and cadence as
+  F-83; **neither draft was pushed under those numbers** — the cadence row was dropped as a duplicate
+  of #96's stronger F-83 (34.6 h of run history) and the privacy row was renumbered to F-85. No
+  duplicate id was published on `main` by this session; `check-html-ids` is green. Third ID collision
+  in this ledger; sessions should re-read `main`'s flag table immediately before opening a PR. Page
+  copy in `docs/DEMO_ACCOUNT.md` was already merged in #94 and was **not** edited again.
+- **K3 done — measured independently, corroborating #96's F-83.** Actions-API run history vs the
+  declared crons: `live-alerts.yml` (`*/10`) fired **one** `schedule` run (02:27:01Z) in the ≈8.4 h
+  from 23:43Z to 08:07Z; `keepalive.yml` (`4,19,34,49`) ran at 16:02Z, 21:34Z, 01:36Z; the committed
+  feed stood at `2026-11-22T02:27:14Z` (≈5.7 h old) at 08:07Z. These are recorded in this session's
+  verification file as corroboration of F-83, **not** as a second finding. GitHub documents both delay
+  and drop for `schedule` runs, so the cause stays **unverified**; only the timestamps are asserted.
+  No workflow defect was reproduced, so **no workflow file was changed**. This session's README
+  qualification was **superseded by #96's stronger wording** and is not re-applied. Liveness that *is*
+  real is confirmed in code: 30 s browser re-sampling and a 60 s feed re-read while the console is
+  open, now covering the committed feed too (per #96's F-82 fix), plus the measured-age badge.
+- **Stale PR #86 (session-37562307)** — closed by session-736be760 at 08:08:23Z, which preserved its
+  two-file diff on its own integration branch (open PR #97). This session independently applied the
+  same one-line wording fix to `verification/2026-11-21-37562307.md` (identical change, merges clean)
+  and **deliberately does not** re-append the board section, to avoid a duplicate ledger entry; its
+  local draft of that section was dropped before publication. Nothing in #86 is lost: the content is
+  in #97's branch and in this session's commit `0598aaa`.
+- **K4 in progress** — evidence, limits and the requirement trace are in
+  [`verification/2026-11-22-8dcab433.md`](verification/2026-11-22-8dcab433.md): `npm ci` and
+  `npm test` exit 0; `build-site --check` clean; 90 pages / 2,201 internal links / 0 broken; 342
+  external URLs listed but **not fetched**; authenticated demo account still disconnected, so every
+  account figure stays blank.
+
+
+## Session session-f134d89d — authenticated demo-account safety and API audit (2026-11-22)
+
+- Arena-pinned branch: `arena/f134d89d-kalshidash1`, based on `main` at `4f1de81`. Branch naming is fixed by Arena.
+- Read this board and the currently pushed claims of sessions `0d9df07c` (independent release check) and `2a42fa01` (independent site/feed verification) before claiming. Historical completed claims and stale rows are preserved; this task is distinct from their release/feed audits. No shared generated HTML, data or navigation is claimed.
+- This session owns only the account/CLI files listed below; any required changes outside that scope will be requested here, not made in another session's files. Real credentials will not be requested, and no authenticated order will be sent during verification.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| D1 | Verify demo-only signed CLI transport, order payload and account snapshot semantics against current official Kalshi API documentation; reproduce and repair only documented defects with offline tests. | done — offline regressions pass; live authentication and execution unverified | session-f134d89d | `tools/demo_trader.mjs`, `scripts/check-demo-safety.mjs`, `assets/demo-account.js`, `docs/DEMO_ACCOUNT.md`, new `verification/2026-11-22-f134d89d.md` |
+| D2 | Run QA, record sources and unresolved limitations; PR/merge and deployment confirmation if permitted and checks pass. | in progress | session-f134d89d | this section of `COORDINATION.md`, PR on the assigned branch |
+
+- Claim rebase conflict: PR #93 merged an independent release section at the same end-of-file location while this claim was being committed. Stopped, preserved both complete sections, and continued the rebase; no other session content was discarded.
+
+### Account audit scope and handoffs — 2026-11-22
+
+- The concurrent PR [#94](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/94) claims `docs/DEMO_ACCOUNT.md` for a public-account privacy warning. This session yields that file; no overlapping edits will be made while it is owned. The CLI's built-in usage and the dated report will describe any change, and a documentation handoff will be made.
+- **Reproduced locally with synthetic responses:** four HTTP-200 empty objects incorrectly set `connected=true` and a capture time; Kalshi documents required balance fields and list arrays. The V2 `cancel` command omits `market_ticker`, so a cancellation without an explicit exchange index defaults to shard 0 instead of auto-routing. This session is fixing both inside its already-claimed CLI/test scope only. Sources: [Get Balance](https://docs.kalshi.com/api-reference/portfolio/get-balance), [Get Positions](https://docs.kalshi.com/api-reference/portfolio/get-positions), [Get Fills](https://docs.kalshi.com/api-reference/portfolio/get-fills), [Get Settlements](https://docs.kalshi.com/api-reference/portfolio/get-settlements), [Cancel Order V2](https://docs.kalshi.com/api-reference/orders/cancel-order-v2).
+- **D1 scope extension, claimed before editing:** `assets/demo-account.js` for connected-account runtime tables only, with synthetic DOM tests in already-claimed `scripts/check-demo-safety.mjs`. Current runtime `kvTable`/`rowsTable` places an endpoint in a separate trailing row rather than on every data row; it also renders the documented list envelopes as giant JSON. This is not an index/navigation/shared data edit. Another session owns the shared template/Flagged-page integration. If source metadata is absent or not an exact official demo endpoint, data will remain withheld and flagged rather than inventing a source.
+- **Integration handoff:** please publish the reproduced empty-account-response and shard-routing issues as source-linked review findings, along with the independent public-snapshot privacy finding, on the Flagged for Review page. Live authentication, order placement, account values and successful shard-routed cancellation remain unverified; no real credentials or orders were used.
+
+### Verification and follow-up coordination
+
+- Rebase onto `main` after PR #96 merged encountered a second end-of-file `COORDINATION.md` conflict. Stopped and retained both the complete session-b8913775 section and this session's section; no other session's content was discarded.
+- PR #94 has merged and its O3 documentation scope is complete. **Re-claiming only the CLI usage and account-capture semantics in `docs/DEMO_ACCOUNT.md`**, preserving the privacy warning and other session's additions. The cancellation command now needs `--ticker`; the former one-argument example would otherwise be misleading.
+- Offline result: `npm test` passed all 17 suites, including 56 demo-safety/display checks; `build-site --check` and supplemental workflow, freshness, link and alert checks passed. The tests use synthetic fixtures only; no live authentication or order was performed. Source-by-source evidence and the post-rebase QA limitations are in `verification/2026-11-22-f134d89d.md`.
+- PR [#97](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/97) was given the privacy/Flagged-page handoff while its owner holds the shared templates. The account CLI findings remain pending publication, not claimed deployed.
+- After rebasing through merged PR #96, all 17 `npm test` suites passed again (1,020 canonical static rows source-linked; 38 chart cases; 56 account-safety cases). The documentation now matches the required ticker and preserves PR #94's privacy warning. GitHub still reports the actual account capture disconnected; secret configuration is unverified.
+- Rebase after PR #102 merged conflicted where both sessions appended their board entries. Stopped, retained both complete entries and continued; the F-85 privacy row and published page warning are preserved. The shared-page owners were notified of the link-label/staleness handoff and concurrent privacy-claim overlap. Latest account test now has 57 offline checks, including the disconnected display.

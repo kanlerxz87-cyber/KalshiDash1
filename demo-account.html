@@ -27,6 +27,24 @@ and documents the credential-gated trade-execution code. Live authentication/exe
 <a href="verification/2026-11-20-d5b935f4.md">verification/2026-11-20-d5b935f4.md</a> · setup guide:
 <a href="docs/DEMO_ACCOUNT.md">docs/DEMO_ACCOUNT.md</a>.</p>
 
+<div class="notice bad" id="public-snapshot-warning">
+<strong>Read this before you connect an account: the snapshot is public.</strong>
+This site is served by GitHub Pages from a <strong>public</strong> repository, and the demo-account workflow
+commits what it reads (<code>data/account.json</code>: balance, positions, fills, settlements) to that
+repository. Anyone can read those values in the repository and on this page. Keeping API keys out of the
+browser keeps the <em>keys</em> secret; it does not make the resulting <em>account data</em> private.
+If you would not publish a balance and a fill history, do not enable this workflow on this site &mdash; it
+needs private storage and a private backend instead.
+Official sources: <a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories#about-repository-visibility" target="_blank" rel="noopener">GitHub: public repositories are accessible to everyone on the internet ↗</a> ·
+<a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages" target="_blank" rel="noopener">GitHub Pages ↗</a> ·
+<a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository" target="_blank" rel="noopener">removing sensitive data later is limited (clones, forks, cached views) ↗</a>.
+<br><span class="small">Current state: <code>data/account.json</code> is a disconnected placeholder
+(<code>connected: false</code>, <code>captured_at: null</code>) &mdash; no account data has been published.
+Demo funds are mock funds and demo prices &ldquo;may not be reflective of those in real markets&rdquo;
+(<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Kalshi demo environment ↗</a>).
+Tracked as <a href="flagged.html#F-85">F-82 on Flagged for review</a>.</span>
+</div>
+
 <div class="notice" id="conn-status"><strong>Connection status: checking <code>data/account.json</code>…</strong></div>
 
 <h2 id="account">Account snapshot (verbatim API responses)</h2>
