@@ -2989,4 +2989,10 @@ is stale for this environment (docs and demo API are readable via the page fetch
 | E4 | Warn before account setup on executive summary and account page | done | `templates/demo-account.tpl`, `templates/executive-summary.tpl`, generated HTML |
 | E5 | Create PR from this branch, require passing checks, merge and verify Pages deployment | in progress | this branch / PR record below |
 
-- Current status: **implementation and local verification done; PR/merge/Pages verification in progress**. Review items F-82 and F-83 do not block the site but remain explicitly open for the owner.
+- Current status: **implementation and local verification done; integration/merge/Pages verification in progress**. Review items remain explicitly open for the owner.
+
+### Concurrent PR overlap — session `arena/b8913775-kalshidash1` / PR #96
+
+- After this audit began, PR #96 opened and claimed `templates/flagged.tpl` / generated `flagged.html`, with IDs F-82/F-83 for a different alerts-feed defect and sampler-cadence correction. Its checks are green, but GitHub reports the PR as `CONFLICTING` against main; no merge was attempted. The IDs collide with this audit's F-82/F-83 labels, and both sessions edit the shared Flagged page.
+- **No changes were pushed to the other session's branch.** As the final integrator on this pinned current branch, this session will integrate the PR #96 head only into this current branch, preserving its app/docs/test fixes and merging both sets of findings. This session's account-exposure finding and extreme-market observation will be renumbered F-84/F-85 so they do not overwrite PR #96's findings. Generated HTML will be rebuilt from the merged templates, then QA rerun. PR #96 will be recorded as integrated through this branch and closed only after the integration PR has merged successfully.
+- Main advanced after this branch was claimed (PRs #93–#95, currently `90d58b3`); before integrating, rebase/merge the current branch onto that main tip and preserve all COORDINATION entries. If any conflict cannot be resolved without losing another session's work, stop and hand it off.
