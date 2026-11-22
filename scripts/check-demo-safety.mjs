@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import crypto from 'node:crypto';
+import { JSDOM } from 'jsdom';
 import { normalizeDemoRoot, mutationRequested, orderBody, sign, apiPathname, captureAccount } from '../tools/demo_trader.mjs';
 
 let checks = 0;
@@ -61,7 +62,35 @@ for (const price of ['0', '1', '-0.1', '1.1', '0.12345', 'Infinity', 'NaN']) {
 }
 check('signing path includes /trade-api/v2 and excludes the query', () => {
   assert.equal(apiPathname('/portfolio/fills?limit=200'), '/trade-api/v2/portfolio/fills');
+  assert.equal(apiPathname('/portfolio/events/orders/order-123?market_ticker=TEST-TICKER'), '/trade-api/v2/portfolio/events/orders/order-123');
 });
+check('cancel dry run supplies the market ticker for exchange-shard auto-routing', () => {
+  const child = spawnSync(process.execPath, ['tools/demo_trader.mjs', 'cancel', '--order-id', 'offline-id', '--ticker', 'TEST-TICKER', '--dry-run'], { env: childEnv, encoding: 'utf8', timeout: 3000 });
+  assert.equal(child.status, 0, child.stderr);
+  const url = new URL(child.stdout.split('\n')[0].replace(/^DELETE /, ''));
+  assert.equal(url.pathname, '/trade-api/v2/portfolio/events/orders/offline-id');
+  assert.equal(url.searchParams.get('market_ticker'), 'TEST-TICKER');
+  assert.equal(url.searchParams.has('exchange_index'), false);
+  assert.match(child.stdout, /DRY RUN/);
+});
+check('cancel encodes the ticker as one query value, never an injected routing parameter', () => {
+  const child = spawnSync(process.execPath, ['tools/demo_trader.mjs', 'cancel', '--order-id', 'offline-id', '--ticker', 'TICKER&exchange_index=0', '--dry-run'], { env: childEnv, encoding: 'utf8', timeout: 3000 });
+  assert.equal(child.status, 0, child.stderr);
+  const url = new URL(child.stdout.split('\n')[0].replace(/^DELETE /, ''));
+  assert.equal(url.searchParams.get('market_ticker'), 'TICKER&exchange_index=0');
+  assert.equal(url.searchParams.has('exchange_index'), false);
+});
+for (const bad of [
+  ['--order-id', 'offline-id'],
+  ['--order-id', 'offline-id', '--ticker', '--confirm-live'],
+  ['--order-id', '..', '--ticker', 'TEST-TICKER'],
+]) {
+  check('cancel rejects missing or unsafe routing arguments before network access', () => {
+    const child = spawnSync(process.execPath, ['tools/demo_trader.mjs', 'cancel', ...bad], { env: childEnv, encoding: 'utf8', timeout: 3000 });
+    assert.notEqual(child.status, 0);
+    assert.doesNotMatch(child.stdout + child.stderr, /fetch failed|→ HTTP/);
+  });
+}
 const stamp = '1795298400000', pathname = '/trade-api/v2/portfolio/balance';
 check('RSA-PSS signature verifies over timestamp + method + full path', () => {
   const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', { modulusLength: 2048 });
@@ -85,18 +114,114 @@ try {
     assert.equal(failed.connected, false); assert.equal(failed.captured_at, null); assert.ok(failed.attempted_at);
     assert.equal(failed.balance.error, true);
   });
+  const fixtures = {
+    '/portfolio/balance': { balance: 0, balance_dollars: '0.0000', portfolio_value: 0, updated_ts: 1795300000 },
+    '/portfolio/positions': { market_positions: [], event_positions: [], cursor: '' },
+    '/portfolio/fills?limit=200': { fills: [], cursor: '' },
+    '/portfolio/settlements?limit=200': { settlements: [], cursor: '' },
+  };
   const paths = [];
   const good = await captureAccount(creds, async (_c, method, path) => {
-    paths.push(path); assert.equal(method, 'GET'); return { ok: true, status: 200, json: { synthetic_fixture: true } };
+    paths.push(path); assert.equal(method, 'GET'); return { ok: true, status: 200, json: fixtures[path] };
   });
-  check('successful mocked account reads retain the exact four source paths', () => {
+  check('schema-shaped empty lists and zero balances are valid, with exact source paths', () => {
     assert.equal(good.connected, true); assert.ok(good.captured_at);
+    assert.equal(good.balance.balance, 0);
     assert.equal(paths.length, 4); assert.ok(paths.includes('/portfolio/fills?limit=200'));
     assert.equal(good.source_urls.length, 4); assert.ok(good.source_urls.every((url) => url.startsWith(primary)));
+  });
+  for (const [path, invalid] of [
+    ['/portfolio/balance', {}],
+    ['/portfolio/balance', { balance: 0, balance_dollars: '', portfolio_value: 0, updated_ts: 0 }],
+    ['/portfolio/positions', { market_positions: [], event_positions: null }],
+    ['/portfolio/fills?limit=200', { fills: [], cursor: null }],
+    ['/portfolio/settlements?limit=200', { settlements: [{} , null] }],
+  ]) {
+    const bad = await captureAccount(creds, async (_c, _m, p) => ({ ok: true, status: 200, json: p === path ? invalid : fixtures[p] }));
+    const name = path.split('?')[0].split('/').pop();
+    check(`HTTP 200 with malformed ${name} stays disconnected and unverified`, () => {
+      assert.equal(bad.connected, false); assert.equal(bad.captured_at, null); assert.equal(bad[name].error, true);
+    });
+  }
+  const thrown = await captureAccount(creds, async (_c, _m, p) => {
+    if (p === '/portfolio/balance') throw new Error('SYNTHETIC TRANSPORT FAILURE');
+    return { ok: true, status: 200, json: fixtures[p] };
+  });
+  check('transport exceptions produce a disconnected attempt, not a successful or stale capture', () => {
+    assert.equal(thrown.connected, false); assert.equal(thrown.captured_at, null); assert.equal(thrown.balance.error, true);
+    assert.ok(!JSON.stringify(thrown).includes('SYNTHETIC TRANSPORT FAILURE'));
   });
   check('signed transport refuses redirects, rather than forwarding auth headers', () => {
     assert.match(readFileSync('tools/demo_trader.mjs', 'utf8'), /body: payload, redirect: "error"/);
   });
 } finally { globalThis.fetch = savedFetch; }
+
+// Render the connected state with invented fixtures; no real account is needed or published.
+const fixture = {
+  connected: true, captured_at: '2026-11-22T00:00:00Z', api_root: primary, environment: 'demo',
+  key_fingerprint: 'offline-only',
+  source_urls: ['/portfolio/balance', '/portfolio/positions', '/portfolio/fills?limit=200', '/portfolio/settlements?limit=200'].map((p) => primary + p),
+  balance: { balance: 0, balance_dollars: '0.0000', portfolio_value: 0, updated_ts: 1795300000 },
+  positions: { market_positions: [{ ticker: 'SYNTHETIC-POSITION', position_fp: '2.00' }], event_positions: [], cursor: '' },
+  fills: { fills: [{ ticker: '<img src=x onerror=alert(1)>', count_fp: '2.00' }], cursor: 'MORE-PAGES' },
+  settlements: { settlements: [{ ticker: 'SYNTHETIC-SETTLEMENT', market_result: 'yes' }], cursor: '' },
+};
+async function renderAccount(payload) {
+  const dom = new JSDOM('<div id="conn-status"></div><div id="account-data"></div>', { url: 'https://example.test/demo-account.html', runScripts: 'outside-only' });
+  dom.window.fetch = async () => ({ ok: true, json: async () => payload });
+  dom.window.eval(readFileSync('assets/demo-account.js', 'utf8'));
+  await new Promise((resolve) => dom.window.setTimeout(resolve, 0));
+  return dom;
+}
+const dom = await renderAccount(fixture);
+check('each rendered account data row carries its exact official endpoint, including zero balances', () => {
+  const rows = [...dom.window.document.querySelectorAll('#account-data tbody tr')];
+  assert.ok(rows.length >= 7, `expected expanded account rows, got ${rows.length}`);
+  for (const row of rows) {
+    const link = row.querySelector('a[href]');
+    assert.ok(link, `data row missing source: ${row.textContent}`);
+    assert.ok(fixture.source_urls.includes(link.href), `unapproved source: ${link.href}`);
+  }
+  const sourceFor = (text) => rows.find((row) => row.textContent.includes(text)).querySelector('a').href;
+  assert.equal(sourceFor('0.0000'), fixture.source_urls[0]);
+  assert.equal(sourceFor('SYNTHETIC-POSITION'), fixture.source_urls[1]);
+  assert.equal(sourceFor('<img'), fixture.source_urls[2]);
+  assert.equal(sourceFor('SYNTHETIC-SETTLEMENT'), fixture.source_urls[3]);
+  assert.equal(dom.window.document.querySelector('#account-data img'), null);
+  assert.match(dom.window.document.querySelector('#account-data').textContent, /additional page/i);
+});
+dom.window.close();
+const alternateDom = await renderAccount({ ...fixture, api_root: alternate, source_urls: fixture.source_urls.map((url) => url.replace(primary, alternate)) });
+check('alternate official demo root also renders with matching endpoint sources', () => {
+  const rows = [...alternateDom.window.document.querySelectorAll('#account-data tbody tr')];
+  assert.ok(rows.length >= 7);
+  assert.ok(rows.every((row) => row.querySelector('a').href.startsWith(alternate + '/portfolio/')));
+});
+alternateDom.window.close();
+for (const sourceUrls of [
+  fixture.source_urls.slice(0, 3),
+  fixture.source_urls.map((url) => url.replace('external-api.demo.kalshi.co', 'external-api.demo.kalshi.co.evil.invalid')),
+  fixture.source_urls.map((url) => url.replace('?limit=200', '?limit=1')),
+]) {
+  const invalidDom = await renderAccount({ ...fixture, source_urls: sourceUrls });
+  check('missing or lookalike endpoint provenance withholds account values and flags them', () => {
+    const text = invalidDom.window.document.body.textContent;
+    assert.match(text, /unverified/i);
+    assert.doesNotMatch(text, /SYNTHETIC-POSITION|0\.0000/);
+  });
+  invalidDom.window.close();
+}
+for (const badPayload of [
+  { ...fixture, balance: {} },
+  { ...fixture, captured_at: null },
+  { ...fixture, positions: { market_positions: [], event_positions: null } },
+]) {
+  const invalidDom = await renderAccount(badPayload);
+  check('old connected snapshots with invalid envelopes or timestamps are withheld', () => {
+    assert.match(invalidDom.window.document.body.textContent, /unverified/i);
+    assert.doesNotMatch(invalidDom.window.document.body.textContent, /SYNTHETIC-POSITION|0\.0000/);
+  });
+  invalidDom.window.close();
+}
 check('offline test never writes account fixtures to the published data', () => assert.equal(readFileSync('data/account.json', 'utf8'), before));
 console.log(`\ndemo-only safety: ${checks} offline checks passed. No authenticated exchange call or order was made.`);
