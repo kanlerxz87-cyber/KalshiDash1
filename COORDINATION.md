@@ -2991,24 +2991,24 @@ session's branch and did not recreate its content.
 | K1 | Read board/repo/open PRs; claim scope, commit and push immediately | **done** — claim pushed as `47cf3da` | session-736be760 | this section of `COORDINATION.md` |
 | K2 | Independent health audit of `main`: full `npm test`, `build-site.mjs --check`, both link checkers, Pages deploy + latest CI runs | **done** — all green; Pages `built` for the `main` tip, no defect | session-736be760 | `verification/2026-11-22-736be760.md` §1 |
 | K3 | Re-verify the published API/platform claims the brief names (REST + WS demo roots, order-book/liquidity semantics, settlement/`result`, candlestick periods, Culture coverage) against official Kalshi docs and live demo reads | **done** — endpoints match character-for-character; book/candles/settlement semantics confirmed; one published settlement over-claim found (§4 below) | session-736be760 | same record §2–§3 |
-| K4 | Take over stale PR #86: verify its ledger claims against official records, then merge or flag | **done** — PR #77 merge SHA/time, its check roll-up, and the Pages retry all confirmed; one wording inference flagged (§7.6) and merged as-is | session-736be760 | PR #86 files via merge only |
-| K5 | Fix only defects reproduced in K2–K3 (smallest change), re-run all gates | **done** — two fixes, F-82 + cadence prose | session-736be760 | `templates/executive-summary.tpl`, `templates/flagged.tpl` + generated `executive-summary.html`, `flagged.html`; `README.md`, `EXECUTIVE_SUMMARY.md` |
+| K4 | Take over stale PR #86: verify its ledger claims against official records, then merge or flag | **done** — PR #77 merge SHA/time, its check roll-up and the Pages retry all confirmed; its branch has an unrelated history, so its two-file diff was applied **verbatim** on this integration branch and the PR is closed as superseded (one wording inference flagged in §7.6) | session-736be760 | PR #86 files via replay only |
+| K5 | Fix only defects reproduced in K2–K3 (smallest change), re-run all gates | **done** — one unique fix published as **F-84**; the cadence prose fix was reverted because session-`b8913775` (PR #96) owns it as F-83 | session-736be760 | `templates/executive-summary.tpl`, `templates/flagged.tpl` + generated `executive-summary.html`, `flagged.html` (the `README.md`/`EXECUTIVE_SUMMARY.md` edits were reverted — see overlap note) |
 | K6 | Final integration: PR to `main`, merge, confirm GitHub Pages deploy of the new build, record PR link + merge SHA + deploy evidence | **done** — see the PR record below | session-736be760 | generated root pages via `scripts/build-site.mjs` only; this board |
 
 ### Findings from K3/K5 (published, not invented)
 
-- **F-82 — published settlement over-claim, fixed.** The Executive summary said a market resolving `scalar` pays
+- **F-84 — published settlement over-claim, fixed.** The Executive summary said a market resolving `scalar` pays
   "$1.00 per contract". Official [Market Settlement](https://docs.kalshi.com/getting_started/market_settlement) gives the
   $1 rule only for yes/no outcomes (and notes "sub-cent scalar settlement" fees), and
   [Settlement Bounds](https://docs.kalshi.com/getting_started/settlement_bounds) shows a scalar market settling at a value
   ($0.50 in its worked example) with a floor. The sentence now restricts $1.00 to a simple binary contract and states that
   scalar pays its settled value minus any floor. The other five pages that mention $1.00 were re-read and already
   conditional; untouched. Row published on `flagged.html` with both sources.
-- **Declared cron vs observed cadence.** `README.md` and `EXECUTIVE_SUMMARY.md` said the sampler "runs every 10 minutes".
+- **Declared cron vs observed cadence (corroboration only — published as F-83 by PR #96).** `README.md` and `EXECUTIVE_SUMMARY.md` said the sampler "runs every 10 minutes".
   GitHub's own run API shows **20 `schedule` runs in the repository's entire history**, `live-alerts` gaps of 7 h 15 m /
-  4 h 44 m / 4 h 02 m, and the newest engine sample ~6 h old at 08:30Z. Both docs now separate the declared `*/10` cron
-  from the measured runs and name the sample age (badge + `#asof`) as the truth. No template claimed a cadence, so no page
-  was regenerated for this.
+  4 h 44 m / 4 h 02 m, and the newest engine sample ~6 h old at 08:30Z. This session's doc edits were reverted when
+  session-`b8913775` opened PR #96 with the same finding as **F-83**; that PR carries the published correction. The
+  measurements above are independent corroboration, and no template claimed a cadence, so no page changed here.
 - Verified live, not from memory: the four demo endpoints in the brief (REST recommended/alternate, WS recommended/
   alternate) match the official docs table exactly; `KXPRESNOMD-28-MSHE`'s published last/bid/ask match the live demo
   market to the cent; Culture's "2 series / 0 open markets" is accurate (both series return empty `status=open` lists).

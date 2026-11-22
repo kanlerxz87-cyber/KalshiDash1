@@ -83,7 +83,7 @@
       <strong>yes</strong> outcome pays YES holders $1 per contract and a <strong>no</strong> outcome pays NO holders $1 per
       contract. A <code>scalar</code> market pays the value it settles at (minus any settlement floor for YES), not a flat
       $1.00, so this site never prices a scalar contract as a binary win/loss — see
-      <a href="flagged.html#F-82">F-82</a>.
+      <a href="flagged.html#F-84">F-84</a>.
       <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Settlement</a> ·
       <a href="https://docs.kalshi.com/getting_started/settlement_bounds" target="_blank" rel="noopener">Settlement Bounds</a> ·
       <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Lifecycle</a></li>

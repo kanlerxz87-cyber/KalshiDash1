@@ -98,7 +98,7 @@ demo API.
 |---|---|---|
 | Alert engine | `tools/live_engine.mjs` | Discovers the five focus topics, samples prices, detects ≥ $0.10 moves (sample-to-sample **and** from 1-minute candles), tracks resolutions, scores alerts |
 | Live console | `alerts/index.html` | Two scrolling feeds: **All events** and **High ROI**; price chart (5 min → 7 days); per-topic highest-dollar boards; resolution log; liquidity ladders |
-| Scheduled sampler | `.github/workflows/live-alerts.yml` | Declares a 10-minute cron so the record continues with no browser open. The declaration is not a guarantee: GitHub may delay or drop scheduled runs, and the repository's history shows 20 `schedule` runs in total with the newest engine sample 5.9 h old at 2026-11-22T08:20Z. The published sample age is the truth (F-45/F-58) |
+| Scheduled sampler | `.github/workflows/live-alerts.yml` | Runs every 10 minutes so the record continues with no browser open |
 | Feed validator | `scripts/check_alerts.mjs` | Blocks any published row that is below threshold, has an invented price, or cites a non-official source |
 | Page test | `scripts/check_alerts_page.mjs` | jsdom render test of both feeds, the filter and the no-invented-price rule |
 
