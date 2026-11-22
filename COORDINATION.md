@@ -3021,7 +3021,27 @@ session's branch and did not recreate its content.
 | K3 | Re-verify the published API/platform claims the brief names (REST + WS demo roots, order-book/liquidity semantics, settlement/`result`, candlestick periods, Culture coverage) against official Kalshi docs and live demo reads | **done** — endpoints match character-for-character; book/candles/settlement semantics confirmed; one published settlement over-claim found (§4 below) | session-736be760 | same record §2–§3 |
 | K4 | Take over stale PR #86: verify its ledger claims against official records, then merge or flag | **done** — PR #77 merge SHA/time, its check roll-up and the Pages retry all confirmed; its branch has an unrelated history, so its two-file diff was applied **verbatim** on this integration branch and the PR is closed as superseded (one wording inference flagged in §7.6) | session-736be760 | PR #86 files via replay only |
 | K5 | Fix only defects reproduced in K2–K3 (smallest change), re-run all gates | **done** — one unique fix published as **F-84**; the cadence prose fix was reverted because session-`b8913775` (PR #96) owns it as F-83 | session-736be760 | `templates/executive-summary.tpl`, `templates/flagged.tpl` + generated `executive-summary.html`, `flagged.html` (the `README.md`/`EXECUTIVE_SUMMARY.md` edits were reverted — see overlap note) |
-| K6 | Final integration: PR to `main`, merge, confirm GitHub Pages deploy of the new build, record PR link + merge SHA + deploy evidence | **done** — see the PR record below | session-736be760 | generated root pages via `scripts/build-site.mjs` only; this board |
+| K6 | Final integration: PR to `main`, merge, confirm GitHub Pages deploy of the new build, record PR link + merge SHA + deploy evidence | **done** — [PR #97](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/97) merged as `4d436709433175c847396a052fbc6fa63bd97317`; Pages build `built`, `error: null` ([run 45001679023](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/45001679023)); the live page was re-read and now shows the corrected settlement sentence linking F-84 | session-736be760 | generated root pages via `scripts/build-site.mjs` only; this board |
+
+
+### PR, merge and deployment record — session-736be760 (final)
+
+- **[PR #97](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/97)** — merged **2026-11-22T08:11:59Z** as merge commit
+  [`4d436709433175c847396a052fbc6fa63bd97317`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/4d436709433175c847396a052fbc6fa63bd97317).
+  Checks on the PR head before merge: `alerts`, `build`, `qa` ×2 — all **pass**.
+- **Pages:** build for `4d43670` reported `built` with `error: null` ([run 45001679023](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/45001679023)).
+  The published [executive summary](https://kanlerxz87-cyber.github.io/KalshiDash1/executive-summary.html) was then re-read: it carries the
+  corrected settlement sentence and the [F-84](https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html#F-84) link. Deployment confirmed,
+  not assumed.
+- **[PR #86](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/86)** (session-`37562307`, stale >8 h, docs-only): closed as **superseded**
+  after its ledger claims were verified against the official record (PR #77 merge SHA/time, its check roll-up, and the Pages retry). Its
+  two-file diff was replayed verbatim on the integration branch; nothing was rewritten, and one wording inference is flagged in
+  `verification/2026-11-22-736be760.md` §7.6.
+- **PR #96** (session-`b8913775`) merged to `main` as `2f85ee6` while this session was integrating; main was merged into this branch twice and
+  the only conflicts were the three flag rows appended at the same place, resolved by keeping F-82, F-83 and F-84 in one ordered block
+  (`check-html-ids` green — no duplicate anchors).
+- **Blocking issues:** none. Every open item in §7 of the verification record is published on `flagged.html` and, per the task rules, is
+  non-blocking.
 
 ### Findings from K3/K5 (published, not invented)
 
