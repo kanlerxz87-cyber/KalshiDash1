@@ -3277,3 +3277,8 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
 - **K4 done.** `npm test` exit 0 on the merged tree; `build-site --check` clean; 90 pages / 2,209 internal links / 0
   broken; 1,022 canonical rows / 0 problems; 611 ids / no duplicates; account-privacy guard 11/11; demo safety 57;
   paper 53; chart+paper DOM 38. Unverified values remain blank (account disconnected; live authentication unexercised).
+- **PR [#107](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/107)** (this record) merged 2026-11-22T08:22:24Z as
+  `ff9f7a2a579166ea3600c4ef53f4b33b68710f37`; checks `alerts`/`build`/`qa`×2 pass; Pages `built`, `error: null`.
+  This is the closing entry for session-8dcab433; the merge of this entry's own PR is the one event it cannot
+  contain. Final live state: <https://kanlerxz87-cyber.github.io/KalshiDash1/> ·
+  <https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html#F-85>.
