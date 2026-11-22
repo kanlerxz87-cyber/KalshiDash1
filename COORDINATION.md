@@ -1,5 +1,15 @@
 # COORDINATION.md — shared task board
 
+## Session session-b8913775 — independent current-state audit (2026-11-22)
+
+Arena-pinned branch `arena/b8913775-kalshidash1`; no branch changes. The only open PR at claim time is #86, a historical deployment ledger. This session does not take over any active file scope.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| B1 | Claim, verify current site/build/deployment and independently audit official-source and demo trading limitations; document evidence and handoffs. | in progress | session-b8913775 | this section of `COORDINATION.md`, new `verification/2026-11-22-b8913775.md` |
+| B2 | If a concrete unclaimed defect is found, separately claim its specific files before changing them; integration/PR only after tests. | unclaimed | session-b8913775 | to be specified |
+
+
 ## Session session-135bb43a — final integration and executable paper-trading verification (2026-11-21)
 
 - Arena-pinned branch: `arena/135bb43a-kalshidash1`, base `b81f9f2731a12fd90e0287cd1d77ded58c35d79e`.
