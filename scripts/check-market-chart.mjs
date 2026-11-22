@@ -39,6 +39,11 @@ async function boot(page, live, fixture = {}) {
     url = String(url); requests.push(url);
     let data;
     if (url.includes('data/snapshot.json')) data = structuredClone(fixture.snapshot || snapshot);
+    /* The engine feed is same-origin committed data, so it is readable with no exchange access. */
+    else if (url.includes('data/live/feed.json')) {
+      if (!fixture.feed) throw new Error('NO FEED FIXTURE');
+      data = structuredClone(fixture.feed);
+    }
     else if (!live) throw new Error('TEST OFFLINE');
     else if (url.includes('/exchange/status')) data = { exchange_active: true, trading_active: true };
     else if (url.includes('/candlesticks?')) data = { candlesticks: [
@@ -206,6 +211,83 @@ try {
   });
   check('canonical dashboard has no unexpected script errors', () => assert.deepEqual(replay.errors, []));
 } finally { replay.dom.window.close(); }
+
+/* ---------------------------------------------- dashboard + engine feed (offline)
+ * The dashboard chats must be able to show the engine's committed alerts, because the visitor's
+ * browser is not always allowed to reach the demo API. Every value below is a SYNTHETIC fixture. */
+const engineFeed = {
+  meta: { generated_at: new Date(NOW - 3 * 3600000).toISOString(), engine: 'tools/live_engine.mjs',
+    model_version: 'heuristic-v2', threshold: 0.1, high_roi_threshold: 0.62 },
+  alerts: [
+    { id: 'trade:FIXTURE@' + (NOW / 1000 - 10800), ts: new Date(NOW - 3 * 3600000).toISOString(),
+      ticker: 'FIXTURE', event_ticker: 'FIXTURE-EVENT', topic: 'crypto', title: 'SYNTHETIC ENGINE ALERT',
+      direction: 'up', from: 0.40, to: 0.55, delta: 0.15, threshold: 0.1,
+      model: { score: 0.78, highROI: true, tradeable: true },
+      source_url: BASE + '/markets?series_ticker=TESTSERIES&status=open&limit=200',
+      settlement_sources: [{ name: 'SYNTHETIC PUBLISHER', url: 'https://www.eia.gov/' }] },
+    { id: 'trade:FIXTURE@' + (NOW / 1000 - 7200), ts: new Date(NOW - 2 * 3600000).toISOString(),
+      ticker: 'FIXTURE', event_ticker: 'FIXTURE-EVENT', topic: 'crypto', title: 'SYNTHETIC ENGINE ALERT',
+      direction: 'down', from: 0.62, to: 0.48, delta: -0.14, threshold: 0.1,
+      model: { score: 0.31, highROI: false, tradeable: true },
+      source_url: BASE + '/markets?series_ticker=TESTSERIES&status=open&limit=200' },
+    /* the three rows below must be dropped, never repaired */
+    { id: 'below-threshold', ts: new Date(NOW - 1800000).toISOString(), ticker: 'FIXTURE', topic: 'crypto',
+      from: 0.50, to: 0.54, delta: 0.04, threshold: 0.1, model: { score: 0.9, highROI: true, tradeable: true } },
+    { id: 'bad-time', ts: 'not-a-time', ticker: 'FIXTURE', topic: 'crypto',
+      from: 0.40, to: 0.60, delta: 0.20, threshold: 0.1, model: { score: 0.9, highROI: true, tradeable: true } },
+    { id: 'no-price', ts: new Date(NOW - 900000).toISOString(), ticker: 'FIXTURE', topic: 'crypto',
+      from: 0.40, to: null, delta: 0.20, threshold: 0.1, model: { score: 0.9, highROI: true, tradeable: true } },
+  ],
+};
+const fed = await boot('dashboard', false, {
+  feed: engineFeed,
+  snapshot: { ...snapshot, candlesticks: { FIXTURE: { m1: {
+    source_url: BASE + '/series/TESTSERIES/markets/FIXTURE/candlesticks?period_interval=1',
+    candles: [[NOW / 1000 - 3600, 0.2], [NOW / 1000 - 3540, 0.35]],
+  } } } },
+});
+try {
+  const doc = fed.w.document;
+  check('engine feed alerts reach both chats with no browser access to the demo API', () => {
+    assert.equal(fed.w.KD.state.mode, 'snapshot');
+    assert.equal(fed.w.KD.state.engineAlerts.length, 2);
+    assert.match(doc.querySelector('#chat-all .log').textContent, /SYNTHETIC ENGINE ALERT/);
+    assert.match(doc.querySelector('#chat-all .log').textContent, /engine feed/);
+    assert.match(doc.querySelector('#mode-notice').textContent, /committed alerts/);
+  });
+  check('engine rows are copied verbatim and keep the exact API URL they were read from', () => {
+    const rows = fed.w.KD.state.engineAlerts;
+    const first = rows.find((r) => r.delta > 0);
+    assert.equal(first.from, 0.4);
+    assert.equal(first.to, 0.55);
+    assert.equal(first.source_url, BASE + '/markets?series_ticker=TESTSERIES&status=open&limit=200');
+    const links = [...doc.querySelectorAll('#chat-all .log .msg a')].map((a) => a.getAttribute('href'));
+    assert.ok(links.includes(BASE + '/markets?series_ticker=TESTSERIES&status=open&limit=200'));
+  });
+  check('sub-threshold, unparsable-time and price-less engine rows are dropped, not repaired', () => {
+    const ids = fed.w.KD.state.engineAlerts.map((r) => r.id);
+    assert.ok(!ids.some((id) => /below-threshold|bad-time|no-price/.test(id)));
+    assert.equal(fed.w.KD.state.engineAlerts.length, 2);
+  });
+  check('the high-ROI pane uses the engine verdict, not the browser cut', () => {
+    const roiMsgs = [...doc.querySelectorAll('#chat-roi .log .msg')];
+    assert.equal(roiMsgs.length, 1);
+    assert.match(roiMsgs[0].textContent, /\+0\.15/);
+    assert.match(roiMsgs[0].textContent, /0\.78 \/ 1/);
+    assert.doesNotMatch(roiMsgs[0].textContent, /research score 78/);
+  });
+  check('an engine sample hours old is dated on the row and never timestamped as now', () => {
+    const time = doc.querySelector('#chat-all .log .m-time').textContent;
+    assert.equal(time, '11-21 19:00:00 UTC');   /* the fixture sample, never the test's "now" */
+    const titles = [...doc.querySelectorAll('#chat-all .log .msg .badge')].map((b) => b.getAttribute('title') || '');
+    assert.ok(titles.some((t) => t.includes('sample of ' + engineFeed.meta.generated_at)));
+  });
+  check('a synthetic snapshot replay never displaces real engine alerts', () => {
+    assert.ok(!fed.w.KD.state.alerts.some((a) => a.replay));
+    assert.doesNotMatch(doc.querySelector('#chat-all .log').textContent, /snapshot replay/);
+  });
+  check('engine-fed dashboard has no unexpected script errors', () => assert.deepEqual(fed.errors, []));
+} finally { fed.dom.window.close(); }
 
 for (const page of ['portfolio', 'analysis']) {
   const view = await boot(page, false);
