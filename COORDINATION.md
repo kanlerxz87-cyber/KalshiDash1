@@ -3104,6 +3104,21 @@ session claimed the files below, and no other session's file, data or row was re
 
 **Overlap note — three sessions, one privacy finding (2026-11-22).** session-272b326f documented the public-snapshot risk in `docs/DEMO_ACCOUNT.md` (PR #94) and handed the page half to the integrator; session-736be760 published the page warning and its **F-85** row; this session measured the same risk independently, prepared a warning plus an `F-84` row, and then **did not publish either** because `main` already carried them. The row was renumbered twice during rebases (F-84 → F-85 → withdrawn) and the duplicate UI was dropped rather than merged; only the additive work was kept: the offline guard and the `F-82` → `F-85` cross-reference label fix on the demo-account page. Nothing of the other sessions' pages, rows or docs was reverted or rewritten.
 
+- **PR [#98](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/98)** — "feat(demo-account): guard the public-snapshot warning and fix its F-85 cross-reference; record the #96 merge and deploy" — **merged** 2026-11-22T08:16:46Z as merge commit [`5ef623ab3b2930ee424a4196a65bb4a74d91c3e2`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/5ef623ab3b2930ee424a4196a65bb4a74d91c3e2).
+  - Checks on the PR head `da25fa7`: `alerts`, `build`, `site-qa`, `suite-qa` — **4/4 pass**.
+  - Pages: `pages/builds/latest` for `5ef623a` → **`built`**, `error.message` **`null`**; post-merge `pages build and deployment`, `Site build check`, `site-qa`, `suite-qa`, `alerts-qa` all **success** on the merge SHA.
+  - **Live verification (cache-busted):** `demo-account.html?v=0817` shows the public-snapshot warning above the account data and its cross-reference now reads **"Tracked as F-85 on Flagged for review"** (it read "F-82" before this PR). `dashboard.html?v=0810` and `flagged.html?v=0810` (F-82/F-83) were verified after #96.
+  - **Rebases:** `main` advanced twice while this PR was open (#97, then #101/#102 — including the very privacy warning this PR prepared). Duplicate warning and duplicate flagged row were **dropped rather than merged**; only the guard, the label fix and the note were kept. Conflicts (`COORDINATION.md`, `templates/{flagged,demo-account}.tpl`, generated HTML) were resolved by keeping both sessions' rows and **regenerating** the HTML, never by hand-editing published output.
+
+### Status of this session's tasks
+
+| ID | Result |
+|---|---|
+| B1 | done — dated report `verification/2026-11-22-b8913775.md`; official sources re-fetched and quoted; 17-suite offline run, `build-site --check` and Pages API checked |
+| B2 | done — **F-82** fixed in `assets/app.js`; `scripts/check-market-chart.mjs` 31 → **38** cases, negative-checked against the pre-fix code |
+| B3 | done — **F-83** measured (6 schedule runs in 34.6 h vs a declared `*/10`) and the claim corrected in `README.md`, `docs/ALERTS.md`, `EXECUTIVE_SUMMARY.md`; cadence itself remains undelivered and flagged |
+| B4 | done — `scripts/check-account-privacy.mjs` (11 checks) protects the F-85 warning that concurrent sessions published; its mislabelled cross-reference was corrected. Owner decision on publishing account data remains open |
+
 ### Sources re-verified this session (official)
 
 [demo environment](https://docs.kalshi.com/getting_started/demo_env) · [orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses) ·
@@ -3201,7 +3216,7 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
 | D1 | Verify demo-only signed CLI transport, order payload and account snapshot semantics against current official Kalshi API documentation; reproduce and repair only documented defects with offline tests. | done — offline regressions pass; live authentication and execution unverified | session-f134d89d | `tools/demo_trader.mjs`, `scripts/check-demo-safety.mjs`, `assets/demo-account.js`, `docs/DEMO_ACCOUNT.md`, new `verification/2026-11-22-f134d89d.md` |
-| D2 | Run QA, record sources and unresolved limitations; PR/merge and deployment confirmation if permitted and checks pass. | in progress | session-f134d89d | this section of `COORDINATION.md`, PR on the assigned branch |
+| D2 | Run QA, record sources and unresolved limitations; PR/merge and deployment confirmation if permitted and checks pass. | done — PR #99 merged; successor Pages deployment and live asset verified | session-f134d89d | this section of `COORDINATION.md`, PR on the assigned branch |
 
 - Claim rebase conflict: PR #93 merged an independent release section at the same end-of-file location while this claim was being committed. Stopped, preserved both complete sections, and continued the rebase; no other session content was discarded.
 
@@ -3220,6 +3235,13 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
 - PR [#97](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/97) was given the privacy/Flagged-page handoff while its owner holds the shared templates. The account CLI findings remain pending publication, not claimed deployed.
 - After rebasing through merged PR #96, all 17 `npm test` suites passed again (1,020 canonical static rows source-linked; 38 chart cases; 56 account-safety cases). The documentation now matches the required ticker and preserves PR #94's privacy warning. GitHub still reports the actual account capture disconnected; secret configuration is unverified.
 - Rebase after PR #102 merged conflicted where both sessions appended their board entries. Stopped, retained both complete entries and continued; the F-85 privacy row and published page warning are preserved. The shared-page owners were notified of the link-label/staleness handoff and concurrent privacy-claim overlap. Latest account test now has 57 offline checks, including the disconnected display.
+
+### PR, merge and deployment — session-f134d89d
+
+- **PR [#99](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/99)** merged at `2026-11-22T08:15:50Z` as [`90c4e620968c816c0b78ac524f0c6ff6f4804e0f`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/90c4e620968c816c0b78ac524f0c6ff6f4804e0f). Its four PR checks passed. Account validation, source-per-runtime-row display and shard-routed cancellation are now merged; only synthetic/offline behavior has been verified.
+- The first Pages run [45001985592](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/45001985592) for that merge was **cancelled**: its deployment log says a higher-priority request was waiting. The subsequent Pages run [45002061011](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/45002061011) for commit [`5ef623ab3b2930ee424a4196a65bb4a74d91c3e2`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/5ef623ab3b2930ee424a4196a65bb4a74d91c3e2), which includes PR #99, **succeeded** (build, report and deploy). Pages build API reported `built`, error `null`. A cache-busted live fetch of `assets/demo-account.js` returned this session's new renderer, and the live account page showed the privacy warning and disconnected status. GitHub emitted a Node 20 action-deprecation warning; it did not fail the deployment.
+- The combined tree after PR #98 passed all **18** `npm test` groups: 57 demo-account/safety checks, 11 privacy checks, 38 chart/paper UI cases, 1,022 static source-linked rows and no broken internal links. `build-site --check` and duplicate-ID check also passed. External links were not exhaustively fetched, and these gates do not prove semantic verification of the whole repo.
+- **Remaining handoff:** F-85 now publishes the privacy risk. PR [#103](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/103)'s template owner has been asked to time-bound the static account-status sentence and to add the specific source-linked account-envelope/cancellation findings to the Flagged page. These two details have not yet been confirmed individually on that page. The [dated verification report](verification/2026-11-22-f134d89d.md) already records them. The committed account is disconnected; actual credentials, account values, execution and returns remain unverified.
 
 ### K4 record — PRs, merges, defect and Pages (session-8dcab433)
 
