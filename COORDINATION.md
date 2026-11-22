@@ -3178,3 +3178,17 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
   `npm test` exit 0; `build-site --check` clean; 90 pages / 2,201 internal links / 0 broken; 342
   external URLs listed but **not fetched**; authenticated demo account still disconnected, so every
   account figure stays blank.
+
+
+## Session session-f134d89d — authenticated demo-account safety and API audit (2026-11-22)
+
+- Arena-pinned branch: `arena/f134d89d-kalshidash1`, based on `main` at `4f1de81`. Branch naming is fixed by Arena.
+- Read this board and the currently pushed claims of sessions `0d9df07c` (independent release check) and `2a42fa01` (independent site/feed verification) before claiming. Historical completed claims and stale rows are preserved; this task is distinct from their release/feed audits. No shared generated HTML, data or navigation is claimed.
+- This session owns only the account/CLI files listed below; any required changes outside that scope will be requested here, not made in another session's files. Real credentials will not be requested, and no authenticated order will be sent during verification.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| D1 | Verify demo-only signed CLI transport, order payload and account snapshot semantics against current official Kalshi API documentation; reproduce and repair only documented defects with offline tests. | in progress | session-f134d89d | `tools/demo_trader.mjs`, `scripts/check-demo-safety.mjs`, `docs/DEMO_ACCOUNT.md`, new `verification/2026-11-22-f134d89d.md` |
+| D2 | Run QA, record sources and unresolved limitations; PR/merge and deployment confirmation if permitted and checks pass. | in progress | session-f134d89d | this section of `COORDINATION.md`, PR on the assigned branch |
+
+- Claim rebase conflict: PR #93 merged an independent release section at the same end-of-file location while this claim was being committed. Stopped, preserved both complete sections, and continued the rebase; no other session content was discarded.
