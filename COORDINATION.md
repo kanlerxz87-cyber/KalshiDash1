@@ -2993,3 +2993,42 @@ is stale for this environment (docs and demo API are readable via the page fetch
 The pinned branch is fixed by the environment. Historical task rows are retained; the previous integration records PR #91 as completed. No source or generated pages are claimed by this session.
 
 - Independent check complete: `npm ci`, `npm test`, and generator `--check` pass; 90 pages / 2,198 internal links checked, external links not fetched. Kalshi's [demo documentation](https://docs.kalshi.com/getting_started/demo_env) was checked for the endpoints and mock-fund caveat. [Pages deployment](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44976170235) succeeded for `4f1de81`; current actual demo-account state remains disconnected and unverified. Full limits and evidence: `verification/2026-11-22-0d9df07c.md`. This is not a new line-by-line verification of the entire repo. Status: done.
+
+---
+
+## Session session-b8913775 — independent current-state audit + dashboard feed fix (2026-11-22 08:02 UTC)
+
+Branch `arena/b8913775-kalshidash1`, branched from `main` @ `4f1de81`. Claim written and pushed before any edit.
+Full evidence: [`verification/2026-11-22-b8913775.md`](verification/2026-11-22-b8913775.md).
+At claim time the only open PR was #86 (a board-only deployment ledger owned by session-37562307); no active
+session claimed the files below, and no other session's file, data or row was reverted or rewritten.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| B1 | Independently verify the published site, committed data, CI and Pages build against official sources; measure what the platform actually delivers. | done (this section + dated report) | session-b8913775 | this section of `COORDINATION.md`, `verification/2026-11-22-b8913775.md` |
+| B2 | **F-82**: the dashboard's two chats never read the committed engine feed, so a reader without demo-API access saw only a synthetic candle replay and an empty high-ROI pane while 40 sampled alerts sat unread. Fix + offline regression test. | done — 7 new DOM assertions (suite 31 → 38), negative-checked | session-b8913775 | `assets/app.js`, `scripts/check-market-chart.mjs` |
+| B3 | **F-83**: the published "runs every 10 minutes" cadence is not what the platform delivers (6 schedule runs in 34.6 h). Correct the claim with the measured interval; do not promise a cadence the repository cannot control. | done (copy corrected; cadence flagged, not fixable in-repo) | session-b8913775 | `templates/flagged.tpl` → `flagged.html` (regenerated), `README.md`, `docs/ALERTS.md`, `EXECUTIVE_SUMMARY.md` |
+
+### Sources re-verified this session (official)
+
+[demo environment](https://docs.kalshi.com/getting_started/demo_env) · [orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses) ·
+[market settlement](https://docs.kalshi.com/getting_started/market_settlement) · [WebSocket connection](https://docs.kalshi.com/websockets/websocket-connection) ·
+[GitHub schedule delays/drops](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+Live demo reads: `/series?category=Culture` (2 series, both `volume_fp 0.00`) and
+`/markets?series_ticker=KXXBANNEDGROK&status=open` (empty) — Culture still has no open market.
+
+### Measured current state (2026-11-22 08:0x UTC)
+
+- Feed `data/live/feed.json`: `generated_at 2026-11-22T02:27:14Z`, 40 alerts (3 high-ROI), 0 resolutions, 4 awaiting, 60 market rows, 8 orderbooks — **≈5.7 h old, past the 45-minute STALE limit**, so every page shows a stale age rather than LIVE for the engine layer.
+- `live-alerts` schedule runs: **6 in 34.6 h** (2026-11-20T21:52Z → 2026-11-22T02:27Z) against a declared `*/10` cron → **F-83**.
+- `data/account.json`: `connected: false`, `captured_at: null`; no demo-credential secrets, so no account figure is verified. No key was requested and no authenticated request or order was made.
+- Pages: `builds/latest` → `built`, `error.message null`, commit `4f1de81`.
+- `npm test`: all 17 suites pass; `build-site --check` clean; source gate 1,020 rows / 100 % publisher links.
+
+### Overlap note (concurrent session-272b326f)
+
+That session's #93–#95 landed `docs/DEMO_ACCOUNT.md` privacy documentation and asked the *final integrator* to add a
+privacy warning to `templates/demo-account.tpl` plus a `flagged.tpl` row. This session did **not** take that over: the
+template/row handoff is still open for whoever performs the next integration, and the conflicting rebase kept both board
+sections in full (nothing of theirs was dropped). Its O3 scope, `docs/DEMO_ACCOUNT.md`, was not edited here.
+
