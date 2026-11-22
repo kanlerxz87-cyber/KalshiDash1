@@ -14,7 +14,7 @@ simulated auto-trade engine and from the portfolio *pages* owned by the final in
 | `node tools/demo_trader.mjs status` | Prints API root + credential state + `GET /exchange/status` | none | [Get Exchange Status](https://docs.kalshi.com/api-reference/exchange/get-exchange-status.md) |
 | `node tools/demo_trader.mjs account` | Signed `GET /portfolio/balance`, `/portfolio/positions`, `/portfolio/fills?limit=200`, `/portfolio/settlements?limit=200` → writes `data/account.json` (verbatim responses + source URLs) | key pair | [API Keys](https://docs.kalshi.com/getting_started/api_keys.md), [Quick Start: Authenticated Requests](https://docs.kalshi.com/getting_started/quick_start_authenticated_requests.md) |
 | `node tools/demo_trader.mjs buy --ticker T --side bid --count N --price P` | Posts `POST /portfolio/events/orders` with the exact quick-start body (`side`, `count`, `price`, `time_in_force: good_till_canceled`, `self_trade_prevention_type: taker_at_cross`, `client_order_id`) — **dry-run unless `--confirm-live`** | key pair | [Quick Start: Create your first order](https://docs.kalshi.com/getting_started/quick_start_create_order.md) |
-| `node tools/demo_trader.mjs cancel --order-id O` | `DELETE /portfolio/events/orders/{order_id}` — **dry-run unless `--confirm-live`** | key pair | same ("Next Steps") |
+| `node tools/demo_trader.mjs cancel --order-id O --ticker T` | `DELETE /portfolio/events/orders/{order_id}?market_ticker=T`; ticker enables shard auto-routing — **dry-run unless `--confirm-live`** | key pair | [Cancel Order V2](https://docs.kalshi.com/api-reference/orders/cancel-order-v2) |
 
 Signing (verified C-3): `KALSHI-ACCESS-KEY`, `KALSHI-ACCESS-SIGNATURE`, `KALSHI-ACCESS-TIMESTAMP`
 headers; signature = base64(RSA-PSS SHA-256 or Ed25519) over `timestamp + METHOD + path` where the
@@ -44,9 +44,9 @@ would be needed for a private dashboard; this static public site is not one.
 2. Add two GitHub repository secrets (Settings → Secrets → Actions):
    - `KALSHI_KEY_ID` — the key id
    - `KALSHI_PRIVATE_KEY` — the full PEM private key
-3. The scheduled workflow `.github/workflows/demo-account.yml` (every 6 h, or run manually via
-   *Actions → demo-account → Run workflow*) then refreshes `data/account.json`, which the
-   `demo-account.html` page renders. Nothing else is required.
+3. `.github/workflows/demo-account.yml` declares a six-hour schedule (or can run via
+   *Actions → demo-account → Run workflow*) to refresh `data/account.json`, which the page reads.
+   [GitHub notes scheduled runs can be delayed or dropped](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule); a successful historical capture does not prove a current connection.
 
 Local use: export `KALSHI_KEY_ID` and `KALSHI_PRIVATE_KEY` (or `KALSHI_PRIVATE_KEY_PATH`) and run
 any command. `--print` shows the raw JSON responses on stdout.
@@ -72,15 +72,11 @@ any command. `--print` shows the raw JSON responses on stdout.
   *id* is logged). The browser never sees keys; a static page cannot and must not sign requests
   (measured browser-signing limitation [F-66](../flagged.html#F-66)).
 - Mutating commands require an explicit `--confirm-live` (the retained flag name means **demo only**, never production). Everything else is dry-run; combining it with `--dry-run` is rejected.
-- Without secrets the tool is a no-op (`account --ci` exits 0) and the site shows
-  "not connected" with this setup page.
+- Without secrets `account --ci` is a no-op. It does not replace any previously published capture, so always use its timestamp; the current committed placeholder is disconnected. If a capture fails, the workflow exits before its normal commit step, so an older published file may remain. See the [verification record](../verification/2026-11-22-f134d89d.md).
 
 ## Data produced (`data/account.json`)
 
-`captured_at` (only after all four reads succeed), `attempted_at`, `connected`, `environment: "demo"`, `api_root`, `key_fingerprint`, `source_urls[]`, and the four
-verbatim API responses (`balance`, `positions`, `fills`, `settlements`). Every field is exactly what
-the API returned; nothing is inferred. If a call fails, the failure body is stored under that key
-with `error: true` — never fabricated. Any failed or empty read keeps `connected: false` and `captured_at: null`; the CLI exits nonzero. The lists are first-page samples (fills/settlements limit 200), not a complete account-history return calculation.
+`captured_at` (after all four sequential reads pass the documented minimum envelope checks), `attempted_at`, `connected`, `environment: "demo"`, `api_root`, `key_fingerprint`, `source_urls[]`, and the four verbatim successful API responses (`balance`, `positions`, `fills`, `settlements`). Values are not inferred. Failed or malformed reads are marked `error: true`; a transport exception is recorded without its potentially sensitive details. Any such failure keeps `connected: false` and `captured_at: null`; the CLI exits nonzero. Zero balances and correctly shaped empty lists are valid, not failures. The lists are first-page samples (fills/settlements limit 200), not a complete or atomic account-history return calculation. [Official balance](https://docs.kalshi.com/api-reference/portfolio/get-balance), [positions](https://docs.kalshi.com/api-reference/portfolio/get-positions), [fills](https://docs.kalshi.com/api-reference/portfolio/get-fills) and [settlements](https://docs.kalshi.com/api-reference/portfolio/get-settlements) document the required envelopes.
 
 ## Caveats (flagged, not blocking)
 
