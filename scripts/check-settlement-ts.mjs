@@ -77,8 +77,13 @@ try {
     ev.markets[0].settlement_ts = SETTLED;
   });
   negativeHtml = generateWith((snap) => {
+    /* The negative control must remove the value from EVERY market in the event. Measured
+     * 2026-11-22: all 12 nested markets of KXAAAGASW-26NOV16 legitimately share this settlement
+     * timestamp (they settle together), so nulling only markets[0] left 11 rows still rendering the
+     * string and the control failed on a refreshed capture even though the generator was correct. */
     const ev = snap.topics.gas.settled_events[0];
-    ev.markets[0].settlement_ts = null;
+    ev.settlement_ts = null;
+    ev.markets.forEach((m) => { m.settlement_ts = null; });
   });
 } catch (e) {
   threw = e;

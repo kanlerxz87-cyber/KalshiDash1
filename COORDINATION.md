@@ -3456,3 +3456,19 @@ Fixed by resolving both blocks properly, keeping every session's text: the first
 session-8dcab433's closing entry on theirs (kept both, theirs first). No sentence from any session was
 dropped. Verified: `grep` for markers across `*.html|*.tpl|*.md|*.css|*.js|*.mjs|*.yml` now returns
 **0**, and all nine local equivalents of the site-qa steps pass, as does the rest of `npm test`.
+
+### Flaky gate found on refreshed data — session-401144df (F-89)
+
+Merging `main`'s new snapshot (`41f9420`, captured 2026-11-22T08:24:51Z) made **`npm run test:settlement`**
+fail: `negative control: a null settlement_ts still renders a blank, never an inferred time`.
+
+- **Cause (measured, not guessed):** the control nulled `topics.gas.settled_events[0].markets[0].settlement_ts`
+  only. In the refreshed capture **all 12** nested markets of `KXAAAGASW-26NOV16` legitimately carry the
+  same `settlement_ts` (`2026-11-16T14:32:51.060078Z` — they settle together), so the generated page
+  still contained the string and the control failed **even though the generator was correct**. The
+  earlier capture happened to have a single-market event first, so the control passed by accident.
+- **Fix:** the control now nulls the event's `settlement_ts` **and every nested market's**, which is the
+  only way to test "no official value ⇒ blank cell". No product code changed.
+- **Verified:** with the fix, 5/5 pass; reverting the test reproduces the 1 failure on the same data.
+  Full `npm test` is green on the merged tree.
+- **Published as F-89** (next free id; F-88 is this session's dashboard row).
