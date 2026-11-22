@@ -3104,6 +3104,21 @@ session claimed the files below, and no other session's file, data or row was re
 
 **Overlap note — three sessions, one privacy finding (2026-11-22).** session-272b326f documented the public-snapshot risk in `docs/DEMO_ACCOUNT.md` (PR #94) and handed the page half to the integrator; session-736be760 published the page warning and its **F-85** row; this session measured the same risk independently, prepared a warning plus an `F-84` row, and then **did not publish either** because `main` already carried them. The row was renumbered twice during rebases (F-84 → F-85 → withdrawn) and the duplicate UI was dropped rather than merged; only the additive work was kept: the offline guard and the `F-82` → `F-85` cross-reference label fix on the demo-account page. Nothing of the other sessions' pages, rows or docs was reverted or rewritten.
 
+- **PR [#98](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/98)** — "feat(demo-account): guard the public-snapshot warning and fix its F-85 cross-reference; record the #96 merge and deploy" — **merged** 2026-11-22T08:16:46Z as merge commit [`5ef623ab3b2930ee424a4196a65bb4a74d91c3e2`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/5ef623ab3b2930ee424a4196a65bb4a74d91c3e2).
+  - Checks on the PR head `da25fa7`: `alerts`, `build`, `site-qa`, `suite-qa` — **4/4 pass**.
+  - Pages: `pages/builds/latest` for `5ef623a` → **`built`**, `error.message` **`null`**; post-merge `pages build and deployment`, `Site build check`, `site-qa`, `suite-qa`, `alerts-qa` all **success** on the merge SHA.
+  - **Live verification (cache-busted):** `demo-account.html?v=0817` shows the public-snapshot warning above the account data and its cross-reference now reads **"Tracked as F-85 on Flagged for review"** (it read "F-82" before this PR). `dashboard.html?v=0810` and `flagged.html?v=0810` (F-82/F-83) were verified after #96.
+  - **Rebases:** `main` advanced twice while this PR was open (#97, then #101/#102 — including the very privacy warning this PR prepared). Duplicate warning and duplicate flagged row were **dropped rather than merged**; only the guard, the label fix and the note were kept. Conflicts (`COORDINATION.md`, `templates/{flagged,demo-account}.tpl`, generated HTML) were resolved by keeping both sessions' rows and **regenerating** the HTML, never by hand-editing published output.
+
+### Status of this session's tasks
+
+| ID | Result |
+|---|---|
+| B1 | done — dated report `verification/2026-11-22-b8913775.md`; official sources re-fetched and quoted; 17-suite offline run, `build-site --check` and Pages API checked |
+| B2 | done — **F-82** fixed in `assets/app.js`; `scripts/check-market-chart.mjs` 31 → **38** cases, negative-checked against the pre-fix code |
+| B3 | done — **F-83** measured (6 schedule runs in 34.6 h vs a declared `*/10`) and the claim corrected in `README.md`, `docs/ALERTS.md`, `EXECUTIVE_SUMMARY.md`; cadence itself remains undelivered and flagged |
+| B4 | done — `scripts/check-account-privacy.mjs` (11 checks) protects the F-85 warning that concurrent sessions published; its mislabelled cross-reference was corrected. Owner decision on publishing account data remains open |
+
 ### Sources re-verified this session (official)
 
 [demo environment](https://docs.kalshi.com/getting_started/demo_env) · [orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses) ·
