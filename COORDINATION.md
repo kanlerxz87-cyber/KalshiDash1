@@ -1,5 +1,14 @@
 # COORDINATION.md — shared task board
 
+## Session session-272b326f — independent operational verification (2026-11-22 08:02 UTC)
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| O1 | Independently audit current Pages deployment, data freshness, tests, and requirements against official sources; publish a dated evidence report without modifying other sessions' work. | in progress | session-272b326f | `verification/2026-11-22-272b326f.md`, this board section |
+| O2 | Record any non-overlapping defect scope on this board before editing; integrate and publish only after checking concurrent work and QA. | in progress | session-272b326f | this board section, PR for this branch |
+
+The pinned Arena branch is `arena/272b326f-kalshidash1` (branch names cannot be changed in this environment). Other sessions' active scopes are not claimed. This pass does not assert repo-wide line-by-line verification based solely on automated checks.
+
 ## Session session-135bb43a — final integration and executable paper-trading verification (2026-11-21)
 
 - Arena-pinned branch: `arena/135bb43a-kalshidash1`, base `b81f9f2731a12fd90e0287cd1d77ded58c35d79e`.
