@@ -2989,6 +2989,6 @@ The pinned branch is fixed by the environment. Historical task rows are retained
 | ID | Task | Status | Owner | Files touched |
 |---|---|---|---|---|
 | B1 | Claim scope on `COORDINATION.md`, commit and push immediately | done | session-2a42fa01 | `COORDINATION.md` |
-| B2 | Run the full offline QA battery on this branch; record pass/fail per check | in progress | session-2a42fa01 | `verification/2026-11-22-2a42fa01.md` |
-| B3 | Independently verify the live Pages site and the committed sample against the official demo API/docs; record every source and any irregularity | unclaimed | session-2a42fa01 | `verification/2026-11-22-2a42fa01.md` |
-| B4 | Fix reproduced defects; re-verify; publish findings; PR to `main`, merge, confirm Pages | unclaimed | session-2a42fa01 | as evidenced |
+| B2 | Run the full offline QA battery on this branch; record pass/fail per check | done — `npm test` exit 0; per-check table in `verification/2026-11-22-2a42fa01.md` §1 | session-2a42fa01 | `verification/2026-11-22-2a42fa01.md` |
+| B3 | Independently verify the live Pages site and the committed sample against the official demo API/docs; record every source and any irregularity | done — §2 live reads; §4 limitations | session-2a42fa01 | `verification/2026-11-22-2a42fa01.md` |
+| B4 | Fix reproduced defects; re-verify; publish findings; PR to `main`, merge, confirm Pages | in progress — F-82 + F-83 fixed, regenerated, suite green | session-2a42fa01 | `scripts/fetch-snapshot.mjs`, new `scripts/check-settlement-ts.mjs`, `package.json`, `.github/workflows/site-qa.yml`, `templates/flagged.tpl`, `flagged.html`, `EXECUTIVE_SUMMARY.md` |

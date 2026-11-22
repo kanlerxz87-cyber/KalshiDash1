@@ -110,6 +110,12 @@ jobs:
       - name: Canonical paper execution and chart provenance regressions (offline)
         run: npm run test:paper && npm run test:chart
 
+      # session-2a42fa01: the category pages' "Settled at" column was blank for every resolved row
+      # because the capture read settlement_ts off the event (which never has it) instead of the
+      # nested market. This runs the real generator on a patched copy of the real snapshot.
+      - name: Resolved events can show the official settlement time
+        run: npm run test:settlement
+
       - name: Demo-only execution boundary and signing (offline; no keys or orders)
         run: npm run test:demo-safety
 
