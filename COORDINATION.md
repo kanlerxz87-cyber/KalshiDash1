@@ -2966,3 +2966,12 @@ The `$1.00 per contract` sentence on a line that also lists `scalar` (true only 
 `previous_price_dollars` · no demo API key, so no authenticated read was exercised · `Site build check` still cannot
 guard token-pushed commits (needs a GitHub App/PAT — a repository-settings decision) · the repo's sandbox-egress note
 is stale for this environment (docs and demo API are readable via the page fetcher).
+
+---
+
+## Session `arena/e43b620f-kalshidash1` — current-main audit and delivery readiness (2026-11-22 UTC)
+
+- Read this task board before starting. The prior project sessions and integration tasks recorded above are complete; this current branch starts at `4f1de81` (the current `origin/main` tip), with no in-progress claim recorded for this session.
+- **Claimed scope:** current-state end-to-end QA and an independent source-backed requirement/status audit. Files: `COORDINATION.md` (this section only), new `verification/2026-11-22-e43b620f.md`. No edits to shared data, templates, generated site pages, workflows, or other session scopes unless a verified defect is first logged here and shown unowned.
+- Task: inspect the shipped dashboard requirements, live feed sample, demo-account safeguards, scheduled automation and source attribution; run the repository's prescribed tests/build/link checks; verify official Kalshi claims against official documentation accessible in this session; report limitations and flag any unverified claims without inferring values. This is an audit on the pinned current branch, not an additional feature implementation.
+- Status: **in progress**.
