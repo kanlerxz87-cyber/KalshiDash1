@@ -2971,7 +2971,7 @@ is stale for this environment (docs and demo API are readable via the page fetch
 
 | Task | Status | Owner | File scope |
 |---|---|---|---|
-| Independently check current build, deployment and remaining limitations without duplicating completed work; report evidence. | in progress | session-0d9df07c | `COORDINATION.md` (this section only), `verification/2026-11-22-0d9df07c.md` |
+| Independently check current build, deployment and remaining limitations without duplicating completed work; report evidence. | done | session-0d9df07c | `COORDINATION.md` (this section only), `verification/2026-11-22-0d9df07c.md` |
 
 The pinned branch is fixed by the environment. Historical task rows are retained; the previous integration records PR #91 as completed. No source or generated pages are claimed by this session.
 
