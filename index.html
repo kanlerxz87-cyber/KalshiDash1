@@ -11,7 +11,7 @@
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span><span class="asof-wrap"><span id="feed-asof" class="small" data-state="pending" data-asof="2026-11-22T10:02:54.000Z">Data as of <b>2026-11-22 10:02:54Z</b> — samples older than 20 min are marked late, older than 45 min STALE (age measured in your browser when the page loaded).</span></span>
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span><span class="asof-wrap"><span id="feed-asof" class="small" data-state="pending" data-asof="2026-11-22T16:55:38.000Z">Data as of <b>2026-11-22 16:55:38Z</b> — samples older than 20 min are marked late, older than 45 min STALE (age measured in your browser when the page loaded).</span></span>
       <span id="mode-badge" class="badge warn">data: probing…</span>
       <span id="clock" class="mono small muted"></span>
     </div>
@@ -70,8 +70,8 @@
       <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo_env</a>. Nothing on this site is a trading recommendation.</li>
     </ul>
 
-    <p><strong>At the verified snapshot (2026-11-22 09:57:18 UTC):</strong> the capture found
-    <strong>2958</strong> open markets across the five topics and
+    <p><strong>At the verified snapshot (2026-11-22 16:55:49 UTC):</strong> the capture found
+    <strong>2810</strong> open markets across the five topics and
     <strong>122</strong> tracked series (top 30 per topic), using <strong>185</strong> documented endpoints.
     The highest-dollar focus-topic rows are listed below and carry their own source links.</p>
 
@@ -86,7 +86,7 @@
     <a class="topic-card" href="categories/elections.html"><h3>Elections</h3><div class="big">326</div><div class="muted small">open markets at capture</div></a>
     <a class="topic-card" href="categories/culture.html"><h3>Culture</h3><div class="big">0</div><div class="muted small">open markets at capture</div></a>
     <a class="topic-card" href="categories/crypto.html"><h3>Crypto</h3><div class="big">1634</div><div class="muted small">open markets at capture</div></a>
-    <a class="topic-card" href="categories/golf.html"><h3>Golf</h3><div class="big">872</div><div class="muted small">open markets at capture</div></a>
+    <a class="topic-card" href="categories/golf.html"><h3>Golf</h3><div class="big">724</div><div class="muted small">open markets at capture</div></a>
   </div>
 
   <h2>Topic summary</h2>
@@ -97,7 +97,7 @@
       <td><strong><a href="categories/gas.html">Gas Prices</a></strong></td>
       <td class="num">30</td>
       <td class="num">126</td>
-      <td class="num">4,672</td>
+      <td class="num">1,418</td>
       <td><a href="market.html?ticker=KXAAAGASW-26NOV23-3.6400">Will average **gas prices** be above $3.6400?</a></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
     </tr>
@@ -105,8 +105,8 @@
       <td><strong><a href="categories/elections.html">Elections</a></strong></td>
       <td class="num">30</td>
       <td class="num">326</td>
-      <td class="num">2,746,100</td>
-      <td><a href="market.html?ticker=KXPRESNOMD-28-MSHE">Will Mikie Sherrill be the nominee for the Presidency for the Democratic party?</a></td>
+      <td class="num">2,492,036</td>
+      <td><a href="market.html?ticker=KXPRESNOMR-28-MPEN">Will Mike Pence be the nominee for the Presidency for the Republican party?</a></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
     </tr>
 <tr>
@@ -121,15 +121,15 @@
       <td><strong><a href="categories/crypto.html">Crypto</a></strong></td>
       <td class="num">30</td>
       <td class="num">1,634</td>
-      <td class="num">639,064</td>
+      <td class="num">601,393</td>
       <td><a href="market.html?ticker=KXBTCY-27JAN0100-B92500">BTC price  on Jan 1, 2027?</a></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
     </tr>
 <tr>
       <td><strong><a href="categories/golf.html">Golf</a></strong></td>
       <td class="num">30</td>
-      <td class="num">872</td>
-      <td class="num">734,474</td>
+      <td class="num">724</td>
+      <td class="num">867,642</td>
       <td><a href="market.html?ticker=KXPGATOUR-THRC26-GHIG">The RSM Classic: Garrick Higgo wins</a></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
     </tr></tbody>
@@ -142,53 +142,79 @@
     <table>
       <thead><tr><th>Market</th><th>Topic</th><th class="num">Last</th><th class="num">Bid / Ask</th><th class="num">Spread</th><th class="num">24h vol ($)</th><th class="num">Total vol ($)</th><th class="num">Open int ($)</th><th>Status</th><th>Result</th><th>Source</th></tr></thead>
       <tbody id="top-table-body"><tr>
-      <td><a href="market.html?ticker=KXPRESNOMD-28-MSHE">Will Mikie Sherrill be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-MSHE</span></td>
+      <td><a href="market.html?ticker=KXPRESNOMR-28-MPEN">Will Mike Pence be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-MPEN</span></td>
       <td><span class="tag elections">Elections</span></td>
       <td class="num">$0.0030</td>
       <td class="num">$0.0020 / $0.0030</td>
       <td class="num">$0.0010</td>
-      <td class="num">120,622</td>
-      <td class="num">566,498</td>
-      <td class="num">388,400</td>
+      <td class="num">176,005</td>
+      <td class="num">37,796,456</td>
+      <td class="num">21,001,302</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr>
 <tr>
       <td><a href="market.html?ticker=KXPRESPERSON-28-TGAB">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-TGAB</span></td>
       <td><span class="tag elections">Elections</span></td>
       <td class="num">$0.0030</td>
-      <td class="num">$0.0020 / $0.0040</td>
-      <td class="num">$0.0020</td>
-      <td class="num">120,132</td>
-      <td class="num">73,112,940</td>
-      <td class="num">42,109,213</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">120,249</td>
+      <td class="num">73,170,992</td>
+      <td class="num">42,111,070</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr>
 <tr>
-      <td><a href="market.html?ticker=KXPRESNOMD-28-JAM">Will Jamie Dimon be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-JAM</span></td>
+      <td><a href="market.html?ticker=KXPRESNOMR-28-EKIR">Will Erika Kirk be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-EKIR</span></td>
       <td><span class="tag elections">Elections</span></td>
       <td class="num">$0.0030</td>
       <td class="num">$0.0020 / $0.0030</td>
       <td class="num">$0.0010</td>
-      <td class="num">118,841</td>
-      <td class="num">120,366,453</td>
-      <td class="num">36,196,915</td>
+      <td class="num">117,123</td>
+      <td class="num">80,507,643</td>
+      <td class="num">58,987,129</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr>
 <tr>
-      <td><a href="market.html?ticker=KXPRESNOMR-28-EKIR">Will Erika Kirk be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-EKIR</span></td>
+      <td><a href="market.html?ticker=KXPRESPERSON-28-MTAY">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-MTAY</span></td>
       <td><span class="tag elections">Elections</span></td>
       <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">117,112</td>
+      <td class="num">1,079,954</td>
+      <td class="num">727,696</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPRESPERSON-28-MOBA">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-MOBA</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0040</td>
       <td class="num">$0.0020 / $0.0040</td>
       <td class="num">$0.0020</td>
-      <td class="num">116,946</td>
-      <td class="num">80,505,152</td>
-      <td class="num">58,986,269</td>
+      <td class="num">117,067</td>
+      <td class="num">422,554</td>
+      <td class="num">300,004</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPRESNOMR-28-DBON">Will Dan Bongino be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-DBON</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">116,482</td>
+      <td class="num">116,482</td>
+      <td class="num">115,967</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
@@ -199,22 +225,9 @@
       <td class="num">$0.0060</td>
       <td class="num">$0.0050 / $0.0060</td>
       <td class="num">$0.0010</td>
-      <td class="num">111,738</td>
-      <td class="num">51,763,903</td>
-      <td class="num">17,265,630</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="market.html?ticker=KXPRESPERSON-28-ESLO">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-ESLO</span></td>
-      <td><span class="tag elections">Elections</span></td>
-      <td class="num">$0.0050</td>
-      <td class="num">$0.0040 / $0.0050</td>
-      <td class="num">$0.0010</td>
-      <td class="num">76,249</td>
-      <td class="num">81,950</td>
-      <td class="num">81,925</td>
+      <td class="num">111,503</td>
+      <td class="num">51,766,393</td>
+      <td class="num">17,268,119</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
@@ -225,152 +238,113 @@
       <td class="num">$0.0100</td>
       <td class="num">$0.0000 / $0.0100</td>
       <td class="num"><span class="muted">—</span></td>
-      <td class="num">65,971</td>
-      <td class="num">67,367,757</td>
-      <td class="num">6,465,948</td>
+      <td class="num">96,315</td>
+      <td class="num">67,399,719</td>
+      <td class="num">6,497,008</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="market.html?ticker=KXPRESNOMR-28-MPEN">Will Mike Pence be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-MPEN</span></td>
-      <td><span class="tag elections">Elections</span></td>
-      <td class="num">$0.0040</td>
-      <td class="num">$0.0030 / $0.0040</td>
-      <td class="num">$0.0010</td>
-      <td class="num">65,287</td>
-      <td class="num">37,627,335</td>
-      <td class="num">21,055,942</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="market.html?ticker=KXPRESNOMD-28-JSTE">Will Jon Stewart be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-JSTE</span></td>
-      <td><span class="tag elections">Elections</span></td>
-      <td class="num">$0.8250</td>
-      <td class="num">$0.0000 / $0.8250</td>
-      <td class="num"><span class="muted">—</span></td>
-      <td class="num">65,194</td>
-      <td class="num">292,931,512</td>
-      <td class="num">116,961,769</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="market.html?ticker=KXPRESNOMR-28-ETRU">Will Eric Trump be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-ETRU</span></td>
-      <td><span class="tag elections">Elections</span></td>
-      <td class="num">$0.0030</td>
-      <td class="num">$0.0020 / $0.0040</td>
-      <td class="num">$0.0020</td>
-      <td class="num">65,140</td>
-      <td class="num">42,655,963</td>
-      <td class="num">17,925,534</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="market.html?ticker=KXPRESNOMR-28-EM">Will Elon Musk be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-EM</span></td>
-      <td><span class="tag elections">Elections</span></td>
-      <td class="num">$0.0040</td>
-      <td class="num">$0.0020 / $0.0040</td>
-      <td class="num">$0.0020</td>
-      <td class="num">65,112</td>
-      <td class="num">12,300,067</td>
-      <td class="num">4,371,501</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="market.html?ticker=KXPRESPERSON-28-JHAW">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-JHAW</span></td>
-      <td><span class="tag elections">Elections</span></td>
-      <td class="num">$0.0040</td>
-      <td class="num">$0.0020 / $0.0040</td>
-      <td class="num">$0.0020</td>
-      <td class="num">65,098</td>
-      <td class="num">848,492</td>
-      <td class="num">510,670</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="market.html?ticker=KXPRESPERSON-28-RPAU">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-RPAU</span></td>
-      <td><span class="tag elections">Elections</span></td>
-      <td class="num">$0.0030</td>
-      <td class="num">$0.0020 / $0.0030</td>
-      <td class="num">$0.0010</td>
-      <td class="num">64,905</td>
-      <td class="num">856,572</td>
-      <td class="num">679,011</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="market.html?ticker=KXPRESPERSON-28-JDIM">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-JDIM</span></td>
-      <td><span class="tag elections">Elections</span></td>
-      <td class="num">$0.0030</td>
-      <td class="num">$0.0020 / $0.0030</td>
-      <td class="num">$0.0010</td>
-      <td class="num">64,814</td>
-      <td class="num">12,370,807</td>
-      <td class="num">8,964,382</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="market.html?ticker=KXPRESNOMR-28-DMCC">Will Dave McCormick be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-DMCC</span></td>
-      <td><span class="tag elections">Elections</span></td>
-      <td class="num">$0.0030</td>
-      <td class="num">$0.0020 / $0.0030</td>
-      <td class="num">$0.0010</td>
-      <td class="num">64,631</td>
-      <td class="num">381,957</td>
-      <td class="num">312,997</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="market.html?ticker=KXPRESNOMR-28-JT">Will John Thune be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-JT</span></td>
-      <td><span class="tag elections">Elections</span></td>
-      <td class="num">$0.0030</td>
-      <td class="num">$0.0020 / $0.0030</td>
-      <td class="num">$0.0010</td>
-      <td class="num">64,592</td>
-      <td class="num">35,596,716</td>
-      <td class="num">8,438,305</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr>
 <tr>
       <td><a href="market.html?ticker=KXBTCY-27JAN0100-T149999.99">BTC price  on Jan 1, 2027?</a><br><span class="ticker">KXBTCY-27JAN0100-T149999.99</span></td>
       <td><span class="tag crypto">Crypto</span></td>
       <td class="num">$0.0100</td>
-      <td class="num">$0.0000 / $0.0100</td>
+      <td class="num">$0.0000 / $1.0000</td>
       <td class="num"><span class="muted">—</span></td>
-      <td class="num">64,469</td>
-      <td class="num">56,172,994</td>
-      <td class="num">11,427,506</td>
+      <td class="num">94,015</td>
+      <td class="num">56,204,889</td>
+      <td class="num">11,458,980</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr>
 <tr>
+      <td><a href="market.html?ticker=KXPRESPERSON-28-ESLO">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-ESLO</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0030 / $0.0050</td>
+      <td class="num">$0.0020</td>
+      <td class="num">75,822</td>
+      <td class="num">84,390</td>
+      <td class="num">84,364</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPRESNOMD-28-EWAR">Will Elizabeth Warren be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-EWAR</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">68,187</td>
+      <td class="num">272,045,427</td>
+      <td class="num">19,099,709</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPRESPERSON-28-TCRU">Who will win the next presidential election?</a><br><span class="ticker">KXPRESPERSON-28-TCRU</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">66,524</td>
+      <td class="num">752,817</td>
+      <td class="num">486,509</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPRESNOMR-28-KB">Will Katie Britt be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-KB</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0050</td>
+      <td class="num">$0.0020 / $0.0050</td>
+      <td class="num">$0.0030</td>
+      <td class="num">64,750</td>
+      <td class="num">94,676,213</td>
+      <td class="num">78,945,991</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPRESNOMD-28-MSHE">Will Mikie Sherrill be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-MSHE</span></td>
+      <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0040</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">64,741</td>
+      <td class="num">569,005</td>
+      <td class="num">389,540</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
       <td><a href="market.html?ticker=KXPRESNOMR-28-SBES">Will Scott Bessent be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-SBES</span></td>
       <td><span class="tag elections">Elections</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">64,389</td>
+      <td class="num">65,742</td>
+      <td class="num">59,005</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPRESNOMR-28-THOM">Will Tom Homan be the nominee for the Presidency for the Republican party?</a><br><span class="ticker">KXPRESNOMR-28-THOM</span></td>
+      <td><span class="tag elections">Elections</span></td>
       <td class="num">$0.0080</td>
-      <td class="num">$0.0020 / $0.0080</td>
-      <td class="num">$0.0060</td>
-      <td class="num">63,836</td>
-      <td class="num">63,849</td>
-      <td class="num">58,423</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">63,587</td>
+      <td class="num">64,882</td>
+      <td class="num">58,153</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
@@ -378,28 +352,54 @@
 <tr>
       <td><a href="market.html?ticker=KXPRESNOMD-28-BORO">Will Beto O&#39;Rourke be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-BORO</span></td>
       <td><span class="tag elections">Elections</span></td>
-      <td class="num">$0.0030</td>
+      <td class="num">$0.0040</td>
       <td class="num">$0.0020 / $0.0040</td>
       <td class="num">$0.0020</td>
-      <td class="num">63,815</td>
-      <td class="num">2,432,032</td>
-      <td class="num">1,739,879</td>
+      <td class="num">63,537</td>
+      <td class="num">2,434,492</td>
+      <td class="num">1,742,112</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr>
 <tr>
-      <td><a href="market.html?ticker=KXPRESNOMD-28-ZMAM">Will Zohran Mamdani be the Democratic Presidential nominee in 2028?</a><br><span class="ticker">KXPRESNOMD-28-ZMAM</span></td>
+      <td><a href="market.html?ticker=KXPRESNOMD-28-JAM">Will Jamie Dimon be the nominee for the Presidency for the Democratic party?</a><br><span class="ticker">KXPRESNOMD-28-JAM</span></td>
       <td><span class="tag elections">Elections</span></td>
       <td class="num">$0.0030</td>
       <td class="num">$0.0020 / $0.0030</td>
       <td class="num">$0.0010</td>
-      <td class="num">63,810</td>
-      <td class="num">137,382,501</td>
-      <td class="num">38,695,110</td>
+      <td class="num">63,509</td>
+      <td class="num">120,368,917</td>
+      <td class="num">36,196,915</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESNOMD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXPGATOUR-THRC26-GHIG">The RSM Classic: Garrick Higgo wins</a><br><span class="ticker">KXPGATOUR-THRC26-GHIG</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0040</td>
+      <td class="num">$0.0020</td>
+      <td class="num">63,486</td>
+      <td class="num">259,921</td>
+      <td class="num">185,147</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="market.html?ticker=KXBTCY-27JAN0100-B112500">BTC price  on Jan 1, 2027?</a><br><span class="ticker">KXBTCY-27JAN0100-B112500</span></td>
+      <td><span class="tag crypto">Crypto</span></td>
+      <td class="num">$0.0100</td>
+      <td class="num">$0.0000 / $0.0100</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">63,465</td>
+      <td class="num">65,515,477</td>
+      <td class="num">12,735,732</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr></tbody>
     </table>
   </div>
@@ -439,7 +439,7 @@
     (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
     <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
        WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
-       Snapshot captured 2026-11-22 09:57:18 UTC ·
+       Snapshot captured 2026-11-22 16:55:49 UTC ·
        <a href="sources.html">Sources</a> ·
        <a href="flagged.html">Flagged for review</a> ·
        <a href="COORDINATION.md">Coordination board</a></p>
