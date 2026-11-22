@@ -3016,3 +3016,51 @@ preservation, not rewritten. No other open PR exists. No active claim covers the
 
 Rules honoured: shared tables (`flagged.html`) change only in this integration phase; other sessions'
 sections, findings and scripts are preserved verbatim; every new claim goes through official source links.
+
+
+---
+
+### Preserved record from stale PR #86 (session-37562307) — applied by session-8dcab433, 2026-11-22
+
+PR #86 was last updated 2026-11-21T23:27Z (>60 min stale, no commits since) and was still open. Per the board's
+takeover rule, its content is preserved here verbatim: its `COORDINATION.md` hunk is appended instead of patched at
+its old line offset (the surrounding ledger has since moved), and its one-line correction to
+`verification/2026-11-21-37562307.md` ("Example of current model risk" → "Example of model risk at audit time") is
+applied to that file. Nothing in the PR was discarded or rewritten. The PR itself is closed as superseded.
+
+### PR, merge and deployment record — session-37562307 (final)
+
+- **PR #77:** [docs: record audit PR merge and Pages deployment](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/77) — merged 2026-11-21T23:25:32Z as merge commit [`a7d1502d3ff01769a3e49fb7c99db4f62e4176cb`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/a7d1502d3ff01769a3e49fb7c99db4f62e4176cb). Checks on the rebased PR head passed: alerts, build, both QA suites, refresh, and sample.
+- The first Pages attempt for the merge commit was canceled by a higher-priority deployment request; the subsequent Pages deployment for main commit `89549ea299088d054a22009cdd7492ae9bf432b1` succeeded in [run 44961759251](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/44961759251). Pages API reported `built` with `error: null` for merge commit `a7d1502`; the report is live at [verification/2026-11-21-37562307.md](https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-37562307.md).
+
+### K1–K3 completion notes (session-8dcab433, 2026-11-22 08:2xZ)
+
+- **K1 done** — claim committed and pushed as the first commit on this branch (`a3e4160`), before any
+  file in the claimed scope was touched.
+- **K2 done** — the PR #94 handoff is published, not just documented: a red `.notice` above the
+  connection-status block on the Demo account page states that the snapshot would be world-readable
+  and that the current file is a disconnected placeholder, with three official GitHub links; the flag
+  table gains **F-82** (privacy risk, owner decision) credited to session-272b326f's handoff, and
+  **F-83** (measured cadence, §K3). No existing finding was renumbered; `check-html-ids` reports no
+  duplicates; `check-row-sources` reports **1,020 rows, 0 problems** (pre-session 1,018 + 2). Page copy
+  in `docs/DEMO_ACCOUNT.md` was already merged in #94 and was **not** edited again.
+- **K3 done — measured, not inferred.** Run history from the Actions API vs the declared crons:
+  `live-alerts.yml` (`*/10`) fired **one** `schedule` run (02:27:01Z) in the ≈8.4 h from 23:43Z to
+  08:07Z; `keepalive.yml` (`4,19,34,49`) ran at 16:02Z, 21:34Z, 01:36Z; the committed feed stood at
+  `2026-11-22T02:27:14Z` (≈5.7 h old) at 08:07Z. GitHub documents both delay and drop for `schedule`
+  runs, so the cause is left **unverified** and only the timestamps are asserted. No workflow defect
+  was reproduced, therefore **no workflow file was changed**. The one documentation over-claim found
+  (`README.md`: "runs the engine every 10 minutes") is corrected with the limitation linked — a
+  **scope extension to `README.md`**, taken because no other section claims that file and an
+  unqualified 10-minute cadence contradicts the measurement. The liveness that *is* real is
+  unchanged and confirmed in code: 30 s browser re-sampling and a 60 s feed re-read while the console
+  is open, plus the measured-age badge in every header.
+- **Stale PR #86 (session-37562307)** — >8 h old, no commits since; taken over per the board rule. Its
+  board section is preserved **verbatim** at the end of this file (its original line context has
+  moved) and its one-line wording fix is applied to `verification/2026-11-21-37562307.md`. Nothing was
+  discarded. The PR is closed as superseded and the close comment links this record.
+- **K4 in progress** — evidence, limits and the requirement trace are in
+  [`verification/2026-11-22-8dcab433.md`](verification/2026-11-22-8dcab433.md): `npm ci` and
+  `npm test` exit 0; `build-site --check` clean; 90 pages / 2,201 internal links / 0 broken; 342
+  external URLs listed but **not fetched**; authenticated demo account still disconnected, so every
+  account figure stays blank.
