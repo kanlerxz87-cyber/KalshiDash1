@@ -333,12 +333,31 @@
   /* Reconstruct the swing alerts that the captured 1-minute candles imply, so the
    * two chat panes still show real, sourced moves when the browser cannot reach
    * the live API. These messages are labelled "snapshot replay". */
+  /* The snapshot keeps candle CLOSES only, discarding the per-period high/low that Kalshi's
+   * candlestick payload carries (docs: api-reference/market/get-market-candlesticks describes
+   * yes_bid/yes_ask/price as open-high-low-close distributions). That loss matters: with closes
+   * alone, a price that spikes for one minute and comes back is indistinguishable from a real move
+   * that was reversed. The committed capture shows what a naive close-to-close replay publishes:
+   * KXPRESNOMD-28-JSTE alternates between $0.003/$0.004 and $0.822/$0.823 on consecutive minutes
+   * (130 reversals of >= $0.10 in 359 minutes) while that market's own captured row is quoted
+   * $0.002/$0.003 -- so the page filled the chat with ~120 invented alternating "up +0.82 / down
+   * -0.82" alerts for a market the engine recorded no alerts for at all.
+   *
+   * Rule: a replayed swing must be SUSTAINED. Every close available in the next SUSTAIN_CANDLES
+   * minutes must still be on the new side before the move is published, which is the minimum
+   * evidence that a trader could have acted on it. A spike that is disproved by what follows is
+   * suppressed and COUNTED (state.replayUncorroborated), never silently dropped; a move with no
+   * later closes to check stays publishable because nothing disproves it. Moves the series does
+   * sustain are kept in BOTH directions. */
+  var SUSTAIN_CANDLES = 3;
+  var SUSTAIN_TOL = 0.05;   // half the $0.10 rule: a confirming close may drift by less than that
   function seedAlertsFromSnapshot(snap) {
     if (!snap || !snap.candlesticks) return;
     var existing = getAlerts();
     if (existing.length) { state.alerts = existing; return; }
     var s = settings();
     var seeded = [];
+    var uncorroborated = [];
     Object.keys(snap.candlesticks).forEach(function (ticker) {
       var m = state.markets[ticker];
       var candles = (snap.candlesticks[ticker].m1 || {}).candles || [];
@@ -347,6 +366,17 @@
         if (from === null || to === null || from < 0 || from > 1 || to < 0 || to > 1) continue;
         var delta = to - from;
         if (Math.round(Math.abs(delta) * 10000) < Math.round(s.threshold * 10000)) continue;
+        /* Sustained-move test: EVERY close available in the next SUSTAIN_CANDLES minutes must still
+         * be on the new side. A single spike fails it; so does a series that alternates, because
+         * half of the confirming closes land back on the old side. A move with no later closes to
+         * check stays publishable (nothing disproves it). */
+        var contradicted = 0;
+        for (var k = 1; k <= SUSTAIN_CANDLES; k += 1) {
+          var later = nullableNumber((candles[i + k] || [])[1]);
+          if (later === null || later < 0 || later > 1) continue;
+          if (delta > 0 ? later < to - SUSTAIN_TOL : later > to + SUSTAIN_TOL) contradicted += 1;
+        }
+        if (contradicted > 0) { uncorroborated.push(ticker + '@' + Number(candles[i][0])); continue; }
         seeded.push({
           id: 'seed-' + ticker + '-' + i,
           type: 'swing', ts: Number(candles[i][0]),
@@ -364,6 +394,7 @@
     seeded.sort(function (a, b) { return a.ts - b.ts; });
     seeded = seeded.slice(-120);
     state.alerts = seeded;
+    state.replayUncorroborated = uncorroborated;
     setAlerts(seeded);
   }
 
@@ -880,7 +911,7 @@
       var cls = a.type === 'resolve' ? 'resolve' : (a.type === 'system' ? 'system' : (a.delta > 0 ? 'up' : 'down'));
       var head = '<div class="m-head"><span class="m-time">' + clock(a.ts) + ' UTC</span>' +
         (a.topic ? '<span class="tag ' + esc(t.id) + '">' + esc(t.label) + '</span>' : '') +
-        (a.replay ? '<span class="badge info">snapshot replay</span>' : '') +
+        (a.replay ? '<span class="badge info" title="Movement between two captured 1-minute closes. The capture keeps closes only, not per-minute high/low, so a move that reversed inside one minute is not shown as one swing.">snapshot replay</span>' : '') +
         (a.roiEligible !== undefined && a.roi !== null ? '<span class="badge neutral">research score ' + a.roi + (a.roiEligible ? '' : ' · ineligible') + '</span>' : '<span class="badge warn">historical score unverified</span>') + '</div>';
       var body;
       if (a.type === 'resolve') {

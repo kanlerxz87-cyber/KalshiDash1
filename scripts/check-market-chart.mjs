@@ -186,7 +186,9 @@ try {
 
 const replay = await boot('dashboard', false, { snapshot: { ...snapshot, candlesticks: { FIXTURE: { m1: {
   source_url: BASE + '/series/TESTSERIES/markets/FIXTURE/candlesticks?period_interval=1',
-  candles: [[NOW / 1000 - 3600, null], [NOW / 1000 - 3540, 0.2], [NOW / 1000 - 3480, 0.3], [NOW / 1000 - 3420, 0.2]],
+  // close 3 stays at 0.30 for three more closes so the up leg is sustained; close 4 then falls
+  // 0.30 -> 0.20 with no later close to disprove it. Both legs must survive the F-83 rule.
+  candles: [[NOW / 1000 - 3600, null], [NOW / 1000 - 3540, 0.2], [NOW / 1000 - 3480, 0.3], [NOW / 1000 - 3420, 0.3], [NOW / 1000 - 3360, 0.3], [NOW / 1000 - 3300, 0.3], [NOW / 1000 - 3240, 0.2]],
 } } } } });
 try {
   check('snapshot replay skips missing closes and retains exact 10-cent changes in both directions', () => {
@@ -206,6 +208,69 @@ try {
   });
   check('canonical dashboard has no unexpected script errors', () => assert.deepEqual(replay.errors, []));
 } finally { replay.dom.window.close(); }
+
+/* F-83. The committed capture keeps candle CLOSES only. One captured series (KXPRESNOMD-28-JSTE)
+ * alternates between $0.003/$0.004 and $0.822/$0.823 on consecutive minutes -- 130 reversals
+ * >= $0.10 -- while that market's own captured row is quoted $0.002/$0.003, and the engine recorded
+ * zero alerts for it. Pairing adjacent closes published ~120 invented alternating alerts.
+ * These fixtures reproduce the shapes; the assertions fail if the sustained-move rule is removed
+ * and also fail if the rule starts eating real moves in either direction. */
+{
+  const flips = [];
+  for (let i = 0; i < 12; i += 1) flips.push([NOW / 1000 - 720 + i * 60, i % 2 ? 0.822 : 0.003]);
+  const spike = [[NOW / 1000 - 480, 0.30], [NOW / 1000 - 420, 0.70], [NOW / 1000 - 360, 0.30],
+    [NOW / 1000 - 300, 0.30], [NOW / 1000 - 240, 0.30]];
+  const real = [[NOW / 1000 - 480, 0.30], [NOW / 1000 - 420, 0.75], [NOW / 1000 - 360, 0.78],
+    [NOW / 1000 - 300, 0.80], [NOW / 1000 - 240, 0.90], [NOW / 1000 - 180, 0.60],
+    [NOW / 1000 - 120, 0.55], [NOW / 1000 - 60, 0.58], [NOW / 1000, 0.57]];
+  const view = await boot('dashboard', false, { snapshot: { ...snapshot,
+    markets: [...snapshot.markets,
+      { ...raw, ticker: 'FLIPFIXTURE', title: 'ALTERNATING CANDLE FIXTURE', topic: 'elections', source_url: BASE + '/markets/FLIPFIXTURE' },
+      { ...raw, ticker: 'SPIKEFIXTURE', title: 'ONE-MINUTE SPIKE FIXTURE', topic: 'elections', source_url: BASE + '/markets/SPIKEFIXTURE' },
+      { ...raw, ticker: 'REALFIXTURE', title: 'SUSTAINED MOVE FIXTURE', topic: 'elections', source_url: BASE + '/markets/REALFIXTURE' }],
+    candlesticks: {
+      FLIPFIXTURE: { m1: { source_url: BASE + '/series/TESTSERIES/markets/FLIPFIXTURE/candlesticks?period_interval=1', candles: flips } },
+      SPIKEFIXTURE: { m1: { source_url: BASE + '/series/TESTSERIES/markets/SPIKEFIXTURE/candlesticks?period_interval=1', candles: spike } },
+      REALFIXTURE: { m1: { source_url: BASE + '/series/TESTSERIES/markets/REALFIXTURE/candlesticks?period_interval=1', candles: real } },
+    } } });
+  try {
+    check('F-83: an alternating series collapses from 11 legs to at most the one undisprovable tail', () => {
+      const legs = view.w.KD.state.alerts.filter((a) => a.ticker === 'FLIPFIXTURE');
+      /* The very last close of a series has no later close to contradict it, so at most that single
+       * leg can survive; before the fix all 11 were published. */
+      assert.ok(legs.length <= 1, 'alternating series published ' + legs.length + ' invented swings');
+      const counted = view.w.KD.state.replayUncorroborated.filter((x) => x.startsWith('FLIPFIXTURE')).length;
+      assert.ok(counted >= 9, 'suppressed legs are counted, got ' + counted);
+    });
+    check('F-83: a one-minute spike is not published as a swing', () => {
+      /* The spike UP (0.30 -> 0.70) is contradicted by the next three closes, so it is suppressed.
+       * The fall back to 0.30 is a move that holds afterwards, and the two legs are alternatives:
+       * exactly one of them can describe the sequence. Asserting zero would demand data the capture
+       * does not contain, so the property asserted is: never both legs, and never the spike leg. */
+      const legs = view.w.KD.state.alerts.filter((a) => a.ticker === 'SPIKEFIXTURE');
+      assert.ok(legs.length <= 1, 'both legs of one spike were published: ' + legs.length);
+      assert.ok(!legs.some((a) => a.from === 0.30 && a.to === 0.70), 'the disproved spike leg was published');
+    });
+    check('F-83: a sustained move IS published, in both directions', () => {
+      const alerts = view.w.KD.state.alerts.filter((a) => a.ticker === 'REALFIXTURE');
+      assert.ok(alerts.length >= 2, 'expected at least an up and a down leg, got ' + alerts.length);
+      assert.ok(alerts.some((a) => a.delta > 0), 'up leg kept');
+      assert.ok(alerts.some((a) => a.delta < 0), 'down leg kept');
+      assert.ok(alerts.every((a) => a.replay === true && a.roi === null));
+    });
+    check('F-83: suppressed moves are counted, never silently dropped', () => {
+      assert.ok(Array.isArray(view.w.KD.state.replayUncorroborated));
+      assert.ok(view.w.KD.state.replayUncorroborated.length >= 3,
+        'expected the alternating and spike legs to be counted, got ' + view.w.KD.state.replayUncorroborated.length);
+    });
+    check('F-83: the replay badge states the close-only evidence limit', () => {
+      const badge = view.w.document.querySelector('#chat-all .badge.info');
+      assert.ok(badge, 'replay badge present');
+      assert.match(badge.getAttribute('title') || '', /captured 1-minute closes/i);
+    });
+    check('F-83: no unexpected script errors on these payloads', () => assert.deepEqual(view.errors, []));
+  } finally { view.dom.window.close(); }
+}
 
 for (const page of ['portfolio', 'analysis']) {
   const view = await boot(page, false);
