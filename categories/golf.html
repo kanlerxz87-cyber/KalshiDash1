@@ -11,7 +11,7 @@
 <header class="site">
   <div class="head-inner">
     <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
-    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span><span class="asof-wrap"><span id="feed-asof" class="small" data-state="pending" data-asof="2026-11-23T12:49:02.000Z">Data as of <b>2026-11-23 12:49:02Z</b> — samples older than 20 min are marked late, older than 45 min STALE (age measured in your browser when the page loaded).</span></span><span id="mode-badge" class="badge warn">data: probing…</span><span id="clock" class="mono small muted"></span></div>
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span><span class="asof-wrap"><span id="feed-asof" class="small" data-state="pending" data-asof="2026-11-23T23:27:02.000Z">Data as of <b>2026-11-23 23:27:02Z</b> — samples older than 20 min are marked late, older than 45 min STALE (age measured in your browser when the page loaded).</span></span><span id="mode-badge" class="badge warn">data: probing…</span><span id="clock" class="mono small muted"></span></div>
   </div>
   <nav class="site"><div class="nav-inner"><span class="nav-sep nav-group">Start</span><span class="nav-links"><a href="../alerts/index.html">Live alerts · 2 chats</a><a href="../dashboard.html">Browser research dashboard</a><a href="../executive-summary.html">Executive summary</a></span><span class="nav-sep nav-group">Topics</span><span class="nav-links"><a href="../categories/gas.html?topic=gas">Gas Prices</a><a href="../categories/elections.html?topic=elections">Elections</a><a href="../categories/culture.html?topic=culture">Culture</a><a href="../categories/crypto.html?topic=crypto">Crypto</a><a href="../categories/golf.html?topic=golf">Golf</a></span><span class="nav-sep nav-group">Trading</span><span class="nav-links"><a href="../markets.html">Markets</a><a href="../market.html">Market detail</a><a href="../portfolio.html">Portfolio</a><a href="../analysis.html">Trade analysis</a><a href="../strategylab.html">Strategy lab</a></span><span class="nav-sep nav-group">Model</span><span class="nav-links"><a href="../strategies.html">Strategies &amp; ROI model</a><a href="../catalyst.html">Swing catalysts</a><a href="../suggestions.html">Suggestions</a></span><span class="nav-sep nav-group">Review</span><span class="nav-links"><a href="../sources.html">Sources</a><a href="../flagged.html">Flagged for review</a><a href="../questions.html">Questions</a><a href="../api.html">API reference</a><a href="../demo-account.html">Demo account</a><a href="../dash/index.html">Legacy suite (dash/)</a><a href="../docs/index.html">Legacy suite (docs/)</a></span></div></nav>
 </header>
@@ -40,7 +40,7 @@
     <td>PGA Tour</td>
     <td>Sports</td>
     <td>Golf</td>
-    <td class="num">42,201,793,508</td>
+    <td class="num">42,201,849,069</td>
     <td><a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.espn.com/" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
     <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
   </tr>
@@ -67,7 +67,7 @@
     <td>PGA Top 20 Finisher</td>
     <td>Sports</td>
     <td>Golf</td>
-    <td class="num">1,316,278,327</td>
+    <td class="num">1,316,278,328</td>
     <td><a href="https://www.espn.com" target="_blank" rel="noopener">ESPN</a>, <a href="https://www.foxsports.com" target="_blank" rel="noopener">Fox Sports</a>, <a href="https://www.pgatour.com/" target="_blank" rel="noopener">the Governing League</a></td>
     <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
   </tr>
@@ -312,11 +312,37 @@
   <div class="table-wrap"><table class="compact"><thead><tr><th>Market</th><th>Topic</th><th class="num">Last</th><th class="num">Bid / Ask</th>
   <th class="num">Spread</th><th class="num">24h vol ($)</th><th class="num">Total vol ($)</th>
   <th class="num">Open int ($)</th><th>Status</th><th>Result</th><th>Source</th></tr></thead><tbody id="market-body"><tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-MAST27-MWAL">Masters Tournament: Matt Wallace wins</a><br><span class="ticker">KXPGATOUR-MAST27-MWAL</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0030</td>
+      <td class="num">$0.0020 / $0.0030</td>
+      <td class="num">$0.0010</td>
+      <td class="num">55,556</td>
+      <td class="num">111,111</td>
+      <td class="num">111,111</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-MAST27-CYOU">Masters Tournament: Cameron Young wins</a><br><span class="ticker">KXPGATOUR-MAST27-CYOU</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0540</td>
+      <td class="num">$0.0350 / $0.0400</td>
+      <td class="num">$0.0050</td>
+      <td class="num">5</td>
+      <td class="num">4,767</td>
+      <td class="num">4,767</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-MFIT">Masters Tournament: Matt Fitzpatrick wins</a><br><span class="ticker">KXPGATOUR-MAST27-MFIT</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0200</td>
-      <td class="num">$0.0210 / $0.0230</td>
-      <td class="num">$0.0020</td>
+      <td class="num">$0.0210 / $0.0300</td>
+      <td class="num">$0.0090</td>
       <td class="num">0</td>
       <td class="num">826,114</td>
       <td class="num">826,086</td>
@@ -328,8 +354,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-RGER">Masters Tournament: Ryan Gerard wins</a><br><span class="ticker">KXPGATOUR-MAST27-RGER</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0080</td>
-      <td class="num">$0.0010 / $1.0000</td>
-      <td class="num">$0.9990</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
       <td class="num">0</td>
       <td class="num">348,611</td>
       <td class="num">348,611</td>
@@ -354,8 +380,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-BCAU">Masters Tournament: Bud Cauley wins</a><br><span class="ticker">KXPGATOUR-MAST27-BCAU</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0030</td>
-      <td class="num">$0.0010 / $0.0100</td>
-      <td class="num">$0.0090</td>
+      <td class="num">$0.0030 / $0.0050</td>
+      <td class="num">$0.0020</td>
       <td class="num">0</td>
       <td class="num">166,677</td>
       <td class="num">166,675</td>
@@ -367,8 +393,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-ASMA">Masters Tournament: Alex Smalley wins</a><br><span class="ticker">KXPGATOUR-MAST27-ASMA</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0030</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
+      <td class="num">$0.0030 / $0.0080</td>
+      <td class="num">$0.0050</td>
       <td class="num">0</td>
       <td class="num">155,556</td>
       <td class="num">155,556</td>
@@ -380,8 +406,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-LHER">Masters Tournament: Lucas Herbert wins</a><br><span class="ticker">KXPGATOUR-MAST27-LHER</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0030</td>
-      <td class="num">$0.0030 / $0.0050</td>
-      <td class="num">$0.0020</td>
+      <td class="num">$0.0010 / $1.0000</td>
+      <td class="num">$0.9990</td>
       <td class="num">0</td>
       <td class="num">111,123</td>
       <td class="num">55,556</td>
@@ -403,24 +429,11 @@
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr>
 <tr>
-      <td><a href="../market.html?ticker=KXPGATOUR-MAST27-MWAL">Masters Tournament: Matt Wallace wins</a><br><span class="ticker">KXPGATOUR-MAST27-MWAL</span></td>
-      <td><span class="tag golf">Golf</span></td>
-      <td class="num">$0.0030</td>
-      <td class="num">$0.0020 / $0.0030</td>
-      <td class="num">$0.0010</td>
-      <td class="num">0</td>
-      <td class="num">55,556</td>
-      <td class="num">55,556</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-AFIT">Masters Tournament: Alex Fitzpatrick wins</a><br><span class="ticker">KXPGATOUR-MAST27-AFIT</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0030</td>
-      <td class="num">$0.0010 / $1.0000</td>
-      <td class="num">$0.9990</td>
+      <td class="num">$0.0030 / $0.0050</td>
+      <td class="num">$0.0020</td>
       <td class="num">0</td>
       <td class="num">55,556</td>
       <td class="num">55,556</td>
@@ -432,8 +445,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-SSCH">Masters Tournament: Scottie Scheffler wins</a><br><span class="ticker">KXPGATOUR-MAST27-SSCH</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.1600</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
+      <td class="num">$0.1700 / $0.1800</td>
+      <td class="num">$0.0100</td>
       <td class="num">0</td>
       <td class="num">46,934</td>
       <td class="num">46,296</td>
@@ -458,40 +471,14 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-JRAH">Masters Tournament: Jon Rahm wins</a><br><span class="ticker">KXPGATOUR-MAST27-JRAH</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0720</td>
-      <td class="num">$0.0000 / $0.3200</td>
-      <td class="num"><span class="muted">—</span></td>
+      <td class="num">$0.0470 / $0.0500</td>
+      <td class="num">$0.0030</td>
       <td class="num">0</td>
       <td class="num">8,337</td>
       <td class="num">8,337</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="../market.html?ticker=KXPGATOUR-MAST27-CYOU">Masters Tournament: Cameron Young wins</a><br><span class="ticker">KXPGATOUR-MAST27-CYOU</span></td>
-      <td><span class="tag golf">Golf</span></td>
-      <td class="num">$0.0350</td>
-      <td class="num">$0.0540 / $0.0590</td>
-      <td class="num">$0.0050</td>
-      <td class="num">0</td>
-      <td class="num">4,762</td>
-      <td class="num">4,762</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="../market.html?ticker=KXPGATOP20-THRC26-PCOO">Pierceson Coody finishes top 20</a><br><span class="ticker">KXPGATOP20-THRC26-PCOO</span></td>
-      <td><span class="tag golf">Golf</span></td>
-      <td class="num">$0.2400</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
-      <td class="num">0</td>
-      <td class="num">1,361</td>
-      <td class="num">1,361</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOP20&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr>
 <tr>
       <td><a href="../market.html?ticker=KXPGAR1LEAD-MAST27-HENG">Will Harris English lead at the end of Round 1 in the The Masters?</a><br><span class="ticker">KXPGAR1LEAD-MAST27-HENG</span></td>
@@ -510,8 +497,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-JNIE">Masters Tournament: Joaquin Niemann wins</a><br><span class="ticker">KXPGATOUR-MAST27-JNIE</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0200</td>
-      <td class="num">$0.0010 / $1.0000</td>
-      <td class="num">$0.9990</td>
+      <td class="num">$0.0060 / $0.0110</td>
+      <td class="num">$0.0050</td>
       <td class="num">0</td>
       <td class="num">182</td>
       <td class="num">0</td>
@@ -523,8 +510,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-TFLE">Masters Tournament: Tommy Fleetwood wins</a><br><span class="ticker">KXPGATOUR-MAST27-TFLE</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0200</td>
-      <td class="num">$0.0210 / $0.0250</td>
-      <td class="num">$0.0040</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
       <td class="num">0</td>
       <td class="num">140</td>
       <td class="num">0</td>
@@ -536,8 +523,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-SBUR">Masters Tournament: Sam Burns wins</a><br><span class="ticker">KXPGATOUR-MAST27-SBUR</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0200</td>
-      <td class="num">$0.0150 / $0.0200</td>
-      <td class="num">$0.0050</td>
+      <td class="num">$0.0170 / $0.0500</td>
+      <td class="num">$0.0330</td>
       <td class="num">0</td>
       <td class="num">122</td>
       <td class="num">0</td>
@@ -575,8 +562,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-RMCI">Masters Tournament: Rory McIlroy wins</a><br><span class="ticker">KXPGATOUR-MAST27-RMCI</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0200</td>
-      <td class="num">$0.0700 / $0.0980</td>
-      <td class="num">$0.0280</td>
+      <td class="num">$0.0790 / $0.0950</td>
+      <td class="num">$0.0160</td>
       <td class="num">0</td>
       <td class="num">48</td>
       <td class="num">0</td>
@@ -588,8 +575,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-SLOW">Masters Tournament: Shane Lowry wins</a><br><span class="ticker">KXPGATOUR-MAST27-SLOW</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0200</td>
-      <td class="num">$0.0080 / $0.0100</td>
-      <td class="num">$0.0020</td>
+      <td class="num">$0.0070 / $0.0180</td>
+      <td class="num">$0.0110</td>
       <td class="num">0</td>
       <td class="num">46</td>
       <td class="num">0</td>
@@ -601,8 +588,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-LABE">Masters Tournament: Ludvig Aberg wins</a><br><span class="ticker">KXPGATOUR-MAST27-LABE</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0200</td>
-      <td class="num">$0.0010 / $1.0000</td>
-      <td class="num">$0.9990</td>
+      <td class="num">$0.0230 / $0.0420</td>
+      <td class="num">$0.0190</td>
       <td class="num">0</td>
       <td class="num">26</td>
       <td class="num">0</td>
@@ -640,8 +627,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-WCLA">Masters Tournament: Wyndham Clark wins</a><br><span class="ticker">KXPGATOUR-MAST27-WCLA</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0200</td>
-      <td class="num">$0.0210 / $0.0430</td>
-      <td class="num">$0.0220</td>
+      <td class="num">$0.0210 / $0.0230</td>
+      <td class="num">$0.0020</td>
       <td class="num">0</td>
       <td class="num">4</td>
       <td class="num">0</td>
@@ -715,19 +702,6 @@
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGARYDER&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr>
 <tr>
-      <td><a href="../market.html?ticker=KXPGATOP20-THRC26-EGRI">Emiliano Grillo finishes top 20</a><br><span class="ticker">KXPGATOP20-THRC26-EGRI</span></td>
-      <td><span class="tag golf">Golf</span></td>
-      <td class="num">$0.5100</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
-      <td class="num">0</td>
-      <td class="num">1</td>
-      <td class="num">1</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOP20&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-JSPI">Masters Tournament: Jordan Spieth wins</a><br><span class="ticker">KXPGATOUR-MAST27-JSPI</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
@@ -744,8 +718,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-XSCH">Masters Tournament: Xander Schauffele wins</a><br><span class="ticker">KXPGATOUR-MAST27-XSCH</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0260 / $0.0300</td>
-      <td class="num">$0.0040</td>
+      <td class="num">$0.0010 / $1.0000</td>
+      <td class="num">$0.9990</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -770,8 +744,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-TWOO">Masters Tournament: Tiger Woods wins</a><br><span class="ticker">KXPGATOUR-MAST27-TWOO</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0010 / $1.0000</td>
-      <td class="num">$0.9990</td>
+      <td class="num">$0.0060 / $0.0400</td>
+      <td class="num">$0.0340</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -783,8 +757,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-TKIM">Masters Tournament: Tom Kim wins</a><br><span class="ticker">KXPGATOUR-MAST27-TKIM</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
+      <td class="num">$0.0070 / $0.0150</td>
+      <td class="num">$0.0080</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -809,8 +783,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-SJIM">Masters Tournament: Sungjae Im wins</a><br><span class="ticker">KXPGATOUR-MAST27-SJIM</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
+      <td class="num">$0.0030 / $0.0100</td>
+      <td class="num">$0.0070</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -835,8 +809,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-RFOW">Masters Tournament: Rickie Fowler wins</a><br><span class="ticker">KXPGATOUR-MAST27-RFOW</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
+      <td class="num">$0.0030 / $0.0110</td>
+      <td class="num">$0.0080</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -846,19 +820,6 @@
     </tr>
 <tr>
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-PREE">Masters Tournament: Patrick Reed wins</a><br><span class="ticker">KXPGATOUR-MAST27-PREE</span></td>
-      <td><span class="tag golf">Golf</span></td>
-      <td class="num">$0.0000</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
-      <td class="num">0</td>
-      <td class="num">0</td>
-      <td class="num">0</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="../market.html?ticker=KXPGATOUR-MAST27-PCAN">Masters Tournament: Patrick Cantlay wins</a><br><span class="ticker">KXPGATOUR-MAST27-PCAN</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
       <td class="num">$0.0100 / $0.0130</td>
@@ -871,11 +832,24 @@
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr>
 <tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-MAST27-PCAN">Masters Tournament: Patrick Cantlay wins</a><br><span class="ticker">KXPGATOUR-MAST27-PCAN</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0000</td>
+      <td class="num">$0.0010 / $1.0000</td>
+      <td class="num">$0.9990</td>
+      <td class="num">0</td>
+      <td class="num">0</td>
+      <td class="num">0</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-MWLE">Masters Tournament: Min Woo Lee wins</a><br><span class="ticker">KXPGATOUR-MAST27-MWLE</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
+      <td class="num">$0.0120 / $0.0130</td>
+      <td class="num">$0.0010</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -887,8 +861,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-MTHO">Masters Tournament: Michael Thorbjornsen wins</a><br><span class="ticker">KXPGATOUR-MAST27-MTHO</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0010 / $1.0000</td>
-      <td class="num">$0.9990</td>
+      <td class="num">$0.0100 / $0.0130</td>
+      <td class="num">$0.0030</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -900,8 +874,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-MMCN">Masters Tournament: Maverick McNealy wins</a><br><span class="ticker">KXPGATOUR-MAST27-MMCN</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
+      <td class="num">$0.0100 / $0.0110</td>
+      <td class="num">$0.0010</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -911,6 +885,19 @@
     </tr>
 <tr>
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-MBRE">Masters Tournament: Michael Brennan wins</a><br><span class="ticker">KXPGATOUR-MAST27-MBRE</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0000</td>
+      <td class="num">$0.0170 / $0.0180</td>
+      <td class="num">$0.0010</td>
+      <td class="num">0</td>
+      <td class="num">0</td>
+      <td class="num">0</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-MAST27-KREI">Masters Tournament: Kristoffer Reitan wins</a><br><span class="ticker">KXPGATOUR-MAST27-KREI</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
       <td class="num">$0.0010 / $1.0000</td>
@@ -923,24 +910,11 @@
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr>
 <tr>
-      <td><a href="../market.html?ticker=KXPGATOUR-MAST27-KREI">Masters Tournament: Kristoffer Reitan wins</a><br><span class="ticker">KXPGATOUR-MAST27-KREI</span></td>
-      <td><span class="tag golf">Golf</span></td>
-      <td class="num">$0.0000</td>
-      <td class="num">$0.0030 / $0.0080</td>
-      <td class="num">$0.0050</td>
-      <td class="num">0</td>
-      <td class="num">0</td>
-      <td class="num">0</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-KKIT">Masters Tournament: Kurt Kitayama wins</a><br><span class="ticker">KXPGATOUR-MAST27-KKIT</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
+      <td class="num">$0.0100 / $0.0110</td>
+      <td class="num">$0.0010</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -965,8 +939,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-JTHO">Masters Tournament: Justin Thomas wins</a><br><span class="ticker">KXPGATOUR-MAST27-JTHO</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
+      <td class="num">$0.0120 / $0.0180</td>
+      <td class="num">$0.0060</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -978,8 +952,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-JSPA">Masters Tournament: J.J. Spaun wins</a><br><span class="ticker">KXPGATOUR-MAST27-JSPA</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0040 / $0.0100</td>
-      <td class="num">$0.0060</td>
+      <td class="num">$0.0040 / $0.0160</td>
+      <td class="num">$0.0120</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -991,8 +965,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-JROS">Masters Tournament: Justin Rose wins</a><br><span class="ticker">KXPGATOUR-MAST27-JROS</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0010 / $1.0000</td>
-      <td class="num">$0.9990</td>
+      <td class="num">$0.0150 / $0.0180</td>
+      <td class="num">$0.0030</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -1004,8 +978,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-JBRI">Masters Tournament: Jacob Bridgeman wins</a><br><span class="ticker">KXPGATOUR-MAST27-JBRI</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0010 / $1.0000</td>
-      <td class="num">$0.9990</td>
+      <td class="num">$0.0030 / $0.0130</td>
+      <td class="num">$0.0100</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -1017,8 +991,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-CMOR">Masters Tournament: Collin Morikawa wins</a><br><span class="ticker">KXPGATOUR-MAST27-CMOR</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
+      <td class="num">$0.0240 / $0.0250</td>
+      <td class="num">$0.0010</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -1030,8 +1004,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-CGOT">Masters Tournament: Chris Gotterup wins</a><br><span class="ticker">KXPGATOUR-MAST27-CGOT</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0120 / $0.0180</td>
-      <td class="num">$0.0060</td>
+      <td class="num">$0.0010 / $1.0000</td>
+      <td class="num">$0.9990</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -1043,8 +1017,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-BGRI">Masters Tournament: Ben Griffin wins</a><br><span class="ticker">KXPGATOUR-MAST27-BGRI</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0000 / $1.0000</td>
-      <td class="num"><span class="muted">—</span></td>
+      <td class="num">$0.0030 / $0.0080</td>
+      <td class="num">$0.0050</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -1056,8 +1030,8 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-BDEC">Masters Tournament: Bryson DeChambeau wins</a><br><span class="ticker">KXPGATOUR-MAST27-BDEC</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
-      <td class="num">$0.0240 / $0.0300</td>
-      <td class="num">$0.0060</td>
+      <td class="num">$0.0240 / $0.0250</td>
+      <td class="num">$0.0010</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -1082,8 +1056,34 @@
       <td><a href="../market.html?ticker=KXPGATOUR-MAST27-ARAI">Masters Tournament: Aaron Rai wins</a><br><span class="ticker">KXPGATOUR-MAST27-ARAI</span></td>
       <td><span class="tag golf">Golf</span></td>
       <td class="num">$0.0000</td>
+      <td class="num">$0.0030 / $0.0050</td>
+      <td class="num">$0.0020</td>
+      <td class="num">0</td>
+      <td class="num">0</td>
+      <td class="num">0</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-MAST27-ABHA">Masters Tournament: Akshay Bhatia wins</a><br><span class="ticker">KXPGATOUR-MAST27-ABHA</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0000</td>
       <td class="num">$0.0010 / $1.0000</td>
       <td class="num">$0.9990</td>
+      <td class="num">0</td>
+      <td class="num">0</td>
+      <td class="num">0</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXPGATOUR-THOC26H24975-RFOX">Will Ryan Fox win the tournament?</a><br><span class="ticker">KXPGATOUR-THOC26H24975-RFOX</span></td>
+      <td><span class="tag golf">Golf</span></td>
+      <td class="num">$0.0000</td>
+      <td class="num">$0.0100 / $1.0000</td>
+      <td class="num">$0.9900</td>
       <td class="num">0</td>
       <td class="num">0</td>
       <td class="num">0</td>
@@ -2562,7 +2562,7 @@
     (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
     <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
        WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
-       Snapshot captured 2026-11-23 20:21:06 UTC ·
+       Snapshot captured 2026-11-23 23:27:13 UTC ·
        <a href="../sources.html">Sources</a> ·
        <a href="../flagged.html">Flagged for review</a> ·
        <a href="../COORDINATION.md">Coordination board</a></p>
