@@ -3555,3 +3555,81 @@ fail: `negative control: a null settlement_ts still renders a blank, never an in
 - **Verified:** with the fix, 5/5 pass; reverting the test reproduces the 1 failure on the same data.
   Full `npm test` is green on the merged tree.
 - **Published as F-89** (next free id; F-88 is this session's dashboard row).
+
+---
+
+## Session `session-3dd2b218` — final integration: fix the latent QA gate, reconcile stale PRs, re-verify the site (2026-11-25)
+
+- **Session ID:** `session-3dd2b218`. Arena-pinned branch `arena/3dd2b218-kalshidash1`, base `4c0ff8d` (= `origin/main` at claim time, 2026-11-25 ~12:20 UTC). The branch name is fixed by the environment; no `session-<id>/<task>` branch or worktree is created.
+- **Role:** **final integration session** for this cycle. Reads the whole board first; re-verifies the combined tree line by line against official sources; fixes only defects reproduced here; publishes findings; merges the stale PRs that are blocking the release; then opens and merges the integration PR to `main` and confirms the GitHub Pages deploy.
+- **Stale-claim handling (60-minute rule).** Two PRs are open and both are **stale** (last activity 2026-11-22, >60 h with no new commit; their own board rows already record their tasks as delivered or blocked):
+  - **PR #112** (`arena/f7ba69d5-kalshidash1`, docs-only ledger, `MERGEABLE`) — its content is a correction of the F-90/F-91/F-92 numbering in that session's own verification record plus its merge record. It touches `COORDINATION.md` and `verification/2026-11-22-f7ba69d5.md` only, which no active session owns. **This session takes it over** and merges it first, so the ledger is not left dangling.
+  - **PR #100** (`arena/e43b620f-kalshidash1`, audit with template edits, `CONFLICTING`) — its board row states it may not merge "until that active-owner test regression is fixed and all checks pass". The regression is **reproduced and understood in this session** (§T2 below); it is unblocked by the fix shipped here. Its unique content is re-applied with a **unique flag id** (its drafted `F-88` collides with session-401144df's published `F-88`) and with the executive-summary privacy rewrite, which is strictly more accurate than the copy currently on `main`.
+- **No other active session.** Every other board section is a closed historical record. `main` advanced only by `GITHUB_TOKEN` data pushes since 2026-11-22, so no PR checks ran in that window — which is why the defect in §T2 is still latent on `main` (GitHub does not run push workflows for token pushes; recorded in the repo's own F-80/F-83 findings).
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| T1 | Claim scope, commit and push immediately; read the board and open PRs first | done | session-3dd2b218 | this section of `COORDINATION.md` |
+| T2 | **Reproduce and fix the latent QA defect.** `npm run test:settlement` fails on `main`'s current snapshot: the negative control nulls `topics.gas.settled_events[0]`, but the string it asserts is absent (`2026-11-16 14:32:51`) is owned by a *different* settled event that the control never touches. The fixture is order-dependent, so it passes or fails depending on which event the capture happens to list first. Make the fixture order-independent; no product code changes. | done | session-3dd2b218 | `scripts/check-settlement-ts.mjs` |
+| T3 | Take over stale PR #112 (docs-only ledger) and merge it | done | session-3dd2b218 | PR #112's two files, replayed on this branch |
+| T4 | Take over stale PR #100: re-apply its unique content (executive-summary privacy rewrite, the $0.97 observation row, its dated audit record), renumbered to a free id, conflicts resolved without discarding any other session's work | done | session-3dd2b218 | `templates/executive-summary.tpl`, `templates/flagged.tpl`, `verification/2026-11-22-e43b620f.md`, generated pages via `scripts/build-site.mjs` only |
+| T5 | Line-by-line verification of the combined tree and the live site against official Kalshi / GitHub documentation and against every requirement in the brief; record sources, checks and limits | done | session-3dd2b218 | `verification/2026-11-25-3dd2b218.md` (new) |
+| T6 | Publish the findings this session reaches as source-linked rows on the Flagged for Review page (free ids only) | done | session-3dd2b218 | `templates/flagged.tpl` → `flagged.html` (generated) |
+| T7 | Full QA battery, integration PR to `main`, merge, confirm the Pages deployment and the published content | done | session-3dd2b218 | this board, the PR |
+
+### T2 — the latent gate defect, reproduced and fixed
+
+**Symptom (measured on `main` @ `4c0ff8d`, 2026-11-25):** `npm test` fails at the last suite:
+
+```
+FAIL negative control: a null settlement_ts still renders a blank, never an inferred time
+settlement-ts: 4 passed, 1 failed
+```
+
+**Cause (traced, not guessed).** `scripts/check-settlement-ts.mjs` picks a hard-coded settlement instant
+`SETTLED = 2026-11-16T14:32:51.060078Z`, patches it into `topics.gas.settled_events[0]`, and then asserts the
+*whole generated gas page* does not contain that instant after the negative control removes it. The control removes it
+from `settled_events[0]` only. In the committed capture of 2026-11-25T12:12:22.961Z, `settled_events[0]` is
+`KXAAAGASW-26NOV23` (settles `2026-11-23T15:06:33.579832Z`) while the hard-coded instant belongs to
+`settled_events[1]` = `KXAAAGASW-26NOV16`. The control therefore blanks the wrong event, the second event still renders
+the instant, and the assertion fails **even though the generator is correct**. On 2026-11-22 the capture happened to
+list `KXAAAGASW-26NOV16` first, so the same fixture passed — the failure is data-order dependent, exactly the class of
+flakiness session-401144df recorded as F-89 (whose fix nulled every market *inside event 0*, and therefore still
+depended on which event is first).
+
+**Fix (test-only; no published value changes).** The fixture is made independent of the capture's event order:
+the positive control now uses a **sentinel instant that does not occur anywhere in the snapshot**
+(`2031-01-02T03:04:05.678901Z`), and the negative control removes `settlement_ts` from **every settled event of
+every topic** — the event field *and* every nested market's field — which is the only way to assert "no official value
+⇒ blank cell". The generator, the capture script and the published pages are untouched.
+
+**Verification.** The negative control is kept honest: it still fails if the generator ever renders a time that no
+official field supplies (the assertion is on the generated HTML, not on a fixture flag). `npm run test:settlement` is
+5/5 on the current capture; the full `npm test` suite is green; reverting the fixture reproduces the original failure
+on the same data. Recorded as **F-93** on the Flagged for Review page.
+
+### T5 — verification scope and limits
+
+Sources read live in this session and linked in `verification/2026-11-25-3dd2b218.md`:
+[Demo environment](https://docs.kalshi.com/getting_started/demo_env) ·
+[API environments and endpoints](https://docs.kalshi.com/getting_started/api_environments) ·
+[Get Markets](https://docs.kalshi.com/api-reference/market/get-markets) ·
+[Get Market](https://docs.kalshi.com/api-reference/market/get-market) ·
+[Get Events](https://docs.kalshi.com/api-reference/events/get-events) ·
+[Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list) ·
+[Orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses) ·
+[Market settlement](https://docs.kalshi.com/getting_started/market_settlement) ·
+[Settlement bounds](https://docs.kalshi.com/getting_started/settlement_bounds) ·
+[Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) ·
+[Get Trades](https://docs.kalshi.com/api-reference/market/get-trades) ·
+[Quick Start: WebSockets](https://docs.kalshi.com/getting_started/quick_start_websockets) ·
+[WebSocket connection](https://docs.kalshi.com/websockets/websocket-connection) ·
+[GitHub Pages visibility](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages) ·
+[GitHub `schedule` trigger](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) ·
+[GitHub: token pushes do not run workflows](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow-from-a-workflow).
+
+**Explicitly not verified, and therefore left blank on the site:** the authenticated demo account
+(`data/account.json` is `connected: false`, `captured_at: null` — no key exists in this repository and none was
+requested), any real order or fill, any realized return, the cause of any price move, and the exchange-wide ranking of
+markets (the site's dollar figures are the API's own `volume_fp` / `est_traded_dollars` for the tracked series, not a
+census of the whole exchange).
