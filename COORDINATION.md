@@ -3589,11 +3589,11 @@ will neither edit nor take over those branches. No other active claim exists on 
 
 | ID | Task | Status | Owner | File scope (only these) |
 |---|---|---|---|---|
-| A1 | Read the board, claim this section, commit and push before any other edit. | in progress | session-a9c4969e | this section of `COORDINATION.md` |
-| A2 | Run the full repository QA suite (`npm ci && npm test`, `build-site --check`) on the current `main` tip; reproduce any failure before touching anything. | unclaimed | session-a9c4969e | read-only unless a defect is reproduced (then claimed separately) |
-| A3 | Re-read the official Kalshi demo-environment and market/orderbook pages that the site cites, and check the user-supplied demo endpoints against them. Flag, do not infer. | unclaimed | session-a9c4969e | read-only; findings go to `verification/2026-11-25-a9c4969e.md` |
-| A4 | Check the deployed GitHub Pages site and the committed `data/live/` timestamps against the 45-minute staleness rule; record the measured cadence of scheduled runs. | unclaimed | session-a9c4969e | read-only; findings go to `verification/2026-11-25-a9c4969e.md` |
-| A5 | Final integration for this session's record only: PR of this branch to `main`, merge, confirm the Pages deploy, record PR/merge in this section. | unclaimed | session-a9c4969e | this section, `verification/2026-11-25-a9c4969e.md` |
+| A1 | Read the board, claim this section, commit and push before any other edit. | done | session-a9c4969e | this section of `COORDINATION.md` |
+| A2 | Run the full repository QA suite (`npm ci && npm test`, `build-site --check`) on the current `main` tip; reproduce any failure before touching anything. | done (one reproduced failure fixed under A6) | session-a9c4969e | read-only unless a defect is reproduced (then claimed separately) |
+| A3 | Re-read the official Kalshi demo-environment and market/orderbook pages that the site cites, and check the user-supplied demo endpoints against them. Flag, do not infer. | done (endpoints match verbatim; 3 flags F-A9C-01..03) | session-a9c4969e | read-only; findings go to `verification/2026-11-25-a9c4969e.md` |
+| A4 | Check the deployed GitHub Pages site and the committed `data/live/` timestamps against the 45-minute staleness rule; record the measured cadence of scheduled runs. | done (engine sample ~12 min old; live-alerts cron 6–10 h apart, already F-83) | session-a9c4969e | read-only; findings go to `verification/2026-11-25-a9c4969e.md` |
+| A5 | Final integration for this session's record only: PR of this branch to `main`, merge, confirm the Pages deploy, record PR/merge in this section. | in progress | session-a9c4969e | this section, `verification/2026-11-25-a9c4969e.md` |
 
 ### A6 — defect claimed before editing (session-a9c4969e)
 
@@ -3614,3 +3614,11 @@ will neither edit nor take over those branches. No other active claim exists on 
 | A4 | done | Pages index serves the 2026-11-25 12:12:22Z capture. Keepalive (`4,19,34,49 * * * *`) committed `pulse 12:13:04Z` and runs the engine itself, so the engine state (`12:12:12Z`) is inside the 45-minute STALE threshold. Scheduled `live-alerts` runs remain 6–10 h apart (already F-83, not re-published). |
 
 **Flags claimed before editing (rows only):** `templates/flagged.tpl` (three new rows `F-A9C-01..03`, appended after F-91) and the generated `flagged.html` via `scripts/build-site.mjs` only. Numeric IDs are avoided on purpose because open PR #112 is renumbering F-90–F-92 and open PR #100 also edits this template; this session does not touch either PR's branch. Other pages are not edited.
+
+### Completion record — session-a9c4969e (A2–A4 done; A5 integration in progress)
+
+- **Files changed in this session:** `scripts/check-settlement-ts.mjs` (A6 test fix), `templates/flagged.tpl` (three rows `F-A9C-01..03`), generated `flagged.html`, new `verification/2026-11-25-a9c4969e.md`, and this board section. No data file, no other page and no other session's PR branch was edited.
+- **Sources (official, fetched 2026-11-25):** [Test In The Demo Environment](https://docs.kalshi.com/getting_started/demo_env), [API Environments and Endpoints](https://docs.kalshi.com/getting_started/api_environments), [Orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses), live demo Trade API reads (`/series`, `/markets`), [GitHub `schedule` trigger](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule).
+- **Verification performed:** full `npm test` (exit 0 after A6), `build-site --check`, `check-links` (0 broken internal), `linkcheck.py`, `test:rows` (1,031 canonical rows, 0 problems), `test:ids` (620 ids, no duplicates), `test:writers` (43/43), and a field-by-field check of one live market row against the official endpoints.
+- **Irregularities flagged (not repaired, `Needs review`):** F-A9C-01 (non-publisher culture settlement sources), F-A9C-02 (malformed blank contract-document fields on `KXSUIPERP`), F-A9C-03 (one unexplained page-render mismatch on the BTC bid/ask, not reproduced). F-L4-07 re-confirmed live.
+- **Board hygiene:** PR #112 (`arena/f7ba69d5-kalshidash1`) was merged to `main` as `c8af9d8` while this session worked. This session rebased its own branch onto that merge and replaced its own three commits on this branch (never merged to `main`) with `--force-with-lease`; no other session's commits were rewritten. PR #100 (`arena/e43b620f-kalshidash1`) is still open and stale and also touches `templates/flagged.tpl`; it is left for its owner. Expect a possible textual conflict in that template if it is merged later.
