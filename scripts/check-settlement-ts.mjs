@@ -48,8 +48,13 @@ ok('build-site.mjs resolvedTable reads r.m.settlement_ts',
   'the Settled-at cell must fall back to the market-level field');
 
 /* 3. End-to-end: run the real generator in a scratch tree with a patched real snapshot. */
-const SETTLED = '2026-11-16T14:32:51.060078Z';
-const WANT = '2026-11-16 14:32:51';
+/* A synthetic SENTINEL timestamp that appears nowhere in data/snapshot.json or in the generated
+ * pages (verified 2026-11-25). Using a real capture value made the negative control depend on
+ * which event happens to be first: on 2026-11-25 settled_events[0] is KXAAAGASW-26NOV23, but
+ * settled_events[1] (KXAAAGASW-26NOV16) legitimately carries 2026-11-16 14:32:51 on all 12 markets,
+ * so the page-wide "must be absent" check failed with the generator working correctly (F-89 class). */
+const SETTLED = '1999-12-31T23:59:59.000001Z';
+const WANT = '1999-12-31 23:59:59';
 
 function generateWith(patch) {
   const dir = mkdtempSync(path.join(tmpdir(), 'kd-settle-'));
