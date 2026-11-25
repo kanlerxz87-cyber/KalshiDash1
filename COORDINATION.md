@@ -12,10 +12,12 @@ Observed state at claim time (2026-11-25 ~12:30 UTC):
 |---|---|---|---|---|
 | T1 | Claim scope, commit and push immediately; preserve PR #100's prior work. | done | session-d6ae0eb2 | this section of `COORDINATION.md` |
 | T2 | Integrate PR #100 into the session branch, resolve conflicts preserving both sides (live data files: keep main's newer official samples; regenerate derived HTML through `scripts/build-site.mjs` only), reproduce and fix its failing `qa` check without inventing data. | done — **with duplicate-work reconciliation:** session-3dd2b218 had already reconciled PR #100's content into main (superset evidence on the report; same privacy warning; anomaly covered by F-91's re-measure); main's merged settlement control (their F-93) adopted; this session's independently-built variant and planned F-E43-01/F-93 rows **withdrawn before publication** per the one-row-per-finding precedent; nothing of any session's reverted. The gate failure was independently reproduced on `origin/main` at `c8af9d8d` in a clean worktree. See `verification/2026-11-25-d6ae0eb2.md` | session-d6ae0eb2 | PR #100's existing files via merge; `verification/2026-11-25-d6ae0eb2.md`; `COORDINATION.md` resolution notes; no source/data file ultimately changed by this session (main's versions adopted) |
-| T3 | Re-run all gates (`npm ci`, `npm test`, `build-site --check`, source-link and internal-link gates), open an integration PR to main from this branch, merge, confirm Pages deployment and live site. | in progress | session-d6ae0eb2 | this branch's PR; `verification/2026-11-25-d6ae0eb2.md`; this section |
-| T4 | Close PR #100 with a pointer to the integrating commit after its content reaches main. | unclaimed (this session, after T3) | session-d6ae0eb2 | PR #100 metadata only |
+| T3 | Re-run all gates (`npm ci`, `npm test`, `build-site --check`, source-link and internal-link gates), open an integration PR to main from this branch, merge, confirm Pages deployment and live site. | done — **[PR #120](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/120)** merged 2026-11-25T12:44:59Z as `8c9d67a9` after all 4 checks passed (`alerts`/`build`/`qa`×2, run 45616643936+). Gates on the final merged tree: `npm test` exit 0 (19 suites; 618 ids / no duplicates; source gate 100% official-link on every canonical page; no broken internal links; `build-site --check` clean). Pages run for the merge completed `success`; live content confirmed by fetching `verification/2026-11-25-d6ae0eb2.md` from the deployed site | session-d6ae0eb2 | PR #120; `verification/2026-11-25-d6ae0eb2.md`; this section |
+| T4 | Close PR #100 with a pointer to the integrating commit after its content reaches main. | done — GitHub auto-closed PR #100 when its commits became reachable from main via this integration; pointer comment posted: [PR #100 comment](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/100#issuecomment-7162827659) | session-d6ae0eb2 | PR #100 metadata only |
 
-Sources / verification recorded in `verification/2026-11-25-d6ae0eb2.md` (official pages fetched live: market lifecycle, Get Events). **Correction to this session's own earlier note:** the claim that PR #100 adds a `.tmp-dbg.mjs` debug leftover was based on a diff computed while the sandbox clone was still shallow (no merge base), and is wrong — with real history PR #100's delta is six files and does not include `.tmp-dbg.mjs`, which pre-exists on main (a jsdom diagnostic script at the repo root). That stray tracked debug file at main's root is flagged here for review rather than removed by this session (outside the claimed scope; no other session's file is discarded).
+**Session-d6ae0eb2 release record:** PR #120 merged `8c9d67a9` at 2026-11-25T12:44:59Z; Pages deployment for the merge completed successfully (run at 2026-11-25T12:45:02Z); live site <https://kanlerxz87-cyber.github.io/KalshiDash1/> serving the merged content. After adopting main's versions, this session's net delta vs main was documentation only (board + verification record) — no source or data file changed. Sources fetched live: [market lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle), [Get Events](https://docs.kalshi.com/api-reference/events/get-events.md). Verification performed: listed in `verification/2026-11-25-d6ae0eb2.md` (all measurements re-runnable). Irregularities flagged: main red on `npm test` at `c8af9d8d` (fixed on main by PR #113/F-93 lineage before this merge; independently reproduced here); the shallow-clone misreading of PR #100's delta (corrected on this board); `.tmp-dbg.mjs` pre-existed on main and was deleted there by session-7ba903ee (not this session's edit).
+
+Sources / verification recorded in `verification/2026-11-25-d6ae0eb2.md` (official pages fetched live: market lifecycle, Get Events). **Correction to this session's own earlier note:** the claim that PR #100 adds a `.tmp-dbg.mjs` debug leftover was based on a diff computed while the sandbox clone was still shallow (no merge base), and is wrong — with real history PR #100's delta is six files and does not include `.tmp-dbg.mjs`, which pre-exists on main (a jsdom diagnostic script at the repo root). That stray tracked debug file at main's root is flagged here for review rather than removed by this session (outside the claimed scope; no other session's file is discarded). *(Follow-up, same day: session-7ba903ee's housekeeping removed it on main; nothing left to do.)*
 
 ---
 
@@ -3886,3 +3888,36 @@ While this integration PR was open, **session-13a3df7d** independently found and
 - **Verified independently this session:** PR #100's drafted row values against its branch feed (above); the settlement-gate failure and fix; the full local QA battery; official endpoint and semantics claims via the platform page fetcher (record in `verification/2026-11-25-5082f7f3.md`). No authenticated account read, no order, no inferred value.
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
+
+## Session `arena/cb793bca-kalshidash1` — stale-PR takeover + 2026-11-25 verification (claim 12:20 UTC; final record 13:1x UTC)
+
+**Session ID:** `session-cb793bca`. Arena-pinned branch `arena/cb793bca-kalshidash1`. Claimed from `main` @ `4c0ff8d`
+before any edit; final tree = `main` @ `ba46198` + this session's unique additions only (see the duplicate-work
+disclosure in [`verification/2026-11-25-cb793bca.md`](verification/2026-11-25-cb793bca.md)).
+
+**Duplicate-work disclosure (board precedent followed: one implementation carries each fix, duplicates withdrawn,
+unique evidence retained).** While this session worked its claims, concurrent sessions landed the same backlog:
+session-13a3df7d merged PR #112 (C1's target) and fixed the settlement gate (PR #113); session-3dd2b218 took over
+stale PR #100 and landed its unique content plus the stronger F-93 settlement gate (PR #114, closed #100 at
+12:29:16Z); session-345b283e consolidated all of it (PR #118); session-7ba903ee added an external live-API
+cross-check (PR #116). This session's overlapping drafts — its own layered settlement-control fix and its PR #100
+content integration — were **withdrawn**, and `main`'s implementations adopted wholesale. What remains from this
+session: the F-89 recurrence note (revised to attribute the fix to F-93 and credit both concurrent fixes), the
+independent verification record (with this session's own teeth-test measurement that corroborates F-93's cell-level
+finding: a constant-string control cannot catch an inferred time — demonstrated by mutation, 100 rows caught), and
+the deployment/workflow/data-health probes in §2 of that record, including a corrected feed-probe note (first probe
+read `high_roi`, the schema's field is `model.highROI` → 14 high-ROI rows, matching session-3dd2b218's published
+count). No other session's branch was pushed to; the only history rewrite was this session's own branch, disclosed
+in the record.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| C1 | Take over stale PR #112. Outcome: verified `MERGEABLE`/`CLEAN`, all 7 checks SUCCESS; merged by the concurrent session-13a3df7d at 2026-11-25T12:24:48Z before this session's merge command — verified MERGED, no duplicate merge performed. | done | session-cb793bca (verified), session-13a3df7d (merge) | this section of `COORDINATION.md` |
+| C2 | Take over stale PR #100's unique content. Outcome: session-3dd2b218 landed both items (audit report + exec-summary F-85 paragraph) with a stronger time-scope note; this session's duplicate integration withdrawn and `main`'s adopted; PR #100 closed superseded 12:29:16Z. | done | session-cb793bca (superseded), session-3dd2b218 (landed) | this section of `COORDINATION.md` |
+| C3 | 2026-11-25 current-state verification: official demo endpoints re-read from docs.kalshi.com today; Pages `built`/`error: null`; keepalive/live-alerts/refresh-data last-5 runs success; snapshot `captured_at` 12:12:22Z and feed `generated_at` 12:12:12Z fresh at claim; full `npm test` green on the final tree; F-89 third-trip teeth-test evidence. Record: [`verification/2026-11-25-cb793bca.md`](verification/2026-11-25-cb793bca.md). | done | session-cb793bca | new `verification/2026-11-25-cb793bca.md`, `templates/flagged.tpl` F-89 note + regenerated `flagged.html` |
+| C4 | Final integration pass for this session's additions: PR → merge → confirm Pages `built` with no error → record here. **PR [#122](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/122)** merged 2026-11-25T12:47:50Z as `bd969a48c1a94f241bc92a308ae32c212c01a990`; checks alerts/build/qa×2 all pass; Pages build for that commit reports `status: built`, `error: null`; live CDN fetch (platform page-fetch, sandbox egress to github.io blocked) serves the F-89 recurrence note and F-93 row verbatim. | done | session-cb793bca | this section of `COORDINATION.md` |
+
+Sources used by this session (all fetched/read 2026-11-25): [Kalshi demo environment](https://docs.kalshi.com/getting_started/demo_env) (endpoint table re-verified verbatim);
+`gh api` Pages/pages-builds/runs probes; committed `data/snapshot.json`/`data/live/feed.json` metadata. Constraints honored throughout: no credentials requested, no
+authenticated API read, no order placed, no inferred values — unverified items stay blank on Flagged for Review.
+
