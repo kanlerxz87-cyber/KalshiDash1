@@ -3592,7 +3592,7 @@ fail: `negative control: a null settlement_ts still renders a blank, never an in
 | T1 | Repo review + line-by-line coverage check vs the brief: executive summary, landing page, category subpages (gas/elections/culture/crypto/golf), dashboard, dual ≥$0.10 scrolling alert chats, resolution tracking (yes/no), automated simulated trades, portfolio, time-window price charts, liquidity/orders-available, suggestions | done | session-13a3df7d | read-only + COORDINATION.md | Kalshi demo_env, orderbook_responses, market_lifecycle, get-trades, candlesticks docs (docs.kalshi.com); live site pages | none |
 | T2 | Fix settlement negative-control test: null settlement_ts on all settled events + all markets so "null renders blank, never inferred" is proven rather than shadowed by sibling events | done | session-13a3df7d | `scripts/check-settlement-ts.mjs` | test's own measurement note; aligns with F-89 record at end of this board | test flaw only (site correct — all-null renders blank) |
 | T3 | Full QA: `npm test` (engine/feed/paper/chart/settlement/lab/privacy/writers/cors/rows/ids/stale), `build-site.mjs --check`, both link checkers (90 pages, 2,227 internal links, 0 broken) | done | session-13a3df7d | scripts/, tools/, data/ | npm test | none |
-| T4 | PR `arena/13a3df7d-kalshidash1` → `main`, merge without waiting, confirm GitHub Pages build, record PR link + merge result here | in progress | session-13a3df7d | COORDINATION.md (this section) | gh, Pages API | none |
+| T4 | PR `arena/13a3df7d-kalshidash1` → `main`, merge without waiting, confirm GitHub Pages build, record PR link + merge result here | done | session-13a3df7d | COORDINATION.md (this section) | gh, Pages API | none |
 
 ### Record — session-13a3df7d (2026-11-25)
 
@@ -3619,3 +3619,11 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review`.
 | E4 | Rebase on latest `main` (expected: settlement-gate fix from the concurrent sessions), full `npm test` evidence, PR of this branch to `main`, merge, confirm the Pages deploy, record PR/merge + sources in this section. | in progress — base `4c0ff8d` `npm test` reproduces the `test:settlement` negative-control failure (13 suites green before it); waiting for the concurrent owners' fix to merge before rebasing, so this PR does not duplicate or pre-empt their file | session-7ba903ee | this section, `verification/2026-11-25-7ba903ee.md` |
 
 Every checked value in E2 is recorded with its official/live source link; unconfirmable values stay blank and are flagged, never inferred.
+
+### PR & merge record (T4) — session-13a3df7d
+
+- **Pull request:** https://github.com/kanlerxz87-cyber/KalshiDash1/pull/113 (`arena/13a3df7d-kalshidash1` → `main`).
+- **Pre-merge checks:** `npm test` green end to end; `build-site.mjs --check` clean; `check-links.mjs` 90 pages / 0 broken internal; `python3 tools/linkcheck.py` 2,227 internal links / 0 broken.
+- **Merge:** `gh pr merge 113 --merge`; merge commit `343ecc99e0bb234544ffbc6f7aadbb1fec9c9675` on `main` (2026-11-25). Merged without waiting for approval, per brief. First-try merge, no conflicts.
+- **GitHub Pages:** latest build `1402186446` for commit `343ecc9` → status `built`, error `null` (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest`, 2026-11-25T12:28:20Z). Pages source is legacy `main` `/`; live site at https://kanlerxz87-cyber.github.io/KalshiDash1/ — landing page, category subpages (gas/elections/culture/crypto/golf), dashboard, dual alert chats, market chart, portfolio/analysis, sources and flagged pages all served from the root.
+- **No broken site deployed:** build and all checks were green before merge; Pages build has no error.
