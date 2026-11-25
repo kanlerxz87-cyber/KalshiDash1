@@ -111,14 +111,15 @@ try {
     ev.markets[0].settlement_ts = SETTLED;
   });
   negativeHtml = generateWith((snap) => {
-    /* The negative control must remove the value from EVERY settled market of EVERY topic:
-     *   - 2026-11-22: all 12 nested markets of KXAAAGASW-26NOV16 legitimately share this
-     *     settlement timestamp (they settle together), so nulling only markets[0] left 11 rows
-     *     still rendering the string;
-     *   - 2026-11-25: the hard-coded instant belonged to a settled event other than
-     *     settled_events[0], so nulling only event 0 left the string on the page.
-     * Nulling every event and every nested market is the only way to test "no official value
-     * anywhere => blank cell everywhere". */
+    /* The negative control must remove the value from EVERY settled event and EVERY market.
+     * Two independent observations led here, both measured:
+     *   - 2026-11-22 (session-13a3df7d, PR #113): gas renders 12 settled events, so nulling only
+     *     settled_events[0] left the other 11 rows still rendering their timestamps and the control
+     *     failed even though the generator was correct;
+     *   - 2026-11-25 (session-3dd2b218): the hard-coded instant belonged to a settled event other
+     *     than settled_events[0], so nulling only event 0 left the string on the page.
+     * Nulling every event and every nested market of EVERY topic is the only way to test
+     * "no official value anywhere => blank cell everywhere". */
     for (const topic of Object.values(snap.topics || {})) {
       for (const ev of topic.settled_events || []) {
         ev.settlement_ts = null;
