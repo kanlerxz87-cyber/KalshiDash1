@@ -48,11 +48,13 @@
       <li><strong>Price and liquidity.</strong> Gold markers and source-linked rows identify observed ≥ $0.10 changes; missing news causes stay unverified. Snapshot times are never relabelled as current.  A time-series chart with selectable 30-second to 24-hour windows, a price axis, and
       an order-book ladder that answers "how many contracts are available at this price".</li>
       <li><strong>Simulated trading.</strong> Five project-authored strategies run automatically while a tab is open, using fresh observed asks with confirmed quantities. No fills are invented from a snapshot or a missing quote. They hold to final settlement and are grouped by strategy and topic. Gross P&amp;L excludes fees, impact and legacy/unverified fills; no profitable ROI is claimed. See <a href="flagged.html#F-PAPER-01">paper-model limits</a>.</li>
-      <li><strong>Your demo account, read-only — and only from a scheduled job.</strong> A GitHub Actions job
-      (<code>tools/demo_trader.mjs</code>) signs the authenticated reads with repository secrets and writes
-      <code>data/account.json</code>; the page renders that file. The browser cannot do the signing itself: the demo API's
-      preflight does not allow the three <code>KALSHI-ACCESS-*</code> headers (measured, <a href="flagged.html#F-66">F-66</a>),
-      so a static page can never read a balance or place an order. No key is requested or stored in your browser.</li>
+      <li><strong>Demo-account access is not connected; do not enable it on this public site yet.</strong> A GitHub Actions job
+      (<code>tools/demo_trader.mjs</code>) is designed to sign account reads with repository secrets and write
+      <code>data/account.json</code>, but GitHub Pages serves that file publicly. If enabled now, balances, positions, fills and settlements
+      would be published. The current snapshot remains <code>connected: false</code> with no capture time. Do not add account secrets
+      until an access-controlled private data path is in place; see <a href="flagged.html#F-85">Flagged for Review F-85</a>.
+      The browser cannot sign requests itself because the demo API's preflight does not allow the three
+      <code>KALSHI-ACCESS-*</code> headers (measured, <a href="flagged.html#F-66">F-66</a>).</li>
     </ul>
   </div>
 
