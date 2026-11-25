@@ -3555,3 +3555,30 @@ fail: `negative control: a null settlement_ts still renders a blank, never an in
 - **Verified:** with the fix, 5/5 pass; reverting the test reproduces the 1 failure on the same data.
   Full `npm test` is green on the merged tree.
 - **Published as F-89** (next free id; F-88 is this session's dashboard row).
+
+## Session arena/13a3df7d-kalshidash1 — completion + final integration pass (current session, 2026-11-25)
+
+- Session ID: `session-13a3df7d`
+- Branch: `arena/13a3df7d-kalshidash1` (active; branched from `main` at `4c0ff8d17c0ba0becfbf5184c37dd0c813cb5b8d`).
+- Arena restricts this session to this branch. No alternate branches or worktrees.
+- Role: completion pass over the merged tree — line-by-line coverage check vs the brief, verification against official Kalshi docs, fix of a defective negative-control test, full QA, then PR → merge → GitHub Pages confirmation.
+
+### Task board
+
+| ID | Task | Status | Owner | File scope | Sources | Irregularities |
+|---|---|---|---|---|---|---|
+| T1 | Repo review + line-by-line coverage check vs the brief: executive summary, landing page, category subpages (gas/elections/culture/crypto/golf), dashboard, dual ≥$0.10 scrolling alert chats, resolution tracking (yes/no), automated simulated trades, portfolio, time-window price charts, liquidity/orders-available, suggestions | done | session-13a3df7d | read-only + COORDINATION.md | Kalshi demo_env, orderbook_responses, market_lifecycle, get-trades, candlesticks docs (docs.kalshi.com); live site pages | none |
+| T2 | Fix settlement negative-control test: null settlement_ts on all settled events + all markets so "null renders blank, never inferred" is proven rather than shadowed by sibling events | done | session-13a3df7d | `scripts/check-settlement-ts.mjs` | test's own measurement note; aligns with F-89 record at end of this board | test flaw only (site correct — all-null renders blank) |
+| T3 | Full QA: `npm test` (engine/feed/paper/chart/settlement/lab/privacy/writers/cors/rows/ids/stale), `build-site.mjs --check`, both link checkers (90 pages, 2,227 internal links, 0 broken) | done | session-13a3df7d | scripts/, tools/, data/ | npm test | none |
+| T4 | PR `arena/13a3df7d-kalshidash1` → `main`, merge without waiting, confirm GitHub Pages build, record PR link + merge result here | in progress | session-13a3df7d | COORDINATION.md (this section) | gh, Pages API | none |
+
+### Record — session-13a3df7d (2026-11-25)
+
+- **Branch state at claim:** `arena/13a3df7d-kalshidash1` == `main` @ `4c0ff8d` (data(live): keepalive pulse 2026-11-25T12:13:04Z). No commits to catch up on or rebase against.
+- **T1 coverage finding:** the brief's deliverables are present in the merged tree: canonical root site + `categories/{gas,elections,culture,crypto,golf}.html`, `dashboard.html` (price chart + liquidity), `alerts/index.html` (two scrolling chats + high-ROI pane), `portfolio.html`/`analysis.html` (paper model + strategy categorisation), `market.html` (candlestick chart + orderbook ladder), `strategies.html`, `suggestions.html`, `executive-summary.html`, `flagged.html`, `sources.html`. Nothing in the brief is unimplemented; no new page is required.
+- **T2:** the `check-settlement-ts.mjs` negative control only nulled `settled_events[0]` while gas.html renders 12 settled events, so it could never pass on a real capture (this is the F-89 regression). Fixed to null every settled event's markets. Verified: 5/5 pass; all-null snapshot renders no inferred timestamp; a populated timestamp still renders "Settled at". No product code changed.
+- **T3:** `npm test` green end to end. `build-site.mjs --check` clean. `check-links.mjs`: 90 pages, no broken internal links. `python3 tools/linkcheck.py`: 2,227 internal links, 0 broken.
+- **Sources (official):** https://docs.kalshi.com/getting_started/demo_env, /getting_started/orderbook_responses, /getting_started/market_lifecycle, /api-reference/market/get-trades, /api-reference/market/get-market-candlesticks — endpoint table, fixed-point `*_fp`/`*_dollars`, binary result yes/no, settlement semantics, poll/backoff behaviour. Verified via the platform fetch tool (sandbox egress to *.kalshi.co is not permitted).
+- **Irregularities:** none new. Pre-existing, already-flagged limitations (browser CORS untested, demo-account not connected without secrets, heuristic ROI model, polling cache lag) remain documented on flagged.html; they do not block this integration.
+
+Status key: `unclaimed` · `in progress` · `done` · `needs review`.
