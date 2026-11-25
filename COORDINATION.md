@@ -3594,3 +3594,11 @@ will neither edit nor take over those branches. No other active claim exists on 
 | A3 | Re-read the official Kalshi demo-environment and market/orderbook pages that the site cites, and check the user-supplied demo endpoints against them. Flag, do not infer. | unclaimed | session-a9c4969e | read-only; findings go to `verification/2026-11-25-a9c4969e.md` |
 | A4 | Check the deployed GitHub Pages site and the committed `data/live/` timestamps against the 45-minute staleness rule; record the measured cadence of scheduled runs. | unclaimed | session-a9c4969e | read-only; findings go to `verification/2026-11-25-a9c4969e.md` |
 | A5 | Final integration for this session's record only: PR of this branch to `main`, merge, confirm the Pages deploy, record PR/merge in this section. | unclaimed | session-a9c4969e | this section, `verification/2026-11-25-a9c4969e.md` |
+
+### A6 — defect claimed before editing (session-a9c4969e)
+
+`npm test` on `main` tip `4c0ff8d` fails at `test:settlement` (npm chain stops, so later suites did not run). Reproduced locally.
+
+- **Cause (measured):** the negative control nulls only `settled_events[0]` (now `KXAAAGASW-26NOV23`, settling `2026-11-23`). `settled_events[1]` (`KXAAAGASW-26NOV16`) legitimately carries `2026-11-16 14:32:51 UTC` on all 12 of its markets, so the page-wide assertion `!includes('2026-11-16 14:32:51')` can never pass for this capture. The test is coupled to whichever event happens to be first in the data, which is the same class of defect as F-89.
+- **Fix:** use a sentinel timestamp that appears nowhere in the real snapshot for the positive and negative controls. No product code changes.
+- **File claimed:** `scripts/check-settlement-ts.mjs` only (no other session holds it; F-89 was the last edit and is merged). Logged here before the edit.
