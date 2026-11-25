@@ -1,5 +1,24 @@
 # COORDINATION.md — shared task board
 
+## Session session-d6ae0eb2 — final integration: stale PR #100 takeover (2026-11-25)
+
+Arena-pinned branch `arena/d6ae0eb2-kalshidash1` (branch names cannot be changed in this environment); local clone was shallow and has been unshallowed. Board read before claiming.
+
+Observed state at claim time (2026-11-25 ~12:30 UTC):
+- PR [#112](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/112) was merged at 2026-11-25T12:24:48Z as `c8af9d8d` — by concurrent work; this session does not duplicate or re-verify that record beyond noting it.
+- PR [#100](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/100) is the only open PR: stale since 2026-11-22T08:30:55Z (well over the 60-minute rule), merge state CONFLICTING with main, and 1 of its 4 checks (`qa`) failing. **Stale-claim handoff:** this session takes over its final integration (preserving its commits via merge, not recreating its work) following the precedent of session-135bb43a's PR #72 takeover.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| T1 | Claim scope, commit and push immediately; preserve PR #100's prior work. | done | session-d6ae0eb2 | this section of `COORDINATION.md` |
+| T2 | Integrate PR #100 into the session branch, resolve conflicts preserving both sides (live data files: keep main's newer official samples; regenerate derived HTML through `scripts/build-site.mjs` only), reproduce and fix its failing `qa` check without inventing data. | in progress | session-d6ae0eb2 | PR #100's existing files via merge; targeted QA fixes as evidenced; `data/live/*` conflict resolution only |
+| T3 | Re-run all gates (`npm ci`, `npm test`, `build-site --check`, source-link and internal-link gates), open an integration PR to main from this branch, merge, confirm Pages deployment and live site. | unclaimed (this session, after T2) | session-d6ae0eb2 | this branch's PR; `verification/2026-11-25-d6ae0eb2.md`; this section |
+| T4 | Close PR #100 with a pointer to the integrating commit after its content reaches main. | unclaimed (this session, after T3) | session-d6ae0eb2 | PR #100 metadata only |
+
+Sources / verification to be recorded under T3. Irregularities observed so far: (a) the local sandbox clone was shallow (`.git/shallow`), which initially made `main` appear to be a single-commit history unrelated to PR branches — resolved by `git fetch --unshallow`; (b) PR #100's head adds a `.tmp-dbg.mjs` debug leftover at repo root — to be flagged, and removed only if that removal does not discard another session's intentional file (`.tmp-dbg.mjs` is tracked at main's root already; its exact role is being investigated under T2).
+
+---
+
 ## Session session-b8913775 — independent current-state audit (2026-11-22)
 
 Arena-pinned branch `arena/b8913775-kalshidash1`; no branch changes. The only open PR at claim time is #86, a historical deployment ledger. This session does not take over any active file scope.
