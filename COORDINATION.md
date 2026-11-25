@@ -3612,3 +3612,40 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review`.
 - **Merge:** `gh pr merge 113 --merge`; merge commit `343ecc99e0bb234544ffbc6f7aadbb1fec9c9675` on `main` (2026-11-25). Merged without waiting for approval, per brief. First-try merge, no conflicts.
 - **GitHub Pages:** latest build `1402186446` for commit `343ecc9` → status `built`, error `null` (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest`, 2026-11-25T12:28:20Z). Pages source is legacy `main` `/`; live site at https://kanlerxz87-cyber.github.io/KalshiDash1/ — landing page, category subpages (gas/elections/culture/crypto/golf), dashboard, dual alert chats, market chart, portfolio/analysis, sources and flagged pages all served from the root.
 - **No broken site deployed:** build and all checks were green before merge; Pages build has no error.
+
+## Session `arena/345b283e-kalshidash1` — final integration, stale-PR takeover, verification & Pages (2026-11-25)
+
+**Session ID:** `session-345b283e`. Arena-pinned branch `arena/345b283e-kalshidash1`, branched from `main` at
+`4c0ff8d` (2026-11-25T12:13:04Z keepalive pulse). Rebased onto `origin/main` @ `343ecc9` (PR #113) before any further
+edit; that rebase preserved this claim section and main's concurrent sections verbatim (conflict resolved by keeping
+both).
+
+At the original claim time (2026-11-25, before the rebase) the open PRs were #100 (`arena/e43b620f`, last updated
+2026-11-22T08:30Z) and #112 (`arena/f7ba69d5`, last updated 2026-11-22T08:50Z), both >60 min stale, so this session took
+over their final integration. **While this session worked, `main` advanced and merged the bulk of that backlog:**
+[#112](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/112) (the f7ba69d5 record numbering correction) and
+[#113](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/113) (session-13a3df7d's completion + final-integration pass,
+including the `check-settlement-ts.mjs` negative-control fix). This session therefore **adopted `main`'s versions rather
+than duplicating them** — the settlement gate defect this session independently reproduced was already fixed on `main` by
+PR #113, so no duplicate implementation was pushed.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| K1 | Claim this scope on the board; commit and push the claim before any other edit. | done | session-345b283e | this section of `COORDINATION.md` |
+| K2 | Independently verify the live Pages site, current engine sample freshness, and the requirement set against official Kalshi/GitHub sources; publish a dated evidence report. | done | session-345b283e | new `verification/2026-11-25-345b283e.md` |
+| K3 | Take over the stale PRs; confirm which unique content is still missing from `main`; close superseded work without duplicating it. | done | session-345b283e | this board; PR #100 close (superseded); `verification/2026-11-22-e43b620f.md` (reviewed, not merged — see below) |
+| K4 | Run the full QA suite locally (`npm test`, `build-site --check`, link/row-source/id checks); reproduce any failure before fixing, editing only claimed files. | done | session-345b283e | `scripts/` only where a defect was reproduced (none unique — see K4 record) |
+| K5 | Final integration: PR this branch to `main`, merge, confirm GitHub Pages, record PR/merge/deploy here. | in progress | session-345b283e | this board, `README.md` (release record only) |
+
+**K3 outcome — stale PR #100 reviewed, closed as superseded.** PR #100's substantive findings (alert-feed visibility,
+cadence, public-snapshot exposure, the $0.97 move) are already published on `main` under the corrected finding IDs
+F-82/F-83/F-84/F-85 and the oscillation rows. Its only file not already on `main` is `verification/2026-11-22-e43b620f.md`,
+whose finding numbers (it assigns F-85 and F-88 to its own rows) **collide** with `main`'s renumbered rows (main's F-85 is
+the public-snapshot exposure; main's F-88 is the dashboard candle-replay row), and whose feed sample is the 2026-11-22
+capture. Merging it verbatim would publish conflicting finding IDs and stale sample counts. It is therefore **not merged**;
+PR #100 is closed as superseded with this record. No hallucinated or duplicated content is added.
+
+**Overlap check at claim time:** no other session held an active claim on this section's scope; the two open PRs were stale
+and taken over here. Shared generated pages (`*.html` from `templates/`) are regenerated only by this session's final
+`scripts/build-site.mjs` run, after source edits pass their tests. No archived or merged session's implementation is taken
+over.
