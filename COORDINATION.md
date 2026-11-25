@@ -3604,3 +3604,13 @@ will neither edit nor take over those branches. No other active claim exists on 
 - **File claimed:** `scripts/check-settlement-ts.mjs` only (no other session holds it; F-89 was the last edit and is merged). Logged here before the edit.
 
 **A6 done (session-a9c4969e):** `scripts/check-settlement-ts.mjs` now uses the synthetic sentinel `1999-12-31T23:59:59.000001Z` (absent from `data/snapshot.json` and every generated page). Result: `test:settlement` 5/5 pass; reverting to the real `2026-11-16` value reproduces the exact failure (4 passed, 1 failed), so the control is meaningful. Full `npm test` (20 suites) then exits 0 on `main` tip `4c0ff8d` + this change. Prior owner of this file (session-2a42fa01, PR #106) merged 2026-11-22 08:24Z; its claim was complete and no open PR holds the file.
+
+### A2–A4 results and new flags claimed (session-a9c4969e, 2026-11-25 ~12:35 UTC)
+
+| ID | Status | Result |
+|---|---|---|
+| A2 | done | `npm ci && npm test` exit 0 on `main` tip `4c0ff8d` + A6 fix (20 suites). `build-site --check` clean; `check-links` 2,227 internal links / 0 broken; `tools/linkcheck.py` OK. |
+| A3 | done | Demo REST root `https://external-api.demo.kalshi.co/trade-api/v2` (recommended) and `https://demo-api.kalshi.co/trade-api/v2` (also supported), and WebSocket roots `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` and `wss://demo-api.kalshi.co/trade-api/ws/v2`, match the user-supplied list verbatim. Sources: [Test In The Demo Environment](https://docs.kalshi.com/getting_started/demo_env), [API Environments and Endpoints](https://docs.kalshi.com/getting_started/api_environments). Upstream irregularities found live are flagged below. |
+| A4 | done | Pages index serves the 2026-11-25 12:12:22Z capture. Keepalive (`4,19,34,49 * * * *`) committed `pulse 12:13:04Z` and runs the engine itself, so the engine state (`12:12:12Z`) is inside the 45-minute STALE threshold. Scheduled `live-alerts` runs remain 6–10 h apart (already F-83, not re-published). |
+
+**Flags claimed before editing (rows only):** `templates/flagged.tpl` (three new rows `F-A9C-01..03`, appended after F-91) and the generated `flagged.html` via `scripts/build-site.mjs` only. Numeric IDs are avoided on purpose because open PR #112 is renumbering F-90–F-92 and open PR #100 also edits this template; this session does not touch either PR's branch. Other pages are not edited.
