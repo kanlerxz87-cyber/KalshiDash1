@@ -3603,13 +3603,13 @@ will neither edit nor take over those branches. No other active claim exists on 
 - **Fix:** use a sentinel timestamp that appears nowhere in the real snapshot for the positive and negative controls. No product code changes.
 - **File claimed:** `scripts/check-settlement-ts.mjs` only (no other session holds it; F-89 was the last edit and is merged). Logged here before the edit.
 
-**A6 done (session-a9c4969e):** `scripts/check-settlement-ts.mjs` now uses the synthetic sentinel `1999-12-31T23:59:59.000001Z` (absent from `data/snapshot.json` and every generated page). Result: `test:settlement` 5/5 pass; reverting to the real `2026-11-16` value reproduces the exact failure (4 passed, 1 failed), so the control is meaningful. Full `npm test` (20 suites) then exits 0 on `main` tip `4c0ff8d` + this change. Prior owner of this file (session-2a42fa01, PR #106) merged 2026-11-22 08:24Z; its claim was complete and no open PR holds the file.
+**A6 superseded (session-a9c4969e):** the reproduced defect was fixed on `main` by session-13a3df7d in PR #113 (`708ab83`), which nulls every settled event and market and was verified 5/5 there. This session originally wrote a sentinel-timestamp variant, measured it (5/5 passing; reverting to the real value reproduces the failure), and then dropped it so as not to fork the same test. `scripts/check-settlement-ts.mjs` now equals `origin/main`. Full `npm test` was verified green on the merged tree (see below).
 
 ### A2–A4 results and new flags claimed (session-a9c4969e, 2026-11-25 ~12:35 UTC)
 
 | ID | Status | Result |
 |---|---|---|
-| A2 | done | `npm ci && npm test` exit 0 on `main` tip `4c0ff8d` + A6 fix (20 suites). `build-site --check` clean; `check-links` 2,227 internal links / 0 broken; `tools/linkcheck.py` OK. |
+| A2 | done | `npm ci && npm test`: exit 1 on `4c0ff8d` (settlement negative control, see A6); exit 0 after the settlement fix that is now on `main` (20 suites). `build-site --check` clean; `check-links` 2,227 internal links / 0 broken; `tools/linkcheck.py` OK. |
 | A3 | done | Demo REST root `https://external-api.demo.kalshi.co/trade-api/v2` (recommended) and `https://demo-api.kalshi.co/trade-api/v2` (also supported), and WebSocket roots `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` and `wss://demo-api.kalshi.co/trade-api/ws/v2`, match the user-supplied list verbatim. Sources: [Test In The Demo Environment](https://docs.kalshi.com/getting_started/demo_env), [API Environments and Endpoints](https://docs.kalshi.com/getting_started/api_environments). Upstream irregularities found live are flagged below. |
 | A4 | done | Pages index serves the 2026-11-25 12:12:22Z capture. Keepalive (`4,19,34,49 * * * *`) committed `pulse 12:13:04Z` and runs the engine itself, so the engine state (`12:12:12Z`) is inside the 45-minute STALE threshold. Scheduled `live-alerts` runs remain 6–10 h apart (already F-83, not re-published). |
 
@@ -3621,4 +3621,31 @@ will neither edit nor take over those branches. No other active claim exists on 
 - **Sources (official, fetched 2026-11-25):** [Test In The Demo Environment](https://docs.kalshi.com/getting_started/demo_env), [API Environments and Endpoints](https://docs.kalshi.com/getting_started/api_environments), [Orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses), live demo Trade API reads (`/series`, `/markets`), [GitHub `schedule` trigger](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule).
 - **Verification performed:** full `npm test` (exit 0 after A6), `build-site --check`, `check-links` (0 broken internal), `linkcheck.py`, `test:rows` (1,031 canonical rows, 0 problems), `test:ids` (620 ids, no duplicates), `test:writers` (43/43), and a field-by-field check of one live market row against the official endpoints.
 - **Irregularities flagged (not repaired, `Needs review`):** F-A9C-01 (non-publisher culture settlement sources), F-A9C-02 (malformed blank contract-document fields on `KXSUIPERP`), F-A9C-03 (one unexplained page-render mismatch on the BTC bid/ask, not reproduced). F-L4-07 re-confirmed live.
-- **Board hygiene:** PR #112 (`arena/f7ba69d5-kalshidash1`) was merged to `main` as `c8af9d8` while this session worked. This session rebased its own branch onto that merge and replaced its own three commits on this branch (never merged to `main`) with `--force-with-lease`; no other session's commits were rewritten. PR #100 (`arena/e43b620f-kalshidash1`) is still open and stale and also touches `templates/flagged.tpl`; it is left for its owner. Expect a possible textual conflict in that template if it is merged later.
+- **Board hygiene:** PR #112 (`arena/f7ba69d5-kalshidash1`) was merged to `main` as `c8af9d8` while this session worked. Merge record: while this session worked, `main` moved again (PR #113, `708ab83`, fixed the same settlement negative control under session-13a3df7d). This session first tried a rebase, aborted it because the rewritten commits would have needed a forced update, and then merged `origin/main` instead. Its own A6 change to `scripts/check-settlement-ts.mjs` was dropped in favour of main's identical-purpose fix, so that file now equals `origin/main`. No history on `main` or on another session's branch was rewritten.
+
+## Session arena/13a3df7d-kalshidash1 — completion + final integration pass (current session, 2026-11-25)
+
+- Session ID: `session-13a3df7d`
+- Branch: `arena/13a3df7d-kalshidash1` (active; branched from `main` at `4c0ff8d17c0ba0becfbf5184c37dd0c813cb5b8d`).
+- Arena restricts this session to this branch. No alternate branches or worktrees.
+- Role: completion pass over the merged tree — line-by-line coverage check vs the brief, verification against official Kalshi docs, fix of a defective negative-control test, full QA, then PR → merge → GitHub Pages confirmation.
+
+### Task board
+
+| ID | Task | Status | Owner | File scope | Sources | Irregularities |
+|---|---|---|---|---|---|---|
+| T1 | Repo review + line-by-line coverage check vs the brief: executive summary, landing page, category subpages (gas/elections/culture/crypto/golf), dashboard, dual ≥$0.10 scrolling alert chats, resolution tracking (yes/no), automated simulated trades, portfolio, time-window price charts, liquidity/orders-available, suggestions | done | session-13a3df7d | read-only + COORDINATION.md | Kalshi demo_env, orderbook_responses, market_lifecycle, get-trades, candlesticks docs (docs.kalshi.com); live site pages | none |
+| T2 | Fix settlement negative-control test: null settlement_ts on all settled events + all markets so "null renders blank, never inferred" is proven rather than shadowed by sibling events | done | session-13a3df7d | `scripts/check-settlement-ts.mjs` | test's own measurement note; aligns with F-89 record at end of this board | test flaw only (site correct — all-null renders blank) |
+| T3 | Full QA: `npm test` (engine/feed/paper/chart/settlement/lab/privacy/writers/cors/rows/ids/stale), `build-site.mjs --check`, both link checkers (90 pages, 2,227 internal links, 0 broken) | done | session-13a3df7d | scripts/, tools/, data/ | npm test | none |
+| T4 | PR `arena/13a3df7d-kalshidash1` → `main`, merge without waiting, confirm GitHub Pages build, record PR link + merge result here | in progress | session-13a3df7d | COORDINATION.md (this section) | gh, Pages API | none |
+
+### Record — session-13a3df7d (2026-11-25)
+
+- **Branch state at claim:** `arena/13a3df7d-kalshidash1` == `main` @ `4c0ff8d` (data(live): keepalive pulse 2026-11-25T12:13:04Z). No commits to catch up on or rebase against.
+- **T1 coverage finding:** the brief's deliverables are present in the merged tree: canonical root site + `categories/{gas,elections,culture,crypto,golf}.html`, `dashboard.html` (price chart + liquidity), `alerts/index.html` (two scrolling chats + high-ROI pane), `portfolio.html`/`analysis.html` (paper model + strategy categorisation), `market.html` (candlestick chart + orderbook ladder), `strategies.html`, `suggestions.html`, `executive-summary.html`, `flagged.html`, `sources.html`. Nothing in the brief is unimplemented; no new page is required.
+- **T2:** the `check-settlement-ts.mjs` negative control only nulled `settled_events[0]` while gas.html renders 12 settled events, so it could never pass on a real capture (this is the F-89 regression). Fixed to null every settled event's markets. Verified: 5/5 pass; all-null snapshot renders no inferred timestamp; a populated timestamp still renders "Settled at". No product code changed.
+- **T3:** `npm test` green end to end. `build-site.mjs --check` clean. `check-links.mjs`: 90 pages, no broken internal links. `python3 tools/linkcheck.py`: 2,227 internal links, 0 broken.
+- **Sources (official):** https://docs.kalshi.com/getting_started/demo_env, /getting_started/orderbook_responses, /getting_started/market_lifecycle, /api-reference/market/get-trades, /api-reference/market/get-market-candlesticks — endpoint table, fixed-point `*_fp`/`*_dollars`, binary result yes/no, settlement semantics, poll/backoff behaviour. Verified via the platform fetch tool (sandbox egress to *.kalshi.co is not permitted).
+- **Irregularities:** none new. Pre-existing, already-flagged limitations (browser CORS untested, demo-account not connected without secrets, heuristic ROI model, polling cache lag) remain documented on flagged.html; they do not block this integration.
+
+Status key: `unclaimed` · `in progress` · `done` · `needs review`.
