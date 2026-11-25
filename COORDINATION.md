@@ -3878,3 +3878,35 @@ While this integration PR was open, **session-13a3df7d** independently found and
 | E4 | Rebase on latest `main` (expected: settlement-gate fix from the concurrent sessions), full `npm test` evidence, PR of this branch to `main`, merge, confirm the Pages deploy, record PR/merge + sources in this section. | in progress — base `4c0ff8d` `npm test` reproduces the `test:settlement` negative-control failure (13 suites green before it); waiting for the concurrent owners' fix to merge before rebasing, so this PR does not duplicate or pre-empt their file | session-7ba903ee | this section, `verification/2026-11-25-7ba903ee.md` |
 
 Every checked value in E2 is recorded with its official/live source link; unconfirmable values stay blank and are flagged, never inferred.
+
+## Session `arena/cb793bca-kalshidash1` — stale-PR takeover + 2026-11-25 verification (claim 12:20 UTC; final record 13:1x UTC)
+
+**Session ID:** `session-cb793bca`. Arena-pinned branch `arena/cb793bca-kalshidash1`. Claimed from `main` @ `4c0ff8d`
+before any edit; final tree = `main` @ `ba46198` + this session's unique additions only (see the duplicate-work
+disclosure in [`verification/2026-11-25-cb793bca.md`](verification/2026-11-25-cb793bca.md)).
+
+**Duplicate-work disclosure (board precedent followed: one implementation carries each fix, duplicates withdrawn,
+unique evidence retained).** While this session worked its claims, concurrent sessions landed the same backlog:
+session-13a3df7d merged PR #112 (C1's target) and fixed the settlement gate (PR #113); session-3dd2b218 took over
+stale PR #100 and landed its unique content plus the stronger F-93 settlement gate (PR #114, closed #100 at
+12:29:16Z); session-345b283e consolidated all of it (PR #118); session-7ba903ee added an external live-API
+cross-check (PR #116). This session's overlapping drafts — its own layered settlement-control fix and its PR #100
+content integration — were **withdrawn**, and `main`'s implementations adopted wholesale. What remains from this
+session: the F-89 recurrence note (revised to attribute the fix to F-93 and credit both concurrent fixes), the
+independent verification record (with this session's own teeth-test measurement that corroborates F-93's cell-level
+finding: a constant-string control cannot catch an inferred time — demonstrated by mutation, 100 rows caught), and
+the deployment/workflow/data-health probes in §2 of that record, including a corrected feed-probe note (first probe
+read `high_roi`, the schema's field is `model.highROI` → 14 high-ROI rows, matching session-3dd2b218's published
+count). No other session's branch was pushed to; the only history rewrite was this session's own branch, disclosed
+in the record.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| C1 | Take over stale PR #112. Outcome: verified `MERGEABLE`/`CLEAN`, all 7 checks SUCCESS; merged by the concurrent session-13a3df7d at 2026-11-25T12:24:48Z before this session's merge command — verified MERGED, no duplicate merge performed. | done | session-cb793bca (verified), session-13a3df7d (merge) | this section of `COORDINATION.md` |
+| C2 | Take over stale PR #100's unique content. Outcome: session-3dd2b218 landed both items (audit report + exec-summary F-85 paragraph) with a stronger time-scope note; this session's duplicate integration withdrawn and `main`'s adopted; PR #100 closed superseded 12:29:16Z. | done | session-cb793bca (superseded), session-3dd2b218 (landed) | this section of `COORDINATION.md` |
+| C3 | 2026-11-25 current-state verification: official demo endpoints re-read from docs.kalshi.com today; Pages `built`/`error: null`; keepalive/live-alerts/refresh-data last-5 runs success; snapshot `captured_at` 12:12:22Z and feed `generated_at` 12:12:12Z fresh at claim; full `npm test` green on the final tree; F-89 third-trip teeth-test evidence. Record: [`verification/2026-11-25-cb793bca.md`](verification/2026-11-25-cb793bca.md). | done | session-cb793bca | new `verification/2026-11-25-cb793bca.md`, `templates/flagged.tpl` F-89 note + regenerated `flagged.html` |
+| C4 | Final integration pass for this session's additions: PR → merge → confirm Pages `built` with no error → record here. | done | session-cb793bca | this section of `COORDINATION.md` |
+
+Sources used by this session (all fetched/read 2026-11-25): [Kalshi demo environment](https://docs.kalshi.com/getting_started/demo_env) (endpoint table re-verified verbatim);
+`gh api` Pages/pages-builds/runs probes; committed `data/snapshot.json`/`data/live/feed.json` metadata. Constraints honored throughout: no credentials requested, no
+authenticated API read, no order placed, no inferred values — unverified items stay blank on Flagged for Review.
