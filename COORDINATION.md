@@ -3577,3 +3577,20 @@ fail: `negative control: a null settlement_ts still renders a blank, never an in
 - **Verified:** with the fix, 5/5 pass; reverting the test reproduces the 1 failure on the same data.
   Full `npm test` is green on the merged tree.
 - **Published as F-89** (next free id; F-88 is this session's dashboard row).
+
+## Session `arena/a9c4969e-kalshidash1` — current-day line-by-line verification, live-site check, integration (2026-11-25 12:22 UTC)
+
+**Session ID:** `session-a9c4969e`. Arena-pinned branch `arena/a9c4969e-kalshidash1`, base = `main` tip `4c0ff8d`.
+Only one branch is available to this session, so per-task file scopes on that branch are the control (same as R-03 above).
+
+**Stale-claim check at 12:22Z:** open PRs are #100 (`arena/e43b620f-kalshidash1`, opened 2026-11-22 08:12Z) and #112
+(`arena/f7ba69d5-kalshidash1`, opened 2026-11-22 08:50Z). Both are more than 60 minutes old and belong to other sessions. This session
+will neither edit nor take over those branches. No other active claim exists on the board.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| A1 | Read the board, claim this section, commit and push before any other edit. | in progress | session-a9c4969e | this section of `COORDINATION.md` |
+| A2 | Run the full repository QA suite (`npm ci && npm test`, `build-site --check`) on the current `main` tip; reproduce any failure before touching anything. | unclaimed | session-a9c4969e | read-only unless a defect is reproduced (then claimed separately) |
+| A3 | Re-read the official Kalshi demo-environment and market/orderbook pages that the site cites, and check the user-supplied demo endpoints against them. Flag, do not infer. | unclaimed | session-a9c4969e | read-only; findings go to `verification/2026-11-25-a9c4969e.md` |
+| A4 | Check the deployed GitHub Pages site and the committed `data/live/` timestamps against the 45-minute staleness rule; record the measured cadence of scheduled runs. | unclaimed | session-a9c4969e | read-only; findings go to `verification/2026-11-25-a9c4969e.md` |
+| A5 | Final integration for this session's record only: PR of this branch to `main`, merge, confirm the Pages deploy, record PR/merge in this section. | unclaimed | session-a9c4969e | this section, `verification/2026-11-25-a9c4969e.md` |
