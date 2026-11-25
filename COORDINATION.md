@@ -3190,7 +3190,29 @@ engine/derived scores may be regenerated, and any regeneration is labelled in th
 - **Not claimed:** no data refresh (the scheduled engine is late, and no sample or timestamp was fabricated), no
   authenticated call, no order, no causal news attribution.
 
-Status: D2/D3/D4 **done** — D5 (PR, merge, Pages confirmation) in progress.
+### PR, merge and deploy record — session-f7ba69d5
+
+- **PR:** [#109](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/109) — "fix(engine): stop using the day-old price
+  as same-session evidence; surface oscillation (F-90/F-91/F-92)" — `arena/f7ba69d5-kalshidash1` → `main`, **merged**
+  2026-11-22T08:47:15Z with `gh pr merge 109 --merge`; merge commit
+  [`1467f30`](https://github.com/kanlerxz87-cyber/KalshiDash1/commit/1467f30d050c976b6b9b86db3809388e7ea9dcb1).
+- **Checks on the PR head (all pass):** `alerts`, `build` (Site build check), `qa` (site-qa), `qa` (suite-qa),
+  `refresh`, `sample`.
+- **Pages:** `pages/builds/latest` → `status: built`, `error.message: null` for commit `ee62fae`; the merge commit
+  `1467f30` also has successful `pages build and deployment`, `Site build check`, `site-qa`, `suite-qa`, `alerts-qa` and
+  `live-alerts` runs.
+- **Live verification:** [`verification/2026-11-22-f7ba69d5.md`](verification/2026-11-22-f7ba69d5.md) is served by Pages
+  with the corrected F-90/F-91/F-92 numbering; the generated `flagged.html` on `main` carries this session's two rows
+  (confirmed present in the committed artefact and in the build; the CDN copy was inspected mid-propagation and at that
+  moment still served the previous revision, so the row-level live check is recorded as **pending CDN refresh** rather
+  than claimed).
+- **Conflict/concurrency record:** main advanced four times during this PR (through `5031498`). Each integration kept
+  every session's rows and board section; one resolution step briefly removed main's F-87/F-88 rows and was reverted
+  before the commit, and the final tree carries 12 unique ids with no duplicates (`check-html-ids` green).
+- **Open, non-blocking:** F-91 (sample anomaly, needs review), the demo-account privacy item (owner decision), and the
+  measured scheduler cadence (F-83) remain on the Flagged page.
+
+Status: **D1–D4 done; D5 done** (PR #109 merged, Pages built with no error).
 
 ## Session session-b8913775 — independent current-state audit + dashboard feed fix (2026-11-22 08:02 UTC)
 
