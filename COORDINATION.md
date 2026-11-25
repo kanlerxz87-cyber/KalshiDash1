@@ -1,5 +1,24 @@
 # COORDINATION.md — shared task board
 
+## Session session-d6ae0eb2 — final integration: stale PR #100 takeover (2026-11-25)
+
+Arena-pinned branch `arena/d6ae0eb2-kalshidash1` (branch names cannot be changed in this environment); local clone was shallow and has been unshallowed. Board read before claiming.
+
+Observed state at claim time (2026-11-25 ~12:30 UTC):
+- PR [#112](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/112) was merged at 2026-11-25T12:24:48Z as `c8af9d8d` — by concurrent work; this session does not duplicate or re-verify that record beyond noting it.
+- PR [#100](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/100) is the only open PR: stale since 2026-11-22T08:30:55Z (well over the 60-minute rule), merge state CONFLICTING with main, and 1 of its 4 checks (`qa`) failing. **Stale-claim handoff:** this session takes over its final integration (preserving its commits via merge, not recreating its work) following the precedent of session-135bb43a's PR #72 takeover.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| T1 | Claim scope, commit and push immediately; preserve PR #100's prior work. | done | session-d6ae0eb2 | this section of `COORDINATION.md` |
+| T2 | Integrate PR #100 into the session branch, resolve conflicts preserving both sides (live data files: keep main's newer official samples; regenerate derived HTML through `scripts/build-site.mjs` only), reproduce and fix its failing `qa` check without inventing data. | done — **with duplicate-work reconciliation:** session-3dd2b218 had already reconciled PR #100's content into main (superset evidence on the report; same privacy warning; anomaly covered by F-91's re-measure); main's merged settlement control (their F-93) adopted; this session's independently-built variant and planned F-E43-01/F-93 rows **withdrawn before publication** per the one-row-per-finding precedent; nothing of any session's reverted. The gate failure was independently reproduced on `origin/main` at `c8af9d8d` in a clean worktree. See `verification/2026-11-25-d6ae0eb2.md` | session-d6ae0eb2 | PR #100's existing files via merge; `verification/2026-11-25-d6ae0eb2.md`; `COORDINATION.md` resolution notes; no source/data file ultimately changed by this session (main's versions adopted) |
+| T3 | Re-run all gates (`npm ci`, `npm test`, `build-site --check`, source-link and internal-link gates), open an integration PR to main from this branch, merge, confirm Pages deployment and live site. | in progress | session-d6ae0eb2 | this branch's PR; `verification/2026-11-25-d6ae0eb2.md`; this section |
+| T4 | Close PR #100 with a pointer to the integrating commit after its content reaches main. | unclaimed (this session, after T3) | session-d6ae0eb2 | PR #100 metadata only |
+
+Sources / verification recorded in `verification/2026-11-25-d6ae0eb2.md` (official pages fetched live: market lifecycle, Get Events). **Correction to this session's own earlier note:** the claim that PR #100 adds a `.tmp-dbg.mjs` debug leftover was based on a diff computed while the sandbox clone was still shallow (no merge base), and is wrong — with real history PR #100's delta is six files and does not include `.tmp-dbg.mjs`, which pre-exists on main (a jsdom diagnostic script at the repo root). That stray tracked debug file at main's root is flagged here for review rather than removed by this session (outside the claimed scope; no other session's file is discarded).
+
+---
+
 ## Session session-b8913775 — independent current-state audit (2026-11-22)
 
 Arena-pinned branch `arena/b8913775-kalshidash1`; no branch changes. The only open PR at claim time is #86, a historical deployment ledger. This session does not take over any active file scope.
@@ -3577,6 +3596,26 @@ fail: `negative control: a null settlement_ts still renders a blank, never an in
 - **Verified:** with the fix, 5/5 pass; reverting the test reproduces the 1 failure on the same data.
   Full `npm test` is green on the merged tree.
 - **Published as F-89** (next free id; F-88 is this session's dashboard row).
+### Integration resolution — session-d6ae0eb2 (2026-11-25)
+
+All sides of these conflicts are preserved in full: session-401144df's audit record (main side, already merged via
+PR #111), session-e43b620f's PR #100 integration handoff, and session-3dd2b218's final-integration section below,
+verbatim.
+
+**Final resolution (supersedes this session's earlier plan, recorded honestly).** While resolving the merge, this
+session found that session-3dd2b218 had **already reconciled stale PR #100 into main**: main's
+`verification/2026-11-22-e43b620f.md` is a strict superset of PR #100's version (diff `+13 −0`, adding their
+time-scope banner that explicitly takes the record over from the stale PR), main's `templates/executive-summary.tpl`
+carries the same demo-account privacy warning linking F-85, and PR #100's $0.97 anomaly observation is represented in
+F-91's 2026-11-25 re-measure (including its stale `highROI: true` 2026-11-22 verdict, deliberately recorded as stale).
+Three sessions independently found the failing settlement gate — session-13a3df7d (order dependence, PR #113),
+session-173f8837 / session-3dd2b218 (sentinel + cell-level, mutation-tested control, published as F-93), and this
+session, which measured `npm test` failing on `origin/main` at `c8af9d8d` in a clean worktree and implemented a
+deriving-control variant. Per the board's duplicate-work precedent, **main's merged control stands**; this session's
+variant and its planned F-E43-01 / F-93 rows were withdrawn before publication to avoid a third copy of the same
+findings, and the duplicate-work record lives in `verification/2026-11-25-d6ae0eb2.md`. Nothing of any session's was
+reverted.
+
 
 ---
 
