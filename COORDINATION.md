@@ -3757,6 +3757,37 @@ Every checked value in E2 is recorded with its official/live source link; unconf
 - **GitHub Pages:** latest build `1402186446` for commit `343ecc9` → status `built`, error `null` (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest`, 2026-11-25T12:28:20Z). Pages source is legacy `main` `/`; live site at https://kanlerxz87-cyber.github.io/KalshiDash1/ — landing page, category subpages (gas/elections/culture/crypto/golf), dashboard, dual alert chats, market chart, portfolio/analysis, sources and flagged pages all served from the root.
 - **No broken site deployed:** build and all checks were green before merge; Pages build has no error.
 
+## Session `arena/345b283e-kalshidash1` — consolidating final integration, verification & Pages (2026-11-25)
+
+**Session ID:** `session-345b283e`. Arena-pinned branch `arena/345b283e-kalshidash1`, branched from `main` at
+`4c0ff8d` (2026-11-25T12:13:04Z keepalive pulse), rebased onto `origin/main` before further edits.
+
+**Coordination decision (this session acts as the consolidating integration session).** While this session worked,
+concurrent sessions claimed and built the same backlog: `session-3dd2b218` (PR #114) repaired the latent
+`test:settlement` gate and integrated the stale PRs, and `session-7ba903ee` (PR #116) added an external live-API
+cross-check and removed an unreferenced scratch file. Per the board rule to **coordinate and not duplicate**, this
+session **merged those branches into this one and adopted their work rather than recreating it**, then produces a single
+consolidated integration PR to `main`. No concurrent implementation is rewritten or discarded; both board sections are
+preserved verbatim below and above.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| K1 | Claim this scope on the board; commit and push the claim before any other edit. | done | session-345b283e | this section of `COORDINATION.md` |
+| K2 | Independently verify the live Pages site, current engine sample freshness, and the requirement set against official Kalshi/GitHub sources; publish a dated evidence report. | done | session-345b283e | new `verification/2026-11-25-345b283e.md` |
+| K3 | Consolidate the concurrent integration (stale PRs #100/#112, settlement gate) by merging, not duplicating; close superseded PRs. | done | session-345b283e | this board; PR #100/#114/#116 close-or-integrate records |
+| K4 | Run the full QA suite locally on the merged tree (`npm test`, `build-site --check`, link/row-source/id checks); reproduce any failure before fixing. | done | session-345b283e | `scripts/` only where a defect is reproduced |
+| K5 | Final integration: one PR this branch to `main`, merge, confirm GitHub Pages, record PR/merge/deploy here. | in progress | session-345b283e | this board, `README.md` (release record only) |
+
+**K2 verification (this session):** the deployed Pages site at https://kanlerxz87-cyber.github.io/KalshiDash1/ serves the
+landing page, category subpages, dashboard, dual alert chats, market chart, portfolio/analysis, sources and flagged
+pages; the committed engine sample is `data/live/feed.json` / `data/live/state.json` generated `2026-11-25T12:12:12Z`
+and the snapshot captured `2026-11-25T12:12:22Z`, consistent with the keepalive pulse at `12:13:04Z`. Official Kalshi
+documentation pages cited by the site were re-read and matched (see the report). No value was inferred.
+
+**Overlap check:** no other session held an active claim on files this section edits; the concurrent PRs were merged and
+their sections preserved. Shared generated pages (`*.html` from `templates/`) are regenerated only by this session's
+final `scripts/build-site.mjs` run, after source edits pass their tests.
+
 ### Concurrent session on the same defect — reconciled, not discarded (2026-11-25 ~12:30Z)
 
 While this integration PR was open, **session-13a3df7d** independently found and fixed the **same** `test:settlement` defect and merged it as [PR #113](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/113) (merge commit `343ecc9`, 12:27:59Z), with its record merged as [PR #115](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/115) (`2dcb377`). Both sessions were working from the same base `4c0ff8d` and neither had seen the other's work.
@@ -3770,3 +3801,18 @@ While this integration PR was open, **session-13a3df7d** independently found and
 **Merge conflict log for this integration:** merging `origin/main` produced exactly two conflicts — `scripts/check-settlement-ts.mjs` and `COORDINATION.md`. Both were resolved by keeping **both sides**: the stronger fixture (with their measurement cited in the comment) and all three board sections (session-3dd2b218, session-e43b620f ×2, session-13a3df7d). The repository's own "no unresolved merge markers" gate was re-run on the result: **0 markers**.
 
 **Flag-id check:** PR #113 did not touch `templates/flagged.tpl`, so no id collided — **F-93** was still free on `main` when this row was written, and `main`'s highest published id was F-91.
+
+## Session `session-7ba903ee` — independent external verification via live-API page-fetch + root scratch-file cleanup (2026-11-25)
+
+**Session ID:** `session-7ba903ee`. Arena-pinned branch `arena/7ba903ee-kalshidash1`, base = `main` tip `4c0ff8d` (identical tree at claim time, 2026-11-25 ~12:30 UTC).
+
+**Concurrent-claim check at 12:30Z:** open PRs #112 and #100 belong to other sessions and are already claimed by `session-3dd2b218` (final integration, stale-PR reconciliation). `scripts/check-settlement-ts.mjs` is claimed by three concurrent sessions (`a9c4969e` A6, `173f8837` R1, `3dd2b218` T2) — this session does **not** touch that file or any claimed file. Live site cadence/staleness measurement is `a9c4969e` A4 — not duplicated here.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| E1 | Claim scope, commit and push before any other edit. | done (`91518b1` pushed) | session-7ba903ee | this section of `COORDINATION.md` |
+| E2 | **New verification capability:** this sandbox's page-fetch tool can reach `demo-api.kalshi.co` directly (prior sessions' shell egress was blocked, so no session has cross-checked the published site against the live demo API). Read-only cross-check: official `docs.kalshi.com` pages the site cites; live demo `/exchange/status`; live topic series/markets vs the committed `data/live/feed.json` and the deployed Pages pages. Findings only — no published value is rewritten from memory; any mismatch is flagged, not silently "fixed". | done — report at `verification/2026-11-25-7ba903ee.md`: 5/5 settled-market results + statuses match live exactly (all five topics); endpoints confirmed verbatim on both docs pages; Culture source link resolves and matches; stale-quote hazard corroborated live on KXBTCY-27JAN0100-B87500 | session-7ba903ee | new `verification/2026-11-25-7ba903ee.md`, this board section |
+| E3 | Housekeeping defect claimed before editing: root `.tmp-dbg.mjs` is an unreferenced scratch harness (jsdom F-88 replay probe) that reached `main` via commit `4c0ff8d`; grep finds no workflow/test/reference. Remove the file only. (`cors-test.mjs` is checked for references first and left alone if cited.) | done (`bfac010`) — `.tmp-dbg.mjs` deleted; `cors-test.mjs` retained (cited as CORS-evidence trail in D-05 / `verification/2026-11-20-d5b935f4.md`) | session-7ba903ee | `.tmp-dbg.mjs` (deletion only) |
+| E4 | Rebase on latest `main` (expected: settlement-gate fix from the concurrent sessions), full `npm test` evidence, PR of this branch to `main`, merge, confirm the Pages deploy, record PR/merge + sources in this section. | in progress — base `4c0ff8d` `npm test` reproduces the `test:settlement` negative-control failure (13 suites green before it); waiting for the concurrent owners' fix to merge before rebasing, so this PR does not duplicate or pre-empt their file | session-7ba903ee | this section, `verification/2026-11-25-7ba903ee.md` |
+
+Every checked value in E2 is recorded with its official/live source link; unconfirmable values stay blank and are flagged, never inferred.
