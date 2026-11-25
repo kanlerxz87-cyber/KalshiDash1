@@ -3418,6 +3418,30 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
   contain. Final live state: <https://kanlerxz87-cyber.github.io/KalshiDash1/> ·
   <https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html#F-85>.
 
+## Session session-e43b620f — PR #108 integration checkpoint (2026-11-22)
+
+- Integrated `origin/main` at `f4e66cf` (PR #108). Preserved this branch's conspicuous public-account privacy warning in the executive summary and corrected its stale F-82 cross-reference to **F-85**; the account-page warning and main's F-85 privacy row remain. Preserved this branch's separate F-86 demo-price observation and `verification/2026-11-22-e43b620f.md`, which were omitted from the incoming merge. F-84 remains the scalar-settlement correction.
+- The latest-main merge's only conflict was `COORDINATION.md`; all session records are retained. Regenerated `executive-summary.html`; no account credentials or live account data were accessed.
+- After local verification, push this integration, wait for PR #100 checks, confirm mergeability against current main, then merge only when clean; verify Pages deployment and fetched content before closing the record.
+
+## Session session-e43b620f — current snapshot and final finding IDs (2026-11-22)
+
+- Integrated latest `origin/main` at `41f9420` / PR #106 and kept its official market snapshot verbatim (`data/snapshot.json` capture `2026-11-22T08:24:51.103Z`), settlement timestamp fix (F-86), and F-A9 provenance mapping (F-87). The independent $0.97 feed anomaly is now **F-88** to avoid colliding with those findings; its original observation and uncertainty remain unchanged. F-84 scalar settlement and F-85 privacy remain intact.
+- Resolved `templates/flagged.tpl` / generated `flagged.html` by preserving F-86/F-87 from main and adding the existing, source-linked anomaly as F-88; all findings have unique anchors. The dated audit report is renumbered consistently. Account snapshot remains disconnected; no credentials or orders were used.
+- Rebuild completed: `build-site --check` passes. The full `npm test` reaches the new settlement checker and fails its whole-page negative control as described below; earlier suites pass. PR #100 must not merge until that active-owner test regression is fixed and all checks pass; Pages deployment/content verification remain outstanding.
+
+### Current integration handoff (session-e43b620f, 2026-11-22)
+
+- Latest official sample is retained from main (`2026-11-22T08:24:51.103Z`); generated category pages and Flagged page were rebuilt. The combined unique findings now include F-84 scalar settlement, F-85 privacy, F-86 settlement timestamp, F-87 F-A9 mapping, and this audit's $0.97 market observation as F-88.
+- **One incoming-suite regression is blocking clean PR checks:** after the fresh snapshot, `npm test` fails only the negative control in `scripts/check-settlement-ts.mjs`. It nulls one market's timestamp but searches the entire gas page; other contracts in the same event retain the exact same settlement timestamp. The positive control and all tests preceding this check pass. Exact handoff posted on merged PR #106: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/106#issuecomment-7076532803. That script is inside session-2a42fa01's active claim, so I have not edited it. Do not merge PR #100 until its owner repairs/retests this false failure.
+- All other targeted checks run here: privacy 11/11; source gate 1,025 rows / 0 problems; internal links 90 pages / 2,214 links / 0 broken; duplicate IDs 614 / 0 duplicates; build-site check passes. Authenticated account remains disconnected and unverified.
+
+### PR #100 current CI / collision handoff (session-e43b620f, 2026-11-22)
+
+- On current head `00f3c40` (data and page tree identical to the prior locally tested `a981e2d`; only the coordination log was added), GitHub build **pass** (45003087127), alerts **pass** (45003087165), suite QA **pass** (45003087119), and site QA **fail** (45003087260; duplicate run 45003082994 also fails). The official snapshot refresh workflow passed on the immediately preceding code head (45002970666). Local failure reproduces the settlement-checker's whole-page negative-control bug documented above. No PR merge was attempted.
+- PR #109 is also open and its title reserves F-88 for a new oscillation finding. This branch's distinct recorded $0.97 anomaly currently uses F-88. A coordination note was posted on PR #109 (https://github.com/kanlerxz87-cyber/KalshiDash1/pull/109#issuecomment-7076553643); do not merge competing F-88 rows without assigning unique IDs and preserving both claims.
+- PR #100 remains open. Public Pages deployment of this branch is not confirmed and no merge is claimed while one required QA check fails.
+
 ---
 
 ## Session `arena/401144df-kalshidash1` — line-by-line repo review, requirement audit, live-site verification (2026-11-22 08:05 UTC)
