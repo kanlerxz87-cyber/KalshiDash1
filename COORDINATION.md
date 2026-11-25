@@ -3802,6 +3802,27 @@ While this integration PR was open, **session-13a3df7d** independently found and
 
 **Flag-id check:** PR #113 did not touch `templates/flagged.tpl`, so no id collided — **F-93** was still free on `main` when this row was written, and `main`'s highest published id was F-91.
 
+---
+
+### PR, merge and deployment record — session-3dd2b218 (2026-11-25)
+
+- **PR:** [#114](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/114) — "Final integration: repair the settlement_ts QA gate (F-93), integrate stale PRs #112/#100, re-verify the site" — `arena/3dd2b218-kalshidash1` → `main`.
+- **Checks on the PR head (all pass):** `alerts` · `build` (Site build check) · `qa` (site-qa) · `qa` (suite-qa) — **4/4**.
+- **Merged:** `gh pr merge 114 --merge` at **2026-11-25T12:33:33Z** → merge commit **`e4287901b5dc82b36f1f26b2b763ac70f609856d`**. Merged without waiting for approval, per the brief.
+- **Post-merge runs on the merge commit:** `site-qa` **success**, `suite-qa` **success**, `alerts-qa` **success**; `Site build check` and `pages build and deployment` were **cancelled** — the standard GitHub Pages behaviour when a newer commit supersedes the deployment (the next two commits, `141fd4b7` and `ccca4746`, both deployed **successfully**). The Pages API reports a superseded build as `errored` / "Page build failed." even though the run's own conclusion is `cancelled`; the successful runs that follow are the authoritative evidence.
+- **GitHub Pages:** `pages/builds/latest` → `status: built`, `error: null` for `ccca4746` (the newest deployment, which includes PR #114). Site: <https://kanlerxz87-cyber.github.io/KalshiDash1/>.
+- **Live verification after the deploy (cache-busted, via the platform page fetcher — this sandbox has no direct TLS egress to `*.github.io`):**
+  - `flagged.html` serves **F-93** in full — the measured failure, both causes, the fix, the mutation evidence, and the explicit credit to session-13a3df7d with a link to PR #113.
+  - `flagged.html` serves **F-91** with the dated re-measurement (103 alerts, 14 high-ROI, all |delta| ≥ $0.97 across 13 tickers, and the changed model verdict), and **F-90** unchanged.
+  - `executive-summary.html` serves the new demo-account bullet ("Demo-account access is not connected; do not enable it on this public site yet", linking F-85 and F-66) and the reconciled headline figures (2903 open markets, 122 tracked series, 185 endpoint calls).
+  - `alerts/index.html` serves "Showing the engine feed.", **103** alerts, **14** high-ROI, largest move **$0.98**, 60 contracts tracked, **0** resolved, with a per-row API URL, contract-terms link, settlement rules and the model's per-term reasons.
+- **Stale PRs closed by this session:** [#112](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/112) — reviewed and **merged** as `c8af9d8` (its F-90→F-92 numbering correction was still needed on `main`). [#100](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/100) — **closed as superseded**, with the reasoning and the credit to its unique contributions posted on the PR before closing.
+- **Concurrency:** `main` advanced twice while this PR was open (PR #113 + #115 from session-13a3df7d, then PR #116 + #117 from session-7ba903ee, both docs-only). Every merge was resolved by keeping **both sides**; the two conflicts in this branch were `scripts/check-settlement-ts.mjs` and `COORDINATION.md`, and both were resolved by union, with the repository's own "no unresolved merge markers" gate re-run green on the result.
+- **Not verified, and therefore left blank on the site:** the authenticated demo account (`data/account.json` is `connected: false`, `captured_at: null` — no secret exists in this repository, none was requested, and **no authenticated read and no order was made**), any realized return, the cause of any price move, and any exchange-wide market ranking. Resolutions are 0 because no tracked market has published a `result` of yes or no yet.
+- **Full record:** [`verification/2026-11-25-3dd2b218.md`](verification/2026-11-25-3dd2b218.md) — sources, methods, measurements and limits.
+
+---
+
 ## Session `session-7ba903ee` — independent external verification via live-API page-fetch + root scratch-file cleanup (2026-11-25)
 
 **Session ID:** `session-7ba903ee`. Arena-pinned branch `arena/7ba903ee-kalshidash1`, base = `main` tip `4c0ff8d` (identical tree at claim time, 2026-11-25 ~12:30 UTC).
