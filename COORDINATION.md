@@ -1,5 +1,24 @@
 # COORDINATION.md — shared task board
 
+## Session session-d6ae0eb2 — final integration: stale PR #100 takeover (2026-11-25)
+
+Arena-pinned branch `arena/d6ae0eb2-kalshidash1` (branch names cannot be changed in this environment); local clone was shallow and has been unshallowed. Board read before claiming.
+
+Observed state at claim time (2026-11-25 ~12:30 UTC):
+- PR [#112](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/112) was merged at 2026-11-25T12:24:48Z as `c8af9d8d` — by concurrent work; this session does not duplicate or re-verify that record beyond noting it.
+- PR [#100](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/100) is the only open PR: stale since 2026-11-22T08:30:55Z (well over the 60-minute rule), merge state CONFLICTING with main, and 1 of its 4 checks (`qa`) failing. **Stale-claim handoff:** this session takes over its final integration (preserving its commits via merge, not recreating its work) following the precedent of session-135bb43a's PR #72 takeover.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| T1 | Claim scope, commit and push immediately; preserve PR #100's prior work. | done | session-d6ae0eb2 | this section of `COORDINATION.md` |
+| T2 | Integrate PR #100 into the session branch, resolve conflicts preserving both sides (live data files: keep main's newer official samples; regenerate derived HTML through `scripts/build-site.mjs` only), reproduce and fix its failing `qa` check without inventing data. | done — **with duplicate-work reconciliation:** session-3dd2b218 had already reconciled PR #100's content into main (superset evidence on the report; same privacy warning; anomaly covered by F-91's re-measure); main's merged settlement control (their F-93) adopted; this session's independently-built variant and planned F-E43-01/F-93 rows **withdrawn before publication** per the one-row-per-finding precedent; nothing of any session's reverted. The gate failure was independently reproduced on `origin/main` at `c8af9d8d` in a clean worktree. See `verification/2026-11-25-d6ae0eb2.md` | session-d6ae0eb2 | PR #100's existing files via merge; `verification/2026-11-25-d6ae0eb2.md`; `COORDINATION.md` resolution notes; no source/data file ultimately changed by this session (main's versions adopted) |
+| T3 | Re-run all gates (`npm ci`, `npm test`, `build-site --check`, source-link and internal-link gates), open an integration PR to main from this branch, merge, confirm Pages deployment and live site. | in progress | session-d6ae0eb2 | this branch's PR; `verification/2026-11-25-d6ae0eb2.md`; this section |
+| T4 | Close PR #100 with a pointer to the integrating commit after its content reaches main. | unclaimed (this session, after T3) | session-d6ae0eb2 | PR #100 metadata only |
+
+Sources / verification recorded in `verification/2026-11-25-d6ae0eb2.md` (official pages fetched live: market lifecycle, Get Events). **Correction to this session's own earlier note:** the claim that PR #100 adds a `.tmp-dbg.mjs` debug leftover was based on a diff computed while the sandbox clone was still shallow (no merge base), and is wrong — with real history PR #100's delta is six files and does not include `.tmp-dbg.mjs`, which pre-exists on main (a jsdom diagnostic script at the repo root). That stray tracked debug file at main's root is flagged here for review rather than removed by this session (outside the claimed scope; no other session's file is discarded).
+
+---
+
 ## Session session-b8913775 — independent current-state audit (2026-11-22)
 
 Arena-pinned branch `arena/b8913775-kalshidash1`; no branch changes. The only open PR at claim time is #86, a historical deployment ledger. This session does not take over any active file scope.
@@ -3418,30 +3437,6 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
   contain. Final live state: <https://kanlerxz87-cyber.github.io/KalshiDash1/> ·
   <https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html#F-85>.
 
-## Session session-e43b620f — PR #108 integration checkpoint (2026-11-22)
-
-- Integrated `origin/main` at `f4e66cf` (PR #108). Preserved this branch's conspicuous public-account privacy warning in the executive summary and corrected its stale F-82 cross-reference to **F-85**; the account-page warning and main's F-85 privacy row remain. Preserved this branch's separate F-86 demo-price observation and `verification/2026-11-22-e43b620f.md`, which were omitted from the incoming merge. F-84 remains the scalar-settlement correction.
-- The latest-main merge's only conflict was `COORDINATION.md`; all session records are retained. Regenerated `executive-summary.html`; no account credentials or live account data were accessed.
-- After local verification, push this integration, wait for PR #100 checks, confirm mergeability against current main, then merge only when clean; verify Pages deployment and fetched content before closing the record.
-
-## Session session-e43b620f — current snapshot and final finding IDs (2026-11-22)
-
-- Integrated latest `origin/main` at `41f9420` / PR #106 and kept its official market snapshot verbatim (`data/snapshot.json` capture `2026-11-22T08:24:51.103Z`), settlement timestamp fix (F-86), and F-A9 provenance mapping (F-87). The independent $0.97 feed anomaly is now **F-88** to avoid colliding with those findings; its original observation and uncertainty remain unchanged. F-84 scalar settlement and F-85 privacy remain intact.
-- Resolved `templates/flagged.tpl` / generated `flagged.html` by preserving F-86/F-87 from main and adding the existing, source-linked anomaly as F-88; all findings have unique anchors. The dated audit report is renumbered consistently. Account snapshot remains disconnected; no credentials or orders were used.
-- Rebuild completed: `build-site --check` passes. The full `npm test` reaches the new settlement checker and fails its whole-page negative control as described below; earlier suites pass. PR #100 must not merge until that active-owner test regression is fixed and all checks pass; Pages deployment/content verification remain outstanding.
-
-### Current integration handoff (session-e43b620f, 2026-11-22)
-
-- Latest official sample is retained from main (`2026-11-22T08:24:51.103Z`); generated category pages and Flagged page were rebuilt. The combined unique findings now include F-84 scalar settlement, F-85 privacy, F-86 settlement timestamp, F-87 F-A9 mapping, and this audit's $0.97 market observation as F-88.
-- **One incoming-suite regression is blocking clean PR checks:** after the fresh snapshot, `npm test` fails only the negative control in `scripts/check-settlement-ts.mjs`. It nulls one market's timestamp but searches the entire gas page; other contracts in the same event retain the exact same settlement timestamp. The positive control and all tests preceding this check pass. Exact handoff posted on merged PR #106: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/106#issuecomment-7076532803. That script is inside session-2a42fa01's active claim, so I have not edited it. Do not merge PR #100 until its owner repairs/retests this false failure.
-- All other targeted checks run here: privacy 11/11; source gate 1,025 rows / 0 problems; internal links 90 pages / 2,214 links / 0 broken; duplicate IDs 614 / 0 duplicates; build-site check passes. Authenticated account remains disconnected and unverified.
-
-### PR #100 current CI / collision handoff (session-e43b620f, 2026-11-22)
-
-- On current head `00f3c40` (data and page tree identical to the prior locally tested `a981e2d`; only the coordination log was added), GitHub build **pass** (45003087127), alerts **pass** (45003087165), suite QA **pass** (45003087119), and site QA **fail** (45003087260; duplicate run 45003082994 also fails). The official snapshot refresh workflow passed on the immediately preceding code head (45002970666). Local failure reproduces the settlement-checker's whole-page negative-control bug documented above. No PR merge was attempted.
-- PR #109 is also open and its title reserves F-88 for a new oscillation finding. This branch's distinct recorded $0.97 anomaly currently uses F-88. A coordination note was posted on PR #109 (https://github.com/kanlerxz87-cyber/KalshiDash1/pull/109#issuecomment-7076553643); do not merge competing F-88 rows without assigning unique IDs and preserving both claims.
-- PR #100 remains open. Public Pages deployment of this branch is not confirmed and no merge is claimed while one required QA check fails.
-
 ---
 
 ## Session `arena/401144df-kalshidash1` — line-by-line repo review, requirement audit, live-site verification (2026-11-22 08:05 UTC)
@@ -3601,6 +3596,155 @@ fail: `negative control: a null settlement_ts still renders a blank, never an in
 - **Verified:** with the fix, 5/5 pass; reverting the test reproduces the 1 failure on the same data.
   Full `npm test` is green on the merged tree.
 - **Published as F-89** (next free id; F-88 is this session's dashboard row).
+### Integration resolution — session-d6ae0eb2 (2026-11-25)
+
+All sides of these conflicts are preserved in full: session-401144df's audit record (main side, already merged via
+PR #111), session-e43b620f's PR #100 integration handoff, and session-3dd2b218's final-integration section below,
+verbatim.
+
+**Final resolution (supersedes this session's earlier plan, recorded honestly).** While resolving the merge, this
+session found that session-3dd2b218 had **already reconciled stale PR #100 into main**: main's
+`verification/2026-11-22-e43b620f.md` is a strict superset of PR #100's version (diff `+13 −0`, adding their
+time-scope banner that explicitly takes the record over from the stale PR), main's `templates/executive-summary.tpl`
+carries the same demo-account privacy warning linking F-85, and PR #100's $0.97 anomaly observation is represented in
+F-91's 2026-11-25 re-measure (including its stale `highROI: true` 2026-11-22 verdict, deliberately recorded as stale).
+Three sessions independently found the failing settlement gate — session-13a3df7d (order dependence, PR #113),
+session-173f8837 / session-3dd2b218 (sentinel + cell-level, mutation-tested control, published as F-93), and this
+session, which measured `npm test` failing on `origin/main` at `c8af9d8d` in a clean worktree and implemented a
+deriving-control variant. Per the board's duplicate-work precedent, **main's merged control stands**; this session's
+variant and its planned F-E43-01 / F-93 rows were withdrawn before publication to avoid a third copy of the same
+findings, and the duplicate-work record lives in `verification/2026-11-25-d6ae0eb2.md`. Nothing of any session's was
+reverted.
+
+
+---
+
+## Session `session-3dd2b218` — final integration: fix the latent QA gate, reconcile stale PRs, re-verify the site (2026-11-25)
+
+- **Session ID:** `session-3dd2b218`. Arena-pinned branch `arena/3dd2b218-kalshidash1`, base `4c0ff8d` (= `origin/main` at claim time, 2026-11-25 ~12:20 UTC). The branch name is fixed by the environment; no `session-<id>/<task>` branch or worktree is created.
+- **Role:** **final integration session** for this cycle. Reads the whole board first; re-verifies the combined tree line by line against official sources; fixes only defects reproduced here; publishes findings; merges the stale PRs that are blocking the release; then opens and merges the integration PR to `main` and confirms the GitHub Pages deploy.
+- **Stale-claim handling (60-minute rule).** Two PRs are open and both are **stale** (last activity 2026-11-22, >60 h with no new commit; their own board rows already record their tasks as delivered or blocked):
+  - **PR #112** (`arena/f7ba69d5-kalshidash1`, docs-only ledger, `MERGEABLE`) — its content is a correction of the F-90/F-91/F-92 numbering in that session's own verification record plus its merge record. It touches `COORDINATION.md` and `verification/2026-11-22-f7ba69d5.md` only, which no active session owns. **This session takes it over** and merges it first, so the ledger is not left dangling.
+  - **PR #100** (`arena/e43b620f-kalshidash1`, audit with template edits, `CONFLICTING`) — its board row states it may not merge "until that active-owner test regression is fixed and all checks pass". The regression is **reproduced and understood in this session** (§T2 below); it is unblocked by the fix shipped here. Its unique content is re-applied with a **unique flag id** (its drafted `F-88` collides with session-401144df's published `F-88`) and with the executive-summary privacy rewrite, which is strictly more accurate than the copy currently on `main`.
+- **No other active session.** Every other board section is a closed historical record. `main` advanced only by `GITHUB_TOKEN` data pushes since 2026-11-22, so no PR checks ran in that window — which is why the defect in §T2 is still latent on `main` (GitHub does not run push workflows for token pushes; recorded in the repo's own F-80/F-83 findings).
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| T1 | Claim scope, commit and push immediately; read the board and open PRs first | done | session-3dd2b218 | this section of `COORDINATION.md` |
+| T2 | **Reproduce and fix the latent QA defect.** `npm run test:settlement` fails on `main`'s current snapshot: the negative control nulls `topics.gas.settled_events[0]`, but the string it asserts is absent (`2026-11-16 14:32:51`) is owned by a *different* settled event that the control never touches. The fixture is order-dependent, so it passes or fails depending on which event the capture happens to list first. Make the fixture order-independent; no product code changes. | done | session-3dd2b218 | `scripts/check-settlement-ts.mjs` |
+| T3 | Take over stale PR #112 (docs-only ledger) and merge it | done | session-3dd2b218 | PR #112's two files, replayed on this branch |
+| T4 | Take over stale PR #100: re-apply its unique content (executive-summary privacy rewrite, the $0.97 observation row, its dated audit record), renumbered to a free id, conflicts resolved without discarding any other session's work | done | session-3dd2b218 | `templates/executive-summary.tpl`, `templates/flagged.tpl`, `verification/2026-11-22-e43b620f.md`, generated pages via `scripts/build-site.mjs` only |
+| T5 | Line-by-line verification of the combined tree and the live site against official Kalshi / GitHub documentation and against every requirement in the brief; record sources, checks and limits | done | session-3dd2b218 | `verification/2026-11-25-3dd2b218.md` (new) |
+| T6 | Publish the findings this session reaches as source-linked rows on the Flagged for Review page (free ids only) | done | session-3dd2b218 | `templates/flagged.tpl` → `flagged.html` (generated) |
+| T7 | Full QA battery, integration PR to `main`, merge, confirm the Pages deployment and the published content | done | session-3dd2b218 | this board, the PR |
+
+### T2 — the latent gate defect, reproduced and fixed
+
+**Symptom (measured on `main` @ `4c0ff8d`, 2026-11-25):** `npm test` fails at the last suite:
+
+```
+FAIL negative control: a null settlement_ts still renders a blank, never an inferred time
+settlement-ts: 4 passed, 1 failed
+```
+
+**Cause (traced, not guessed).** `scripts/check-settlement-ts.mjs` picks a hard-coded settlement instant
+`SETTLED = 2026-11-16T14:32:51.060078Z`, patches it into `topics.gas.settled_events[0]`, and then asserts the
+*whole generated gas page* does not contain that instant after the negative control removes it. The control removes it
+from `settled_events[0]` only. In the committed capture of 2026-11-25T12:12:22.961Z, `settled_events[0]` is
+`KXAAAGASW-26NOV23` (settles `2026-11-23T15:06:33.579832Z`) while the hard-coded instant belongs to
+`settled_events[1]` = `KXAAAGASW-26NOV16`. The control therefore blanks the wrong event, the second event still renders
+the instant, and the assertion fails **even though the generator is correct**. On 2026-11-22 the capture happened to
+list `KXAAAGASW-26NOV16` first, so the same fixture passed — the failure is data-order dependent, exactly the class of
+flakiness session-401144df recorded as F-89 (whose fix nulled every market *inside event 0*, and therefore still
+depended on which event is first).
+
+**Fix (test-only; no published value changes).** The fixture is made independent of the capture's event order:
+the positive control now uses a **sentinel instant that does not occur anywhere in the snapshot**
+(`2031-01-02T03:04:05.678901Z`), and the negative control removes `settlement_ts` from **every settled event of
+every topic** — the event field *and* every nested market's field — which is the only way to assert "no official value
+⇒ blank cell". The generator, the capture script and the published pages are untouched.
+
+**Verification.** The negative control is kept honest: it still fails if the generator ever renders a time that no
+official field supplies (the assertion is on the generated HTML, not on a fixture flag). `npm run test:settlement` is
+5/5 on the current capture; the full `npm test` suite is green; reverting the fixture reproduces the original failure
+on the same data. Recorded as **F-93** on the Flagged for Review page.
+
+### T5 — verification scope and limits
+
+Sources read live in this session and linked in `verification/2026-11-25-3dd2b218.md`:
+[Demo environment](https://docs.kalshi.com/getting_started/demo_env) ·
+[API environments and endpoints](https://docs.kalshi.com/getting_started/api_environments) ·
+[Get Markets](https://docs.kalshi.com/api-reference/market/get-markets) ·
+[Get Market](https://docs.kalshi.com/api-reference/market/get-market) ·
+[Get Events](https://docs.kalshi.com/api-reference/events/get-events) ·
+[Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list) ·
+[Orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses) ·
+[Market settlement](https://docs.kalshi.com/getting_started/market_settlement) ·
+[Settlement bounds](https://docs.kalshi.com/getting_started/settlement_bounds) ·
+[Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) ·
+[Get Trades](https://docs.kalshi.com/api-reference/market/get-trades) ·
+[Quick Start: WebSockets](https://docs.kalshi.com/getting_started/quick_start_websockets) ·
+[WebSocket connection](https://docs.kalshi.com/websockets/websocket-connection) ·
+[GitHub Pages visibility](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages) ·
+[GitHub `schedule` trigger](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) ·
+[GitHub: token pushes do not run workflows](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow-from-a-workflow).
+
+**Explicitly not verified, and therefore left blank on the site:** the authenticated demo account
+(`data/account.json` is `connected: false`, `captured_at: null` — no key exists in this repository and none was
+requested), any real order or fill, any realized return, the cause of any price move, and the exchange-wide ranking of
+markets (the site's dollar figures are the API's own `volume_fp` / `est_traded_dollars` for the tracked series, not a
+census of the whole exchange).
+## Session session-e43b620f — PR #108 integration checkpoint (2026-11-22)
+
+- Integrated `origin/main` at `f4e66cf` (PR #108). Preserved this branch's conspicuous public-account privacy warning in the executive summary and corrected its stale F-82 cross-reference to **F-85**; the account-page warning and main's F-85 privacy row remain. Preserved this branch's separate F-86 demo-price observation and `verification/2026-11-22-e43b620f.md`, which were omitted from the incoming merge. F-84 remains the scalar-settlement correction.
+- The latest-main merge's only conflict was `COORDINATION.md`; all session records are retained. Regenerated `executive-summary.html`; no account credentials or live account data were accessed.
+- After local verification, push this integration, wait for PR #100 checks, confirm mergeability against current main, then merge only when clean; verify Pages deployment and fetched content before closing the record.
+
+## Session session-e43b620f — current snapshot and final finding IDs (2026-11-22)
+
+- Integrated latest `origin/main` at `41f9420` / PR #106 and kept its official market snapshot verbatim (`data/snapshot.json` capture `2026-11-22T08:24:51.103Z`), settlement timestamp fix (F-86), and F-A9 provenance mapping (F-87). The independent $0.97 feed anomaly is now **F-88** to avoid colliding with those findings; its original observation and uncertainty remain unchanged. F-84 scalar settlement and F-85 privacy remain intact.
+- Resolved `templates/flagged.tpl` / generated `flagged.html` by preserving F-86/F-87 from main and adding the existing, source-linked anomaly as F-88; all findings have unique anchors. The dated audit report is renumbered consistently. Account snapshot remains disconnected; no credentials or orders were used.
+- Rebuild completed: `build-site --check` passes. The full `npm test` reaches the new settlement checker and fails its whole-page negative control as described below; earlier suites pass. PR #100 must not merge until that active-owner test regression is fixed and all checks pass; Pages deployment/content verification remain outstanding.
+
+### Current integration handoff (session-e43b620f, 2026-11-22)
+
+- Latest official sample is retained from main (`2026-11-22T08:24:51.103Z`); generated category pages and Flagged page were rebuilt. The combined unique findings now include F-84 scalar settlement, F-85 privacy, F-86 settlement timestamp, F-87 F-A9 mapping, and this audit's $0.97 market observation as F-88.
+- **One incoming-suite regression is blocking clean PR checks:** after the fresh snapshot, `npm test` fails only the negative control in `scripts/check-settlement-ts.mjs`. It nulls one market's timestamp but searches the entire gas page; other contracts in the same event retain the exact same settlement timestamp. The positive control and all tests preceding this check pass. Exact handoff posted on merged PR #106: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/106#issuecomment-7076532803. That script is inside session-2a42fa01's active claim, so I have not edited it. Do not merge PR #100 until its owner repairs/retests this false failure.
+- All other targeted checks run here: privacy 11/11; source gate 1,025 rows / 0 problems; internal links 90 pages / 2,214 links / 0 broken; duplicate IDs 614 / 0 duplicates; build-site check passes. Authenticated account remains disconnected and unverified.
+
+### PR #100 current CI / collision handoff (session-e43b620f, 2026-11-22)
+
+- On current head `00f3c40` (data and page tree identical to the prior locally tested `a981e2d`; only the coordination log was added), GitHub build **pass** (45003087127), alerts **pass** (45003087165), suite QA **pass** (45003087119), and site QA **fail** (45003087260; duplicate run 45003082994 also fails). The official snapshot refresh workflow passed on the immediately preceding code head (45002970666). Local failure reproduces the settlement-checker's whole-page negative-control bug documented above. No PR merge was attempted.
+- PR #109 is also open and its title reserves F-88 for a new oscillation finding. This branch's distinct recorded $0.97 anomaly currently uses F-88. A coordination note was posted on PR #109 (https://github.com/kanlerxz87-cyber/KalshiDash1/pull/109#issuecomment-7076553643); do not merge competing F-88 rows without assigning unique IDs and preserving both claims.
+- PR #100 remains open. Public Pages deployment of this branch is not confirmed and no merge is claimed while one required QA check fails.
+
+### T2/T3/T4 results — measured, with sources
+
+**T2 — the gate (F-93).** `npm test` failed on `main` @ `4c0ff8d` with `FAIL negative control: a null settlement_ts still renders a blank, never an inferred time`. Two independent causes, both traced to the fixture and not to the product code:
+- *Order dependence:* the control removed `settlement_ts` from `topics.gas.settled_events[0]` while asserting the absence of an instant that belonged to `settled_events[1]` (`KXAAAGASW-26NOV16`, `2026-11-16T14:32:51.060078Z`); the 2026-11-25 capture lists `KXAAAGASW-26NOV23` first, so the control blanked the wrong event and failed although the generator was correct. The same class of flake as F-89, whose fix nulled every market *inside event 0* and therefore still depended on the event order.
+- *Too-weak control:* the assertion searched for one hard-coded string, so a generator that inferred a *different* time passed. Proven by mutation — the generator was made to fall back to a constant time and the control still reported success.
+*Fix (test only):* the positive control uses a sentinel instant that occurs nowhere in the snapshot (with a new assertion proving that), the negative control removes `settlement_ts` from every settled event of every topic (event field and every nested market's field), and it then reads the **rendered** "Settled at" cell of every resolved row and fails if any contains a date. `npm run test:settlement` is 6/6 on the current capture; the mutation now fails the control on 100 rows with exit 1. No generator, capture script, published page or captured value changed. Published as **F-93**.
+
+**T3 — PR #112 merged.** Reviewed before merging: it renumbers section "5. F-90 — live-signal UX" to **F-92** in `verification/2026-11-22-f7ba69d5.md`, and `main`'s copy still read `F-90` at line 100, contradicting the board's own renumbering note and the file's other sections. Its four checks had passed. Merged with `gh pr merge 112 --merge` → **`c8af9d8`**.
+
+**T4 — PR #100 taken over, partially re-applied.** Unique content kept: the **executive-summary privacy rewrite** (main's copy described the account job in the present tense; the PR's copy says it *is designed to*, adds that Pages serves the file publicly, and links F-85 — strictly more accurate and consistent with F-85's own wording) and the **dated audit record** `verification/2026-11-22-e43b620f.md`, preserved as written with a time-scope note naming the sample and base it describes, the current sample, and why its "F-88" paragraph is no longer current. Its board sections are appended verbatim.
+**Its `F-88` flagged row was declined**, for two independent reasons: (a) it **duplicates the published F-91** — the same `KXBTCY-27JAN0100-B87500` observation from the same sample, with the same "mechanism unverified" caveat — and two rows for one finding is the duplication this board has already had to renumber three times (F-75→F-78/F-79, F-78→F-80, F-79→F-81); (b) its **numbers are stale** — it states `score 0.779`, `highROI: true`, `tradeable: true`, while in the current sample those oscillation rows score **0.277–0.300** and are labelled **`tradeable: false`** (capped by the follow-through gate because the published quote does not sit at the recorded swing price). Publishing the old verdict as current would be an inaccurate claim. **F-91 was updated in place instead**, with a dated re-measurement: the current sample (`2026-11-25T12:12:12.000Z`) has **103 alerts, 14 high-ROI, all 103 with |delta| ≥ $0.97 across 13 distinct tickers** (`KXBTCY-27JAN0100-B97500` 36 rows, `-B87500` 25 alternating $0.01↔$0.99, `KXPRESNOMD-28-BOBA` 17, `KXPRESPERSON-28-VRAM` 15, nine tickers with one row each), and the model verdict for those rows changed. The row states explicitly that the earlier `highROI: true` verdict is stale and is not restated as current.
+
+**T5 — verification.** Full detail and every source link: [`verification/2026-11-25-3dd2b218.md`](verification/2026-11-25-3dd2b218.md). Highlights:
+- **Official sources re-read** (demo env, api environments, Get Markets/Market/Events/Series/Trades/Candlesticks, orderbook responses, market settlement, settlement bounds, WebSockets, and GitHub's Pages / `schedule` / token-push references). The brief's four endpoints match the official table character-for-character.
+- **Live cell-for-cell comparison:** `GET /markets/KXAAAGASW-26NOV30-3.5400` returned `last 0.1500`, `yes_bid 0.0300`, `yes_ask 0.0400`, `volume_24h_fp 3133.16`, `status active`, `result ""`; the published `categories/gas.html` row shows `$0.1500`, `$0.0300 / $0.0400`, `3,133`, `active` and `—` for the empty result. All match; the empty result is left blank, never inferred.
+- **Headline numbers reconciled** against the committed capture: 2903 open markets, 122 tracked series (30+30+2+30+30), 185 endpoints, and the five topic cards — all reproduce exactly.
+- **Live site fetched after deployment:** the alerts console renders "Showing the engine feed.", **103** alerts, **14** high-ROI, largest move **$0.98**, 60 contracts tracked, **0** resolved, with a per-row API URL, contract-terms link, settlement rules and the model's per-term reasons.
+- **QA:** `npm ci` + `npm test` (18 suites) exit 0; `build-site --check` clean (22 pages); `check-html-ids` 618 ids / 0 duplicates; `check-row-sources` PASS; both link checkers 0 broken; `test:settlement` 6/6. External links are listed by the checkers, **not fetched**.
+- **Still blank, by design:** the demo account (`connected: false`, `captured_at: null` — no secret exists in this repository, none was requested, no authenticated read or order was made), resolutions (0 — no tracked market has published a `result` yet), any causal attribution for a price move, and any realized return.
+
+### Rules honoured
+
+- Shared outputs (`templates/flagged.tpl`, `templates/executive-summary.tpl`, the generated pages, `COORDINATION.md`) were changed only in this integration phase, and the generated HTML was produced by `scripts/build-site.mjs` — never hand-edited.
+- No published value, captured market value, timestamp or score was changed by hand. The only code change is to a test fixture.
+- No other session's row, section, script, workflow or data file was removed, renumbered or rewritten. The only flag id consumed is **F-93**; F-91 was updated in place rather than duplicated.
+- No credential was requested, stored or used, and no order was sent.
+---
 
 ## Session arena/13a3df7d-kalshidash1 — completion + final integration pass (current session, 2026-11-25)
 
@@ -3616,7 +3760,7 @@ fail: `negative control: a null settlement_ts still renders a blank, never an in
 | T1 | Repo review + line-by-line coverage check vs the brief: executive summary, landing page, category subpages (gas/elections/culture/crypto/golf), dashboard, dual ≥$0.10 scrolling alert chats, resolution tracking (yes/no), automated simulated trades, portfolio, time-window price charts, liquidity/orders-available, suggestions | done | session-13a3df7d | read-only + COORDINATION.md | Kalshi demo_env, orderbook_responses, market_lifecycle, get-trades, candlesticks docs (docs.kalshi.com); live site pages | none |
 | T2 | Fix settlement negative-control test: null settlement_ts on all settled events + all markets so "null renders blank, never inferred" is proven rather than shadowed by sibling events | done | session-13a3df7d | `scripts/check-settlement-ts.mjs` | test's own measurement note; aligns with F-89 record at end of this board | test flaw only (site correct — all-null renders blank) |
 | T3 | Full QA: `npm test` (engine/feed/paper/chart/settlement/lab/privacy/writers/cors/rows/ids/stale), `build-site.mjs --check`, both link checkers (90 pages, 2,227 internal links, 0 broken) | done | session-13a3df7d | scripts/, tools/, data/ | npm test | none |
-| T4 | PR `arena/13a3df7d-kalshidash1` → `main`, merge without waiting, confirm GitHub Pages build, record PR link + merge result here | in progress | session-13a3df7d | COORDINATION.md (this section) | gh, Pages API | none |
+| T4 | PR `arena/13a3df7d-kalshidash1` → `main`, merge without waiting, confirm GitHub Pages build, record PR link + merge result here | done | session-13a3df7d | COORDINATION.md (this section) | gh, Pages API | none |
 
 ### Record — session-13a3df7d (2026-11-25)
 
@@ -3629,23 +3773,116 @@ fail: `negative control: a null settlement_ts still renders a blank, never an in
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
 
+## Session `session-7ba903ee` — independent external verification via live-API page-fetch + root scratch-file cleanup (2026-11-25)
+
+**Session ID:** `session-7ba903ee`. Arena-pinned branch `arena/7ba903ee-kalshidash1`, base = `main` tip `4c0ff8d` (identical tree at claim time, 2026-11-25 ~12:30 UTC).
+
+**Concurrent-claim check at 12:30Z:** open PRs #112 and #100 belong to other sessions and are already claimed by `session-3dd2b218` (final integration, stale-PR reconciliation). `scripts/check-settlement-ts.mjs` is claimed by three concurrent sessions (`a9c4969e` A6, `173f8837` R1, `3dd2b218` T2) — this session does **not** touch that file or any claimed file. Live site cadence/staleness measurement is `a9c4969e` A4 — not duplicated here.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| E1 | Claim scope, commit and push before any other edit. | done (`91518b1` pushed) | session-7ba903ee | this section of `COORDINATION.md` |
+| E2 | **New verification capability:** this sandbox's page-fetch tool can reach `demo-api.kalshi.co` directly (prior sessions' shell egress was blocked, so no session has cross-checked the published site against the live demo API). Read-only cross-check: official `docs.kalshi.com` pages the site cites; live demo `/exchange/status`; live topic series/markets vs the committed `data/live/feed.json` and the deployed Pages pages. Findings only — no published value is rewritten from memory; any mismatch is flagged, not silently "fixed". | done — report at `verification/2026-11-25-7ba903ee.md`: 5/5 settled-market results + statuses match live exactly (all five topics); endpoints confirmed verbatim on both docs pages; Culture source link resolves and matches; stale-quote hazard corroborated live on KXBTCY-27JAN0100-B87500 | session-7ba903ee | new `verification/2026-11-25-7ba903ee.md`, this board section |
+| E3 | Housekeeping defect claimed before editing: root `.tmp-dbg.mjs` is an unreferenced scratch harness (jsdom F-88 replay probe) that reached `main` via commit `4c0ff8d`; grep finds no workflow/test/reference. Remove the file only. (`cors-test.mjs` is checked for references first and left alone if cited.) | done (`bfac010`) — `.tmp-dbg.mjs` deleted; `cors-test.mjs` retained (cited as CORS-evidence trail in D-05 / `verification/2026-11-20-d5b935f4.md`) | session-7ba903ee | `.tmp-dbg.mjs` (deletion only) |
+| E4 | Rebase on latest `main` (expected: settlement-gate fix from the concurrent sessions), full `npm test` evidence, PR of this branch to `main`, merge, confirm the Pages deploy, record PR/merge + sources in this section. | done — rebased onto `343ecc9` (settlement fix from PR #113; rebase conflict in this board resolved keeping both sessions' sections incl. the restored `Status key` footer); full `npm test` **exit 0** on the rebased tree + `build-site --check` clean. **PR [#116](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/116)** merged as `141fd4b7a7dc54c9823ddea014328cb6aadab16c` (main had concurrently advanced to `e428790` = PR #114; integrated via merge commit, all four PR checks green, merge without waiting for approval per brief). Pages build for `141fd4b`: status `built`, error `null`; the immediately preceding build for `e428790` was cancelled-by-supersession (transient queueing, not a broken deploy — the `errored` API entry is that cancelled run). Live site re-fetched after deploy and renders. No new flagged irregularities. | session-7ba903ee | this section, `verification/2026-11-25-7ba903ee.md` |
+
+Every checked value in E2 is recorded with its official/live source link; unconfirmable values stay blank and are flagged, never inferred.
+- *Board dedupe (2026-11-25, session-5082f7f3): a second copy of this section was appended at the file end by the PR #118 merge with a stale "E4 in progress" cell contradicting the done record above. The stale copy was removed; its only unique wording (the pre-rebase E4 status text) is superseded by the done row, and no other session's content was dropped.*
+
+### PR & merge record (T4) — session-13a3df7d
+
+- **Pull request:** https://github.com/kanlerxz87-cyber/KalshiDash1/pull/113 (`arena/13a3df7d-kalshidash1` → `main`).
+- **Pre-merge checks:** `npm test` green end to end; `build-site.mjs --check` clean; `check-links.mjs` 90 pages / 0 broken internal; `python3 tools/linkcheck.py` 2,227 internal links / 0 broken.
+- **Merge:** `gh pr merge 113 --merge`; merge commit `343ecc99e0bb234544ffbc6f7aadbb1fec9c9675` on `main` (2026-11-25). Merged without waiting for approval, per brief. First-try merge, no conflicts.
+- **GitHub Pages:** latest build `1402186446` for commit `343ecc9` → status `built`, error `null` (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest`, 2026-11-25T12:28:20Z). Pages source is legacy `main` `/`; live site at https://kanlerxz87-cyber.github.io/KalshiDash1/ — landing page, category subpages (gas/elections/culture/crypto/golf), dashboard, dual alert chats, market chart, portfolio/analysis, sources and flagged pages all served from the root.
+- **No broken site deployed:** build and all checks were green before merge; Pages build has no error.
+
+## Session `arena/345b283e-kalshidash1` — consolidating final integration, verification & Pages (2026-11-25)
+
+**Session ID:** `session-345b283e`. Arena-pinned branch `arena/345b283e-kalshidash1`, branched from `main` at
+`4c0ff8d` (2026-11-25T12:13:04Z keepalive pulse), rebased onto `origin/main` before further edits.
+
+**Coordination decision (this session acts as the consolidating integration session).** While this session worked,
+concurrent sessions claimed and built the same backlog: `session-3dd2b218` (PR #114) repaired the latent
+`test:settlement` gate and integrated the stale PRs, and `session-7ba903ee` (PR #116) added an external live-API
+cross-check and removed an unreferenced scratch file. Per the board rule to **coordinate and not duplicate**, this
+session **merged those branches into this one and adopted their work rather than recreating it**, then produces a single
+consolidated integration PR to `main`. No concurrent implementation is rewritten or discarded; both board sections are
+preserved verbatim below and above.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| K1 | Claim this scope on the board; commit and push the claim before any other edit. | done | session-345b283e | this section of `COORDINATION.md` |
+| K2 | Independently verify the live Pages site, current engine sample freshness, and the requirement set against official Kalshi/GitHub sources; publish a dated evidence report. | done | session-345b283e | new `verification/2026-11-25-345b283e.md` |
+| K3 | Consolidate the concurrent integration (stale PRs #100/#112, settlement gate) by merging, not duplicating; close superseded PRs. | done | session-345b283e | this board; PR #100/#114/#116 close-or-integrate records |
+| K4 | Run the full QA suite locally on the merged tree (`npm test`, `build-site --check`, link/row-source/id checks); reproduce any failure before fixing. | done | session-345b283e | `scripts/` only where a defect is reproduced |
+| K5 | Final integration: one PR this branch to `main`, merge, confirm GitHub Pages, record PR/merge/deploy here. | in progress | session-345b283e | this board, `README.md` (release record only) |
+
+**K2 verification (this session):** the deployed Pages site at https://kanlerxz87-cyber.github.io/KalshiDash1/ serves the
+landing page, category subpages, dashboard, dual alert chats, market chart, portfolio/analysis, sources and flagged
+pages; the committed engine sample is `data/live/feed.json` / `data/live/state.json` generated `2026-11-25T12:12:12Z`
+and the snapshot captured `2026-11-25T12:12:22Z`, consistent with the keepalive pulse at `12:13:04Z`. Official Kalshi
+documentation pages cited by the site were re-read and matched (see the report). No value was inferred.
+
+**Overlap check:** no other session held an active claim on files this section edits; the concurrent PRs were merged and
+their sections preserved. Shared generated pages (`*.html` from `templates/`) are regenerated only by this session's
+final `scripts/build-site.mjs` run, after source edits pass their tests.
+
+### Concurrent session on the same defect — reconciled, not discarded (2026-11-25 ~12:30Z)
+
+While this integration PR was open, **session-13a3df7d** independently found and fixed the **same** `test:settlement` defect and merged it as [PR #113](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/113) (merge commit `343ecc9`, 12:27:59Z), with its record merged as [PR #115](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/115) (`2dcb377`). Both sessions were working from the same base `4c0ff8d` and neither had seen the other's work.
+
+**What each side found (both measured, independently):**
+- session-13a3df7d: *the control nulled only `settled_events[0]` while `categories/gas.html` renders 12 settled events, so the other 11 rows still rendered their timestamps and the control could never pass on a real capture.* Fix: null `settlement_ts` on every settled event's every market.
+- session-3dd2b218: the same order dependence (the hard-coded instant belonged to `settled_events[1]`, not `[0]`) **plus** a second defect neither side had measured before: *the assertion searched the page for one hard-coded string, so a generator that inferred a different time passed the gate.* Proven by mutation.
+
+**Resolution (the pattern this board has used before for one defect found twice):** the merged tree keeps **this session's stronger implementation**, which **subsumes** session-13a3df7d's fix — it nulls `settlement_ts` on every settled event **of every topic** (their fix covered the gas topic only) and adds the two properties their version did not have: the **order-independent sentinel instant** (asserted to occur nowhere in the capture) and the **cell-level assertion** that reads the rendered "Settled at" cell of every resolved row and fails if any contains a date. Their fix's measurement note is preserved in the code comment, their **board section is preserved verbatim**, their commits are in `main`'s history, and the **F-93 row credits them explicitly**. **Nothing of theirs was reverted, renumbered or rewritten.**
+
+**Merge conflict log for this integration:** merging `origin/main` produced exactly two conflicts — `scripts/check-settlement-ts.mjs` and `COORDINATION.md`. Both were resolved by keeping **both sides**: the stronger fixture (with their measurement cited in the comment) and all three board sections (session-3dd2b218, session-e43b620f ×2, session-13a3df7d). The repository's own "no unresolved merge markers" gate was re-run on the result: **0 markers**.
+
+**Flag-id check:** PR #113 did not touch `templates/flagged.tpl`, so no id collided — **F-93** was still free on `main` when this row was written, and `main`'s highest published id was F-91.
+
 ---
 
-## Session `arena/5082f7f3-kalshidash1` — stale-PR #100 takeover + independent verification (2026-11-25)
+### PR, merge and deployment record — session-3dd2b218 (2026-11-25)
 
-- Session ID: `session-5082f7f3`. Arena-pinned branch `arena/5082f7f3-kalshidash1`, claim commit based on `main` @ `343ecc9` (after PRs #112 and #113 merged the same morning).
-- Arena restricts this session to this branch. No alternate branches or worktrees. All commits and PRs from this branch only.
-- **Stale-claim takeover check at claim time (2026-11-25 ~12:3x UTC):** the only open PR is [#100](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/100) (`arena/e43b620f-kalshidash1`, last commit 2026-11-22T08:30Z — >60 minutes with no commits; `CONFLICTING` against current `main`; its own board notes instruct that its audit's `F-88` row must be renumbered before merge because PR #110 already published `F-88`). Per the >60-minute rule this session **takes over completing and integrating PR #100**, preserving all of its content. `session-13a3df7d` (active the same morning, PR #113) did not claim #100 on its board; this session does not touch that session's files beyond merging `main` forward.
-- Concurrency note: `main` moved twice during this session's start (PR #112 merged 12:24:48Z, PR #113 merged 12:27:59Z). This session re-fetches and merges `origin/main` before every push and treats every commit it did not write as another session's work.
+- **PR:** [#114](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/114) — "Final integration: repair the settlement_ts QA gate (F-93), integrate stale PRs #112/#100, re-verify the site" — `arena/3dd2b218-kalshidash1` → `main`.
+- **Checks on the PR head (all pass):** `alerts` · `build` (Site build check) · `qa` (site-qa) · `qa` (suite-qa) — **4/4**.
+- **Merged:** `gh pr merge 114 --merge` at **2026-11-25T12:33:33Z** → merge commit **`e4287901b5dc82b36f1f26b2b763ac70f609856d`**. Merged without waiting for approval, per the brief.
+- **Post-merge runs on the merge commit:** `site-qa` **success**, `suite-qa` **success**, `alerts-qa` **success**; `Site build check` and `pages build and deployment` were **cancelled** — the standard GitHub Pages behaviour when a newer commit supersedes the deployment (the next two commits, `141fd4b7` and `ccca4746`, both deployed **successfully**). The Pages API reports a superseded build as `errored` / "Page build failed." even though the run's own conclusion is `cancelled`; the successful runs that follow are the authoritative evidence.
+- **GitHub Pages:** `pages/builds/latest` → `status: built`, `error: null` for `ccca4746` (the newest deployment, which includes PR #114). Site: <https://kanlerxz87-cyber.github.io/KalshiDash1/>.
+- **Live verification after the deploy (cache-busted, via the platform page fetcher — this sandbox has no direct TLS egress to `*.github.io`):**
+  - `flagged.html` serves **F-93** in full — the measured failure, both causes, the fix, the mutation evidence, and the explicit credit to session-13a3df7d with a link to PR #113.
+  - `flagged.html` serves **F-91** with the dated re-measurement (103 alerts, 14 high-ROI, all |delta| ≥ $0.97 across 13 tickers, and the changed model verdict), and **F-90** unchanged.
+  - `executive-summary.html` serves the new demo-account bullet ("Demo-account access is not connected; do not enable it on this public site yet", linking F-85 and F-66) and the reconciled headline figures (2903 open markets, 122 tracked series, 185 endpoint calls).
+  - `alerts/index.html` serves "Showing the engine feed.", **103** alerts, **14** high-ROI, largest move **$0.98**, 60 contracts tracked, **0** resolved, with a per-row API URL, contract-terms link, settlement rules and the model's per-term reasons.
+- **Stale PRs closed by this session:** [#112](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/112) — reviewed and **merged** as `c8af9d8` (its F-90→F-92 numbering correction was still needed on `main`). [#100](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/100) — **closed as superseded**, with the reasoning and the credit to its unique contributions posted on the PR before closing.
+- **Concurrency:** `main` advanced twice while this PR was open (PR #113 + #115 from session-13a3df7d, then PR #116 + #117 from session-7ba903ee, both docs-only). Every merge was resolved by keeping **both sides**; the two conflicts in this branch were `scripts/check-settlement-ts.mjs` and `COORDINATION.md`, and both were resolved by union, with the repository's own "no unresolved merge markers" gate re-run green on the result.
+- **Not verified, and therefore left blank on the site:** the authenticated demo account (`data/account.json` is `connected: false`, `captured_at: null` — no secret exists in this repository, none was requested, and **no authenticated read and no order was made**), any realized return, the cause of any price move, and any exchange-wide market ranking. Resolutions are 0 because no tracked market has published a `result` of yes or no yet.
+- **Full record:** [`verification/2026-11-25-3dd2b218.md`](verification/2026-11-25-3dd2b218.md) — sources, methods, measurements and limits.
+
+---
+
+## Session `arena/5082f7f3-kalshidash1` — independent verification + PR-#100 takeover reconciliation (2026-11-25)
+
+- **Session ID:** `session-5082f7f3`. Arena-pinned branch `arena/5082f7f3-kalshidash1`, claim pushed at 2026-11-25 12:26 UTC based on `main` @ `343ecc9` (immediately after PRs #112 and #113 had merged). All commits and PRs are from this branch only; no other session's branch was pushed to.
+- **Concurrency at claim time:** PRs #112/#113 merged minutes before this claim; during this session's work, sessions `3dd2b218` (PR #114), `7ba903ee` (PRs #116/#117), `345b283e` (PR #118), `3dd2b218` (PR #119) and `d6ae0eb2` (PR #120) all landed on `main`. Every commit this session did not write is treated as another session's work.
 
 ### Task board — session-5082f7f3
 
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
-| X1 | Read the board, claim this section, commit and push before any other edit. | in progress | session-5082f7f3 | this section of `COORDINATION.md` |
-| X2 | Take over stale PR #100: merge its branch into this branch against current `main`, resolve conflicts without dropping any session's text, renumber its audit finding per its own handoff note (its `F-88` → next free id), regenerate generated HTML via `scripts/build-site.mjs` only. | unclaimed | session-5082f7f3 | PR #100's files (`COORDINATION.md`, `templates/executive-summary.tpl`, `templates/flagged.tpl`, `verification/2026-11-22-e43b620f.md`, regenerated `executive-summary.html`/`flagged.html`) |
-| X3 | Reproduce PR #100's failing `site-qa` check locally on the merged tree, fix only what is reproduced; run the full QA battery (`npm test`, `build-site --check`, both link checkers, row-source gate). | unclaimed | session-5082f7f3 | same scope + test scripts only if a defect is reproduced |
-| X4 | Independent line-by-line verification record against official sources with links; flag, never infer. | unclaimed | session-5082f7f3 | new `verification/2026-11-25-5082f7f3.md`, this board |
-| X5 | Integration PR → `main` → merge without waiting → confirm GitHub Pages deploy → record PR link, merge SHA and Pages result here; close #100 with the integration pointer. | unclaimed | session-5082f7f3 | this section, PR via `gh` |
+| X1 | Read the board, claim this section, commit and push before any other edit. | done (claim pushed 2026-11-25 12:26 UTC) | session-5082f7f3 | this section of `COORDINATION.md` |
+| X2 | Take over stale PR #100 (merge its branch here, renumber its drafted anomaly row to a free id, regenerate pages via `scripts/build-site.mjs`, full QA). | done — **superseded and withdrawn before publication.** This session merged PR #100's branch and reproduced the exact row values against PR #100's own branch feed (`score 0.779`, `highROI: true`, `tradeable: true`, `2026-11-21T23:24:53.000Z`, `$0.99 → $0.02`). While it worked, `session-3dd2b218` (PR #114) completed the same takeover on `main` and **declined the drafted row**: it duplicates the published **F-91** observation and its model verdict is stale (current-sample oscillation rows score 0.277–0.300, `tradeable: false`). This session independently reached the same staleness finding and **adopted main's disposition**: on this branch's final merge, `main`'s versions were taken for every shared file (`templates/flagged.tpl`, `templates/executive-summary.tpl`, `verification/2026-11-22-e43b620f.md`, `COORDINATION.md`), and its duplicate re-application was dropped. Nothing of any session's work was reverted. | session-5082f7f3 | PR #100's files via merge (superseded; final tree = `main`'s) |
+| X3 | Reproduce PR #100's failing `site-qa` locally on the merged tree; run the full QA battery. | done — independently reproduced the `test:settlement` negative-control failure on `main` @ `4c0ff8d` (same root cause `session-13a3df7d` and `session-3dd2b218` fixed; now F-93). Full battery green on this session's final merged tree: `npm test` exit 0 (all suites, settlement 5/5), `build-site --check` clean, `check-links.mjs` + `tools/linkcheck.py` 0 broken, `check-row-sources` enforced, `check-html-ids` clean, JS `node --check` loop, merge-marker grep 0, `qa_logic_test`, `alerts-qa`, `alerts-render-test` (jsdom 24.1.3), `check-data-writer-concurrency` 31/31, `check-data-workflow-shells` 9/9, `py_compile` OK — i.e. every `site-qa.yml` step run locally. | session-5082f7f3 | read-only (no test script changed) |
+| X4 | Independent line-by-line verification record against official sources with links; flag, never infer. | done — record at `verification/2026-11-25-5082f7f3.md`: 5 official pages read live via the page fetcher (endpoints, orderbook/liquidity semantics, WS authentication, settlement cited), live Pages checks (landing, flagged, fresh feed `2026-11-25T12:12:12Z`), PR-#100 row values reproduced against its branch feed, full local QA battery green; 4 irregularities recorded with dispositions | session-5082f7f3 | new `verification/2026-11-25-5082f7f3.md`, this board |
+| X5 | Integration PR → `main` → merge without waiting → confirm GitHub Pages deploy → record PR link, merge SHA and Pages result here. | unclaimed | session-5082f7f3 | this section, PR via `gh` |
+
+### Coordination notes — session-5082f7f3
+
+- **PR-#100 takeover race (2026-11-25 ~12:26–12:44 UTC):** this session claimed the takeover at 12:26 UTC; `session-3dd2b218` closed PR #100 at 12:29 UTC with a disposition comment and merged its takeover as PR #114; `session-d6ae0eb2` recorded a third independent reconciliation in PR #120. All three independently found the same facts; the one-row-per-finding precedent was upheld and no duplicate anomaly row is published. PR #100 itself is closed (not merged) with its full disposition on the PR.
+- **Duplicate board section removed (this session's only edit outside its own section):** `main` @ `8c9d67a` carried **two copies** of session-7ba903ee's section — an artifact of the PR #118 merge — the second ending the file with a stale "E4 in progress" cell that contradicted the first copy's "E4 done + PR #116 record". The stale copy was removed; its only unique text (the pre-rebase E4 wording) is superseded by the done row, and the removal is noted in the surviving section. No other session's content was dropped.
+- **F-91 cross-reference (wording fix, no value changed):** F-91's note said the same anomaly "was independently observed in the concurrent open PR's F-86 row". PR #100 is closed and its drafted row was never published, so this session corrected the wording in place to point at the closed PR's drafted row and its dated audit record. No measured value, badge or link target of F-91's data was changed.
+- **Verified independently this session:** PR #100's drafted row values against its branch feed (above); the settlement-gate failure and fix; the full local QA battery; official endpoint and semantics claims via the platform page fetcher (record in `verification/2026-11-25-5082f7f3.md`). No authenticated account read, no order, no inferred value.
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
