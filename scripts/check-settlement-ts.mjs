@@ -48,8 +48,39 @@ ok('build-site.mjs resolvedTable reads r.m.settlement_ts',
   'the Settled-at cell must fall back to the market-level field');
 
 /* 3. End-to-end: run the real generator in a scratch tree with a patched real snapshot. */
-const SETTLED = '2026-11-16T14:32:51.060078Z';
-const WANT = '2026-11-16 14:32:51';
+/* The timestamp under test must be DERIVED from the capture, never hard-coded. Measured
+ * 2026-11-25 (session-d6ae0eb2, the second failure of this class after F-89): the control
+ * hard-coded KXAAAGASW-26NOV16's settlement time, but the scheduled snapshot refresh had
+ * moved that event from settled_events[0] to [1] (NOV23 now sorts first), so the page
+ * legitimately still rendered the NOV16 time from event [1] and the control failed on
+ * origin/main itself. The control now (a) targets the first event that actually carries an
+ * official settlement_ts, (b) asserts the time of a DIFFERENT untouched event still renders
+ * — so a blank-everything regression cannot pass vacuously, and (c) fails explicitly if the
+ * capture no longer has two events with timestamps, rather than weakening silently.
+ * The positive control injects a synthetic 2031 value that no 2026-era capture can contain. */
+const INJECTED_RAW = '2031-02-14T09:45:12.000000Z';
+const WANT = '2031-02-14 09:45:12';
+
+const fmtTs = (raw) => String(raw).replace('T', ' ').slice(0, 19);
+
+function pickTarget(snap) {
+  for (const ev of (snap.topics.gas.settled_events || [])) {
+    for (const m of (ev.markets || [])) {
+      if (m.settlement_ts) return { ev, raw: m.settlement_ts };
+    }
+  }
+  return null;
+}
+
+function pickOtherEvent(snap, target) {
+  for (const ev of (snap.topics.gas.settled_events || [])) {
+    if (ev === target.ev) continue;
+    for (const m of (ev.markets || [])) {
+      if (m.settlement_ts) return { ev, raw: m.settlement_ts };
+    }
+  }
+  return null;
+}
 
 function generateWith(patch) {
   const dir = mkdtempSync(path.join(tmpdir(), 'kd-settle-'));
@@ -71,19 +102,23 @@ function generateWith(patch) {
 let threw = null;
 let positiveHtml = '';
 let negativeHtml = '';
+let other = null;
 try {
+  const snapNow = JSON.parse(readFileSync(path.join(ROOT, 'data', 'snapshot.json'), 'utf8'));
+  other = pickOtherEvent(snapNow, pickTarget(snapNow));
   positiveHtml = generateWith((snap) => {
-    const ev = snap.topics.gas.settled_events[0];
-    ev.markets[0].settlement_ts = SETTLED;
+    const target = pickTarget(snap);
+    target.ev.markets[0].settlement_ts = INJECTED_RAW;
   });
   negativeHtml = generateWith((snap) => {
     /* The negative control must remove the value from EVERY market in the event. Measured
      * 2026-11-22: all 12 nested markets of KXAAAGASW-26NOV16 legitimately share this settlement
      * timestamp (they settle together), so nulling only markets[0] left 11 rows still rendering the
-     * string and the control failed on a refreshed capture even though the generator was correct. */
-    const ev = snap.topics.gas.settled_events[0];
-    ev.settlement_ts = null;
-    ev.markets.forEach((m) => { m.settlement_ts = null; });
+     * string and the control failed on a refreshed capture even though the generator was correct.
+     * Measured 2026-11-25: the targeted event itself is now picked from the data (see above). */
+    const target = pickTarget(snap);
+    target.ev.settlement_ts = null;
+    target.ev.markets.forEach((m) => { m.settlement_ts = null; });
   });
 } catch (e) {
   threw = e;
@@ -92,8 +127,18 @@ try {
 ok('generator runs end-to-end in a scratch tree', threw === null, threw ? String(threw.message || threw) : '');
 ok('a settled market with settlement_ts renders "Settled at" from the official field',
   positiveHtml.includes(WANT), 'expected ' + WANT + ' in categories/gas.html');
+const target = (() => { try { return pickTarget(JSON.parse(readFileSync(path.join(ROOT, 'data', 'snapshot.json'), 'utf8'))); } catch { return null; } })();
+const targetWant = target ? fmtTs(target.raw) : null;
 ok('negative control: a null settlement_ts still renders a blank, never an inferred time',
-  negativeHtml !== '' && !negativeHtml.includes(WANT));
+  negativeHtml !== '' && Boolean(targetWant) && !negativeHtml.includes(targetWant),
+  'the targeted event\u2019s own time ' + (targetWant || '(none in capture)') + ' must disappear');
+ok('non-vacuity: an untouched settled event still renders its official time',
+  Boolean(other) && Boolean(other.raw) && negativeHtml.includes(fmtTs(other.raw)),
+  other ? 'expected ' + fmtTs(other.raw) + ' from ' + (other.ev.event_ticker || other.ev.title || 'another event') + ' to survive'
+        : 'capture has no second settled event with a timestamp — the control would be vacuous, so this is a failure');
+if (other && targetWant && fmtTs(other.raw) === targetWant) {
+  failures.push('control design: two distinct settled events share the same second-level timestamp (' + targetWant + '); the assertion cannot distinguish them');
+}
 
 console.log(`\nsettlement-ts: ${pass} passed, ${failures.length} failed`);
 if (failures.length) {
