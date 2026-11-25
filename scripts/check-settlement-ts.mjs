@@ -47,9 +47,43 @@ ok('build-site.mjs resolvedTable reads r.m.settlement_ts',
   /r\.ev\.settlement_ts\s*\|\|\s*r\.m\.settlement_ts/.test(buildSrc),
   'the Settled-at cell must fall back to the market-level field');
 
-/* 3. End-to-end: run the real generator in a scratch tree with a patched real snapshot. */
-const SETTLED = '2026-11-16T14:32:51.060078Z';
-const WANT = '2026-11-16 14:32:51';
+/* 3. End-to-end: run the real generator in a scratch tree with a patched real snapshot.
+ *
+ * FIXTURE INDEPENDENCE (session-3dd2b218, 2026-11-25). The fixture used to hard-code a real
+ * settlement instant taken from the 2026-11-22 capture (`2026-11-16T14:32:51.060078Z`, the
+ * KXAAAGASW-26NOV16 event) and asserted that the generated gas page no longer contained that
+ * instant after the negative control removed it. That made the control depend on WHICH settled
+ * event the capture happens to list first: the control removed the value from
+ * `settled_events[0]`, but the hard-coded instant belonged to a different event whenever the
+ * capture ordered them differently. Measured on the 2026-11-25 capture, `settled_events[0]` is
+ * KXAAAGASW-26NOV23 and the hard-coded instant belongs to `settled_events[1]`, so the control
+ * blanked the wrong event and failed even though the generator was correct.
+ *
+ * The fixture is now order-independent in two ways:
+ *   a) the positive control uses a SENTINEL instant that occurs nowhere in the snapshot, so the
+ *      assertion can never be satisfied by a real captured row;
+ *   b) the negative control removes `settlement_ts` from EVERY settled event of EVERY topic
+ *      (the event field and every nested market's field) — the only way to assert "no official
+ *      value anywhere => no time rendered anywhere".
+ * The generator, the capture script and every published page are untouched by this change. */
+const SETTLED = '2031-01-02T03:04:05.678901Z';
+const WANT = '2031-01-02 03:04:05';
+
+/* Read the "Settled at" cell (the 6th cell) of every row of the resolved-events table.
+ * The generator renders it as `<span class="muted">—</span>` when no official value exists, and
+ * as "<iso> UTC" when one does. Extracting the cell — rather than searching the whole page — is
+ * what makes the negative control able to catch ANY inferred time, not just one hard-coded
+ * string. (Measured 2026-11-25: a generator mutated to fall back to a constant time still
+ * passed a "the sentinel is absent" assertion, because the inferred value was a different
+ * string. This cell-level check fails on that mutation.) */
+function settledCells(html) {
+  const body = html.slice(html.indexOf('id="resolved-body"'));
+  const rows = body.match(/<tr>[\s\S]*?<\/tr>/g) || [];
+  return rows.map((row) => {
+    const cells = row.match(/<td[\s\S]*?<\/td>/g) || [];
+    return cells.length >= 6 ? cells[5] : '';
+  });
+}
 
 function generateWith(patch) {
   const dir = mkdtempSync(path.join(tmpdir(), 'kd-settle-'));
@@ -77,23 +111,43 @@ try {
     ev.markets[0].settlement_ts = SETTLED;
   });
   negativeHtml = generateWith((snap) => {
-    /* The negative control must remove the value from EVERY market in the event. Measured
-     * 2026-11-22: all 12 nested markets of KXAAAGASW-26NOV16 legitimately share this settlement
-     * timestamp (they settle together), so nulling only markets[0] left 11 rows still rendering the
-     * string and the control failed on a refreshed capture even though the generator was correct. */
-    const ev = snap.topics.gas.settled_events[0];
-    ev.settlement_ts = null;
-    ev.markets.forEach((m) => { m.settlement_ts = null; });
+    /* The negative control must remove the value from EVERY settled market of EVERY topic:
+     *   - 2026-11-22: all 12 nested markets of KXAAAGASW-26NOV16 legitimately share this
+     *     settlement timestamp (they settle together), so nulling only markets[0] left 11 rows
+     *     still rendering the string;
+     *   - 2026-11-25: the hard-coded instant belonged to a settled event other than
+     *     settled_events[0], so nulling only event 0 left the string on the page.
+     * Nulling every event and every nested market is the only way to test "no official value
+     * anywhere => blank cell everywhere". */
+    for (const topic of Object.values(snap.topics || {})) {
+      for (const ev of topic.settled_events || []) {
+        ev.settlement_ts = null;
+        for (const m of ev.markets || []) m.settlement_ts = null;
+      }
+    }
   });
 } catch (e) {
   threw = e;
 }
 
 ok('generator runs end-to-end in a scratch tree', threw === null, threw ? String(threw.message || threw) : '');
+/* The sentinel must not already exist in the capture, otherwise the positive control could be
+ * satisfied by a row the fixture never touched. */
+const rawSnapshot = readFileSync(path.join(ROOT, 'data', 'snapshot.json'), 'utf8');
+ok('the positive-control sentinel does not occur in the committed snapshot',
+  !rawSnapshot.includes(SETTLED) && !rawSnapshot.includes('2031-01-02'),
+  'the sentinel instant must be unique to the fixture');
+const positiveCells = settledCells(positiveHtml);
 ok('a settled market with settlement_ts renders "Settled at" from the official field',
-  positiveHtml.includes(WANT), 'expected ' + WANT + ' in categories/gas.html');
+  positiveHtml.includes(WANT) && positiveCells.some((c) => c.includes(WANT)),
+  'expected ' + WANT + ' in the Settled-at cell of categories/gas.html');
+const negativeCells = settledCells(negativeHtml);
+const inferred = negativeCells.filter((c) => !/class="muted">/.test(c) && /\d{4}-\d{2}-\d{2}/.test(c));
 ok('negative control: a null settlement_ts still renders a blank, never an inferred time',
-  negativeHtml !== '' && !negativeHtml.includes(WANT));
+  negativeHtml !== '' && negativeCells.length > 0 && inferred.length === 0,
+  inferred.length
+    ? 'the generator rendered an inferred settlement time in ' + inferred.length + ' row(s): ' + inferred[0]
+    : (negativeCells.length ? '' : 'no resolved rows were generated, so the control proved nothing'));
 
 console.log(`\nsettlement-ts: ${pass} passed, ${failures.length} failed`);
 if (failures.length) {
