@@ -3637,7 +3637,7 @@ will neither edit nor take over those branches. No other active claim exists on 
 | T1 | Repo review + line-by-line coverage check vs the brief: executive summary, landing page, category subpages (gas/elections/culture/crypto/golf), dashboard, dual ≥$0.10 scrolling alert chats, resolution tracking (yes/no), automated simulated trades, portfolio, time-window price charts, liquidity/orders-available, suggestions | done | session-13a3df7d | read-only + COORDINATION.md | Kalshi demo_env, orderbook_responses, market_lifecycle, get-trades, candlesticks docs (docs.kalshi.com); live site pages | none |
 | T2 | Fix settlement negative-control test: null settlement_ts on all settled events + all markets so "null renders blank, never inferred" is proven rather than shadowed by sibling events | done | session-13a3df7d | `scripts/check-settlement-ts.mjs` | test's own measurement note; aligns with F-89 record at end of this board | test flaw only (site correct — all-null renders blank) |
 | T3 | Full QA: `npm test` (engine/feed/paper/chart/settlement/lab/privacy/writers/cors/rows/ids/stale), `build-site.mjs --check`, both link checkers (90 pages, 2,227 internal links, 0 broken) | done | session-13a3df7d | scripts/, tools/, data/ | npm test | none |
-| T4 | PR `arena/13a3df7d-kalshidash1` → `main`, merge without waiting, confirm GitHub Pages build, record PR link + merge result here | in progress | session-13a3df7d | COORDINATION.md (this section) | gh, Pages API | none |
+| T4 | PR `arena/13a3df7d-kalshidash1` → `main`, merge without waiting, confirm GitHub Pages build, record PR link + merge result here | done | session-13a3df7d | COORDINATION.md (this section) | gh, Pages API | none |
 
 ### Record — session-13a3df7d (2026-11-25)
 
@@ -3649,6 +3649,8 @@ will neither edit nor take over those branches. No other active claim exists on 
 - **Irregularities:** none new. Pre-existing, already-flagged limitations (browser CORS untested, demo-account not connected without secrets, heuristic ROI model, polling cache lag) remain documented on flagged.html; they do not block this integration.
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
+
+## Session `arena/a9c4969e-kalshidash1` — handoff record (2026-11-25)
 
 ### Handoff to the integrator — session-a9c4969e → session-3dd2b218 (2026-11-25)
 
@@ -3665,3 +3667,11 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review`.
 3. **Board ownership:** this branch's COORDINATION.md section is the only change this session made to the board. Keep it when you merge.
 
 **What this session will NOT do:** it will not edit `flagged.tpl`, `flagged.html`, `executive-summary.*`, or the settlement test on its own, and it will not merge PR #114. Once #114 is merged, a reviewer can confirm `F-A9C-01..03` appear on the live Flagged page.
+
+### PR & merge record (T4) — session-13a3df7d
+
+- **Pull request:** https://github.com/kanlerxz87-cyber/KalshiDash1/pull/113 (`arena/13a3df7d-kalshidash1` → `main`).
+- **Pre-merge checks:** `npm test` green end to end; `build-site.mjs --check` clean; `check-links.mjs` 90 pages / 0 broken internal; `python3 tools/linkcheck.py` 2,227 internal links / 0 broken.
+- **Merge:** `gh pr merge 113 --merge`; merge commit `343ecc99e0bb234544ffbc6f7aadbb1fec9c9675` on `main` (2026-11-25). Merged without waiting for approval, per brief. First-try merge, no conflicts.
+- **GitHub Pages:** latest build `1402186446` for commit `343ecc9` → status `built`, error `null` (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest`, 2026-11-25T12:28:20Z). Pages source is legacy `main` `/`; live site at https://kanlerxz87-cyber.github.io/KalshiDash1/ — landing page, category subpages (gas/elections/culture/crypto/golf), dashboard, dual alert chats, market chart, portfolio/analysis, sources and flagged pages all served from the root.
+- **No broken site deployed:** build and all checks were green before merge; Pages build has no error.
