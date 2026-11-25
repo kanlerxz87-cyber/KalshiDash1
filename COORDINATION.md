@@ -3604,3 +3604,24 @@ fail: `negative control: a null settlement_ts still renders a blank, never an in
 - **Irregularities:** none new. Pre-existing, already-flagged limitations (browser CORS untested, demo-account not connected without secrets, heuristic ROI model, polling cache lag) remain documented on flagged.html; they do not block this integration.
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
+
+---
+
+## Session `arena/5082f7f3-kalshidash1` — stale-PR #100 takeover + independent verification (2026-11-25)
+
+- Session ID: `session-5082f7f3`. Arena-pinned branch `arena/5082f7f3-kalshidash1`, claim commit based on `main` @ `343ecc9` (after PRs #112 and #113 merged the same morning).
+- Arena restricts this session to this branch. No alternate branches or worktrees. All commits and PRs from this branch only.
+- **Stale-claim takeover check at claim time (2026-11-25 ~12:3x UTC):** the only open PR is [#100](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/100) (`arena/e43b620f-kalshidash1`, last commit 2026-11-22T08:30Z — >60 minutes with no commits; `CONFLICTING` against current `main`; its own board notes instruct that its audit's `F-88` row must be renumbered before merge because PR #110 already published `F-88`). Per the >60-minute rule this session **takes over completing and integrating PR #100**, preserving all of its content. `session-13a3df7d` (active the same morning, PR #113) did not claim #100 on its board; this session does not touch that session's files beyond merging `main` forward.
+- Concurrency note: `main` moved twice during this session's start (PR #112 merged 12:24:48Z, PR #113 merged 12:27:59Z). This session re-fetches and merges `origin/main` before every push and treats every commit it did not write as another session's work.
+
+### Task board — session-5082f7f3
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| X1 | Read the board, claim this section, commit and push before any other edit. | in progress | session-5082f7f3 | this section of `COORDINATION.md` |
+| X2 | Take over stale PR #100: merge its branch into this branch against current `main`, resolve conflicts without dropping any session's text, renumber its audit finding per its own handoff note (its `F-88` → next free id), regenerate generated HTML via `scripts/build-site.mjs` only. | unclaimed | session-5082f7f3 | PR #100's files (`COORDINATION.md`, `templates/executive-summary.tpl`, `templates/flagged.tpl`, `verification/2026-11-22-e43b620f.md`, regenerated `executive-summary.html`/`flagged.html`) |
+| X3 | Reproduce PR #100's failing `site-qa` check locally on the merged tree, fix only what is reproduced; run the full QA battery (`npm test`, `build-site --check`, both link checkers, row-source gate). | unclaimed | session-5082f7f3 | same scope + test scripts only if a defect is reproduced |
+| X4 | Independent line-by-line verification record against official sources with links; flag, never infer. | unclaimed | session-5082f7f3 | new `verification/2026-11-25-5082f7f3.md`, this board |
+| X5 | Integration PR → `main` → merge without waiting → confirm GitHub Pages deploy → record PR link, merge SHA and Pages result here; close #100 with the integration pointer. | unclaimed | session-5082f7f3 | this section, PR via `gh` |
+
+Status key: `unclaimed` · `in progress` · `done` · `needs review`.
