@@ -3593,7 +3593,7 @@ will neither edit nor take over those branches. No other active claim exists on 
 | A2 | Run the full repository QA suite (`npm ci && npm test`, `build-site --check`) on the current `main` tip; reproduce any failure before touching anything. | done (one reproduced failure fixed under A6) | session-a9c4969e | read-only unless a defect is reproduced (then claimed separately) |
 | A3 | Re-read the official Kalshi demo-environment and market/orderbook pages that the site cites, and check the user-supplied demo endpoints against them. Flag, do not infer. | done (endpoints match verbatim; 3 flags F-A9C-01..03) | session-a9c4969e | read-only; findings go to `verification/2026-11-25-a9c4969e.md` |
 | A4 | Check the deployed GitHub Pages site and the committed `data/live/` timestamps against the 45-minute staleness rule; record the measured cadence of scheduled runs. | done (engine sample ~12 min old; live-alerts cron 6–10 h apart, already F-83) | session-a9c4969e | read-only; findings go to `verification/2026-11-25-a9c4969e.md` |
-| A5 | Final integration for this session's record only: PR of this branch to `main`, merge, confirm the Pages deploy, record PR/merge in this section. | in progress | session-a9c4969e | this section, `verification/2026-11-25-a9c4969e.md` |
+| A5 | Final integration: PR to `main`, merge, Pages confirmation. | **handed off — not opened by this session** (see handoff below); integration is claimed by session-3dd2b218 via PR #114 (opened 2026-11-25 12:29Z) | session-a9c4969e | this section, `verification/2026-11-25-a9c4969e.md` |
 
 ### A6 — defect claimed before editing (session-a9c4969e)
 
@@ -3649,3 +3649,19 @@ will neither edit nor take over those branches. No other active claim exists on 
 - **Irregularities:** none new. Pre-existing, already-flagged limitations (browser CORS untested, demo-account not connected without secrets, heuristic ROI model, polling cache lag) remain documented on flagged.html; they do not block this integration.
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
+
+### Handoff to the integrator — session-a9c4969e → session-3dd2b218 (2026-11-25)
+
+**Decision:** this session did **not** open a second integration PR. PR #114 (`arena/3dd2b218-kalshidash1`, opened 2026-11-25 12:29Z, fresh claim) is the active final integration, and it edits the same shared outputs (`templates/flagged.tpl`, `flagged.html`, `COORDINATION.md`, the settlement test). A competing PR would create exactly the duplicate-work and conflict the board forbids. Nothing from this session is merged except what is already on `main`.
+
+**Requests for the integrator (PR #114):**
+
+1. **Add these findings to `templates/flagged.tpl` (rows verbatim, then `build-site`).** They are committed on `arena/a9c4969e-kalshidash1` in commit `b33331d`, and the same rows are in `flagged.html` there. Run `git show b33331d -- templates/flagged.tpl` to see the diff.
+   - `F-A9C-01` — culture series `KXXBANNEDGROK` / `KXXBANNEDMURRAYHILLGUY1` publish non-publisher `settlement_sources` (blank name `account holder of `, Google-search URLs). Source: [official series list](https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true).
+   - `F-A9C-02` — crypto series `KXSUIPERP` has empty `contract_url` and `contract_terms_url` `…/contract_terms/.pdf`. Source: [official series list](https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&limit=2).
+   - `F-A9C-03` — unresolved page-render mismatch on `KXBTCY-27JAN0100-B87500` bid/ask (`$0.9900` in one page-fetcher render vs official `yes_ask_dollars` 0.0100). **Not reproduced; please have a reviewer check it in a browser before treating it as a defect.**
+   - Full record: `verification/2026-11-25-a9c4969e.md` (on the same branch).
+2. **Settlement test conflict:** `main` already contains the fix for the same negative control, from PR #113 (`708ab83`, session-13a3df7d), which nulls every settled event and every nested market. PR #114's `scripts/check-settlement-ts.mjs` was written from `4c0ff8d` and will conflict. Keep `main`'s version unless you can show it is wrong; if you keep the sentinel variant, reconcile the two rather than stacking them. Re-run `npm run test:settlement` after merging.
+3. **Board ownership:** this branch's COORDINATION.md section is the only change this session made to the board. Keep it when you merge.
+
+**What this session will NOT do:** it will not edit `flagged.tpl`, `flagged.html`, `executive-summary.*`, or the settlement test on its own, and it will not merge PR #114. Once #114 is merged, a reviewer can confirm `F-A9C-01..03` appear on the live Flagged page.
