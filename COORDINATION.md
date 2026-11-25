@@ -3555,3 +3555,13 @@ fail: `negative control: a null settlement_ts still renders a blank, never an in
 - **Verified:** with the fix, 5/5 pass; reverting the test reproduces the 1 failure on the same data.
   Full `npm test` is green on the merged tree.
 - **Published as F-89** (next free id; F-88 is this session's dashboard row).
+
+## Session session-173f8837 — final regression repair (2026-11-25)
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| R1 | Review current checkout and run repository verification; fix the reproducible settlement-checker false negative using isolated test data and rerun the full suite. | done | session-173f8837 | `scripts/check-settlement-ts.mjs`, this board section |
+
+**Finding and repair:** `npm test` initially failed only the settlement check's negative control. It patched one market with the genuine captured timestamp, then searched the entire generated page for that value; other legitimate markets shared it, so the negative control incorrectly reported a failure. Replaced the fixture value with a distinctive synthetic sentinel absent from the capture and retained the positive/negative end-to-end assertions. This changes test fixture data only, not published market data or runtime behavior.
+
+**Verification:** installed locked dev dependencies with `npm ci` (audit reported 0 vulnerabilities). `npm run test:settlement` passes 5/5; complete `npm test` passes, including official-source row gate (1,028 canonical rows, 0 provenance failures), internal-link checks (0 broken), paper-trading and chart regression suites, demo-safety and privacy checks. Test fixtures are synthetic/offline; no authenticated exchange call, account access, or order was made. Existing evidence documentation and official links remain in `SOURCES.md`, `VERIFICATION.md`, and `flagged.html`; this test repair makes no new claims about live market data.

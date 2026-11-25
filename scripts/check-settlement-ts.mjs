@@ -48,8 +48,10 @@ ok('build-site.mjs resolvedTable reads r.m.settlement_ts',
   'the Settled-at cell must fall back to the market-level field');
 
 /* 3. End-to-end: run the real generator in a scratch tree with a patched real snapshot. */
-const SETTLED = '2026-11-16T14:32:51.060078Z';
-const WANT = '2026-11-16 14:32:51';
+/* Use a sentinel not present elsewhere in the captured dataset: the negative control must
+ * distinguish its patched row from other legitimate markets that can share a real timestamp. */
+const SETTLED = '2099-01-02T03:04:05.000000Z';
+const WANT = '2099-01-02 03:04:05';
 
 function generateWith(patch) {
   const dir = mkdtempSync(path.join(tmpdir(), 'kd-settle-'));
