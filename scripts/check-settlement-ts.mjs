@@ -47,39 +47,42 @@ ok('build-site.mjs resolvedTable reads r.m.settlement_ts',
   /r\.ev\.settlement_ts\s*\|\|\s*r\.m\.settlement_ts/.test(buildSrc),
   'the Settled-at cell must fall back to the market-level field');
 
-/* 3. End-to-end: run the real generator in a scratch tree with a patched real snapshot. */
-/* The timestamp under test must be DERIVED from the capture, never hard-coded. Measured
- * 2026-11-25 (session-d6ae0eb2, the second failure of this class after F-89): the control
- * hard-coded KXAAAGASW-26NOV16's settlement time, but the scheduled snapshot refresh had
- * moved that event from settled_events[0] to [1] (NOV23 now sorts first), so the page
- * legitimately still rendered the NOV16 time from event [1] and the control failed on
- * origin/main itself. The control now (a) targets the first event that actually carries an
- * official settlement_ts, (b) asserts the time of a DIFFERENT untouched event still renders
- * — so a blank-everything regression cannot pass vacuously, and (c) fails explicitly if the
- * capture no longer has two events with timestamps, rather than weakening silently.
- * The positive control injects a synthetic 2031 value that no 2026-era capture can contain. */
-const INJECTED_RAW = '2031-02-14T09:45:12.000000Z';
-const WANT = '2031-02-14 09:45:12';
+/* 3. End-to-end: run the real generator in a scratch tree with a patched real snapshot.
+ *
+ * FIXTURE INDEPENDENCE (session-3dd2b218, 2026-11-25). The fixture used to hard-code a real
+ * settlement instant taken from the 2026-11-22 capture (`2026-11-16T14:32:51.060078Z`, the
+ * KXAAAGASW-26NOV16 event) and asserted that the generated gas page no longer contained that
+ * instant after the negative control removed it. That made the control depend on WHICH settled
+ * event the capture happens to list first: the control removed the value from
+ * `settled_events[0]`, but the hard-coded instant belonged to a different event whenever the
+ * capture ordered them differently. Measured on the 2026-11-25 capture, `settled_events[0]` is
+ * KXAAAGASW-26NOV23 and the hard-coded instant belongs to `settled_events[1]`, so the control
+ * blanked the wrong event and failed even though the generator was correct.
+ *
+ * The fixture is now order-independent in two ways:
+ *   a) the positive control uses a SENTINEL instant that occurs nowhere in the snapshot, so the
+ *      assertion can never be satisfied by a real captured row;
+ *   b) the negative control removes `settlement_ts` from EVERY settled event of EVERY topic
+ *      (the event field and every nested market's field) — the only way to assert "no official
+ *      value anywhere => no time rendered anywhere".
+ * The generator, the capture script and every published page are untouched by this change. */
+const SETTLED = '2031-01-02T03:04:05.678901Z';
+const WANT = '2031-01-02 03:04:05';
 
-const fmtTs = (raw) => String(raw).replace('T', ' ').slice(0, 19);
-
-function pickTarget(snap) {
-  for (const ev of (snap.topics.gas.settled_events || [])) {
-    for (const m of (ev.markets || [])) {
-      if (m.settlement_ts) return { ev, raw: m.settlement_ts };
-    }
-  }
-  return null;
-}
-
-function pickOtherEvent(snap, target) {
-  for (const ev of (snap.topics.gas.settled_events || [])) {
-    if (ev === target.ev) continue;
-    for (const m of (ev.markets || [])) {
-      if (m.settlement_ts) return { ev, raw: m.settlement_ts };
-    }
-  }
-  return null;
+/* Read the "Settled at" cell (the 6th cell) of every row of the resolved-events table.
+ * The generator renders it as `<span class="muted">—</span>` when no official value exists, and
+ * as "<iso> UTC" when one does. Extracting the cell — rather than searching the whole page — is
+ * what makes the negative control able to catch ANY inferred time, not just one hard-coded
+ * string. (Measured 2026-11-25: a generator mutated to fall back to a constant time still
+ * passed a "the sentinel is absent" assertion, because the inferred value was a different
+ * string. This cell-level check fails on that mutation.) */
+function settledCells(html) {
+  const body = html.slice(html.indexOf('id="resolved-body"'));
+  const rows = body.match(/<tr>[\s\S]*?<\/tr>/g) || [];
+  return rows.map((row) => {
+    const cells = row.match(/<td[\s\S]*?<\/td>/g) || [];
+    return cells.length >= 6 ? cells[5] : '';
+  });
 }
 
 function generateWith(patch) {
@@ -102,43 +105,50 @@ function generateWith(patch) {
 let threw = null;
 let positiveHtml = '';
 let negativeHtml = '';
-let other = null;
 try {
-  const snapNow = JSON.parse(readFileSync(path.join(ROOT, 'data', 'snapshot.json'), 'utf8'));
-  other = pickOtherEvent(snapNow, pickTarget(snapNow));
   positiveHtml = generateWith((snap) => {
-    const target = pickTarget(snap);
-    target.ev.markets[0].settlement_ts = INJECTED_RAW;
+    const ev = snap.topics.gas.settled_events[0];
+    ev.markets[0].settlement_ts = SETTLED;
   });
   negativeHtml = generateWith((snap) => {
-    /* The negative control must remove the value from EVERY market in the event. Measured
-     * 2026-11-22: all 12 nested markets of KXAAAGASW-26NOV16 legitimately share this settlement
-     * timestamp (they settle together), so nulling only markets[0] left 11 rows still rendering the
-     * string and the control failed on a refreshed capture even though the generator was correct.
-     * Measured 2026-11-25: the targeted event itself is now picked from the data (see above). */
-    const target = pickTarget(snap);
-    target.ev.settlement_ts = null;
-    target.ev.markets.forEach((m) => { m.settlement_ts = null; });
+    /* The negative control must remove the value from EVERY settled event and EVERY market.
+     * Two independent observations led here, both measured:
+     *   - 2026-11-22 (session-13a3df7d, PR #113): gas renders 12 settled events, so nulling only
+     *     settled_events[0] left the other 11 rows still rendering their timestamps and the control
+     *     failed even though the generator was correct;
+     *   - 2026-11-25 (session-3dd2b218): the hard-coded instant belonged to a settled event other
+     *     than settled_events[0], so nulling only event 0 left the string on the page.
+     * Nulling every event and every nested market of EVERY topic is the only way to test
+     * "no official value anywhere => blank cell everywhere". */
+    for (const topic of Object.values(snap.topics || {})) {
+      for (const ev of topic.settled_events || []) {
+        ev.settlement_ts = null;
+        for (const m of ev.markets || []) m.settlement_ts = null;
+      }
+    }
   });
 } catch (e) {
   threw = e;
 }
 
 ok('generator runs end-to-end in a scratch tree', threw === null, threw ? String(threw.message || threw) : '');
+/* The sentinel must not already exist in the capture, otherwise the positive control could be
+ * satisfied by a row the fixture never touched. */
+const rawSnapshot = readFileSync(path.join(ROOT, 'data', 'snapshot.json'), 'utf8');
+ok('the positive-control sentinel does not occur in the committed snapshot',
+  !rawSnapshot.includes(SETTLED) && !rawSnapshot.includes('2031-01-02'),
+  'the sentinel instant must be unique to the fixture');
+const positiveCells = settledCells(positiveHtml);
 ok('a settled market with settlement_ts renders "Settled at" from the official field',
-  positiveHtml.includes(WANT), 'expected ' + WANT + ' in categories/gas.html');
-const target = (() => { try { return pickTarget(JSON.parse(readFileSync(path.join(ROOT, 'data', 'snapshot.json'), 'utf8'))); } catch { return null; } })();
-const targetWant = target ? fmtTs(target.raw) : null;
+  positiveHtml.includes(WANT) && positiveCells.some((c) => c.includes(WANT)),
+  'expected ' + WANT + ' in the Settled-at cell of categories/gas.html');
+const negativeCells = settledCells(negativeHtml);
+const inferred = negativeCells.filter((c) => !/class="muted">/.test(c) && /\d{4}-\d{2}-\d{2}/.test(c));
 ok('negative control: a null settlement_ts still renders a blank, never an inferred time',
-  negativeHtml !== '' && Boolean(targetWant) && !negativeHtml.includes(targetWant),
-  'the targeted event\u2019s own time ' + (targetWant || '(none in capture)') + ' must disappear');
-ok('non-vacuity: an untouched settled event still renders its official time',
-  Boolean(other) && Boolean(other.raw) && negativeHtml.includes(fmtTs(other.raw)),
-  other ? 'expected ' + fmtTs(other.raw) + ' from ' + (other.ev.event_ticker || other.ev.title || 'another event') + ' to survive'
-        : 'capture has no second settled event with a timestamp — the control would be vacuous, so this is a failure');
-if (other && targetWant && fmtTs(other.raw) === targetWant) {
-  failures.push('control design: two distinct settled events share the same second-level timestamp (' + targetWant + '); the assertion cannot distinguish them');
-}
+  negativeHtml !== '' && negativeCells.length > 0 && inferred.length === 0,
+  inferred.length
+    ? 'the generator rendered an inferred settlement time in ' + inferred.length + ' row(s): ' + inferred[0]
+    : (negativeCells.length ? '' : 'no resolved rows were generated, so the control proved nothing'));
 
 console.log(`\nsettlement-ts: ${pass} passed, ${failures.length} failed`);
 if (failures.length) {
