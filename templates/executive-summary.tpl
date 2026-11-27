@@ -29,14 +29,26 @@
     <div class="btnrow"><a class="btn primary" href="dashboard.html">Open the live dashboard</a></div>
   </div>
 
-  <aside class="notice warn" aria-label="Current operational status">
-    <strong>Operational status · verified 2026-11-27 22:25 UTC.</strong>
-    The committed alert feed was generated at <code>2026-11-27T17:34:38Z</code> and was 290.2 minutes old at verification,
-    beyond the 45-minute stale threshold. Treat its prices and counts as a historical sample, not current quotes.
-    The most recent captured market snapshot is <code>2026-11-27T17:41:59Z</code>. The demo-account snapshot is
-    disconnected (<code>connected: false</code>); the paper simulator is not exchange execution. See the
-    <a href="verification/2026-11-27-a1ded21f.md">dated verification report</a> and
-    <a href="flagged.html">Flagged for Review</a> for limitations and source links.
+  <aside class="notice good" aria-label="Current operational status">
+    <strong>Operational status · verified 2026-11-27 22:40 UTC (session-8e28c889).</strong>
+    The alert feed is current again: <code>data/live/feed.json</code> was generated at
+    <code>2026-11-27T22:26:30Z</code> — 2.3 minutes old at verification — and the committed snapshot at
+    <code>2026-11-27T22:26:41Z</code>. The advance came from one dispatched
+    <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/46076632008">keepalive run</a>,
+    not from a schedule fix: GitHub's <code>schedule</code> delivery here is sparse (10 runs in 24 h, tracked as
+    <a href="flagged.html">F-83</a>), so the feed ages again when nothing dispatches it. Read the age badge, not the
+    word "live". The demo-account snapshot is still disconnected (<code>connected: false</code>), and the paper
+    simulator is not exchange execution. Evidence:
+    <a href="verification/2026-11-27-8e28c889.md">dated verification report</a>.
+  </aside>
+
+  <aside class="notice warn" aria-label="Earlier operational status, kept as history">
+    <strong>Historical · status at 2026-11-27 22:25 UTC (session-a1ded21f), kept verbatim.</strong>
+    At that moment the committed feed was generated at <code>2026-11-27T17:34:38Z</code> and measured 290.2 minutes
+    old, beyond the 45-minute stale threshold; its 122 alerts, 41 resolutions and 14 awaiting rows were a
+    historical sample. The snapshot then in force was <code>2026-11-27T17:41:59Z</code>.
+    <a href="verification/2026-11-27-a1ded21f.md">That report</a> is retained unchanged; only its freshness lines
+    were superseded, 68 seconds later, by the pulse above.
   </aside>
 
   <h2>1 · What was built</h2>
