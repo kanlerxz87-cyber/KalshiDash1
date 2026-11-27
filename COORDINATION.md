@@ -4190,9 +4190,34 @@ Arena branch `arena/8e28c889-kalshidash1`, based on `main` @ `5a15790` (PR #138 
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
 | E1 | Claim scope on this board, commit and push immediately before any other edit. | done — claim committed and pushed as `7b2db3a` (rebased to `610e7ef`, then `df0f429`). | session-8e28c889 | this section of `COORDINATION.md` |
-| E2 | Re-verify official Kalshi demo/API sources line-by-line (demo env, API environments, market data, orderbook, settlement, WebSockets) and record each with its source link; measure current feed/snapshot ages, counts, QA battery, Pages build, live site, schedule-delivery gap, demo-account state. | unclaimed | session-8e28c889 | `verification/2026-11-27-8e28c889.md` (new) |
-| E3 | Append a dated 2026-11-27 update block to `EXECUTIVE_SUMMARY.md` with measured current numbers (preserving all history; no values inferred). | unclaimed | session-8e28c889 | `EXECUTIVE_SUMMARY.md` (append only) |
+| E2 | Re-verify official Kalshi demo/API sources line-by-line (demo env, API environments, market data, orderbook, settlement, WebSockets) and record each with its source link; measure current feed/snapshot ages, counts, QA battery, Pages build, live site, schedule-delivery gap, demo-account state. | **done** — 9 source claims confirmed verbatim on `docs.kalshi.com` (demo env, API environments, quick-start market data, order-book responses, candlesticks reference, settlement, authenticated requests, WebSockets, request signing); 22-suite `npm test` exit 0; `build-site --check` clean; 90 pages / 0 broken internal links; Pages `built` @ `94994de`; schedule delivery measured at 10 runs/24 h (F-83); account still `connected:false`. **New flags published on flagged.html: F-96 (workflow ref guard), F-97 (WebSocket probe wording).** | session-8e28c889 | `verification/2026-11-27-8e28c889.md` (new) |
+| E3 | Append a dated 2026-11-27 update block to `EXECUTIVE_SUMMARY.md` with measured current numbers (preserving all history; no values inferred). | **done** — new `## Operational status update — verified 2026-11-27 22:40 UTC` block + header date; session-a1ded21f's 22:25 block kept verbatim under an explicit "historical, superseded on freshness only" note. See E6 for the same correction on the published page. | session-8e28c889 | `EXECUTIVE_SUMMARY.md` (append only) |
 | E4 | Attempt freshness recovery by dispatching the existing keepalive workflow on `main` (no new workflow, no code change); verify the new sample lands and re-run gates. | **done** — `gh workflow run keepalive.yml --ref main` → run [46076632008](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/46076632008) `completed/success`; it published commit `762c596` and moved the published feed from `2026-11-27T17:34:38Z` (291.5 min old) to `2026-11-27T22:26:30Z` (2.3 min old) and the snapshot from `17:41:59Z` to `22:26:41Z`. See the conflict/handoff note at the end of this section. | session-8e28c889 | `gh workflow run` + this section (no repo file edits for the dispatch itself) |
-| E5 | Full QA battery, rebase onto latest `main`, open PR to `main`, merge without waiting when green, confirm GitHub Pages `built` + live pages, record PR link and merge result here. | unclaimed | session-8e28c889 | PR metadata, this section |
+| E5 | Full QA battery, rebase onto latest `main`, open PR to `main`, merge without waiting when green, confirm GitHub Pages `built` + live pages, record PR link and merge result here. | in progress | session-8e28c889 | PR metadata, this section |
+| E6 | **Handoff, added mid-session.** The 22:26Z recovery pulse made session-a1ded21f's just-merged top notice on the **published** executive-summary page factually stale (it still said the feed was 290.2 min old and stale). Correct that notice on `templates/executive-summary.tpl` + regenerated `executive-summary.html`, keeping their text verbatim as a dated historical block. Taken over because that session's PR #141 had already merged (claim resolved) and its own disclosure asks for a follow-on rather than a rewrite. | **done** — notice rewritten with the recovered measurement; the 22:25 text kept verbatim as an explicitly historical aside; `build-site` regenerated `executive-summary.html`. | session-8e28c889 | `templates/executive-summary.tpl`, generated `executive-summary.html` via `scripts/build-site.mjs` only |
+| E7 | Publish this session's two new findings on the **Flagged for Review** page with official source links, as the brief requires, without touching any other session's rows. IDs checked against the live page first: the highest published id was **F-95** (owned by session-add70e82's resolution fix), so the two new findings are **F-96** (workflow ref guard) and **F-97** (WebSocket probe wording). | **done** — two append-only rows in `templates/flagged.tpl`, `flagged.html` regenerated; source gate `check-row-sources` passes 1026 canonical rows / 0 problems. | session-8e28c889 | `templates/flagged.tpl` (append rows only), generated `flagged.html` via `scripts/build-site.mjs` only |
+
+Status key: `unclaimed` · `in progress` · `done` · `needs review`.
+
+### Notes — handoff, conflicts, and one cross-session observation (session-8e28c889)
+
+- **Scope handoff, resolved without a rewrite.** `EXECUTIVE_SUMMARY.md` and `templates/executive-summary.tpl` were claimed here at
+  `main` @ `5a15790` while session-a1ded21f still looked idle. Its PR **#141 merged at 22:26:01Z**, right after the keepalive pulse
+  `762c596` that this session dispatched, which made its brand-new top notice ("the feed is 290.2 minutes old and stale") wrong on
+  the live page minutes after publication. Rather than revert that work, E3/E6 keep its text **verbatim** under an explicit
+  "historical — superseded on freshness only" marker and add the recovered measurement above it. Nothing from session-a1ded21f,
+  session-155a1ceb or session-528c51c9 was removed; `verification/2026-11-27-a1ded21f.md` is untouched.
+- **Conflict log.** `git pull --rebase origin main` conflicted in `COORDINATION.md` (both sessions appended a section at the file end).
+  Resolved by keeping the session-a1ded21f section first, then this section, and re-applying this session's status cells; zero
+  content from the other session was dropped. Because the branch had already been rebased twice, the earlier `7b2db3a` claim commit
+  was replaced and published with `git push --force-with-lease=arena/8e28c889-kalshidash1:7b2db3a` — a lease against this session's
+  own tip, verified beforehand that the remote branch held no other writer's commit.
+- **Why the recovery used `--ref main`.** `keepalive.yml` commits to `${GITHUB_REF_NAME}` with no main-only guard, so a dispatch on a
+  session branch would write sampled data onto that branch. Flagged as **F-96** for a one-line workflow guard; the workflow file is
+  outside this session's claimed scope, so it was not edited here.
+- **Cross-session observation, not acted on (their scope).** At 22:28:49Z the branch `arena/1a950f57-kalshidash1` recorded
+  `site-qa` **failure** alongside green `suite-qa`/`alerts-qa`/`external-sources`. That is not this branch and not on `main`; whoever
+  integrates that branch should read the failing step before merging it.
+
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
