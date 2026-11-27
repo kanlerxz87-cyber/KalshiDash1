@@ -7,7 +7,8 @@ Arena branch `arena/155a1ceb-kalshidash1`, based on `5a1579067e8ac7238ce80f2672f
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
 | R1 | Claim current-tree audit scope before work. | done | session-155a1ceb | this section of `COORDINATION.md` |
-| R2 | Re-check official demo/API and orderbook semantics, run local QA and inspect existing integration/release evidence; log accurate current limitations. | in progress | session-155a1ceb | `verification/2026-11-27-155a1ceb.md` (new), this section |
+| R2 | Re-check official demo/API and orderbook semantics, run local QA and inspect existing integration/release evidence; log accurate current limitations. | done — official docs re-fetched; full test, build, source-row, and internal-link checks pass; no new discrepancy reproduced. Audit record documents account/backend and cadence limits. | session-155a1ceb | `verification/2026-11-27-155a1ceb.md`, this section |
+| R3 | Record release readiness. | done — latest Pages workflow for the base commit succeeded (run 46045170290); public landing page fetched successfully. No site/data change was required, so no PR or new deployment was necessary. | session-155a1ceb | this section |
 
 
 ## Session session-528c51c9 — measured anonymous WebSocket-handshake evidence + fresh CORS re-probe (2026-11-27)
