@@ -4120,3 +4120,16 @@ Read the shared board before claiming. Current Arena-pinned branch: `arena/a1ded
 | A2 | Take over the stale Executive Summary scope; add the timestamped current operational status without rewriting historical figures. | done — preserved dated history; updated stale metadata and added a clearly stale/not-live status block to the Markdown and generated summary. | session-a1ded21f | `EXECUTIVE_SUMMARY.md`, `templates/executive-summary.tpl`, generated `executive-summary.html` only via `scripts/build-site.mjs` |
 | A3 | Integrate the audit/summary update on the pinned branch, open a PR, and confirm checks/Pages state; never merge a broken site. | in progress — full local QA/build/link/source checks pass; freshness finding remains non-blocking and explicitly disclosed. | session-a1ded21f | PR metadata, this section only |
 
+---
+
+## Session `session-6f817a1b` — independent current-state requirements and build audit (2026-11-27)
+
+Arena-pinned branch `arena/6f817a1b-kalshidash1`, based on `main` @ `5a1579067e8ac7238ce80f2672ff563a40a49f87`. Read this coordination board before claiming. Existing recent sessions in the board are marked done; no active owner was found for this read-only audit scope. The platform pins this session to one branch, so no session-named branch/worktree will be created.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| A1 | Claim this audit scope before other edits. | in progress | session-6f817a1b | this section of `COORDINATION.md` |
+| A2 | Independently run the repository's full automated QA and inspect the canonical build/data/navigation/source-link contracts against official Kalshi docs; do not make any authenticated call or place an order. | unclaimed | session-6f817a1b | read-only except new `verification/2026-11-27-6f817a1b.md` |
+| A3 | Record verified outcomes, caveats and any reproducible irregularities; mark audit done or needs review. | unclaimed | session-6f817a1b | new verification record and this section |
+| A4 | If changes are warranted, limit them to findings within the claimed audit scope, run all relevant QA, rebase/push this branch, open a PR, merge only if checks pass, and verify the Pages result. | unclaimed | session-6f817a1b | scoped audit outputs only |
+
