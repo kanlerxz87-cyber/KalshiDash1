@@ -4241,7 +4241,7 @@ reviewable table. This session claims exactly those three gaps.
 | K2 | Make external-source verification automatic and re-runnable: add a documented opt-in `verify:external` audit that probes every `docs.kalshi.com` doc URL the site cites against the publisher's own `llms.txt` index (no guessing, no scraping of content), and wire it as a **non-blocking** signal so Pages never breaks on a publisher-side outage. | done — `scripts/check-external-sources.mjs` (20 offline checks + negative controls), `verify:external` + `test:external-sources` in `package.json`, offline coverage step in `site-qa.yml`, new `external-sources.yml` workflow (run [46076557700](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/46076557700) and later: evidence committed by the runner, 31 citations, 0 broken). **It found a real defect on its first run** — see K6. | session-1a950f57 | `scripts/check-external-sources.mjs`, `data/external-source-check.json`, `package.json`, `.github/workflows/site-qa.yml`, `.github/workflows/external-sources.yml` |
 | K3 | Close the shell-syntax gap: extend `scripts/check-data-workflow-shells.mjs` to every workflow that runs a block `run:` (currently 3 of 10; `demo-account.yml` is the only credential-bearing writer and is unchecked), with positive and negative controls. | done — discovers every workflow (24 block scripts across 11 files incl. `demo-account.yml`), asserts the discovery is non-empty and that the known writers keep their blocks, positive + negative controls. | session-1a950f57 | `scripts/check-data-workflow-shells.mjs` |
 | K4 | Publish one reviewable requirements-conformance table (each session requirement → where it is delivered → how it is verified → its known limitation), linking existing official sources rather than restating values; regenerate the published HTML through `scripts/build-site.mjs` only. | done — `requirements.html` (nav: Review group; one link from `index.html`), 20 rows, added to `check-row-sources.mjs` so it obeys the same rule as every other table. It restates no price or count, so it cannot drift from the sourced tables. | session-1a950f57 | `templates/requirements.tpl`, `requirements.html`, `scripts/build-site.mjs`, `templates/index.tpl`, `scripts/check-row-sources.mjs` |
-| K5 | Full QA battery, PR to `main`, merge when green without waiting for approval, confirm the Pages build, and re-fetch the published pages; record the release here. | in progress | session-1a950f57 | PR metadata, this section |
+| K5 | Full QA battery, PR to `main`, merge when green without waiting for approval, confirm the Pages build, and re-fetch the published pages; record the release here. | done — **[PR #149](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/149)** merged `2026-11-27T22:45:21Z` as `4f11cbb` (checks `alerts`/`build`/`qa`×2 green), and a follow-up **[PR #154](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/154)** merged `22:56:43Z` as `c500684` for the deploy repair (K7), also green. One `site-qa` failure on #149 was this session's own defect — `check-data-writer-concurrency.mjs` grepped the shell gate's source for hard-coded file names — reproduced locally, fixed by asserting the gate's outcome instead (`32 passed, 0 failed`), and re-run green before the merge. | session-1a950f57 | PR metadata, this section |
 | K6 | (added during K2) Publish the defect the new gate found, with official evidence, instead of silently fixing it. | done — `F-SOURCE-02` on `flagged.html`: `api.html` linked `.../search/get-tags-by-categories`, which Kalshi lists in neither `llms.txt` nor `sitemap.xml` and which does not serve a page; the documented page is `.../search/get-tags-for-series-categories` (HTTP 200, same endpoint). Fixed to the publisher's listed path. | session-1a950f57 | `templates/flagged.tpl`, `templates/api.tpl` |
 | K7 | (added after K5 merged) **Deploy failed on `main` after the merge** — repair it, and stop the class of defect from recurring. | done — two GitHub Pages builds errored on `main` right after PR #149 (`4f11cbb`, `66e9af0`). Reproduced locally at both commits: `Committed site is stale for: requirements.html` — the page quoted the previous data sample's footer clock (`Snapshot captured 22:39:18 UTC`) while the tree's data was `22:43:05`. Fixed the site output, extended the generator's staleness exception to the footer clock, and added an executable guard that reads the **committed** pages and fails if any quotes a clock that is not this tree's data (negative control: rewinding one page's footer fails the guard and names the page). Published as **F-CHART-03**. Pages build for the repair commit confirmed `built`, `error: null`. | session-1a950f57 | `requirements.html`, `scripts/build-site.mjs`, `scripts/check_build_staleness.mjs`, `templates/flagged.tpl` (+ regenerated pages) |
 
@@ -4336,6 +4336,30 @@ the sandbox cannot reach the demo API or the live site over TLS (`SSL_ERROR_SYSC
 committed samples written by the CI samplers and the deploy was confirmed through the Pages API plus a page fetch. Remaining
 non-blocking flags: **F-83** (schedule delivery sparse — root cause unfixed, so the feed will age again), **F-94** (high-ROI pane
 saturated), **F-96**, **F-97**, **F-DEMO-01** (account disconnected; no balance/fill ever verified), Culture 0 open markets.
+
+**Session-1a950f57 close-out (2026-11-27).** K1–K7 done. Two defects found, verified against official sources, fixed and
+published on the Flagged for Review page with their evidence: **F-SOURCE-02** (the API reference linked a Kalshi
+documentation path the publisher lists nowhere and which serves no page; the documented slug is
+`get-tags-for-series-categories`, HTTP 200) and **F-CHART-03** (a generated page was committed carrying the previous data
+sample's clocks, which turned two GitHub Pages builds red on `main` after PR #149; repaired, and now guarded by an
+executable check that reads the *committed* pages). Two gates closed: every cited `docs.kalshi.com` page is now checked
+against the publisher's own `llms.txt` + `sitemap.xml` (new `external-sources` workflow + offline coverage gate), and the
+workflow shell gate now discovers all 11 workflows instead of 3 hard-coded ones. One page added: `requirements.html`, 20
+rows under the same row-source rule as every other table.
+
+**Live verification after merge:** `requirements.html` and `flagged.html` re-fetched from
+`https://kanlerxz87-cyber.github.io/KalshiDash1/` and serve the new content; the tree at `main` @ `c5573bd` passes
+`build-site.mjs --check`, `check_build_staleness.mjs` (12 assertions) and the full `npm test` battery.
+
+**Conflict log (session-1a950f57):** `main` advanced through PRs #139–#155 while this branch was open, forcing three
+rounds of rebase/merge. Conflicts were confined to `COORDINATION.md` (every session's section preserved — 65 section
+headings before and after), `package.json` (test chain kept as a union: the concurrent `console-chart` addition **and**
+`external-sources`), the executive-summary files, `requirements.tpl`/`requirements.html` (this session's version
+regenerated), and the runner-written `data/external-source-check.json` (newest artifact kept). Nothing from another
+session was reverted. One Pages build record for `c500684` reads `status: errored, duration 0` while the subsequent
+evidence contradicts it: the `Site build check` run for the same SHA is `success`, the exact step body passes on that
+tree in a clean worktree, and the deploys immediately before (`440fd5f`, `db19f5d`) and after (`c5573bd`) are `built`
+with the merged content live. Recorded as an inconsistency rather than asserted either way.
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
 
