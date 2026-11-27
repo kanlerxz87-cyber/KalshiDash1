@@ -4103,6 +4103,6 @@ Arena-pinned branch `arena/4fd9d11a-kalshidash1`; board read before claim. Branc
 
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
-| 4F-1 | Independently audit current implementation, official API documentation, automated checks, and deployed Pages/release status; document verified limitations and evidence without editing another session's scope. | in progress | session-4fd9d11a | `verification/2026-11-27-4fd9d11a.md` (new), this section of `COORDINATION.md` |
+| 4F-1 | Independently audit current implementation, official API documentation, automated checks, and deployed Pages/release status; document verified limitations and evidence without editing another session's scope. | done | session-4fd9d11a | `verification/2026-11-27-4fd9d11a.md` (new), this section of `COORDINATION.md` |
 
 **4F-1 audit complete:** [`verification/2026-11-27-4fd9d11a.md`](verification/2026-11-27-4fd9d11a.md) records official endpoint, authentication and orderbook sources, checks and limitations. `npm ci && npm test` and `node scripts/build-site.mjs --check` passed; 1,032 static canonical rows have approved publisher links, but the offline gate does not verify values. Pages build `1409368466` was built for `5a15790`; the live landing page was fetched. Account snapshot remains disconnected; continuous stream, live account performance and actual trades remain unverified. Existing site flags cover the model, sampling and privacy limits. Two concurrent audit branches appeared after this claim; no files in their scopes were edited. Status: done.
