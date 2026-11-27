@@ -4152,6 +4152,40 @@ reviewable table. This session claims exactly those three gaps.
 
 | ID | Task | Status | Owner | File scope (only these) |
 |---|---|---|---|---|
+| K1 | Claim this scope on the board; commit and push the claim before any other edit. | done | session-1a950f57 | this section of `COORDINATION.md` |
+| K2 | Make external-source verification automatic and re-runnable: add a documented opt-in `verify:external` audit that probes every `docs.kalshi.com` doc URL the site cites against the publisher's own `llms.txt` index (no guessing, no scraping of content), and wire it as a **non-blocking** signal so Pages never breaks on a publisher-side outage. | unclaimed | session-1a950f57 | new `scripts/check-external-sources.mjs`, new `data/external-source-check.json`, `package.json`, `.github/workflows/site-qa.yml` |
+| K3 | Close the shell-syntax gap: extend `scripts/check-data-workflow-shells.mjs` to every workflow that runs a block `run:` (currently 3 of 10; `demo-account.yml` is the only credential-bearing writer and is unchecked), with positive and negative controls. | unclaimed | session-1a950f57 | `scripts/check-data-workflow-shells.mjs` |
+| K4 | Publish one reviewable requirements-conformance table (each session requirement → where it is delivered → how it is verified → its known limitation), linking existing official sources rather than restating values; regenerate the published HTML through `scripts/build-site.mjs` only. | unclaimed | session-1a950f57 | new `templates/requirements.tpl`, generated `requirements.html`, `scripts/build-site.mjs` (PAGES + nav entry only), `templates/index.tpl` (one link) |
+| K5 | Full QA battery, PR to `main`, merge when green without waiting for approval, confirm the Pages build, and re-fetch the published pages; record the release here. | unclaimed | session-1a950f57 | PR metadata, this section |
+
+Sources for this session's verification work are official and fetched live on 2026-11-27 (page-fetch tool, since the
+sandbox egress allowlist excludes kalshi.co): `docs.kalshi.com/llms.txt` (the publisher's own page index),
+`docs.kalshi.com/sitemap.xml`, `docs.kalshi.com/getting_started/demo_env` (demo REST/WS endpoint table),
+`docs.kalshi.com/getting_started/orderbook_responses` and `docs.kalshi.com/api-reference/market/get-market-orderbook`
+(bids-only book, bid/ask reciprocity, empty book → 200), the live Demo API
+`external-api.demo.kalshi.co/trade-api/v2/exchange/status` and `.../markets?series_ticker=KXAAAGASM&status=open`.
+No credentials, no authenticated read, no order placed, and no value is inferred.
+
+Status key: `unclaimed` · `in progress` · `done` · `needs review`.
+
+## Session `arena/1a950f57-kalshidash1` — requirements-conformance verification + trader-verification/QA hardening (2026-11-27)
+
+**Session ID:** `session-1a950f57`. Arena-pinned branch `arena/1a950f57-kalshidash1`, branched from `main` @
+`5a1579067e8ac7238ce80f2672ff563a40a49f87` (PR #138 merge). Board read before claiming.
+
+**Concurrent sessions observed at claim time (2026-11-27T22:24–22:35Z), all audit-only, so none is duplicated here:**
+`arena/4fd9d11a` (claim: independent release and requirements audit), `arena/732e24f6` (claim: independent
+post-integration verification, new `verification/2026-11-27-732e24f6.md`), `arena/155a1ceb` (claim: current-tree
+verification audit). Those three are read-only audits publishing their own dated records; this session does **not**
+write a fourth audit record of the same facts and does **not** touch their files.
+
+**What is genuinely unclaimed at claim time:** the repo's external-source liveness audit is not enforced anywhere
+(`tools/external_link_audit.mjs` exists but no workflow runs it and CI has no general egress), the data-writer shell
+syntax gate only covers 3 of the 4 writer workflows, and no page states the session's requirement set in one
+reviewable table. This session claims exactly those three gaps.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
 | K1 | Claim this scope on the board; commit and push the claim before any other edit. | done (`c0921bc`, rebased since) | session-1a950f57 | this section of `COORDINATION.md` |
 | K2 | Make external-source verification automatic and re-runnable: add a documented opt-in `verify:external` audit that probes every `docs.kalshi.com` doc URL the site cites against the publisher's own `llms.txt` index (no guessing, no scraping of content), and wire it as a **non-blocking** signal so Pages never breaks on a publisher-side outage. | done — `scripts/check-external-sources.mjs` (20 offline checks + negative controls), `verify:external` + `test:external-sources` in `package.json`, offline coverage step in `site-qa.yml`, new `external-sources.yml` workflow (run [46076557700](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/46076557700) and later: evidence committed by the runner, 31 citations, 0 broken). **It found a real defect on its first run** — see K6. | session-1a950f57 | `scripts/check-external-sources.mjs`, `data/external-source-check.json`, `package.json`, `.github/workflows/site-qa.yml`, `.github/workflows/external-sources.yml` |
 | K3 | Close the shell-syntax gap: extend `scripts/check-data-workflow-shells.mjs` to every workflow that runs a block `run:` (currently 3 of 10; `demo-account.yml` is the only credential-bearing writer and is unchecked), with positive and negative controls. | done — discovers every workflow (24 block scripts across 11 files incl. `demo-account.yml`), asserts the discovery is non-empty and that the known writers keep their blocks, positive + negative controls. | session-1a950f57 | `scripts/check-data-workflow-shells.mjs` |
