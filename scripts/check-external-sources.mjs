@@ -101,10 +101,15 @@ export function isKalshiDocsUrl(url) {
   } catch { return false; }
 }
 
+/* A citation is a LINK the reader can follow: an `href` attribute. A documentation URL that is
+ * merely quoted in prose is not one, and treating it as one produces a false positive — the
+ * Flagged page names a dead Kalshi path in <code> when it explains why that path is wrong, and the
+ * first version of this extractor dutifully reported the explanation as a broken citation.
+ * data/sources.json is structured, so its `url` fields are read directly instead (readCitations). */
 export function extractCitations(text) {
   const out = [];
-  for (const m of String(text).matchAll(/https:\/\/docs\.kalshi\.com[^\s"'<>)\]}]*/g)) {
-    const url = normaliseUrl(m[0]);
+  for (const m of String(text).matchAll(/\bhref\s*=\s*["'](https:\/\/docs\.kalshi\.com[^"']*)["']/g)) {
+    const url = normaliseUrl(m[1]);
     if (!isKalshiDocsUrl(url)) continue;
     out.push(url);
   }
@@ -244,9 +249,11 @@ function selftest() {
   ok(judge('https://docs.kalshi.com/llms.txt', { sitemap, index }).verdict === 'skipped',
     'the index file is skipped, not reported broken');
 
-  const cites = extractCitations('<a href="https://docs.kalshi.com/a">a</a> https://docs.kalshi.com/b.');
-  ok(cites.length === 2 && cites[1] === 'https://docs.kalshi.com/b',
-    'citation extraction finds every link and strips trailing punctuation');
+  const cites = extractCitations('<a href="https://docs.kalshi.com/a">a</a> and <a href="https://docs.kalshi.com/c.md">c</a>');
+  ok(cites.length === 2 && cites[1] === 'https://docs.kalshi.com/c.md',
+    'citation extraction finds every linked page in either form');
+  ok(extractCitations('<code>https://docs.kalshi.com/removed/path</code> is wrong').length === 0,
+    'negative control: a URL quoted in prose is not a citation (it would be a false positive)');
 
   if (failures.length) { console.error(`\nexternal-source selftest: ${failures.length} FAILED`); process.exit(1); }
   console.log(`\nexternal-source selftest: ${pass} checks passed (offline, no network).`);
@@ -333,12 +340,17 @@ function checkMode() {
   const current = readCitations().map((c) => c.target);
   const uncovered = current.filter((t) => !recorded.has(t));
   const stale = [...recorded].filter((t) => !current.includes(t));
+  /* A citation the evidence does not cover must not publish silently: that is the state in which
+   * the broken-link defect F-SOURCE-02 existed. A citation that has been REMOVED from the site is
+   * the expected, good outcome of a fix, so it is reported as a reminder and never fails — failing
+   * it would make the gate red until a network job happened to re-run. */
   if (uncovered.length) {
     problems.push(`${uncovered.length} citation(s) on the site are not covered by the evidence `
       + `(${uncovered.slice(0, 5).join(', ')}${uncovered.length > 5 ? ', …' : ''}); re-run the external source check`);
   }
   if (stale.length) {
-    problems.push(`${stale.length} recorded citation(s) are no longer on the site (${stale.slice(0, 5).join(', ')}); refresh the evidence`);
+    console.log(`  ${stale.length} recorded citation(s) are no longer on the site — the evidence can be refreshed `
+      + `by the external-sources workflow (expected after a citation fix): ${stale.slice(0, 5).join(', ')}${stale.length > 5 ? ', …' : ''}`);
   }
 
   const broken = (doc.citations || []).filter((c) => c.verdict === 'broken');
