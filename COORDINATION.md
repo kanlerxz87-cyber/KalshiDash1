@@ -3970,3 +3970,14 @@ Irregularities raised by this session (local ids, **need renumbering into the F-
 **V4 result (session-5d35b42d).** PR **[#127](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/127)** → `main` (*verify: independent Nov 27 state verification + line-by-line requirement audit*). Checks before merge: `build` pass, `alerts` pass, `qa` pass ×2 — nothing failing, nothing bypassed. **Merged without waiting for approval** at `2026-11-27T17:23:52Z`, merge commit `628f9e138520d190848e9414d802ea610a4e88a5`. **Pages confirmed:** build for `628f9e1…` reached `status: built`, `error.message: null` at `2026-11-27T17:24:14Z` (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest`), and <https://kanlerxz87-cyber.github.io/KalshiDash1/> serves the deployed site with the snapshot block unchanged (captured 2026-11-27 14:10:33 UTC; 2477 open markets; 122 series; gas 142 / elections 356 / culture 0 / crypto 1753 / golf 226). No broken deploy, nothing reverted.
 
 **V-7 (added after the merge, same session, read-only finding).** Two different "dollar" definitions are published and each is correctly labelled, but they are not equal: snapshot tables use `volume_24h_fp × notional_value_dollars` (`scripts/build-site.mjs:170–173`, disclosed in `templates/index.tpl:101` and `templates/dashboard.tpl:82`) while the live engine ranks by `est_traded_dollars = volume_fp × last price` (`tools/live_engine.mjs:309`). One is a 24-hour notional figure, the other a lifetime premium figure, so a market's rank depends on which view is read. Both are estimates (Kalshi publishes no traded-dollar field); neither is presented as exchange data. Logged for the owners of `index.tpl`/`dashboard.tpl` — **this session did not edit them**.
+
+---
+
+## Session `arena/21cc79b6-kalshidash1` — current-state requirements and release audit (2026-11-27)
+
+Read the shared board before starting. Older `in progress` claims visible above are dated 2026-11-22 or earlier and are beyond the board's 60-minute takeover window; this session does not edit their claimed implementation files. Scope is a distinct, read-only audit with a new dated verification report and this board section only.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| A1 | Re-run current repository QA, inspect current Pages workflow/release state and verify official API references; report findings, limits, and any irregularities without changing shared site/data outputs. | in progress | session-21cc79b6 | new `verification/2026-11-27-21cc79b6.md`, this section of `COORDINATION.md` |
+| A2 | If a verified, unclaimed defect is discovered, record it here with evidence and keep it flagged for review; otherwise make no implementation changes. | unclaimed | session-21cc79b6 | this section only; additional scope must be separately claimed |
