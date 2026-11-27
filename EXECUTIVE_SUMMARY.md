@@ -1,8 +1,31 @@
 # Executive Summary — KalshiDash1
 
-**Updated:** 2026-11-27 22:25 UTC (session-a1ded21f; older dated entries below are preserved) · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/a1ded21f-kalshidash1` · **Session:** `session-a1ded21f`
+**Updated:** 2026-11-27 22:40 UTC (session-8e28c889; the 22:25 UTC status below is kept as history) · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/8e28c889-kalshidash1` · **Session:** `session-8e28c889`
+
+## Operational status update — verified 2026-11-27 22:40 UTC (session-8e28c889, freshness recovery)
+
+> Supersedes the **freshness lines only** of the 22:25 UTC status below. Every other finding there stands.
+> Full evidence, with official source links: [`verification/2026-11-27-8e28c889.md`](verification/2026-11-27-8e28c889.md).
+
+| Check | Measured state | Source |
+|---|---|---|
+| Alert feed | `generated_at` **2026-11-27T22:26:30Z** — **2.3 min** old at 22:28:45Z, inside the 20-minute warn band, no longer stale. 123 alerts (21 high-ROI, 67 tradeable), 41 resolutions, 15 awaiting. | [`data/live/feed.json`](data/live/feed.json) |
+| Market snapshot | `captured_at` **2026-11-27T22:26:41.539Z** — **2.1 min** old. 200 market rows; 2,362 open markets at capture: Gas 135, Elections 376, Culture 0, Crypto 1,635, Golf 216. | [`data/snapshot.json`](data/snapshot.json) |
+| 24 h notional at capture | Elections $5,078,071 · Golf $1,157,166 · Crypto $512,077 · Gas $22,293 · Culture $0 (cumulative contracts × published `notional_value_dollars`; not traded cash, not an exchange-wide census). | [`data/snapshot.json`](data/snapshot.json) |
+| How the feed got fresh | `gh workflow run keepalive.yml --ref main` → run [46076632008](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/46076632008) `completed/success`, publishing commit `762c596`. The feed moved from `17:34:38Z` (291.5 min old) to `22:26:30Z` in one dispatch. | [run 46076632008](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/46076632008) · [keepalive workflow](https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/.github/workflows/keepalive.yml) |
+| Root cause, unchanged | **10 schedule-triggered runs in 24 h** across all workflows against crons that declare far more (keepalive alone declares `4,19,34,49 * * * *`). GitHub documents schedule delay and drop. One dispatch is not a fix; the feed will age again. Published as **F-83**. | [schedule docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) · [run history](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/workflows/keepalive.yml) |
+| Official sources re-verified | Demo REST/WS roots, keyless market-data access, order-book schema, candlestick path and its required parameters, the $1-per-contract binary settlement rule, and the three signing headers were each re-read on `docs.kalshi.com` during this window; all nine claims confirmed verbatim. | [demo env](https://docs.kalshi.com/getting_started/demo_env) · [API environments](https://docs.kalshi.com/getting_started/api_environments) · [market data](https://docs.kalshi.com/getting_started/quick_start_market_data) · [order books](https://docs.kalshi.com/getting_started/orderbook_responses) · [candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) · [settlement](https://docs.kalshi.com/getting_started/market_settlement) · [websockets](https://docs.kalshi.com/getting_started/quick_start_websockets) |
+| Build and QA | `npm test` **22 suites, exit 0**; `build-site --check` "Committed site matches the templates and data"; `check-links` 90 pages, 0 broken internal links; engine selftest green; `freshness_check` reports no problem on the recovered feed. | [`package.json`](package.json) · [dated verification report](verification/2026-11-27-8e28c889.md) |
+| GitHub Pages | `pages/builds/latest` → **`built`**, `error.message: null`, commit `94994de`, finished 2026-11-27T22:28:57Z. | [Pages build API](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest) |
+| Demo account | Unchanged: `data/account.json` is `connected: false` with no capture time. No balance, position or fill has ever been verified against a demo account, and none is claimed here. | [`data/account.json`](data/account.json) · [F-85](flagged.html#F-85) |
+| New irregularities for review | **F-96:** `keepalive.yml` publishes to `${GITHUB_REF_NAME}` with no main-only guard, so a `workflow_dispatch --ref <branch>` would commit sampled data onto that branch (this session used `--ref main` deliberately). **F-97:** the anonymous WebSocket probe records `upgrade timed out` with `http_status: null` rather than an HTTP refusal, so the site may only say "no anonymous stream observed". | [Flagged for Review](flagged.html) |
 
 ## Current operational status — verified 2026-11-27 22:25 UTC
+
+> **Historical, kept verbatim (2026-11-27 22:42 UTC note by session-8e28c889):** the freshness lines in this block
+> were true at 22:25 UTC and were superseded 68 seconds later by the recovery pulse recorded above. The
+> demo-account and transport findings here still stand.
+
 
 - **The dashboard is deployed, but the committed alert feed is stale:** `data/live/feed.json` was generated at `2026-11-27T17:34:38Z` and measured 290.2 minutes old, beyond the 45-minute stale threshold. Its 122 alerts, 41 resolutions, and 14 awaiting counts are a historical sample, not live quotes.
 - **Last captured market snapshot:** `2026-11-27T17:41:59.132Z`. It recorded Gas 135 open markets, Elections 356, Culture 0, Crypto 1,753, and Golf 220. These counts and dollar estimates are snapshot values, not a current ranking.
