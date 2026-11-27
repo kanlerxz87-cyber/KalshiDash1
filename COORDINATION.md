@@ -40,11 +40,11 @@ correctly by reading the official candlestick endpoint and is **not** affected.
 
 | ID | Task | Status | Owner | File scope (only these) |
 |---|---|---|---|---|
-| G1 | Claim scope on this board; commit and push the claim before any other edit. | in progress | session-69be5016 | this section of `COORDINATION.md` only |
-| G2 | Fix the console chart so every advertised window is fed from **official exchange data**: add a browser-side candlestick fetch (documented `GET /series/{series}/markets/{ticker}/candlesticks`) for the selected market, merged with the engine feed and the browser samples, de-duplicated, each point retaining its exact `source_url`; keep the honest empty state and never invent a price. | unclaimed → this session | session-69be5016 | `alerts/js/alerts-live.js`, `alerts/js/alerts-page.js`, `alerts/index.html` |
-| G3 | Add an offline regression gate that reproduces the defect and proves the fix: the console chart must offer the brief's granularities, must request the official candlestick path with a documented `period_interval`, and must not render a window it cannot source. Wire it into `package.json` (`test:console-chart`) and one `site-qa.yml` step. | unclaimed → this session | session-69be5016 | `scripts/check-console-chart.mjs` (new), `package.json`, `.github/workflows/site-qa.yml` |
-| G4 | Publish a dated verification record with official source links and a **"Brief requirements, line by line"** traceability table (every requirement in the request → where it is met → the official source → verified / unverified), re-fetched from docs.kalshi.com during this session. | unclaimed → this session | session-69be5016 | `verification/2026-11-27-69be5016.md` (new) |
-| G5 | Publish the chart finding as its own Flagged-row (`F-CHART-02`) with official source links, regenerate every page strictly through `scripts/build-site.mjs`, run the full QA battery, open a PR from this branch, merge when green without waiting for approval, confirm the Pages build, and record the result here. | unclaimed → this session | session-69be5016 | `templates/flagged.tpl`, generated `*.html`, `COORDINATION.md`, PR metadata |
+| G1 | Claim scope on this board; commit and push the claim before any other edit. | done (`43fab70`, pushed before any code edit) | session-69be5016 | this section of `COORDINATION.md` only |
+| G2 | Fix the console chart so every advertised window is fed from **official exchange data**: add a browser-side candlestick fetch (documented `GET /series/{series}/markets/{ticker}/candlesticks`) for the selected market, merged with the engine feed and the browser samples, de-duplicated, each point retaining its exact `source_url`; keep the honest empty state and never invent a price. | done — shipped in #144 | session-69be5016 | `alerts/js/alerts-live.js`, `alerts/js/alerts-page.js`, `alerts/index.html` |
+| G3 | Add an offline regression gate that reproduces the defect and proves the fix: the console chart must offer the brief's granularities, must request the official candlestick path with a documented `period_interval`, and must not render a window it cannot source. Wire it into `package.json` (`test:console-chart`) and one `site-qa.yml` step. | done — shipped in #144 | session-69be5016 | `scripts/check-console-chart.mjs` (new), `package.json`, `.github/workflows/site-qa.yml` |
+| G4 | Publish a dated verification record with official source links and a **"Brief requirements, line by line"** traceability table (every requirement in the request → where it is met → the official source → verified / unverified), re-fetched from docs.kalshi.com during this session. | done — shipped in #144 | session-69be5016 | `verification/2026-11-27-69be5016.md` (new) |
+| G5 | Publish the chart finding as its own Flagged-row (`F-CHART-02`) with official source links, regenerate every page strictly through `scripts/build-site.mjs`, run the full QA battery, open a PR from this branch, merge when green without waiting for approval, confirm the Pages build, and record the result here. | done — shipped in #144 | session-69be5016 | `templates/flagged.tpl`, generated `*.html`, `COORDINATION.md`, PR metadata |
 
 **Explicitly out of scope (not touched, to avoid conflicting with other sessions):** `data/live/feed.json` and
 `data/snapshot.json` (regenerated only by the scheduled workflows, never hand-edited), `tools/live_engine.mjs`,
@@ -58,6 +58,38 @@ legacy suites (`dash/`, `docs/`). If a change is needed in any of them it is log
 (b) The 122-alert feed's repeated `KXBTCY-27JAN0100-B97500` 0.97↔0.01 rows are **not** duplicate alerts: measured
 0 violations of the 15-minute `collapseDuplicates` invariant across 106 consecutive same-ticker pairs, and both the feed
 gate (`scripts/check_alerts.mjs`) and the offline suite already assert that invariant.
+
+**Release record (`session-69be5016`, final).** All five tasks done.
+
+- **G2 — fix shipped.** `alerts/js/alerts-live.js` gained `fetchCandles()` / `candleIntervalFor()` / `chartSeries()`;
+  `alerts/js/alerts-page.js` draws 60 s · 5 min · 15 min · 1 h · 6 h · 24 h · 7 d and captions how many plotted points
+  are official traded closes; `alerts/index.html` carries the legend, the official-endpoint explanation and the
+  correction of suggestion **S-05** (which had still described the candle chart as unimplemented — corrected in the
+  follow-up commit and now pinned by gate check H8). Official basis: the only permitted `period_interval` values
+  (1 / 60 / 1440), the 5,000-period cap, second-only timestamps and the nullable `price.close_dollars` field, all read
+  live from [Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) and the
+  demo root from [Test In The Demo Environment](https://docs.kalshi.com/getting_started/demo_env).
+- **G3 — gate shipped.** `scripts/check-console-chart.mjs`, **52 offline assertions**, wired into `package.json`
+  (`test:console-chart`, appended to the `test` chain) and `.github/workflows/site-qa.yml`. Includes a **positive
+  control** (official candles fill the 5-minute and 1-hour windows) and a **negative control** (they stay under two
+  points when the request is blocked). Verified to fail on the pre-fix code.
+- **G4 — record published.** `verification/2026-11-27-69be5016.md`, including a 26-row brief requirements traceability
+  table that leaves the demo-account balance/P&L (#14) and live order execution (#16) explicitly **unverified**.
+- **G5 — released.** PR **[#144](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/144)** → `main`. All four checks
+  green on the head (`alerts`, `build`, `qa` ×2 — runs 46077271337 / 46077271420 / 46077271385 / 46077271455).
+  **Merged without waiting for approval** at `2026-11-27T22:33:37Z` as `3f1cd0e9c3c7ee71c815fbdbe7484c7890a12872`.
+  GitHub Pages build for that exact commit: `status: "built"`, `error: { message: null }` at `2026-11-27T22:33:39Z`
+  (`gh api repos/kanlerxz87-cyber/KalshiDash1/pages/builds/latest` — the reported commit equals the merge commit, so
+  the served tree is the fixed one). Local gates on the rebased tree: `npm test` **23 suites green**,
+  `build-site --check` clean, 90 pages with no broken internal links, no duplicate ids.
+- **Flagged for review:** `F-CHART-02` on `flagged.html` (109 rows now). Unverified items remain exactly as the record
+  states: demo-account balance/positions/fills/P&L (`F-85`/`V-5`, account not connected) and live order execution
+  (no credentials requested, no authenticated call made by this session).
+- **Conflict log:** rebased onto `main` after PR #142 landed mid-session. The single `COORDINATION.md` append conflict
+  was resolved by keeping **both** sections — `session-155a1ceb`'s audit section is intact ahead of this one. PR #142's
+  alert-page freshness copy and its `check_alerts_page.mjs` assertions touch the same two files as this fix; the
+  auto-merge kept both, and the full suite (including their assertions) was re-run green afterwards. Nothing from any
+  concurrent session was discarded.
 
 ## Session session-528c51c9 — measured anonymous WebSocket-handshake evidence + fresh CORS re-probe (2026-11-27)
 
