@@ -1,6 +1,14 @@
 # Executive Summary — KalshiDash1
 
-**Updated:** 2026-11-22 08:10 UTC (session-b8913775; earlier 2026-11-21 20:28 UTC record kept below) · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/96019ad5-kalshidash1` · **Session:** `session-96019ad5`
+**Updated:** 2026-11-27 22:25 UTC (session-a1ded21f; older dated entries below are preserved) · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/a1ded21f-kalshidash1` · **Session:** `session-a1ded21f`
+
+## Current operational status — verified 2026-11-27 22:25 UTC
+
+- **The dashboard is deployed, but the committed alert feed is stale:** `data/live/feed.json` was generated at `2026-11-27T17:34:38Z` and measured 290.2 minutes old, beyond the 45-minute stale threshold. Its 122 alerts, 41 resolutions, and 14 awaiting counts are a historical sample, not live quotes.
+- **Last captured market snapshot:** `2026-11-27T17:41:59.132Z`. It recorded Gas 135 open markets, Elections 356, Culture 0, Crypto 1,753, and Golf 220. These counts and dollar estimates are snapshot values, not a current ranking.
+- **Account and trading:** `data/account.json` remains `connected: false`, with no capture time. Portfolio/order execution is not connected. The browser simulator and strategy model are paper/research tooling; `highROI` is a heuristic label, not realized return.
+- **Live transport:** official demo REST roots and WebSocket URLs below were rechecked against Kalshi's [demo environment](https://docs.kalshi.com/getting_started/demo_env) and [API environments](https://docs.kalshi.com/getting_started/api_environments). A keyless anonymous WebSocket handshake was not accepted in the measured probe; see [the probe record](verification/2026-11-27-528c51c9.md). This site must not claim authenticated tick-level streaming.
+- **Build and QA:** `npm test`, `node scripts/build-site.mjs --check`, both internal-link checkers, and the canonical source-link gate passed. `tools/freshness_check.mjs` correctly reports the feed stale. See [the current dated verification report](verification/2026-11-27-a1ded21f.md) and [Flagged for Review](flagged.html).
 
 > **Scope and freshness note:** Sections 4–6 below preserve the historical findings from the explicitly dated
 > 2026-11-20 11:10 UTC snapshot; those numbers are not current-market claims. Current repository/feed checks and
