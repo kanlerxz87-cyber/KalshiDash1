@@ -84,8 +84,18 @@ jobs:
       - name: Data-writer publish path checks
         run: node scripts/check-data-writer-concurrency.mjs
 
-      - name: Data workflow shell syntax (all three writers)
+      # session-1a950f57: this gate used to hard-code three files while the repository had ten
+      # workflows, so demo-account.yml — the only workflow holding the Kalshi credentials — was
+      # never shell-checked. It now discovers every workflow and asserts the discovery itself.
+      - name: Data workflow shell syntax (every workflow, auto-discovered)
         run: node scripts/check-data-workflow-shells.mjs
+
+      # session-1a950f57: check-row-sources proves each row CARRIES a publisher link; nothing
+      # proved the cited docs.kalshi.com pages still exist. This asserts the committed evidence
+      # (written by the external-sources workflow from Kalshi's own llms.txt + sitemap.xml) covers
+      # every current citation. Broken upstream pages are printed for review and never block.
+      - name: Cited Kalshi doc pages exist (offline coverage gate)
+        run: npm run test:external-sources
 
       # session-c85ee474: F-01/F-51 were closed by measurement and F-66 was opened from the same
       # data. This re-derives every verdict from data/cors-probe.json and fails if the published
