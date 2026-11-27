@@ -52,6 +52,7 @@ import { dirname } from 'node:path';
 import { randomBytes, createHash } from 'node:crypto';
 import http from 'node:http';
 import https from 'node:https';
+import net from 'node:net';
 
 /* ---------------------------------------------------------------- constants */
 
@@ -97,7 +98,7 @@ function isLoopback(hostname) {
 
 /** Refuse anything that is not one of the two documented demo WebSocket hosts.
  *  Loopback is accepted only when the caller passes {allowLoopback:true} (selftest). */
-function assertProbeUrl(rawUrl, { allowLoopback = false } = {}) {
+function assertProbeUrl(rawUrl, { allowLoopback = false, anyPath = false } = {}) {
   let url;
   try { url = new URL(rawUrl); } catch { throw new Error('DEMO-ONLY: not a valid URL'); }
   const host = url.hostname.toLowerCase();
@@ -113,7 +114,7 @@ function assertProbeUrl(rawUrl, { allowLoopback = false } = {}) {
     throw new Error(`DEMO-ONLY host guard: refused "${host}" — only the documented demo WebSocket hosts (${DEMO_WS_HOSTS.join(', ')}) may be probed`);
   }
   if (url.protocol !== 'wss:') throw new Error('DEMO-ONLY: demo hosts must be probed over wss:');
-  if (url.pathname !== DEMO_WS_PATH) {
+  if (!anyPath && url.pathname !== DEMO_WS_PATH) {
     throw new Error(`DEMO-ONLY: refusing path "${url.pathname}" — the documented path is ${DEMO_WS_PATH}`);
   }
   return url;
@@ -204,7 +205,7 @@ function createFrameParser(onFrame, { onProtocolError } = {}) {
 
 /* ------------------------------------------------------- HTTP upgrade client */
 
-function rawUpgradeRequest(url, timeoutMs) {
+function rawUpgradeRequest(url, timeoutMs, { origin = true } = {}) {
   return new Promise((resolve) => {
     const started = Date.now();
     const transport = url.protocol === 'https:' ? https : http;
@@ -214,7 +215,9 @@ function rawUpgradeRequest(url, timeoutMs) {
       Upgrade: 'websocket',
       'Sec-WebSocket-Version': '13',
       'Sec-WebSocket-Key': key,
-      Origin: SITE_ORIGIN, // browsers always attach Origin; this is the published site's origin
+      // browsers always attach Origin; this is the published site's origin. The `origin:false`
+      // diagnostic variant (which no browser can produce) is recorded as diagnostic-only.
+      ...(origin ? { Origin: SITE_ORIGIN } : {}),
       'User-Agent': USER_AGENT,
       // Deliberately NO KALSHI-ACCESS-KEY / -SIGNATURE / -TIMESTAMP: the measured question is
       // whether the anonymous upgrade succeeds. The tool holds no credentials at all.
@@ -275,6 +278,7 @@ const HEADER_ALLOWLIST = [
   'connection', 'upgrade', 'sec-websocket-accept', 'sec-websocket-extensions', 'date',
   'access-control-allow-origin', 'access-control-allow-credentials', 'vary', 'cache-control',
   'strict-transport-security', 'x-content-type-options', 'via',
+  'location', 'x-cache', 'x-amz-cf-id', 'x-amz-cf-pop',
 ];
 function pickHeaders(headers) {
   const out = {};
@@ -443,42 +447,104 @@ function tryParseJson(text) {
 
 /* ------------------------------------------------------------------ probe */
 
-async function probeHost(rawUrl, { allowLoopback = false, commandWaitMs, eventsWindowMs } = {}) {
-  const url = assertProbeUrl(rawUrl, { allowLoopback });
+async function probeHost(rawUrl, { allowLoopback = false, commandWaitMs, eventsWindowMs, upgradeTimeoutMs = UPGRADE_TIMEOUT_MS } = {}) {
+  const firstUrl = assertProbeUrl(rawUrl, { allowLoopback });
   const result = {
     url: rawUrl,
-    host_role: isLoopback(url.hostname) ? 'loopback selftest fixture' : (HOST_ROLES[url.hostname.toLowerCase()] || {}).role || null,
-    official_sources: isLoopback(url.hostname) ? [] : (HOST_ROLES[url.hostname.toLowerCase()] || {}).sources || [],
+    host_role: isLoopback(firstUrl.hostname) ? 'loopback selftest fixture' : (HOST_ROLES[firstUrl.hostname.toLowerCase()] || {}).role || null,
+    official_sources: isLoopback(firstUrl.hostname) ? [] : (HOST_ROLES[firstUrl.hostname.toLowerCase()] || {}).sources || [],
+    attempts: [],
     anonymous_handshake: null,
     post_upgrade: null,
     verdict: null,
   };
-  const upgrade = await rawUpgradeRequest(url, UPGRADE_TIMEOUT_MS);
-  const handshake = {
-    attempted_at: new Date().toISOString(),
-    upgraded: upgrade.upgraded === true,
-    http_status: upgrade.http_status ?? null,
-    status_message: upgrade.status_message ?? null,
-    headers: upgrade.headers || {},
-    body_snippet: upgrade.body_snippet ?? null,
-    sec_websocket_accept_matches: upgrade.sec_websocket_accept_matches ?? null,
-    error: upgrade.error ?? null,
-    ms: upgrade.ms,
-  };
-  result.anonymous_handshake = handshake;
 
-  if (!handshake.upgraded) {
-    result.verdict = handshake.error
-      ? 'unreachable_or_timed_out'
-      : `handshake_rejected_http_${handshake.http_status ?? 'unknown'}`;
-    return result;
+  // Attempt queue: one browser-faithful attempt (with Origin); if the host never answers
+  // (timeout/unreachable) one polite retry, then one diagnostic attempt without the Origin
+  // header (labelled diagnostic — a browser always sends Origin). Any 3xx whose Location is
+  // still a documented demo host is followed ONCE (never credentials, never a foreign host).
+  const pending = [{ url: rawUrl, variant: 'origin' }];
+  let attemptNo = 0;
+  let followedChain = false;
+  while (pending.length && attemptNo < 4) {
+    const job = pending.shift();
+    attemptNo += 1;
+    const jobUrl = assertProbeUrl(job.url, { allowLoopback, anyPath: !!job.anyPath });
+    const up = await rawUpgradeRequest(jobUrl, upgradeTimeoutMs, { origin: job.variant !== 'no_origin' });
+    const entry = {
+      attempt: attemptNo,
+      requested_url: job.url,
+      variant: job.variant,
+      note: job.note || null,
+      upgraded: up.upgraded === true,
+      http_status: up.http_status ?? null,
+      status_message: up.status_message ?? null,
+      headers: up.headers || {},
+      body_snippet: up.body_snippet ?? null,
+      sec_websocket_accept_matches: up.sec_websocket_accept_matches ?? null,
+      error: up.error ?? null,
+      ms: up.ms,
+      __socket: up.socket || null,
+      __head: up.head || null,
+    };
+
+    if (entry.upgraded) {
+      result.attempts.push(entry);
+      result.anonymous_handshake = entry;
+      break;
+    }
+
+    // Redirect? Record the target; follow it only into a documented demo host.
+    const loc = entry.headers['location'];
+    if (entry.http_status && entry.http_status >= 300 && entry.http_status < 400 && loc) {
+      entry.redirect_location = loc;
+      try {
+        const target = new URL(loc, jobUrl);
+        const demoHost = allowLoopback
+          ? isLoopback(target.hostname) // selftest fixtures redirect within loopback only
+          : DEMO_WS_HOSTS.includes(target.hostname.toLowerCase());
+        if (demoHost && ['wss:', 'https:', 'ws:', 'http:'].includes(target.protocol)) {
+          entry.followed_to = target.toString();
+          if (!followedChain) {
+            followedChain = true;
+            pending.unshift({ url: target.toString(), variant: job.variant, anyPath: true, note: 'followed 3xx Location (one hop max)' });
+          } else {
+            entry.follow_blocked_by = 'redirect chain already followed once';
+          }
+        } else {
+          entry.follow_blocked_by = 'DEMO-ONLY guard: redirect target is not a documented demo host';
+        }
+      } catch {
+        entry.follow_blocked_by = 'invalid redirect Location';
+      }
+    } else if (entry.error) {
+      // Unresponsive host: one retry, then the no-Origin diagnostic (only for the primary attempt).
+      if (job.variant === 'origin' && !job.retried) {
+        pending.unshift({ url: job.url, variant: 'origin', retried: true, note: `retry after: ${entry.error}` });
+      } else if (job.variant === 'origin' && job.retried) {
+        pending.push({ url: job.url, variant: 'no_origin', note: 'diagnostic only — browsers always send Origin on the WebSocket handshake; this checks whether Origin-based filtering (not authentication) caused the silence' });
+      }
+    }
+    result.attempts.push(entry);
+    result.anonymous_handshake = entry;
   }
 
-  const session = await runAnonymousSession(url, upgrade, { commandWaitMs, eventsWindowMs });
-  result.post_upgrade = session;
-  result.verdict = session.subscribed
-    ? 'handshake_upgraded_subscription_accepted'
-    : (session.subscribe_response ? 'handshake_upgraded_subscription_rejected' : 'handshake_upgraded_no_subscribe_response');
+  if (result.anonymous_handshake && result.anonymous_handshake.upgraded) {
+    const handshake = result.anonymous_handshake;
+    const upgrade = { socket: handshake.__socket, head: handshake.__head };
+    const session = await runAnonymousSession(firstUrl, upgrade, { commandWaitMs, eventsWindowMs });
+    result.post_upgrade = session;
+    result.verdict = session.subscribed
+      ? 'handshake_upgraded_subscription_accepted'
+      : (session.subscribe_response ? 'handshake_upgraded_subscription_rejected' : 'handshake_upgraded_no_subscribe_response');
+  } else {
+    const last = result.anonymous_handshake || {};
+    result.verdict = last.error
+      ? 'unreachable_or_timed_out'
+      : `handshake_rejected_http_${last.http_status ?? 'unknown'}`;
+  }
+  // never serialize the live sockets
+  for (const a of result.attempts) { delete a.__socket; delete a.__head; }
   return result;
 }
 
@@ -594,6 +660,50 @@ async function selftest() {
   assert.ok(acc.post_upgrade.list_subscriptions_response, 'list_subscriptions response missing');
   assert.equal(acc.post_upgrade.ended_by, 'closed_by_both', 'close handshake did not complete');
   ok('accepter fixture: upgrade 101 verified, subscribe/list/event/close recorded, close completed by both sides');
+
+  // 3b. Redirecter fixture: a 3xx whose Location is another allowed (loopback) target is followed
+  //     exactly once, and the session then completes on the target.
+  const redirecter = http.createServer((req, res) => { res.writeHead(500); res.end(); });
+  redirecter.on('upgrade', (req, socket) => {
+    socket.write('HTTP/1.1 301 Moved Permanently\r\nLocation: ws://127.0.0.1:' + accepter.address().port + '/trade-api/ws/v2\r\nConnection: close\r\nContent-Length: 0\r\n\r\n');
+    socket.destroy();
+  });
+  await new Promise((r) => redirecter.listen(0, '127.0.0.1', r));
+  const red = await probeHost('ws://127.0.0.1:' + redirecter.address().port + '/trade-api/ws/v2', { allowLoopback: true, upgradeTimeoutMs: 1500, commandWaitMs: 2000, eventsWindowMs: 100 });
+  assert.equal(red.attempts[0].http_status, 301, 'redirecter fixture did not 301');
+  assert.equal(red.attempts[0].redirect_location.includes('/trade-api/ws/v2'), true, 'redirect Location not recorded');
+  assert.equal(red.attempts.length, 2, 'redirect was not followed exactly one hop');
+  assert.equal(red.attempts[1].upgraded, true, 'followed target did not upgrade');
+  assert.equal(red.post_upgrade.subscribed, true, 'session after redirect did not subscribe');
+  assert.equal(red.verdict, 'handshake_upgraded_subscription_accepted');
+  ok('redirecter fixture: 301 Location recorded, followed once, session completed on the target');
+  redirecter.close();
+
+  // 3c. Foreign redirect: the DEMO-ONLY guard must block following a non-demo target.
+  const foreign = http.createServer((req, res) => { res.writeHead(500); res.end(); });
+  foreign.on('upgrade', (req, socket) => {
+    socket.write('HTTP/1.1 301 Moved Permanently\r\nLocation: http://evil.invalid/not-demo\r\nConnection: close\r\nContent-Length: 0\r\n\r\n');
+    socket.destroy();
+  });
+  await new Promise((r) => foreign.listen(0, '127.0.0.1', r));
+  const fore = await probeHost('ws://127.0.0.1:' + foreign.address().port + '/trade-api/ws/v2', { allowLoopback: true, upgradeTimeoutMs: 1500, commandWaitMs: 1000, eventsWindowMs: 100 });
+  assert.equal(fore.attempts.length, 1, 'foreign redirect was followed (negative control failed)');
+  assert.match(fore.attempts[0].follow_blocked_by || '', /DEMO-ONLY/);
+  assert.equal(fore.verdict, 'handshake_rejected_http_301');
+  ok('foreign redirect target refused by the DEMO-ONLY guard, never followed');
+  foreign.close();
+
+  // 3d. Silent host (accepts TCP, never answers): one retry, then the labelled no-Origin
+  //     diagnostic — and the verdict stays "unreachable", never "accepted".
+  const silent = net.createServer((sock) => { sock.on('error', () => {}); }); // never writes
+  await new Promise((r) => silent.listen(0, '127.0.0.1', r));
+  const sil = await probeHost('ws://127.0.0.1:' + silent.address().port + '/trade-api/ws/v2', { allowLoopback: true, upgradeTimeoutMs: 300, commandWaitMs: 300, eventsWindowMs: 50 });
+  assert.equal(sil.attempts.length, 3, 'expected timeout→retry→no-Origin diagnostic, got ' + sil.attempts.length);
+  assert.ok(sil.attempts.every((a) => a.error && !a.upgraded), 'an attempt on the silent fixture reported success');
+  assert.equal(sil.attempts[2].variant, 'no_origin');
+  assert.equal(sil.verdict, 'unreachable_or_timed_out');
+  ok('silent fixture: timeout retry + labelled no-Origin diagnostic recorded, verdict unreachable_or_timed_out');
+  silent.close();
 
   // 4. Structural guarantees: the report can never claim orders/credentials.
   const report = buildReport([acc]);
