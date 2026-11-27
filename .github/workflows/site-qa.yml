@@ -161,6 +161,14 @@ jobs:
       - name: Alert-console chart windows sourced from official candles
         run: npm run test:console-chart
 
+      # session-fa679d25 (F-ALERTS-01, F-ALERTS-02, F-HTML-01 & WS-probe citations):
+      # offline positive/negative regression checks ensuring finalized/closed contracts stay off
+      # live boards and polling budgets, alerts/index.html links point to ../market.html?ticker=,
+      # ?topic= deep-links click real topic controls, canonical HTML has zero nested <a> tags or
+      # table-column mismatches, and published pages cite data/ws-probe.json.
+      - name: Alerts-console live-board, navigation, HTML & WS-probe integrity
+        run: npm run test:alerts-console
+
       - name: Python tool syntax
         run: python -m py_compile tools/*.py
 

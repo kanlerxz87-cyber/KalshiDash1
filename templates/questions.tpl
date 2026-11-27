@@ -57,9 +57,15 @@
           <td><a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a></td></tr>
         <tr><td>Why is there no live streaming feed?</td>
           <td>The WebSocket endpoint requires API-key authentication during the handshake, even for public market-data channels.
+          Live anonymous handshake probes on 2026-11-27 confirmed <code>anonymous_handshake_accepted_on_any_demo_host: false</code>
+          (<code>wss://demo-api.kalshi.co/trade-api/ws/v2</code> returned HTTP 301 → 401 <code>token_authentication_failure</code>;
+          <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> timed out after 10 s; see
+          <a href="data/ws-probe.json"><code>data/ws-probe.json</code></a> and
+          <a href="verification/2026-11-27-528c51c9.md">probe record</a>).
           The dashboard therefore polls REST, which is cached briefly by the exchange and can lag a few seconds.</td>
           <td><a href="https://docs.kalshi.com/websockets/websocket-connection" target="_blank" rel="noopener">WebSocket Connection</a> ·
-          <a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Data freshness</a></td></tr>
+          <a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Data freshness</a> ·
+          <a href="data/ws-probe.json">Measured WS probe</a></td></tr>
         <tr><td>Which series count as "gas prices"?</td>
           <td>The AAA retail gasoline series (ticker prefix <code>KXAAAGAS</code> or <code>AAAGAS</code>, or a title containing "gas price"), explicitly excluding natural gas futures (<code>KXNGAS*</code> / <code>NGAS*</code> / "natural gas", which settle against EIA Henry Hub) and diesel. Every kept series settles against AAA. Crude-oil, natural-gas, diesel and coal series in the broader "Oil and energy" tag are excluded by that rule.</td>
           <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">Live series query</a></td></tr>

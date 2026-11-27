@@ -160,7 +160,7 @@ function footerHtml(base = '') {
 function marketTable(rows, opts = {}) {
   const base = opts.base || '';
   if (!rows.length) {
-    return `<tr><td colspan="12" class="muted">${esc(opts.empty || 'No rows.')}</td></tr>`;
+    return `<tr><td colspan="11" class="muted">${esc(opts.empty || 'No rows.')}</td></tr>`;
   }
   return rows.map((m) => {
     const spread = (m.yes_ask_dollars !== null && m.yes_bid_dollars !== null && m.yes_ask_dollars > 0 && m.yes_bid_dollars > 0)

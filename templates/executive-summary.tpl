@@ -120,7 +120,11 @@
       <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Settlement</a> ·
       <a href="https://docs.kalshi.com/getting_started/settlement_bounds" target="_blank" rel="noopener">Settlement Bounds</a> ·
       <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Lifecycle</a></li>
-      <li>The WebSocket feed requires API-key authentication during the handshake, so a keyless static site must poll REST — and REST
+      <li>The WebSocket feed requires API-key authentication during the handshake — confirmed both by the official docs and by
+      live anonymous handshake probes on 2026-11-27 (<code>wss://demo-api.kalshi.co/trade-api/ws/v2</code> returned HTTP 301 →
+      401 <code>token_authentication_failure</code>; <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> timed out
+      after 10 s, see <a href="data/ws-probe.json">measured WS probe</a> and
+      <a href="verification/2026-11-27-528c51c9.md">probe record</a>) — so a keyless static site must poll REST, and REST
       quotes can lag the exchange by a few seconds.
       <a href="https://docs.kalshi.com/websockets/websocket-connection" target="_blank" rel="noopener">WebSocket</a></li>
       <li>Demo prices and behaviour may not reflect real markets, and demo funds are mock funds.
@@ -141,7 +145,8 @@
       <code>data/account.json</code> records <code>connected: false</code>.</li>
       <li><strong>A live order feed from the exchange.</strong> Kalshi's WebSocket handshake requires a signed API-key request
       (<a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">Quick Start:
-      WebSockets</a>), so a static site cannot stream ticks. Alerts come from a scheduled REST sampler plus in-browser polling;
+      WebSockets</a>; measured 2026-11-27 in <a href="data/ws-probe.json"><code>data/ws-probe.json</code></a> —
+      <code>anonymous_handshake_accepted_on_any_demo_host: false</code>), so a static site cannot stream ticks. Alerts come from a scheduled REST sampler plus in-browser polling;
       the header badge always states the measured age of the newest sample.</li>
       <li><strong>Anything outside the five topics.</strong> The demo exchange lists many more categories; they are out of scope by
       the brief, and the full taxonomy is linked from <a href="api.html">API reference</a>.</li>
