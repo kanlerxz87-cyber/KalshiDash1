@@ -85,6 +85,25 @@ gate (`scripts/check_alerts.mjs`) and the offline suite already assert that inva
 - **Flagged for review:** `F-CHART-02` on `flagged.html` (109 rows now). Unverified items remain exactly as the record
   states: demo-account balance/positions/fills/P&L (`F-85`/`V-5`, account not connected) and live order execution
   (no credentials requested, no authenticated call made by this session).
+- **Follow-ups released after the main fix (each merged green, no approval waited on):**
+  **[PR #147](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/147)** — merged `2026-11-27T22:37:02Z` as `59d0d35f`,
+  after all four checks passed. It corrects suggestion **S-05** on the alerts page, which still described the candle chart as
+  unimplemented even though the page's own preamble says "Nothing here is implemented yet unless it says so"; the row now
+  carries an *Implemented 2026-11-27* badge, names the remaining open part (persisting one candle series per window in the
+  engine feed), and links `F-CHART-02`. Gate check **H8** pins it so the suggestion board and the shipped behaviour cannot
+  drift apart again (gate 52/52). This was caught by re-reading the **deployed** page after the merge, not by the suite.
+  **[PR #150](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/150)** — merged `2026-11-27T22:41:30Z` as `c0bd4ea`,
+  checks green; a documentation-only follow-up adding a **second, independent measurement** to the verification record.
+- **Second measurement on the fresh sample (recorded in `verification/2026-11-27-69be5016.md`).** The scheduled writer
+  published `meta.generated_at 2026-11-27T22:26:30Z` (123 alerts, 41 resolutions) while this session closed out. Re-running
+  the identical query reproduces the defect exactly — **0/25** candidates for both the 5-minute and the 1-hour window,
+  **21/25** with no `history` at all — so the cause is the feed's shape, not one stale capture. Same measurement: only
+  **4 of 60** published market rows carried any history (highest-dollar ranks 3–10 had none), while **60 of 60** publish a
+  `series_ticker`, the only input the candlestick endpoint needs — which is why the chart fix reaches every candidate.
+- **Final deployment confirmed.** The latest Pages build reports `status: "built"`, `error: { message: null }` for commit
+  **`c0bd4ea`** — the `main` tip after all three PRs — so the served tree contains the fix, the S-05 correction, the gate
+  and the record. On-tree gates at close-out: `npm test` **23 suites green** (including `test:console-chart` 52/52),
+  `build-site --check` clean, 90 pages with no broken internal links, no duplicate ids.
 - **Conflict log:** rebased onto `main` after PR #142 landed mid-session. The single `COORDINATION.md` append conflict
   was resolved by keeping **both** sections — `session-155a1ceb`'s audit section is intact ahead of this one. PR #142's
   alert-page freshness copy and its `check_alerts_page.mjs` assertions touch the same two files as this fix; the
