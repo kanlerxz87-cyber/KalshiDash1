@@ -3980,4 +3980,5 @@ Read the shared board before starting. Older `in progress` claims visible above 
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
 | A1 | Re-run current repository QA, inspect current Pages workflow/release state and verify official API references; report findings, limits, and any irregularities without changing shared site/data outputs. | in progress | session-21cc79b6 | new `verification/2026-11-27-21cc79b6.md`, this section of `COORDINATION.md` |
-| A2 | If a verified, unclaimed defect is discovered, record it here with evidence and keep it flagged for review; otherwise make no implementation changes. | unclaimed | session-21cc79b6 | this section only; additional scope must be separately claimed |
+| A2 | If a verified, unclaimed defect is discovered, record it here with evidence and keep it flagged for review; otherwise make no implementation changes. | in progress | session-21cc79b6 | this section only; additional scope must be separately claimed |
+| A3 | Correct the stale “Updated” metadata in the Markdown executive summary and add a dated current-status note, explicitly separating committed sample data from live exchange data; keep all historical sections dated and unchanged. | in progress | session-21cc79b6 | `EXECUTIVE_SUMMARY.md`, this section, `verification/2026-11-27-21cc79b6.md` |
