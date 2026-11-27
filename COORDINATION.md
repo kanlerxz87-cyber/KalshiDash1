@@ -3932,3 +3932,13 @@ Sources used by this session (all fetched/read 2026-11-25): [Kalshi demo environ
 `gh api` Pages/pages-builds/runs probes; committed `data/snapshot.json`/`data/live/feed.json` metadata. Constraints honored throughout: no credentials requested, no
 authenticated API read, no order placed, no inferred values — unverified items stay blank on Flagged for Review.
 
+
+## Session session-cc57fe69 — independent current-state verification (2026-11-27)
+
+Arena fixes this session to branch `arena/cc57fe69-kalshidash1`; no branch rename. Board inspected before claim. No open PRs at claim.
+
+| Task | Status | Owner | File scope |
+|---|---|---|---|
+| Independently test current build and inspect operational limitations and deployment; report evidence and unverified requirements without claiming repository-wide manual verification. | in progress | session-cc57fe69 | this section of `COORDINATION.md`, new `verification/2026-11-27-cc57fe69.md` |
+
+Any needed changes outside this scope will be requested on the board rather than edited without a separate claim.
