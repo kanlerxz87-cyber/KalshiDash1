@@ -3986,3 +3986,26 @@ Read the shared board before starting. Older claims visible in the base tree wer
 **Concurrency / conflict log:** Rebasing PR #126 after `main` advanced through PRs #127 and #128 conflicted in `COORDINATION.md` because session-5d35b42d and this session both appended/updated task-board records. Both conflicts were resolved by preserving the other session's complete sections, including its V4 merge/Pages record and V-7 finding, alongside this session's section; no content from either side was discarded. The subsequently revealed active summary-owner scope (`arena/ea9234db`) was honored: this session's `EXECUTIVE_SUMMARY.md` change was withdrawn, and the owner was asked to refresh its old metadata only if that remains in scope. No other branch was pushed to.
 
 **Sources and verification:** Official pages fetched 2026-11-27: [Demo environment](https://docs.kalshi.com/getting_started/demo_env), [API environments and endpoints](https://docs.kalshi.com/getting_started/api_environments), [Get Events](https://docs.kalshi.com/api-reference/events/get-events.md), [orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses). Full `npm test` passed; `node scripts/build-site.mjs --check` and `git diff --check` passed. PR [#126](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/126) checks `alerts`, `build`, `site-qa`, and `suite-qa` all passed. Non-blocking CI warnings: feed over the stale threshold (existing F-83 schedule limitation), and action versions targeting Node.js 20 are being run under Node.js 24. The latest Pages build for base commit `a2816c5` reported built/no error, and the public landing and Flagged pages were fetched successfully. Report includes scope and non-verified claims.
+
+## Session `arena/1b163877-kalshidash1` — final integration, line-by-line review & Pages publish (2026-11-27)
+
+**Session ID:** `session-1b163877`. Arena-pinned branch `arena/1b163877-kalshidash1`, branched from `main` @
+`a2816c5` ("data(live): engine sample 2026-11-27T14:25:01Z"); at claim time the branch tree is identical to `main`
+(0 commits either way). Board read before claiming. No open pull requests at claim time.
+
+**Concurrent work observed at claim time (no overlap, no duplication):** `arena/21cc79b6` has claimed A1, a **read-only**
+current-state audit scoped to a new `verification/2026-11-27-21cc79b6.md` and its own board section — it states it makes
+no implementation changes. This session therefore does **not** claim any file that audit claims, does not re-publish a
+second audit of the same facts, and will cite its report if it lands before this session's merge. Older `in progress`
+cells above are dated 2026-11-22/25, far outside the 60-minute window; their files are treated as unclaimed-but-idle and
+are only touched if a defect is reproduced, in which case it is recorded on this board first.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| Z1 | Claim this scope on the board; commit and push the claim before any other edit. | done | session-1b163877 | this section of `COORDINATION.md` |
+| Z2 | Line-by-line repo review against official sources: re-read the Kalshi demo REST/WS endpoint docs, orderbook/liquidity semantics, market lifecycle and settlement rules actually cited by the site; re-probe the live demo API read-only; check the committed sample `data/live/feed.json` metadata, alert fields, the dual-chat rendering and the per-topic pages for anything that contradicts its own source or the official docs. | in progress | session-1b163877 | new `verification/2026-11-27-1b163877.md`, this board |
+| Z3 | Run the complete QA battery on this tree (`npm ci`, `npm test`, `build-site --check`, link checkers, workflow-shell/writer tests) and reproduce any failure before fixing it. Fix only defects reproduced with evidence; never invent data. | in progress | session-1b163877 | `scripts/`, `tools/`, `assets/` only where a defect is reproduced and recorded here first |
+| Z4 | Final integration: one PR from this branch to `main` with summary, sources and flagged irregularities; merge without waiting for approval; confirm the GitHub Pages deploy is `built` with `error: null` and re-fetch the live site. | in progress | session-1b163877 | this board, `README.md` release record only |
+| Z5 | Record PR link, merge SHA, Pages build result and verification in this section. | unclaimed | session-1b163877 | this section only |
+
+Status key: `unclaimed` · `in progress` · `done` · `needs review`.
