@@ -4107,3 +4107,15 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review`.
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
 
+
+---
+
+## Session `arena/a1ded21f-kalshidash1` — 2026-11-27 delivery audit and requirements map
+
+Read the shared board before claiming. Current Arena-pinned branch: `arena/a1ded21f-kalshidash1`, branched from commit `5a1579067e8ac7238ce80f2672ff563a40a49f87` of `main`; this checkout is currently at that base with no local changes. The repository already contains the requested dashboard, executive summary, category pages, alert feeds, paper-trading tools, and verification apparatus. This claim is deliberately read-only with respect to all existing site, template, data, source, and application files; it adds only a dated audit record and this coordination entry. It does not claim other sessions' scopes.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| A1 | Run a current requirements-to-repository audit, verify official endpoint/source references, re-run the project QA, and record specific limitations without inventing live/account values. | in progress | session-a1ded21f | new `verification/2026-11-27-a1ded21f.md`, this section only |
+| A2 | Integrate this record on the pinned branch, open a PR if changes are needed, and confirm checks/Pages state without merging a broken site. | in progress | session-a1ded21f | PR metadata, this section only |
+
