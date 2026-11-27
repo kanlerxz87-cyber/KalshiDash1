@@ -3939,4 +3939,6 @@ Arena fixes this session to branch `arena/49860fd0-kalshidash1`. Board read befo
 
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
-| A498 | Audit current build, deployment, and major requested capabilities; document evidence and limitations. | in progress | session-49860fd0 | this section of `COORDINATION.md`, new `verification/2026-11-27-49860fd0.md` |
+| A498 | Audit current build, deployment, and major requested capabilities; document evidence and limitations. | done | session-49860fd0 | this section of `COORDINATION.md`, new `verification/2026-11-27-49860fd0.md` |
+
+**A498 result:** See [`verification/2026-11-27-49860fd0.md`](verification/2026-11-27-49860fd0.md). Official Kalshi demo and orderbook documentation fetched; local tests and build staleness check passed; deployed landing page fetched and Pages build reported success. Irregularities: delayed feed and bounded sampling, disconnected demo account, public account-snapshot privacy, and unverified ROI/causality. Existing [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html) documents limitations. This scoped audit is not a final integration or a claim of complete line-by-line verification. Initial pull of this new branch failed because its remote ref did not yet exist; pulled main before first push instead.
