@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-27T22:31:59.722Z",
+  "checked_at": "2026-11-27T22:29:03.609Z",
   "verified": true,
   "scope": "citations to docs.kalshi.com only (existence/form, not page content)",
   "method": "Every docs.kalshi.com citation found in templates/*.tpl and data/sources.json is reduced to its canonical page URL and looked up in the publisher's own listings: llms.txt (the documentation index) and sitemap.xml. Two URL forms are normalised onto one key (/path and /path.md). Existence and form only — page content is not read, so this file never asserts what a page says.",
@@ -112,7 +112,6 @@
         "templates/api.tpl",
         "templates/flagged.tpl",
         "templates/questions.tpl",
-        "templates/requirements.tpl",
         "templates/strategies.tpl"
       ],
       "url": "https://docs.kalshi.com/api-reference/market/get-market-orderbook",
@@ -281,7 +280,7 @@
         "page"
       ],
       "cited_in": [
-        "templates/flagged.tpl"
+        "templates/api.tpl"
       ],
       "url": "https://docs.kalshi.com/api-reference/search/get-tags-by-categories",
       "page": "https://docs.kalshi.com/api-reference/search/get-tags-by-categories",
@@ -293,11 +292,9 @@
     {
       "target": "https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories",
       "forms": [
-        "markdown",
-        "page"
+        "markdown"
       ],
       "cited_in": [
-        "templates/api.tpl",
         "templates/flagged.tpl"
       ],
       "url": "https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories",
@@ -356,7 +353,6 @@
         "templates/flagged.tpl",
         "templates/index.tpl",
         "templates/questions.tpl",
-        "templates/requirements.tpl",
         "templates/strategylab.tpl"
       ],
       "url": "https://docs.kalshi.com/getting_started/demo_env",
@@ -398,7 +394,6 @@
         "templates/markets.tpl",
         "templates/portfolio.tpl",
         "templates/questions.tpl",
-        "templates/requirements.tpl",
         "templates/suggestions.tpl"
       ],
       "url": "https://docs.kalshi.com/getting_started/market_lifecycle",
@@ -424,7 +419,6 @@
         "templates/markets.tpl",
         "templates/portfolio.tpl",
         "templates/questions.tpl",
-        "templates/requirements.tpl",
         "templates/strategylab.tpl",
         "templates/suggestions.tpl"
       ],
@@ -474,7 +468,6 @@
       "cited_in": [
         "templates/flagged.tpl",
         "templates/market.tpl",
-        "templates/requirements.tpl",
         "templates/strategies.tpl",
         "templates/suggestions.tpl"
       ],
@@ -497,7 +490,6 @@
         "templates/flagged.tpl",
         "templates/index.tpl",
         "templates/questions.tpl",
-        "templates/requirements.tpl",
         "templates/suggestions.tpl"
       ],
       "url": "https://docs.kalshi.com/getting_started/quick_start_authenticated_requests",
@@ -533,8 +525,7 @@
         "templates/executive-summary.tpl",
         "templates/flagged.tpl",
         "templates/index.tpl",
-        "templates/questions.tpl",
-        "templates/requirements.tpl"
+        "templates/questions.tpl"
       ],
       "url": "https://docs.kalshi.com/getting_started/quick_start_market_data",
       "page": "https://docs.kalshi.com/getting_started/quick_start_market_data",
@@ -604,8 +595,7 @@
         "templates/dashboard.tpl",
         "templates/executive-summary.tpl",
         "templates/flagged.tpl",
-        "templates/questions.tpl",
-        "templates/requirements.tpl"
+        "templates/questions.tpl"
       ],
       "url": "https://docs.kalshi.com/websockets/websocket-connection",
       "page": "https://docs.kalshi.com/websockets/websocket-connection",
