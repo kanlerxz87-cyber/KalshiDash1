@@ -152,9 +152,21 @@ for (const f of WRITERS) {
  * 4. The shell-syntax gate must cover ALL THREE writers, not only the two that originally had the
  *    missing-`fi` bug (that omission is exactly how keepalive's own breakage went unnoticed).
  * ---------------------------------------------------------------------------------------- */
-const shellCheck = readFileSync('scripts/check-data-workflow-shells.mjs', 'utf8');
-for (const f of WRITERS) {
-  ok(shellCheck.includes(f), `scripts/check-data-workflow-shells.mjs covers ${f}`);
+/* session-1a950f57: this used to grep the shell-checker's SOURCE for each file name, which only
+ * worked while that checker hard-coded its file list. The checker now discovers every workflow, so
+ * a name-grep would assert the implementation detail rather than the outcome (and its own header
+ * explains why discovery is the point). Execute the checker instead: it must exit 0 and print a
+ * shell-checked count for every writer. That is the property this repository actually needs. */
+{
+  const { spawnSync } = await import('node:child_process');
+  const run = spawnSync(process.execPath, ['scripts/check-data-workflow-shells.mjs'], { encoding: 'utf8' });
+  const output = `${run.stdout || ''}${run.stderr || ''}`;
+  ok(run.status === 0, 'scripts/check-data-workflow-shells.mjs exits 0');
+  for (const f of WRITERS) {
+    const name = f.split('/').pop();
+    ok(new RegExp(`${name.replace('.', '\\.')}:\\d+`).test(output),
+      `scripts/check-data-workflow-shells.mjs shell-checks ${f}`);
+  }
 }
 
 console.log(`\ndata-writer publish checks: ${pass} passed, ${fails.length} failed`);
