@@ -122,6 +122,13 @@ jobs:
       - name: Demo-only execution boundary and signing (offline; no keys or orders)
         run: npm run test:demo-safety
 
+      # session-1b163877, F-94: the selective chat pane is published as "events our model likes
+      # as high ROI", so the shape of that selection must be measured, not assumed. This reports
+      # composition and fails only on the model's own published invariants (a highROI row must
+      # meet its threshold and must be tradeable at its recorded swing price).
+      - name: High-ROI selection composition and invariants
+        run: npm run test:highroi
+
       - name: Python tool syntax
         run: python -m py_compile tools/*.py
 

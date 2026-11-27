@@ -118,13 +118,22 @@ These rows are marked `candle` in the feed, so a reader can tell how each alert 
 
 | Weight | Term | Formula | Reasoning |
 |---|---|---|---|
-| 0.20 | headroom | `min(from, 1−from) / 0.50` | moves near the extremes are mostly noise |
+| 0.20 | headroom | `min(from, 1−from) / 0.50` | moves near the extremes are mostly noise — **measured limit (F-94):** at $0.99 the term is 0.02, so it can contribute at most 0.005 and cannot exclude a row by itself; size + liquidity alone reach 0.775 |
 | 0.20 | size | `min(1, |Δ| / 0.50)` | bigger move, bigger signal |
 | 0.35 | liquidity | `min(1, volume_24h_fp / 1000)` | a move on an empty book cannot be traded |
 | 0.25 | spread | `max(0, 1 − (ask − bid) × 10)` | a $0.10 spread eats a $0.10 move |
 | ×0.5 | staleness | applied when the sample is > 1 h old | REST reads lag (S2) |
 
 `highROI = score ≥ 0.62`. **It is not back-tested and it does not predict outcomes.** Each row
+
+**Composition is measured, not assumed (F-94, 2026-11-27).** `node scripts/highroi-composition.mjs` reports what the
+selective pane contains and fails if any `highROI` row misses its own threshold or is not `tradeable` at its recorded
+swing price. On the committed sample of 2026-11-27T14:24:49Z: 20 of 121 alerts are `highROI`, all 20 are down-swings,
+10 of 20 start within $0.05 of an extreme, and the size and liquidity terms are saturated (1.00) on every one of them —
+so the published score there is driven by book tightness, not by headroom. No re-weighting was applied: a new weight
+without a back-test would be a guess. See `flagged.html#F-94`.
+
+Each row
 prints its own term values so the ranking can be challenged.
 
 ### 3.5 Resolutions
