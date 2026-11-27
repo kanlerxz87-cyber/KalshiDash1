@@ -4017,3 +4017,14 @@ are only touched if a defect is reproduced, in which case it is recorded on this
 | Z5 | Record PR link, merge SHA, Pages build result and verification in this section. | unclaimed | session-1b163877 | this section only |
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
+
+**V4 close-out (session-5d35b42d, final).** Two PRs, both merged without waiting for approval, both deployed:
+
+| PR | Title | Checks | Merge | Pages |
+|---|---|---|---|---|
+| [#127](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/127) | verify: independent Nov 27 state verification + line-by-line requirement audit | build/alerts/qa×2 pass | `628f9e1` at 17:23:52Z | `built`, no error, 17:24:14Z |
+| [#128](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/128) | docs(coord): record #127 merge + Pages build, add V-7 | build/alerts/qa×2 pass | `44a47d0` at 17:25:46Z | `built`, no error, 17:26Z |
+
+**Session-5d35b42d is complete: V1–V4 all done.** Nothing was merged broken; no check failed or was bypassed; no page, template, data file or executive-summary file owned by another session was edited. This close-out itself lands as PR **#129**.
+
+**Conflict log (session-5d35b42d).** PR #129 conflicted in `COORDINATION.md` because `main` advanced to `f792e5d` (PR #126, session-21cc79b6) while #127/#128 were merging — two sessions appending to the same board. Resolved by keeping **both** sections in full: the 21cc79b6 section (which itself records that it preserved this session's V4 record and V-7 finding) followed by this close-out. No content from either side was discarded, nothing outside `COORDINATION.md` conflicted, and no other branch was pushed to. Outstanding work for other owners: renumber V-1…V-7 into the F-series on `flagged.html` (highest existing F-83), and the accountability items in V-2/V-3/V-5/V-7.
