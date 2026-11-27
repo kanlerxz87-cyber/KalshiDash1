@@ -178,10 +178,10 @@
   }
 
   /* ------------------------------------------------------- topic deep links */
-  /* `dashboard.html?topic=golf` and `alerts/index.html?topic=golf` were previously accepted by
-   * neither page, so a "Golf" nav entry could not open the dashboard already filtered. This
-   * applies the filter by clicking the filter control the page already has, so it stays in sync
-   * with each page's own logic instead of duplicating it. */
+  /* `dashboard.html?topic=golf`, `markets.html?topic=golf`, and `alerts/index.html?topic=golf`
+   * apply the filter by clicking the page's own topic button so it stays in sync with each
+   * page's logic instead of duplicating it (F-ALERTS-02: updated selectors to match the actual
+   * #topic-chips, #markets-topic-chips, and #topic-tabs containers). */
   function applyTopicFilter() {
     var m = location.search.match(/[?&]topic=([a-z]+)/i);
     if (!m) return;
@@ -189,12 +189,19 @@
     var tries = 0;
     var timer = setInterval(function () {
       tries += 1;
-      var btns = document.querySelectorAll('#filters button, #topic-filter button, .filters button');
+      var btns = document.querySelectorAll(
+        '#topic-chips button, #markets-topic-chips button, #topic-tabs button, #filters button, #topic-filter button, .filters button'
+      );
       var hit = null;
       for (var i = 0; i < btns.length; i++) {
-        var key = (btns[i].getAttribute('data-topic') || btns[i].getAttribute('data-filter')
-          || btns[i].textContent || '').toLowerCase();
-        if (key.indexOf(want) !== -1) { hit = btns[i]; break; }
+        var exact = (btns[i].getAttribute('data-topic') || btns[i].getAttribute('data-filter') || '').toLowerCase();
+        if (exact && exact === want) { hit = btns[i]; break; }
+      }
+      if (!hit) {
+        for (var j = 0; j < btns.length; j++) {
+          var label = (btns[j].textContent || '').toLowerCase();
+          if (label.indexOf(want) !== -1) { hit = btns[j]; break; }
+        }
       }
       if (hit) {
         hit.click();
