@@ -90,6 +90,7 @@
   </div>
 
   <h2>Topic summary</h2>
+  <p class="sub">24h volume ($) sums 24-hour contracts × published <code>notional_value_dollars</code> across every captured open market in the topic (labeled <em>top 60 of N</em> when an older snapshot omits the full-topic total). The background alert engine separately estimates lifetime traded premium (cumulative contracts × last price).</p>
   <div class="table-wrap">
     <table>
       <thead><tr><th>Topic</th><th class="num">Series tracked</th><th class="num">Open markets</th><th class="num">24h volume ($)</th><th>Highest-dollar row</th><th>Source</th></tr></thead>
@@ -97,7 +98,7 @@
       <td><strong><a href="categories/gas.html">Gas Prices</a></strong></td>
       <td class="num">30</td>
       <td class="num">142</td>
-      <td class="num">13,662</td>
+      <td class="num">13,662<br><span class="small muted">top 60 of 142</span></td>
       <td><a href="market.html?ticker=KXAAAGASM-26NOV30-3.50">Will average **gas prices** be above $3.50?</a></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
     </tr>
@@ -105,7 +106,7 @@
       <td><strong><a href="categories/elections.html">Elections</a></strong></td>
       <td class="num">30</td>
       <td class="num">356</td>
-      <td class="num">3,411,835</td>
+      <td class="num">3,411,835<br><span class="small muted">top 60 of 356</span></td>
       <td><a href="market.html?ticker=KXPRESNOMR-28-ETRU">Will Eric Trump be the nominee for the Presidency for the Republican party?</a></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
     </tr>
@@ -121,7 +122,7 @@
       <td><strong><a href="categories/crypto.html">Crypto</a></strong></td>
       <td class="num">30</td>
       <td class="num">1,753</td>
-      <td class="num">373,475</td>
+      <td class="num">373,475<br><span class="small muted">top 60 of 1,753</span></td>
       <td><a href="market.html?ticker=KXBTCY-27JAN0100-B102500">BTC price  on Jan 1, 2027?</a></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
     </tr>
@@ -129,7 +130,7 @@
       <td><strong><a href="categories/golf.html">Golf</a></strong></td>
       <td class="num">30</td>
       <td class="num">226</td>
-      <td class="num">927,246</td>
+      <td class="num">927,246<br><span class="small muted">top 60 of 226</span></td>
       <td><a href="market.html?ticker=KXDPWORLDTOUR-BMAPC26-LVAN">BMW Australian PGA Championship: Lars Van Der Vight wins</a></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&amp;tags=Golf&amp;include_volume=true" target="_blank" rel="noopener">series query</a></td>
     </tr></tbody>

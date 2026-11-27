@@ -36,7 +36,7 @@ function ok(name, cond, detail = '') {
  *    so a bare regex would still pass after the settled mapping was removed (measured). */
 const fetchSrc = readFileSync(path.join(ROOT, 'scripts', 'fetch-snapshot.mjs'), 'utf8');
 const settledBlock = fetchSrc.match(
-  /markets:\s*\(ev\.markets\s*\|\|\s*\[\]\)\.slice\(0,\s*12\)\.map\(\(m\)\s*=>\s*\(\{([\s\S]*?)\}\)\)/);
+  /markets:\s*(?:resolvedMarkets|\(ev\.markets\s*\|\|\s*\[\]\)(?:\.filter\([^)]*\))?)\.slice\(0,\s*12\)\.map\(\(m\)\s*=>\s*\(\{([\s\S]*?)\}\)\)/);
 ok('fetch-snapshot.mjs maps settlement_ts from the nested settled market',
   Boolean(settledBlock && /settlement_ts:\s*m\.settlement_ts/.test(settledBlock[1])),
   'the settled-event market mapping must read m.settlement_ts');

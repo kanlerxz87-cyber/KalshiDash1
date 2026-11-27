@@ -195,19 +195,32 @@ function allMarkets() {
     (b.volume_24h_fp || 0) - (a.volume_24h_fp || 0) || (b.volume_fp || 0) - (a.volume_fp || 0));
 }
 
+function isResolvedMarket(m) {
+  const r = String((m && m.result) || '').trim().toLowerCase();
+  return r === 'yes' || r === 'no' || r === 'scalar';
+}
+
 function topicOverviewTable(base = '') {
   return TOPICS.map((t) => {
     const topic = snap.topics[t.id] || {};
     const live = (topic.live_markets || []);
-    const vol = live.reduce((s, m) => s + ((m.volume_24h_fp === null || m.volume_24h_fp === undefined
-      || m.notional_value_dollars === null || m.notional_value_dollars === undefined)
-      ? 0 : m.volume_24h_fp * m.notional_value_dollars), 0);
+    const totalOpen = topic.live_markets_total === undefined ? live.length : topic.live_markets_total;
+    const hasFullVol = typeof topic.live_volume_24h_notional_total === 'number'
+      && Number.isFinite(topic.live_volume_24h_notional_total);
+    const vol = hasFullVol
+      ? topic.live_volume_24h_notional_total
+      : live.reduce((s, m) => s + ((m.volume_24h_fp === null || m.volume_24h_fp === undefined
+        || m.notional_value_dollars === null || m.notional_value_dollars === undefined)
+        ? 0 : m.volume_24h_fp * m.notional_value_dollars), 0);
+    const volScope = !hasFullVol && totalOpen > live.length
+      ? `<br><span class="small muted">top ${live.length} of ${num(totalOpen)}</span>`
+      : '';
     const best = live[0];
     return `<tr>
       <td><strong><a href="${base}categories/${t.id}.html">${esc(t.label)}</a></strong></td>
       <td class="num">${num((topic.series || []).length)}</td>
-      <td class="num">${num(topic.live_markets_total === undefined ? live.length : topic.live_markets_total)}</td>
-      <td class="num">${num(vol)}</td>
+      <td class="num">${num(totalOpen)}</td>
+      <td class="num">${num(vol)}${volScope}</td>
       <td>${best ? `<a href="${base}market.html?ticker=${encodeURIComponent(best.ticker)}">${esc(best.title)}</a>` : '<span class="muted">no open market at capture</span>'}</td>
       <td class="src">${srcLink(topic.series_query, 'series query')}</td>
     </tr>`;
@@ -235,13 +248,15 @@ function resolvedTable(topicId) {
   const topic = snap.topics[topicId] || {};
   const rows = [];
   (topic.settled_events || []).forEach((ev) => {
-    (ev.markets || []).forEach((m) => rows.push({ ev, m }));
+    (ev.markets || []).filter(isResolvedMarket).forEach((m) => rows.push({ ev, m }));
   });
   if (!rows.length) return '<tr><td colspan="8" class="muted">No settled event captured for this topic at snapshot time.</td></tr>';
-  return rows.map((r) => `<tr>
+  return rows.map((r) => {
+    const badgeClass = r.m.result === 'yes' ? 'good' : (r.m.result === 'no' ? 'bad' : 'neutral');
+    return `<tr>
     <td>${esc(r.ev.title || r.ev.event_ticker)}<br><span class="ticker">${esc(r.ev.event_ticker)}</span></td>
     <td>${esc(r.m.yes_sub_title || '—')}<br><span class="ticker">${esc(r.m.ticker)}</span></td>
-    <td>${r.m.result ? `<span class="badge ${r.m.result === 'yes' ? 'good' : 'bad'}">${esc(r.m.result)}</span>` : '<span class="muted">—</span>'}</td>
+    <td><span class="badge ${badgeClass}">${esc(r.m.result)}</span></td>
     <td class="num">${cents(r.m.settlement_value_dollars)}</td>
     <td class="num">${num(r.m.volume_fp)}</td>
     <td>${dt(r.ev.settlement_ts || r.m.settlement_ts)}</td>
@@ -249,7 +264,8 @@ function resolvedTable(topicId) {
       ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.name)}</a>`
       : esc(x.name || '—'))).join(', ') || '<span class="muted">—</span>'}</td>
     <td class="src">${srcLink(r.ev.source_url, 'events query')}</td>
-  </tr>`).join('\n');
+  </tr>`;
+  }).join('\n');
 }
 
 function liquidityTable(base = '', topicId = null) {

@@ -58,7 +58,7 @@
     topics: [
       { id: 'gas', label: 'Gas Prices', color: '#f5a524',
         query: '/series?category=Economics&tags=Oil%20and%20energy&include_volume=true',
-        rule: 'Series whose ticker starts with KXAAAGAS, or whose title contains "gas price". All settle against AAA (gasprices.aaa.com).' },
+        rule: 'AAA retail gasoline series (ticker prefix KXAAAGAS or AAAGAS, or title containing "gas price"), excluding natural gas (KXNGAS*/NGAS*, EIA) and diesel. All kept series settle against AAA (gasprices.aaa.com).' },
       { id: 'elections', label: 'Elections', color: '#4c9aff',
         query: '/series?category=Elections&include_volume=true',
         rule: 'Every series whose categories list contains "Elections".' },
@@ -88,6 +88,16 @@
   function nullableNumber(v) {
     if (v === null || v === undefined || typeof v === 'boolean' || (typeof v === 'string' && !v.trim())) return null;
     return Number.isFinite(Number(v)) ? Number(v) : null;
+  }
+  function isGasPriceSeries(s) {
+    var ticker = String((s && s.ticker) || '');
+    var title = String((s && s.title) || '');
+    if (/^(?:KX)?NGAS/i.test(ticker) || /\bnatural\s+gas\b|\bdiesel\b/i.test(title) || /diesel/i.test(ticker)) return false;
+    return /^(?:KX)?AAAGAS/i.test(ticker) || /\bgas price/i.test(title);
+  }
+  function isResolvedMarket(m) {
+    var r = String((m && m.result) || '').trim().toLowerCase();
+    return r === 'yes' || r === 'no' || r === 'scalar';
   }
 
   var STRATEGIES = [
@@ -484,7 +494,7 @@
       chain = chain.then(function () {
         return apiGet(topic.query).catch(function () { return { series: [] }; }).then(function (res) {
           var kept = (res.series || []).filter(function (s) {
-            if (topic.id === 'gas') return /^KXAAAGAS/.test(s.ticker || '') || /gas price/i.test(s.title || '');
+            if (topic.id === 'gas') return isGasPriceSeries(s);
             if (topic.id === 'golf') return (s.tags || []).includes('Golf');
             return true;
           });
@@ -1165,7 +1175,7 @@
       var rows = Object.keys(state.markets).map(function (k) { return state.markets[k]; }).filter(function (m) {
         if (f.topic !== 'all' && m.topic !== f.topic) return false;
         if (f.status === 'open' && (m.status === 'finalized' || m.status === 'settled' || m.status === 'closed')) return false;
-        if (f.status === 'resolved' && !(m.result === 'yes' || m.result === 'no')) return false;
+        if (f.status === 'resolved' && !isResolvedMarket(m)) return false;
         if (f.q && String(m.title || '').toLowerCase().indexOf(f.q.toLowerCase()) < 0 &&
             String(m.ticker || '').toLowerCase().indexOf(f.q.toLowerCase()) < 0) return false;
         return true;
@@ -1247,14 +1257,15 @@
         if (snap && snap.topics && snap.topics[topicId]) {
           (snap.topics[topicId].settled_events || []).forEach(function (ev) {
             (ev.markets || []).forEach(function (m) {
-              resolved.push({ ev: ev, m: m });
+              if (isResolvedMarket(m)) resolved.push({ ev: ev, m: m });
             });
           });
         }
         resolvedBody.innerHTML = resolved.length ? resolved.map(function (r) {
+          var badgeClass = r.m.result === 'yes' ? 'good' : (r.m.result === 'no' ? 'bad' : 'neutral');
           return '<tr><td>' + esc(r.ev.title || r.ev.event_ticker) + '<br><span class="ticker">' + esc(r.ev.event_ticker) + '</span></td>' +
             '<td>' + esc(r.m.yes_sub_title || '—') + '<br><span class="ticker">' + esc(r.m.ticker) + '</span></td>' +
-            '<td>' + (r.m.result ? '<span class="badge ' + (r.m.result === 'yes' ? 'good' : 'bad') + '">' + esc(r.m.result) + '</span>' : '<span class="muted">—</span>') + '</td>' +
+            '<td><span class="badge ' + badgeClass + '">' + esc(r.m.result) + '</span></td>' +
             '<td class="num">' + cents(r.m.settlement_value_dollars) + '</td>' +
             '<td class="num">' + num(r.m.volume_fp) + '</td>' +
             '<td>' + dt(r.ev.settlement_ts || (r.m.settlement_ts)) + '</td>' +

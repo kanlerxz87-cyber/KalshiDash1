@@ -61,8 +61,7 @@
           <td><a href="https://docs.kalshi.com/websockets/websocket-connection" target="_blank" rel="noopener">WebSocket Connection</a> ·
           <a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Data freshness</a></td></tr>
         <tr><td>Which series count as "gas prices"?</td>
-          <td>The AAA gasoline series (ticker prefix <code>KXAAAGAS</code>, or a title containing "gas price"). Each settles
-          against AAA. Crude-oil and coal series in the broader "Oil and energy" tag are excluded by that rule.</td>
+          <td>The AAA retail gasoline series (ticker prefix <code>KXAAAGAS</code> or <code>AAAGAS</code>, or a title containing "gas price"), explicitly excluding natural gas futures (<code>KXNGAS*</code> / <code>NGAS*</code> / "natural gas", which settle against EIA Henry Hub) and diesel. Every kept series settles against AAA. Crude-oil, natural-gas, diesel and coal series in the broader "Oil and energy" tag are excluded by that rule.</td>
           <td><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">Live series query</a></td></tr>
         <tr><td>Can a browser call the demo API directly?</td>
           <td><strong>Yes for public reads; no for signed requests</strong> — measured 2026-11-21, not assumed.

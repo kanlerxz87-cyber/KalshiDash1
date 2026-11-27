@@ -129,6 +129,13 @@ jobs:
       - name: High-ROI selection composition and invariants
         run: npm run test:highroi
 
+      # session-c23c0f31 (F-GAS-01, F-RESOLVED-01, F-VOL-01): offline regression checks for
+      # retail-gasoline AAA series filtering (rejecting EIA natural gas & diesel), excluding
+      # still-active markets from partially-settled events in the Resolved Events table, and
+      # full-topic vs top-60 24h notional volume honesty.
+      - name: Topic filter, resolved-table and 24h-volume integrity
+        run: npm run test:topic-integrity
+
       - name: Python tool syntax
         run: python -m py_compile tools/*.py
 

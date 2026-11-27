@@ -90,6 +90,7 @@
   </div>
 
   <h2>Topic summary</h2>
+  <p class="sub">24h volume ($) sums 24-hour contracts × published <code>notional_value_dollars</code> across every captured open market in the topic (labeled <em>top 60 of N</em> when an older snapshot omits the full-topic total). The background alert engine separately estimates lifetime traded premium (cumulative contracts × last price).</p>
   <div class="table-wrap">
     <table>
       <thead><tr><th>Topic</th><th class="num">Series tracked</th><th class="num">Open markets</th><th class="num">24h volume ($)</th><th>Highest-dollar row</th><th>Source</th></tr></thead>
