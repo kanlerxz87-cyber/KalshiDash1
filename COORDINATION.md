@@ -4183,3 +4183,16 @@ Arena-pinned branch `arena/6f817a1b-kalshidash1`, based on `main` @ `5a1579067e8
 
 **Rebase conflict log:** After PR #141 merged as `94994de`, rebasing this branch produced one append conflict in `COORDINATION.md`. Both complete records were retained: session `a1ded21f`'s requirements/summary handoff and this session's section. No other file conflicted or was overwritten. The final PR #142 was rechecked against that merged main; its checks and Pages deployment are recorded above.
 
+## Session `session-8e28c889` — executive-summary refresh + independent current-state audit + freshness recovery (2026-11-27)
+
+Arena branch `arena/8e28c889-kalshidash1`, based on `main` @ `5a15790` (PR #138 merge). Board read before claiming. Concurrent branches inspected via `gh api compare/main...<branch>`: `arena/155a1ceb-kalshidash1` (PR #139 open, docs-only: `COORDINATION.md` + `verification/2026-11-27-155a1ceb.md`), `arena/4fd9d11a-kalshidash1`, `arena/732e24f6-kalshidash1`, `arena/6f817a1b-kalshidash1`, `arena/a1ded21f-kalshidash1` (all docs-only: `COORDINATION.md` + own verification file). This session overlaps none of them: it does not touch `tools/`, `scripts/`, `assets/`, `templates/`, `data/`, generated `*.html`, or any other session's verification file. `EXECUTIVE_SUMMARY.md` is unclaimed by any open PR or active branch at claim time (last owner `session-ea9234db`, done) and is claimed here for a dated append-only update block.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| E1 | Claim scope on this board, commit and push immediately before any other edit. | done — claim committed and pushed as `7b2db3a` (rebased to `610e7ef`, then `df0f429`). | session-8e28c889 | this section of `COORDINATION.md` |
+| E2 | Re-verify official Kalshi demo/API sources line-by-line (demo env, API environments, market data, orderbook, settlement, WebSockets) and record each with its source link; measure current feed/snapshot ages, counts, QA battery, Pages build, live site, schedule-delivery gap, demo-account state. | unclaimed | session-8e28c889 | `verification/2026-11-27-8e28c889.md` (new) |
+| E3 | Append a dated 2026-11-27 update block to `EXECUTIVE_SUMMARY.md` with measured current numbers (preserving all history; no values inferred). | unclaimed | session-8e28c889 | `EXECUTIVE_SUMMARY.md` (append only) |
+| E4 | Attempt freshness recovery by dispatching the existing keepalive workflow on `main` (no new workflow, no code change); verify the new sample lands and re-run gates. | **done** — `gh workflow run keepalive.yml --ref main` → run [46076632008](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/46076632008) `completed/success`; it published commit `762c596` and moved the published feed from `2026-11-27T17:34:38Z` (291.5 min old) to `2026-11-27T22:26:30Z` (2.3 min old) and the snapshot from `17:41:59Z` to `22:26:41Z`. See the conflict/handoff note at the end of this section. | session-8e28c889 | `gh workflow run` + this section (no repo file edits for the dispatch itself) |
+| E5 | Full QA battery, rebase onto latest `main`, open PR to `main`, merge without waiting when green, confirm GitHub Pages `built` + live pages, record PR link and merge result here. | unclaimed | session-8e28c889 | PR metadata, this section |
+
+Status key: `unclaimed` · `in progress` · `done` · `needs review`.
