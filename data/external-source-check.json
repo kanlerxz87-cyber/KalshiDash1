@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-27T22:31:59.722Z",
+  "checked_at": "2026-11-27T22:32:58.386Z",
   "verified": true,
   "scope": "citations to docs.kalshi.com only (existence/form, not page content)",
   "method": "Every docs.kalshi.com citation found in templates/*.tpl and data/sources.json is reduced to its canonical page URL and looked up in the publisher's own listings: llms.txt (the documentation index) and sitemap.xml. Two URL forms are normalised onto one key (/path and /path.md). Existence and form only — page content is not read, so this file never asserts what a page says.",
@@ -16,12 +16,10 @@
     }
   },
   "summary": {
-    "distinct_citations": 32,
+    "distinct_citations": 31,
     "ok": 31,
-    "broken": 1,
-    "broken_pages": [
-      "https://docs.kalshi.com/api-reference/search/get-tags-by-categories"
-    ]
+    "broken": 0,
+    "broken_pages": []
   },
   "citations": [
     {
@@ -274,21 +272,6 @@
       "in_sitemap": true,
       "in_llms_index": true,
       "verdict": "ok"
-    },
-    {
-      "target": "https://docs.kalshi.com/api-reference/search/get-tags-by-categories",
-      "forms": [
-        "page"
-      ],
-      "cited_in": [
-        "templates/flagged.tpl"
-      ],
-      "url": "https://docs.kalshi.com/api-reference/search/get-tags-by-categories",
-      "page": "https://docs.kalshi.com/api-reference/search/get-tags-by-categories",
-      "form": "page",
-      "in_sitemap": false,
-      "in_llms_index": false,
-      "verdict": "broken"
     },
     {
       "target": "https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories",
