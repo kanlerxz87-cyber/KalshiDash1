@@ -29,6 +29,16 @@
     <div class="btnrow"><a class="btn primary" href="dashboard.html">Open the live dashboard</a></div>
   </div>
 
+  <aside class="notice warn" aria-label="Current operational status">
+    <strong>Operational status · verified 2026-11-27 22:25 UTC.</strong>
+    The committed alert feed was generated at <code>2026-11-27T17:34:38Z</code> and was 290.2 minutes old at verification,
+    beyond the 45-minute stale threshold. Treat its prices and counts as a historical sample, not current quotes.
+    The most recent captured market snapshot is <code>2026-11-27T17:41:59Z</code>. The demo-account snapshot is
+    disconnected (<code>connected: false</code>); the paper simulator is not exchange execution. See the
+    <a href="verification/2026-11-27-a1ded21f.md">dated verification report</a> and
+    <a href="flagged.html">Flagged for Review</a> for limitations and source links.
+  </aside>
+
   <h2>1 · What was built</h2>
   <div class="panel">
     <p>A single, static, dependency-free dashboard for Kalshi's official <strong>demo</strong> exchange, published on GitHub
