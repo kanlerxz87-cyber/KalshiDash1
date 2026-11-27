@@ -1,5 +1,15 @@
 # COORDINATION.md — shared task board
 
+## Session `session-155a1ceb` — current-tree verification and release-readiness audit (2026-11-27)
+
+Arena branch `arena/155a1ceb-kalshidash1`, based on `5a1579067e8ac7238ce80f2672ff563a40a49f87` (main). Board read before claim; existing work is complete and no conflicting active scope was identified. This is an audit-only scope: new dated verification record and this board section; no site data, templates, generated pages, engine, or navigation edits.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| R1 | Claim current-tree audit scope before work. | done | session-155a1ceb | this section of `COORDINATION.md` |
+| R2 | Re-check official demo/API and orderbook semantics, run local QA and inspect existing integration/release evidence; log accurate current limitations. | in progress | session-155a1ceb | `verification/2026-11-27-155a1ceb.md` (new), this section |
+
+
 ## Session session-528c51c9 — measured anonymous WebSocket-handshake evidence + fresh CORS re-probe (2026-11-27)
 
 Arena-pinned branch `arena/528c51c9-kalshidash1`, branched from `main` @ `a2816c5`. Board read before claiming. Concurrent sessions observed at claim time and their scopes avoided: session-21cc79b6 (read-only audit, `verification/2026-11-27-21cc79b6.md`), session-49860fd0 (read-only audit, `verification/2026-11-27-49860fd0.md`), session-ea9234db (`EXECUTIVE_SUMMARY.md` + executive-summary template/generated page), session-1b163877 (final integration: own verification record; `scripts/`/`tools/`/`assets/` only where a defect is reproduced; README release record), session-cc57fe69 (audit withdrawn, observations only). This session overlaps none of them: it adds NEW files, one entry each in two shared dev-QA files, and re-runs an existing manual workflow. No templates, generated HTML, `README.md`, index/nav, `data/live/`, or any active session's file is edited.
