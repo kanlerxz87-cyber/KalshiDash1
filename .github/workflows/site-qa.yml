@@ -141,6 +141,16 @@ jobs:
       - name: Topic filter, resolved-table and 24h-volume integrity
         run: npm run test:topic-integrity
 
+      # session-69be5016 (F-CHART-02): the alert console's chart offered 5-minute and 1-hour
+      # windows that the engine feed alone could never fill (one point per run; the declared
+      # */10 cron is delivered hourly-ish at best, F-83). The fix sources each window from the
+      # official Get Market Candlesticks endpoint. This gate asserts the documented request
+      # contract (interval enum, 5,000-period cap, seconds), that a null traded close is never
+      # filled, and — with a negative control — that the official series is what makes the
+      # short windows renderable.
+      - name: Alert-console chart windows sourced from official candles
+        run: npm run test:console-chart
+
       - name: Python tool syntax
         run: python -m py_compile tools/*.py
 

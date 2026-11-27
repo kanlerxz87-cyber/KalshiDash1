@@ -175,7 +175,7 @@
     feed: null,
     feedError: null,
     feedFetchedAt: null,
-    live: { markets: {}, history: {}, alerts: [], order: [], ok: false, note: '', lastPoll: null },
+    live: { markets: {}, history: {}, alerts: [], order: [], ok: false, note: '', lastPoll: null, candles: {} },
     mode: 'probing'
   };
 
@@ -411,6 +411,148 @@
     return f[ticker] || state.live.history[ticker] || [];
   }
 
+  /* ---------------- official candlestick history for the console chart ----------------
+   *
+   * WHY THIS EXISTS (measured 2026-11-27, F-CHART-02). The console chart offered 5-minute,
+   * 1-hour, 6-hour, 24-hour and 7-day windows but was fed only by `feed.history` (one point per
+   * engine run) and by samples this tab recorded while open. In the committed feed NOT ONE of
+   * the 25 highest-dollar chart candidates had two samples inside the 5-minute or the 1-hour
+   * window, so two of the five advertised windows could not draw a line at all: the engine's
+   * declared every-10-minutes cron is delivered far less often than declared (F-83).
+   *
+   * The exchange publishes exactly the missing resolution. GET
+   * /series/{series_ticker}/markets/{ticker}/candlesticks returns per-period OHLC of *traded*
+   * prices, with period_interval restricted by the official schema to 1, 60 or 1440 minutes and
+   * each response capped at 5,000 periods; timestamps are Unix seconds.
+   *   https://docs.kalshi.com/api-reference/market/get-market-candlesticks
+   *
+   * Honesty rules enforced here:
+   *   * the plotted value is the OFFICIAL traded close `price.close_dollars` for that period
+   *     (the same field assets/app.js charts on market.html). A period with no trade returns a
+   *     null close and is SKIPPED, never filled from an adjacent candle, the bid, the ask or an
+   *     interpolated estimate;
+   *   * every point keeps the exact request URL that produced it, so the page can show where
+   *     the line came from;
+   *   * a failed or rate-limited request leaves the previous cache in place and reports it. It
+   *     never downgrades the chart to an invented series.
+   * The last candlesticks can lag the latest trades by a few seconds (official doc), which is
+   * why the newest browser sample and the live last price are drawn on top of them. */
+
+  var CANDLE_TTL_MS = 60000;      // re-fetch at most once a minute per market+interval
+  var CANDLE_MAX_PERIODS = 5000;  // documented per-request cap
+
+  /* The smallest documented interval that can resolve the chosen window. 7 days at 1-minute
+   * periods is 10,080 periods, over the 5,000 cap, so the longer windows ask for 60-minute
+   * candles (168 periods) or 1,440-minute candles (7 periods) instead. */
+  function candleIntervalFor(windowSec) {
+    if (!windowSec) return 1;
+    if (windowSec / 60 <= CANDLE_MAX_PERIODS) return 1;
+    if (windowSec / 3600 <= CANDLE_MAX_PERIODS) return 60;
+    return 1440;
+  }
+
+  function candles(ticker) {
+    var c = state.live.candles[ticker];
+    return c && Array.isArray(c.points) ? c : null;
+  }
+
+  /* Fetch (or reuse) official candles for one market. Resolves to the cache entry.
+   * `force` bypasses the TTL. Never throws: the caller draws whatever official data exists. */
+  function fetchCandles(ticker, windowSec, opts) {
+    opts = opts || {};
+    var m = state.live.markets[ticker] || ((state.feed && state.feed.markets) || []).filter(function (x) {
+      return x.ticker === ticker;
+    })[0];
+    var slot = state.live.candles[ticker] || (state.live.candles[ticker] = {});
+    if (!m || !m.series_ticker) {
+      slot.error = 'no series ticker is published for this market, so the candlestick endpoint cannot be called';
+      slot.basis = null;
+      return Promise.resolve(slot);
+    }
+    var interval = candleIntervalFor(windowSec);
+    if (slot.pending && slot.interval === interval) return slot.pending;
+    var nowMs = Date.now();
+    if (!opts.force && slot.fetched_at && slot.interval === interval
+        && nowMs - slot.fetched_at < CANDLE_TTL_MS && Array.isArray(slot.points)) {
+      return Promise.resolve(slot);
+    }
+    var end = Math.floor(nowMs / 1000);
+    /* Ask for at least one day of 1-minute candles so a short window still has context, and
+     * never more than the documented 5,000-period cap. */
+    var span = Math.max(windowSec || 0, interval === 1 ? 3600 : 86400);
+    var maxSpan = CANDLE_MAX_PERIODS * interval * 60;
+    if (span > maxSpan) span = maxSpan;
+    var start = end - span;
+    var path = '/series/' + encodeURIComponent(m.series_ticker) + '/markets/' + encodeURIComponent(ticker) +
+      '/candlesticks?start_ts=' + start + '&end_ts=' + end + '&period_interval=' + interval;
+    var url = BASE + path;
+    slot.interval = interval;
+    slot.basis = interval === 1 ? 'official 1-minute traded close (price.close_dollars)'
+      : interval === 60 ? 'official 1-hour traded close (price.close_dollars)'
+        : 'official 1-day traded close (price.close_dollars)';
+    slot.source_url = url;
+    slot.pending = getJson(path).then(function (j) {
+      var out = [];
+      (j.candlesticks || []).forEach(function (c) {
+        var t = num(c && c.end_period_ts);
+        var v = num(c && c.price && c.price.close_dollars);
+        if (t === null || v === null) return;   // no trade in this period: never invent one
+        if (v < 0 || v > 1) return;             // a binary contract price outside $0–$1 is not ours
+        out.push({ t: t, p: v });
+      });
+      out.sort(function (a, b) { return a.t - b.t; });
+      slot.points = out;
+      slot.fetched_at = Date.now();
+      slot.error = null;
+      return slot;
+    }, function (e) {
+      slot.error = String(e && e.message || e);
+      slot.fetched_at = Date.now();
+      if (!Array.isArray(slot.points)) slot.points = [];
+      return slot;
+    }).then(function (s) {
+      s.pending = null;
+      return s;
+    });
+    return slot.pending;
+  }
+
+  /* The exact series the console chart plots: official traded candle closes, merged with the
+   * samples recorded by the engine feed and by this tab, de-duplicated by timestamp with the
+   * official print winning. Exported so the offline gate (scripts/check-console-chart.mjs) can
+   * assert the merge without a canvas.
+   *
+   * Returns { points, official, error, basis, interval, source_url }, where `points` is always
+   * strictly what was published — never an interpolation, a carry-forward, or a bid/ask stand-in. */
+  function chartSeries(ticker, windowSec, nowSec) {
+    var now = typeof nowSec === 'number' ? nowSec : Math.floor(Date.now() / 1000);
+    var from = now - (windowSec || 3600);
+    var entry = candles(ticker);
+    var byT = {};
+    function add(t, p, official) {
+      var tt = num(t), pp = num(p);
+      if (tt === null || pp === null || !isFinite(tt) || !isFinite(pp)) return;
+      if (tt < from || tt > now + 60 || pp < 0 || pp > 1) return;
+      var at = Math.round(tt);
+      if (!byT[at] || (official && !byT[at].official)) byT[at] = { t: at, p: pp, official: !!official };
+    }
+    ((entry && entry.points) || []).forEach(function (c) { add(c.t, c.p, true); });
+    (history(ticker) || []).forEach(function (smp) {
+      if (Array.isArray(smp)) add(smp[0], smp[1], false);
+      else if (smp) add(smp.t, smp.p, false);
+    });
+    var points = Object.keys(byT).map(function (k) { return byT[k]; })
+      .sort(function (a, b) { return a.t - b.t; });
+    return {
+      points: points,
+      official: points.filter(function (x) { return x.official; }).length,
+      error: (entry && entry.error) || null,
+      basis: (entry && entry.basis) || null,
+      interval: (entry && entry.interval) || null,
+      source_url: (entry && entry.source_url) || null
+    };
+  }
+
   /* How many series matched for a topic in the last engine run (from the compact summary). */
   function topicSeriesCount(topicId) {
     var t = (state.feed && state.feed.meta && state.feed.topic_rules) || [];
@@ -430,6 +572,7 @@
     loadFeed: loadFeed, pollLive: pollLive,
     allAlerts: allAlerts, highRoiAlerts: highRoiAlerts, resolutions: resolutions, awaiting: awaiting,
     markets: markets, history: history, orderbooks: orderbooks, topicSeriesCount: topicSeriesCount,
+    candles: candles, fetchCandles: fetchCandles, candleIntervalFor: candleIntervalFor, chartSeries: chartSeries,
     modelScore: modelScore, trackedPrice: trackedPrice,
     num: num, round: round, usd: usd, esc: esc, topicLabel: topicLabel
   };

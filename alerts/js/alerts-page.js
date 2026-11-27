@@ -460,9 +460,18 @@
   /* ---------------- chart ---------------- */
 
   function chartWindows() {
+    /* The brief asks for selectable seconds / minutes / hours timestamp lengths. The exchange's
+     * finest documented candlestick period is 1 minute (period_interval ∈ {1, 60, 1440}), so a
+     * 60-second window is drawn from the 1-minute official close plus this tab's own samples;
+     * each button's tooltip says which period backs it. */
     var defs = [
-      { s: 300, l: '5 min' }, { s: 3600, l: '1 hour' }, { s: 21600, l: '6 hours' },
-      { s: 86400, l: '24 hours' }, { s: 604800, l: '7 days' }
+      { s: 60, l: '60 s', t: '1-minute official candle + live samples' },
+      { s: 300, l: '5 min', t: '1-minute official candles' },
+      { s: 900, l: '15 min', t: '1-minute official candles' },
+      { s: 3600, l: '1 hour', t: '1-minute official candles' },
+      { s: 21600, l: '6 hours', t: '1-minute official candles' },
+      { s: 86400, l: '24 hours', t: '1-minute official candles' },
+      { s: 604800, l: '7 days', t: '1-hour official candles' }
     ];
     var wrap = document.getElementById('chart-window-btns');
     wrap.innerHTML = '';
@@ -470,6 +479,7 @@
       var b = document.createElement('button');
       b.className = 'btn small' + (d.s === ui.chartWindow ? ' primary' : '');
       b.textContent = d.l;
+      if (d.t) b.title = 'source: ' + d.t;
       b.addEventListener('click', function () {
         ui.chartWindow = d.s;
         chartWindows();
@@ -500,6 +510,19 @@
   }
 
   function drawChart() {
+    /* Ask the exchange for official candles for the selected market. The fetch is cached and
+     * never throws; if it is still in flight or blocked (CORS/offline) the chart redraws from
+     * the samples that do exist rather than showing anything invented. See A.fetchCandles. */
+    if (ui.chartTicker && A.fetchCandles) {
+      var pending = A.fetchCandles(ui.chartTicker, ui.chartWindow);
+      if (pending && pending.then) {
+        pending.then(function () { drawChartPoints(); }, function () { drawChartPoints(); });
+      }
+    }
+    drawChartPoints();
+  }
+
+  function drawChartPoints() {
     var canvas = document.getElementById('chart');
     var dpr = window.devicePixelRatio || 1;
     var w = canvas.clientWidth || 800;
@@ -520,13 +543,14 @@
     var pad = { l: 46, r: 12, t: 12, b: 26 };
     // History is a compact array of [timestamp, price] pairs (see tools/live_engine.mjs);
     // the object form {t,p} is still accepted so an older cached feed keeps rendering.
-    var raw = A.history(ui.chartTicker) || [];
     var now = Math.floor(Date.now() / 1000);
     var from = now - ui.chartWindow;
-    var pts = raw.map(function (smp) {
-      if (Array.isArray(smp)) return { t: smp[0], p: smp[1] };
-      return { t: smp.t, p: smp.p };
-    }).filter(function (p) { return p && p.t >= from && typeof p.p === 'number'; });
+
+    /* One shared merge (A.chartSeries): official exchange candle closes first, then the samples
+     * this tab and the engine recorded, de-duplicated by timestamp with the official print
+     * winning. Nothing is interpolated between points. */
+    var series = A.chartSeries(ui.chartTicker, ui.chartWindow, now);
+    var pts = series.points;
 
     // axes
     ctx.strokeStyle = '#e3e8ee';
@@ -553,9 +577,16 @@
 
     if (pts.length < 2) {
       ctx.fillStyle = '#5b6b7b';
-      ctx.fillText('Not enough samples in this window yet — the engine adds one per run.', pad.l + 10, pad.t + 24);
+      ctx.fillText('Not enough priced observations in this window to draw a line.', pad.l + 10, pad.t + 24);
+      /* Say WHY, so an empty chart is never misread as "this contract did not move". */
+      var why;
+      if (!ui.chartTicker) why = 'no market selected yet';
+      else if (series.error) why = 'the official candlestick request failed (' + series.error + ')';
+      else if (!series.interval) why = 'waiting for the official candlestick request';
+      else if (!series.official) why = 'the exchange published no traded candle close in this window';
+      else why = 'only ' + series.official + ' official traded close(s) fall inside this window';
       document.getElementById('chart-note').textContent = ui.chartTicker
-        ? 'showing ' + ui.chartTicker + ' · ' + pts.length + ' sample(s) in window'
+        ? 'showing ' + ui.chartTicker + ' · ' + pts.length + ' priced point(s) in window · ' + why
         : '';
       return;
     }
@@ -582,8 +613,14 @@
       ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2); ctx.fill();
     });
 
-    document.getElementById('chart-note').textContent =
-      ui.chartTicker + ' · ' + pts.length + ' sample(s) · window ' + Math.round(ui.chartWindow / 60) + ' min';
+    /* Provenance on the chart itself: which official series is drawn, and whether the
+     * exchange request failed. A reader must be able to tell an official traded line from
+     * this tab's own samples without opening dev tools. */
+    var note = ui.chartTicker + ' · ' + pts.length + ' point(s) (' + series.official + ' official traded closes'
+      + (series.interval ? ', ' + series.interval + '-min candle' : '') + ')'
+      + ' · window ' + (ui.chartWindow < 3600 ? Math.round(ui.chartWindow / 60) + ' min' : Math.round(ui.chartWindow / 3600) + ' h');
+    if (series.error) note += ' · candlestick request failed: ' + series.error;
+    document.getElementById('chart-note').textContent = note;
   }
 
   /* ---------------- controls ---------------- */

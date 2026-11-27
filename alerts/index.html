@@ -146,19 +146,29 @@
 
   <h2>Live price chart — highest-dollar contract</h2>
   <div class="controls">
-    <span class="small muted">X axis: time · Y axis: contract price</span>
+    <span class="small muted">X axis: time (60 s → 7 d) · Y axis: contract price</span>
     <span id="chart-window-btns" class="controls" style="margin:0"></span>
     <select id="chart-ticker" class="btn" style="max-width:340px"><option value="">loading markets…</option></select>
   </div>
   <div class="chart-wrap">
     <canvas id="chart" height="260" aria-label="Contract price over time"></canvas>
     <div class="legend">
-      <span><i style="background:#14568f"></i>tracked price</span>
+      <span><i style="background:#14568f"></i>official traded close / tracked price</span>
       <span><i style="background:#1a7f4e"></i>alert ≥ $0.10 up</span>
       <span><i style="background:#b3372e"></i>alert ≥ $0.10 down</span>
       <span id="chart-note" class="muted"></span>
     </div>
   </div>
+  <p class="small muted" style="margin-top:8px">
+    Every line is drawn from the exchange's own
+    <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Get Market Candlesticks</a>
+    endpoint — the traded close (<code>price.close_dollars</code>) for each period, at the documented 1-minute, 1-hour or
+    1-day period chosen to fit the window inside the 5,000-period request cap — merged with the samples the engine and
+    this tab recorded. A period with no trade is skipped, never interpolated, and the caption under the chart names the
+    official series and point count it is showing. If the request is blocked (CORS/offline) the chart says so and falls
+    back to the recorded samples only. Why this was needed is recorded as
+    <a href="../flagged.html#F-CHART-02">F-CHART-02</a>.
+  </p>
 
   <h2>Highest-dollar live events, kept separate by topic</h2>
   <p class="small muted" style="margin-top:0">

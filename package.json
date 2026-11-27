@@ -17,7 +17,7 @@
     "test:cors": "node scripts/check-cors-evidence.mjs",
     "test:ws": "node tools/ws_probe.mjs --selftest",
     "test:links": "node scripts/check-links.mjs && python3 tools/linkcheck.py",
-    "test": "npm run test:engine && npm run test:feed && npm run test:feed-current && npm run test:rescore && npm run test:guard && npm run test:resolution && npm run test:page && npm run test:ids && npm run test:rows && npm run test:stale && npm run test:lab && npm run test:cors && npm run test:ws && npm run test:links && npm run test:paper && npm run test:chart && npm run test:settlement && npm run test:demo-safety && npm run test:writers && npm run test:privacy && npm run test:highroi && npm run test:topic-integrity",
+    "test": "npm run test:engine && npm run test:feed && npm run test:feed-current && npm run test:rescore && npm run test:guard && npm run test:resolution && npm run test:page && npm run test:ids && npm run test:rows && npm run test:stale && npm run test:lab && npm run test:cors && npm run test:ws && npm run test:links && npm run test:paper && npm run test:chart && npm run test:settlement && npm run test:demo-safety && npm run test:writers && npm run test:privacy && npm run test:highroi && npm run test:topic-integrity && npm run test:console-chart",
     "test:stale": "node scripts/check_build_staleness.mjs",
     "test:paper": "node scripts/check-paper.mjs",
     "test:settlement": "node scripts/check-settlement-ts.mjs",
@@ -26,7 +26,8 @@
     "test:writers": "node scripts/check-workflow-site-consistency.mjs",
     "test:privacy": "node scripts/check-account-privacy.mjs",
     "test:highroi": "node scripts/highroi-composition.mjs --check",
-    "test:topic-integrity": "node scripts/check-topic-and-resolved-integrity.mjs"
+    "test:topic-integrity": "node scripts/check-topic-and-resolved-integrity.mjs",
+    "test:console-chart": "node scripts/check-console-chart.mjs"
   },
   "devDependencies": {
     "jsdom": "^25.0.1"
