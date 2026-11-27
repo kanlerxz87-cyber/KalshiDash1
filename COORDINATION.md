@@ -11,6 +11,54 @@ Arena branch `arena/155a1ceb-kalshidash1`, based on `5a1579067e8ac7238ce80f2672f
 | R3 | Record release readiness. | done — latest Pages workflow for the base commit succeeded (run 46045170290); public landing page fetched successfully. No site/data change was required, so no PR or new deployment was necessary. | session-155a1ceb | this section |
 
 
+## Session session-69be5016 — live-console chart integrity: 5-minute and 1-hour windows cannot render (2026-11-27)
+
+**Session ID:** `session-69be5016`. Arena-pinned branch `arena/69be5016-kalshidash1` (branch name is fixed in this
+environment), branched from `main` @ `5a15790` (the PR #138 merge). Board read before claiming. **No open pull requests**
+at claim time; every recent run on `main` is green (`site-qa`, `suite-qa`, `alerts-qa` — runs 2026-11-27T22:24Z).
+
+**Baseline established before any edit (this session):** `npm ci` clean; full `npm test` **exit 0, all 22 suites green**
+(engine, feed, feed-current, rescore, guard, resolution, page, ids, rows, stale, lab, cors, ws, links, paper, chart,
+settlement, demo-safety, writers, privacy, highroi, topic-integrity). No pre-existing red gate was bypassed.
+
+**Reproduced defect (measured, not inferred).** The alert console's own "Live price chart — highest-dollar contract"
+(`alerts/index.html` §Live price chart, drawn by `alerts/js/alerts-page.js` `drawChart()`) offers five windows —
+**5 min · 1 hour · 6 hours · 24 hours · 7 days** — but in the committed engine sample
+`data/live/feed.json` (`meta.generated_at` 2026-11-27T17:34:38Z) **not one of the 25 chart candidates has two samples
+inside the 5-minute or the 1-hour window**. Measured per candidate against `feed.history`: 5 min → **0/25** candidates
+reach the 2 points the renderer needs (its own guard is `pts.length < 2`), 1 hour → **0/25**, 6 h → 4/25, 24 h → 4/25,
+7 d → 4/25; **21 of the 25 highest-ranked candidates have no history array at all**. Cause: `A.history(ticker)` returns
+only `state.live.history` (accumulated while *this tab* is open and able to reach the API) or `feed.history` (one point
+per engine run). The engine's declared `*/10` cron is delivered far less often (documented **F-83**; measured schedule
+runs today at 14:24Z then a 10-hour gap), so the two shortest windows are structurally empty in the committed record.
+The empty state is honest (it prints "Not enough samples in this window yet"), but two of the five advertised windows
+cannot show data, which fails the brief's requirement for a price-movement graph with selectable
+seconds/minutes/hours timestamp lengths. The separate market page (`market.html`, `assets/app.js`) already solves this
+correctly by reading the official candlestick endpoint and is **not** affected.
+
+**Claimed scope (non-overlapping; this session edits only these):**
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| G1 | Claim scope on this board; commit and push the claim before any other edit. | in progress | session-69be5016 | this section of `COORDINATION.md` only |
+| G2 | Fix the console chart so every advertised window is fed from **official exchange data**: add a browser-side candlestick fetch (documented `GET /series/{series}/markets/{ticker}/candlesticks`) for the selected market, merged with the engine feed and the browser samples, de-duplicated, each point retaining its exact `source_url`; keep the honest empty state and never invent a price. | unclaimed → this session | session-69be5016 | `alerts/js/alerts-live.js`, `alerts/js/alerts-page.js`, `alerts/index.html` |
+| G3 | Add an offline regression gate that reproduces the defect and proves the fix: the console chart must offer the brief's granularities, must request the official candlestick path with a documented `period_interval`, and must not render a window it cannot source. Wire it into `package.json` (`test:console-chart`) and one `site-qa.yml` step. | unclaimed → this session | session-69be5016 | `scripts/check-console-chart.mjs` (new), `package.json`, `.github/workflows/site-qa.yml` |
+| G4 | Publish a dated verification record with official source links and a **"Brief requirements, line by line"** traceability table (every requirement in the request → where it is met → the official source → verified / unverified), re-fetched from docs.kalshi.com during this session. | unclaimed → this session | session-69be5016 | `verification/2026-11-27-69be5016.md` (new) |
+| G5 | Publish the chart finding as its own Flagged-row (`F-CHART-02`) with official source links, regenerate every page strictly through `scripts/build-site.mjs`, run the full QA battery, open a PR from this branch, merge when green without waiting for approval, confirm the Pages build, and record the result here. | unclaimed → this session | session-69be5016 | `templates/flagged.tpl`, generated `*.html`, `COORDINATION.md`, PR metadata |
+
+**Explicitly out of scope (not touched, to avoid conflicting with other sessions):** `data/live/feed.json` and
+`data/snapshot.json` (regenerated only by the scheduled workflows, never hand-edited), `tools/live_engine.mjs`,
+`EXECUTIVE_SUMMARY.md` and `templates/executive-summary.tpl`, index/navigation (owned by integration), and the two
+legacy suites (`dash/`, `docs/`). If a change is needed in any of them it is logged here as a request instead.
+
+**Already-checked, NOT defects (recorded so no session re-does this work).** (a) Culture showing 0 open markets is
+**not** a filter bug: the official tag map (`/search/tags_by_categories`, committed snapshot) has no `Culture` key, but
+`GET /series?category=Culture` genuinely returns 2 series, which the repo already documents precisely as
+**F-04 → F-50 → F-52** with live evidence. This session reproduced the same conclusion and changed nothing.
+(b) The 122-alert feed's repeated `KXBTCY-27JAN0100-B97500` 0.97↔0.01 rows are **not** duplicate alerts: measured
+0 violations of the 15-minute `collapseDuplicates` invariant across 106 consecutive same-ticker pairs, and both the feed
+gate (`scripts/check_alerts.mjs`) and the offline suite already assert that invariant.
+
 ## Session session-528c51c9 — measured anonymous WebSocket-handshake evidence + fresh CORS re-probe (2026-11-27)
 
 Arena-pinned branch `arena/528c51c9-kalshidash1`, branched from `main` @ `a2816c5`. Board read before claiming. Concurrent sessions observed at claim time and their scopes avoided: session-21cc79b6 (read-only audit, `verification/2026-11-27-21cc79b6.md`), session-49860fd0 (read-only audit, `verification/2026-11-27-49860fd0.md`), session-ea9234db (`EXECUTIVE_SUMMARY.md` + executive-summary template/generated page), session-1b163877 (final integration: own verification record; `scripts/`/`tools/`/`assets/` only where a defect is reproduced; README release record), session-cc57fe69 (audit withdrawn, observations only). This session overlaps none of them: it adds NEW files, one entry each in two shared dev-QA files, and re-runs an existing manual workflow. No templates, generated HTML, `README.md`, index/nav, `data/live/`, or any active session's file is edited.
