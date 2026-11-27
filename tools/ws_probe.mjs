@@ -469,7 +469,19 @@ async function probeHost(rawUrl, { allowLoopback = false, commandWaitMs, eventsW
   while (pending.length && attemptNo < 4) {
     const job = pending.shift();
     attemptNo += 1;
-    const jobUrl = assertProbeUrl(job.url, { allowLoopback, anyPath: !!job.anyPath });
+    let jobUrl;
+    try {
+      jobUrl = job.prevalidated ? new URL(job.url) : assertProbeUrl(job.url, { allowLoopback, anyPath: !!job.anyPath });
+    } catch (err) {
+      if (attemptNo === 1 && !job.prevalidated) throw err; // misuse of the tool: fail loudly
+      result.attempts.push({
+        attempt: attemptNo, requested_url: String(job.url), variant: job.variant, note: job.note || null,
+        upgraded: false, http_status: null, status_message: null, headers: {}, body_snippet: null,
+        sec_websocket_accept_matches: null, error: 'DEMO-ONLY guard rejected follow target: ' + err.message, ms: 0,
+      });
+      result.anonymous_handshake = result.attempts[result.attempts.length - 1];
+      continue;
+    }
     const up = await rawUpgradeRequest(jobUrl, upgradeTimeoutMs, { origin: job.variant !== 'no_origin' });
     const entry = {
       attempt: attemptNo,
@@ -500,19 +512,28 @@ async function probeHost(rawUrl, { allowLoopback = false, commandWaitMs, eventsW
       entry.redirect_location = loc;
       try {
         const target = new URL(loc, jobUrl);
-        const demoHost = allowLoopback
-          ? isLoopback(target.hostname) // selftest fixtures redirect within loopback only
-          : DEMO_WS_HOSTS.includes(target.hostname.toLowerCase());
-        if (demoHost && ['wss:', 'https:', 'ws:', 'http:'].includes(target.protocol)) {
-          entry.followed_to = target.toString();
-          if (!followedChain) {
-            followedChain = true;
-            pending.unshift({ url: target.toString(), variant: job.variant, anyPath: true, note: 'followed 3xx Location (one hop max)' });
-          } else {
-            entry.follow_blocked_by = 'redirect chain already followed once';
-          }
+        if (target.username || target.password) {
+          entry.follow_blocked_by = 'DEMO-ONLY guard: redirect target carries credentials';
         } else {
-          entry.follow_blocked_by = 'DEMO-ONLY guard: redirect target is not a documented demo host';
+          const demoHost = allowLoopback
+            ? isLoopback(target.hostname) // selftest fixtures redirect within loopback only
+            : DEMO_WS_HOSTS.includes(target.hostname.toLowerCase());
+          // A wss→https 301 is common (the upgrade request over TLS gets a plain HTTP answer),
+          // so follow jobs may use wss OR https on demo hosts; ws/http only in loopback selftests.
+          const schemeOk = allowLoopback
+            ? ['ws:', 'wss:'].includes(target.protocol)
+            : ['wss:', 'https:'].includes(target.protocol);
+          if (demoHost && schemeOk) {
+            entry.followed_to = target.toString();
+            if (!followedChain) {
+              followedChain = true;
+              pending.unshift({ url: target.toString(), variant: job.variant, prevalidated: true, note: 'followed 3xx Location (one hop max)' });
+            } else {
+              entry.follow_blocked_by = 'redirect chain already followed once';
+            }
+          } else {
+            entry.follow_blocked_by = 'DEMO-ONLY guard: redirect target is not a documented demo host (or its scheme is refused)';
+          }
         }
       } catch {
         entry.follow_blocked_by = 'invalid redirect Location';
