@@ -3932,3 +3932,18 @@ Sources used by this session (all fetched/read 2026-11-25): [Kalshi demo environ
 `gh api` Pages/pages-builds/runs probes; committed `data/snapshot.json`/`data/live/feed.json` metadata. Constraints honored throughout: no credentials requested, no
 authenticated API read, no order placed, no inferred values — unverified items stay blank on Flagged for Review.
 
+
+## Session `arena/5d35b42d-kalshidash1` — independent current-state + line-by-line verification (2026-11-27)
+
+**Session ID:** `session-5d35b42d`. Arena-pinned branch `arena/5d35b42d-kalshidash1`, branched from `main` @ `a2816c54` (engine sample 2026-11-27T14:25:01Z). Board read before claiming.
+
+**Observed state at claim time (2026-11-27 ~17:20 UTC):** no open PRs; Pages `built`/`error: null` for `a2816c54`; committed feed `generated_at` 2026-11-27T14:24:49Z (~176 min old, past the 45-min stale limit); last scheduled `live-alerts` run 46015672033 (created 14:24:37Z) succeeded and produced `a2816c54`, with no scheduled run since — scheduler stall consistent with the documented GitHub delay/drop behaviour already flagged as F-83. Concurrent sessions `arena/ea9234db-kalshidash1` (executive-summary audit claim) and `arena/1b163877-kalshidash1` (final-integration claim) hold those scopes; this session does not touch `EXECUTIVE_SUMMARY.md`, `executive-summary.html`, templates, generated pages, or data files.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| V1 | Claim scope, commit and push immediately. | in progress | session-5d35b42d | this section of `COORDINATION.md` |
+| V2 | Independent current-state verification: re-read official Kalshi docs (demo env, API environments, market-data quick start, orderbook, settlement, order placement, get-market), cross-check live demo API (exchange status, Culture series/open markets, gas series), probe Pages/workflows/freshness via `gh`, run offline gates (`npm test`, `build-site --check`, link check). Record with source links; blank/flag anything unverifiable. | unclaimed | session-5d35b42d | new `verification/2026-11-27-5d35b42d.md`, this section |
+| V3 | Line-by-line requirement audit: each user requirement vs the published implementation, with official source links; log any defect as a request here instead of editing another session's files. | unclaimed | session-5d35b42d | `verification/2026-11-27-5d35b42d.md`, this section |
+| V4 | Integration: PR from this branch to `main`, merge without waiting for approval, confirm Pages `built` with no error, record PR link + merge result here. | unclaimed | session-5d35b42d | PR metadata, this section |
+
+Constraints honored: no credentials requested or stored, no authenticated API read, no order placed, no inferred values — unverified items stay blank and are flagged for review.
