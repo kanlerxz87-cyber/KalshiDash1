@@ -274,9 +274,12 @@
         </tr>
         <tr>
           <td>S-05</td>
-          <td><strong>Candle-based chart for every window</strong></td>
+          <td><strong>Candle-based chart for every window</strong> <span class="badge good">Implemented 2026-11-27</span></td>
           <td>Fills gaps where the sampler was not running, so the chart is continuous instead of dotted.</td>
-          <td>Already used for alert detection; needs to be stored per window (1 min / 60 min / 1 day intervals).</td>
+          <td><strong>Done for this chart</strong> (session-69be5016, <a href="../flagged.html#F-CHART-02">F-CHART-02</a>): every window now merges the
+            official traded candle close (1-minute, 1-hour or 1-day period, chosen to fit the 5,000-period cap) with the recorded
+            samples, and the caption states how many points are official. Still open: persisting one candle series per window in the
+            engine feed, so a closed page keeps the same resolution without re-requesting it.</td>
           <td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Get Market Candlesticks</a></td>
         </tr>
         <tr>

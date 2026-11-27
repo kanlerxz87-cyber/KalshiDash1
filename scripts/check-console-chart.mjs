@@ -290,6 +290,10 @@ check(/candlestick request failed/.test(pageSrc), 'H4: a failed candlestick requ
 check(/get-market-candlesticks/.test(html), 'H5: the page must link the official candlestick documentation');
 check(/F-CHART-02/.test(html), 'H6: the page must cite the finding it fixes');
 check(/export/.test('') === false && /function fetchCandles/.test(liveSrcStatic), 'H7: the fetch lives in the data layer');
+/* The suggestions board must not still describe the candle chart as unimplemented. The page's
+ * own preamble says "Nothing here is implemented yet unless it says so", so S-05 has to say so. */
+check(/Candle-based chart for every window[\s\S]{0,200}Implemented 2026-11-27/.test(html),
+  'H8: suggestion S-05 must be marked implemented now that the chart sources official candles');
 
 /* ------------------------------------------------------------------ report */
 
