@@ -1,0 +1,605 @@
+{
+  "checked_at": "2026-11-27T22:37:56.377Z",
+  "verified": true,
+  "scope": "citations to docs.kalshi.com only (existence/form, not page content)",
+  "method": "Every docs.kalshi.com citation found in templates/*.tpl and data/sources.json is reduced to its canonical page URL and looked up in the publisher's own listings: llms.txt (the documentation index) and sitemap.xml. Two URL forms are normalised onto one key (/path and /path.md). Existence and form only — page content is not read, so this file never asserts what a page says.",
+  "sources": {
+    "llms_txt": {
+      "url": "https://docs.kalshi.com/llms.txt",
+      "entry": "fetched",
+      "pages_listed": 296
+    },
+    "sitemap_xml": {
+      "url": "https://docs.kalshi.com/sitemap.xml",
+      "entry": "fetched",
+      "pages_listed": 296
+    }
+  },
+  "summary": {
+    "distinct_citations": 31,
+    "ok": 31,
+    "broken": 0,
+    "broken_pages": []
+  },
+  "citations": [
+    {
+      "target": "https://docs.kalshi.com/api-reference/events/get-events",
+      "forms": [
+        "markdown",
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/api.tpl",
+        "templates/catalyst.tpl",
+        "templates/flagged.tpl",
+        "templates/requirements.tpl",
+        "templates/strategylab.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/events/get-events",
+      "page": "https://docs.kalshi.com/api-reference/events/get-events",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/exchange/get-exchange-status",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "templates/api.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/exchange/get-exchange-status",
+      "page": "https://docs.kalshi.com/api-reference/exchange/get-exchange-status",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/market/get-market",
+      "forms": [
+        "markdown",
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/api.tpl",
+        "templates/catalyst.tpl",
+        "templates/flagged.tpl",
+        "templates/market.tpl",
+        "templates/strategies.tpl",
+        "templates/strategylab.tpl",
+        "templates/suggestions.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/market/get-market",
+      "page": "https://docs.kalshi.com/api-reference/market/get-market",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+      "forms": [
+        "markdown",
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/api.tpl",
+        "templates/catalyst.tpl",
+        "templates/flagged.tpl",
+        "templates/requirements.tpl",
+        "templates/suggestions.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+      "page": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/market/get-market-orderbook",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/api.tpl",
+        "templates/flagged.tpl",
+        "templates/questions.tpl",
+        "templates/requirements.tpl",
+        "templates/strategies.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/market/get-market-orderbook",
+      "page": "https://docs.kalshi.com/api-reference/market/get-market-orderbook",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/market/get-markets",
+      "forms": [
+        "markdown",
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/api.tpl",
+        "templates/catalyst.tpl",
+        "templates/flagged.tpl",
+        "templates/questions.tpl",
+        "templates/strategylab.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/market/get-markets",
+      "page": "https://docs.kalshi.com/api-reference/market/get-markets",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/market/get-series",
+      "forms": [
+        "markdown"
+      ],
+      "cited_in": [
+        "templates/flagged.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/market/get-series",
+      "page": "https://docs.kalshi.com/api-reference/market/get-series",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/market/get-series-list",
+      "forms": [
+        "markdown",
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/api.tpl",
+        "templates/flagged.tpl",
+        "templates/questions.tpl",
+        "templates/requirements.tpl",
+        "templates/suggestions.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/market/get-series-list",
+      "page": "https://docs.kalshi.com/api-reference/market/get-series-list",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/market/get-trades",
+      "forms": [
+        "markdown",
+        "page"
+      ],
+      "cited_in": [
+        "templates/flagged.tpl",
+        "templates/questions.tpl",
+        "templates/suggestions.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/market/get-trades",
+      "page": "https://docs.kalshi.com/api-reference/market/get-trades",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/orders/create-order-v2",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/api.tpl",
+        "templates/flagged.tpl",
+        "templates/questions.tpl",
+        "templates/requirements.tpl",
+        "templates/strategylab.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/orders/create-order-v2",
+      "page": "https://docs.kalshi.com/api-reference/orders/create-order-v2",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/portfolio/get-balance",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "templates/api.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/portfolio/get-balance",
+      "page": "https://docs.kalshi.com/api-reference/portfolio/get-balance",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/portfolio/get-fills",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "templates/api.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/portfolio/get-fills",
+      "page": "https://docs.kalshi.com/api-reference/portfolio/get-fills",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/portfolio/get-positions",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "templates/api.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/portfolio/get-positions",
+      "page": "https://docs.kalshi.com/api-reference/portfolio/get-positions",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/portfolio/get-settlements",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "templates/api.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/portfolio/get-settlements",
+      "page": "https://docs.kalshi.com/api-reference/portfolio/get-settlements",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories",
+      "forms": [
+        "markdown",
+        "page"
+      ],
+      "cited_in": [
+        "templates/api.tpl",
+        "templates/flagged.tpl"
+      ],
+      "url": "https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories",
+      "page": "https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/api_environments",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/index.tpl",
+        "templates/questions.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/api_environments",
+      "page": "https://docs.kalshi.com/getting_started/api_environments",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/api_keys",
+      "forms": [
+        "markdown",
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/demo-account.tpl",
+        "templates/flagged.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/api_keys",
+      "page": "https://docs.kalshi.com/getting_started/api_keys",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/demo_env",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/api.tpl",
+        "templates/catalyst.tpl",
+        "templates/demo-account.tpl",
+        "templates/executive-summary.tpl",
+        "templates/flagged.tpl",
+        "templates/index.tpl",
+        "templates/questions.tpl",
+        "templates/requirements.tpl",
+        "templates/strategylab.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/demo_env",
+      "page": "https://docs.kalshi.com/getting_started/demo_env",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/fixed_point_migration",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "templates/api.tpl",
+        "templates/catalyst.tpl",
+        "templates/flagged.tpl",
+        "templates/strategylab.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/fixed_point_migration",
+      "page": "https://docs.kalshi.com/getting_started/fixed_point_migration",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/market_lifecycle",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/executive-summary.tpl",
+        "templates/flagged.tpl",
+        "templates/index.tpl",
+        "templates/market.tpl",
+        "templates/markets.tpl",
+        "templates/portfolio.tpl",
+        "templates/questions.tpl",
+        "templates/requirements.tpl",
+        "templates/suggestions.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/market_lifecycle",
+      "page": "https://docs.kalshi.com/getting_started/market_lifecycle",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/market_settlement",
+      "forms": [
+        "markdown",
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/catalyst.tpl",
+        "templates/executive-summary.tpl",
+        "templates/flagged.tpl",
+        "templates/index.tpl",
+        "templates/market.tpl",
+        "templates/markets.tpl",
+        "templates/portfolio.tpl",
+        "templates/questions.tpl",
+        "templates/requirements.tpl",
+        "templates/strategylab.tpl",
+        "templates/suggestions.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/market_settlement",
+      "page": "https://docs.kalshi.com/getting_started/market_settlement",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/order_direction",
+      "forms": [
+        "markdown"
+      ],
+      "cited_in": [
+        "templates/flagged.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/order_direction",
+      "page": "https://docs.kalshi.com/getting_started/order_direction",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/order_errors",
+      "forms": [
+        "markdown"
+      ],
+      "cited_in": [
+        "templates/demo-account.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/order_errors",
+      "page": "https://docs.kalshi.com/getting_started/order_errors",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/orderbook_responses",
+      "forms": [
+        "markdown",
+        "page"
+      ],
+      "cited_in": [
+        "templates/flagged.tpl",
+        "templates/market.tpl",
+        "templates/requirements.tpl",
+        "templates/strategies.tpl",
+        "templates/suggestions.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/orderbook_responses",
+      "page": "https://docs.kalshi.com/getting_started/orderbook_responses",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/quick_start_authenticated_requests",
+      "forms": [
+        "markdown",
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/demo-account.tpl",
+        "templates/flagged.tpl",
+        "templates/index.tpl",
+        "templates/questions.tpl",
+        "templates/requirements.tpl",
+        "templates/suggestions.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/quick_start_authenticated_requests",
+      "page": "https://docs.kalshi.com/getting_started/quick_start_authenticated_requests",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/quick_start_create_order",
+      "forms": [
+        "markdown"
+      ],
+      "cited_in": [
+        "templates/demo-account.tpl",
+        "templates/flagged.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/quick_start_create_order",
+      "page": "https://docs.kalshi.com/getting_started/quick_start_create_order",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/quick_start_market_data",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/executive-summary.tpl",
+        "templates/flagged.tpl",
+        "templates/index.tpl",
+        "templates/questions.tpl",
+        "templates/requirements.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/quick_start_market_data",
+      "page": "https://docs.kalshi.com/getting_started/quick_start_market_data",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/quick_start_websockets",
+      "forms": [
+        "markdown",
+        "page"
+      ],
+      "cited_in": [
+        "templates/executive-summary.tpl",
+        "templates/flagged.tpl",
+        "templates/suggestions.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/quick_start_websockets",
+      "page": "https://docs.kalshi.com/getting_started/quick_start_websockets",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/rate_limits",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/catalyst.tpl",
+        "templates/questions.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/rate_limits",
+      "page": "https://docs.kalshi.com/getting_started/rate_limits",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/getting_started/settlement_bounds",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "templates/executive-summary.tpl",
+        "templates/flagged.tpl"
+      ],
+      "url": "https://docs.kalshi.com/getting_started/settlement_bounds",
+      "page": "https://docs.kalshi.com/getting_started/settlement_bounds",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    },
+    {
+      "target": "https://docs.kalshi.com/websockets/websocket-connection",
+      "forms": [
+        "page"
+      ],
+      "cited_in": [
+        "data/sources.json",
+        "templates/dashboard.tpl",
+        "templates/executive-summary.tpl",
+        "templates/flagged.tpl",
+        "templates/questions.tpl",
+        "templates/requirements.tpl"
+      ],
+      "url": "https://docs.kalshi.com/websockets/websocket-connection",
+      "page": "https://docs.kalshi.com/websockets/websocket-connection",
+      "form": "page",
+      "in_sitemap": true,
+      "in_llms_index": true,
+      "verdict": "ok"
+    }
+  ]
+}

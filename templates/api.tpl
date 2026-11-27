@@ -53,7 +53,7 @@
           <td><a href="https://docs.kalshi.com/api-reference/exchange/get-exchange-status" target="_blank" rel="noopener">Exchange status</a></td></tr>
         <tr><td><code>GET /search/tags_by_categories</code></td><td>The official category → tag taxonomy, used to select the golf series.</td>
           <td>category keys and their tag lists</td>
-          <td><a href="https://docs.kalshi.com/api-reference/search/get-tags-by-categories" target="_blank" rel="noopener">Tags by category</a></td></tr>
+          <td><a href="https://docs.kalshi.com/api-reference/search/get-tags-for-series-categories" target="_blank" rel="noopener">Get Tags for Series Categories</a></td></tr>
         <tr><td><code>GET /series?category=…&amp;tags=…&amp;include_volume=true</code></td><td>Topic discovery for all five topics.</td>
           <td><code>ticker</code>, <code>title</code>, <code>category</code>, <code>tags</code>, <code>volume_fp</code>,
           <code>settlement_sources</code>, <code>contract_terms_url</code></td>

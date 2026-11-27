@@ -10,7 +10,6 @@ Arena branch `arena/155a1ceb-kalshidash1`, based on `5a1579067e8ac7238ce80f2672f
 | R2 | Re-check official demo/API and orderbook semantics, run local QA and inspect existing integration/release evidence; log accurate current limitations. | done — official docs re-fetched; full test, build, source-row, and internal-link checks pass; no new discrepancy reproduced. Audit record documents account/backend and cadence limits. | session-155a1ceb | `verification/2026-11-27-155a1ceb.md`, this section |
 | R3 | Record release readiness. | done — latest Pages workflow for the base commit succeeded (run 46045170290); public landing page fetched successfully. No site/data change was required, so no PR or new deployment was necessary. | session-155a1ceb | this section |
 
-
 ## Session session-69be5016 — live-console chart integrity: 5-minute and 1-hour windows cannot render (2026-11-27)
 
 **Session ID:** `session-69be5016`. Arena-pinned branch `arena/69be5016-kalshidash1` (branch name is fixed in this
@@ -455,8 +454,6 @@ Arena fixes this session's branch name as `arena/4251f2d1-kalshidash1`. Prior wo
 |---|---|---|---|
 | Investigate failing scheduled snapshot and live-alert workflows; implement and verify a targeted fix if supported by evidence, otherwise flag the limitation | done — main push-triggered write-back observed | session-4251f2d1 | `.github/workflows/refresh-data.yml`, `.github/workflows/live-alerts.yml`, `scripts/check-data-workflow-shells.mjs`, `templates/flagged.tpl`, generated `flagged.html`, this board section |
 
-
-
 ### PR, merge and deployment — session-4251f2d1
 
 - [PR #41](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/41) merged 2026-11-21 06:28:36 UTC; merge commit `41a263bbb8e3d76eff066bfe42e9a50199cf9d72`. All PR checks passed, including feature-branch fetch and validation, which deliberately skip write-back.
@@ -727,7 +724,6 @@ Reproduction detail is in `verification/2026-11-21-7dc87913.md` §4.
 - GitHub `schedule` delay/drop caveat: <https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule>
 - `verification/2026-11-21-7dc87913.md` — the full record
 
-
 ## Session `session-b8fa3d44` — stale PR #39 alert-feed deduplication takeover (2026-11-21 UTC)
 
 - **Takeover basis:** PR #39 / `session-f7490df7` has no commits since 2026-11-20 19:36 UTC, well beyond the board’s 60-minute handoff threshold. Its two-file scope does not overlap active PR #43 (`COORDINATION.md`, docs, flags, verification) or PR #45 (executive-summary freshness and verification). The scheduled-workflow scope previously considered by this session was already completed in PR #41/#44, so it is not touched.
@@ -860,7 +856,6 @@ See `verification/2026-11-20-dd012e26.md` for the exact scope, methods and evide
 - Post-deploy correction PR #37: https://github.com/kanlerxz87-cyber/KalshiDash1/pull/37 — corrected F-52's link to F-50 after the deployed page was inspected; merged with commit `82f5f0ba4e7c729707f15666b7bf3802ba2db1e7` at 2026-11-20T19:29:09Z. All four PR checks passed.
 - GitHub Pages: `pages-build-deployment` run 44802145793 succeeded for PR #32; after PR #37, the Pages API reported `built`, `error: null`, at merge commit `82f5f0ba4e7c729707f15666b7bf3802ba2db1e7` (2026-11-20T19:29:39Z). The public landing page and Flagged for Review page were fetched. The final deployed F-52 row now points to F-50.
 - Follow-up workflow result: on `main`, `Refresh demo data snapshot` run 44802297690 and `live-alerts` run 44802297778 failed at their commit/write-back step, although capture, regeneration, links, API sample and feed validation passed. Raw GitHub Actions logs could not be downloaded from this sandbox, so exact command errors are unverified. This remains F-44 and is **not claimed as fixed**; feature-branch workflow runs now skip write-back intentionally. Site build/tests/deploy themselves passed.
-
 
 ---
 
@@ -1190,9 +1185,6 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review` (published 
 - **Irregularities / flags (non-blocking, on dash/flagged.html):** F-08 poll latency + REST caching lag; F-09 heuristic models (published formulas); F-10 auto-trade concentration on hourly demo BTC markets; F-11 engines are browser-local (run only while their page is open); F-12 cause links include labeled auto-generated news pointers. F-04 updated with the new LIVE-mode evidence.
 - **This record** lands on `main` via the follow-up PR created after the merge of #21 (a record cannot contain its own merge commit — same pattern as PR #10's post-merge record).
 
-
-
-
 ### Reconciliation — parallel alerts implementations merged (2026-11-20)
 
 PR #15 (`arena/815b546d-kalshidash1`) and this session independently implemented the same missing brief items
@@ -1271,7 +1263,6 @@ Decision: this session did the full site on its own branch, because it may only 
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review` (published on the Flagged page; does not block).
 
-
 ## Claim — session-cb49437b (2026-11-20)
 
 - **Session ID:** `session-cb49437b`
@@ -1298,7 +1289,6 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review` (published 
 | T-A4 | Verification + integration + PR/merge/deploy | unclaimed | — | — |
 
 Claim pushed immediately per the board convention.
-
 
 ### session-cb49437b — completion record (2026-11-20)
 
@@ -1380,7 +1370,6 @@ loads from the project subpath.
 - Checks not run: GitHub Actions workflow `pages.yml` was not registered for this repo (no runs; Actions settings not readable with the token). Equivalent checks were run locally (see above).
 - Open items for the owner (see Flagged page): F-01 browser CORS to the demo API untested; F-07 no demo key, so no portfolio or trades; F-15 contradiction in a prior note about gas markets; F-14 Pages source choice.
 - Pages: the token got HTTP 403 when changing Pages to the workflow build type or to `/docs` (repo admin needed). The existing legacy source (`main`, `/`) is used, so the site is at the repo root.
-
 
 ## Session arena/815b546d-kalshidash1 — live alert feeds + automated simulated trades (current session)
 
@@ -1824,7 +1813,6 @@ the Flagged for Review page.
   - PR #19 (session 7f90cf50, `catalyst.html` and `strategylab.html`): their content, CSS and scripts are kept. Both pages are now built from `templates/catalyst.tpl` and `templates/strategylab.tpl` inside the shared navigation (Overview → More), and the `trading.html` link points to `portfolio.html`. Their meta descriptions are kept verbatim.
 - **Flagged for review (open items for the reviewer):** F-01 to F-33 on `flagged.html`. Nothing blocks the merge. F-07 is superseded by F-24 (the demo account is wired, but no real order has been placed).
 
-
 ## Verification performed (session-ef745c36, 2026-11-20)
 
 - Read each official page with the fetch tool and recorded the URL in `scripts/build-site.mjs` (`S` object) and on the Sources page.
@@ -1853,7 +1841,6 @@ the Flagged for Review page.
 - Checks not run: GitHub Actions workflow `pages.yml` was not registered for this repo (no runs; Actions settings not readable with the token). Equivalent checks were run locally (see above).
 - Open items for the owner (see Flagged page): F-01 browser CORS to the demo API untested; F-07 no demo key, so no portfolio or trades; F-15 contradiction in a prior note about gas markets; F-14 Pages source choice.
 - Pages: the token got HTTP 403 when changing Pages to the workflow build type or to `/docs` (repo admin needed). The existing legacy source (`main`, `/`) is used, so the site is at the repo root.
-
 
 ## Session arena/815b546d-kalshidash1 — live alert feeds + automated simulated trades (current session)
 
@@ -2616,7 +2603,6 @@ Post-merge state at 20:29 UTC: `main` = `7b4b4d1`; `npm test` exit 0; `build-sit
 - **Irregularities:** stale-feed limit, BTC `$0.97`/`$0.01` flap (F-BFC-03), sandbox-blocked external fetches and 60-day schedule auto-disable — all retained as published on flagged.html; no unverified value was fabricated.
 - **Parallel-session note:** fd481e62 (PR #58), 93edc454 (PR #59), 549a3b66 (PR #57) record their own integration passes; c85ee474 (PR #62) is open. Their records were retained; one COORDINATION.md conflict was resolved by keeping both sections; the rebasing never discarded the other sessions' work.
 
-
 ---
 
 ## Session `arena/c85ee474-kalshidash1` — browser-CORS determination pass (2026-11-21 UTC)
@@ -3059,7 +3045,6 @@ Overlap check: PR #72 (`arena/e7260519-kalshidash1`) is open and covers alert mo
 - **GitHub Pages deployment:** `pages/builds/latest` for merge commit `31f93a487a8352151aab54a8e32b7d690d3dfc82` → `status: "built"`, `error.message: null`, created `2026-11-21T23:27:23Z`, updated `2026-11-21T23:27:53Z`.
 - **Live post-deploy verification:** Fetched `https://kanlerxz87-cyber.github.io/KalshiDash1/` and `https://kanlerxz87-cyber.github.io/KalshiDash1/verification/2026-11-21-4068bcda.md` directly from GitHub Pages; both serve the merged content cleanly.
 
-
 ### Follow-up found while verifying the live deploy — F-79 (session-2ea8e33c)
 
 Reading the deployed alerts console at 2026-11-21T23:24Z showed **"No data available. Neither the
@@ -3170,7 +3155,6 @@ session's branch and did not recreate its content.
 | K4 | Take over stale PR #86: verify its ledger claims against official records, then merge or flag | **done** — PR #77 merge SHA/time, its check roll-up and the Pages retry all confirmed; its branch has an unrelated history, so its two-file diff was applied **verbatim** on this integration branch and the PR is closed as superseded (one wording inference flagged in §7.6) | session-736be760 | PR #86 files via replay only |
 | K5 | Fix only defects reproduced in K2–K3 (smallest change), re-run all gates | **done** — one unique fix published as **F-84**; the cadence prose fix was reverted because session-`b8913775` (PR #96) owns it as F-83 | session-736be760 | `templates/executive-summary.tpl`, `templates/flagged.tpl` + generated `executive-summary.html`, `flagged.html` (the `README.md`/`EXECUTIVE_SUMMARY.md` edits were reverted — see overlap note) |
 | K6 | Final integration: PR to `main`, merge, confirm GitHub Pages deploy of the new build, record PR link + merge SHA + deploy evidence | **done** — [PR #97](https://github.com/kanlerxz87-cyber/KalshiDash1/pull/97) merged as `4d436709433175c847396a052fbc6fa63bd97317`; Pages build `built`, `error: null` ([run 45001679023](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/45001679023)); the live page was re-read and now shows the corrected settlement sentence linking F-84 | session-736be760 | generated root pages via `scripts/build-site.mjs` only; this board |
-
 
 ### PR, merge and deployment record — session-736be760 (final)
 
@@ -3450,7 +3434,6 @@ this session applied only its one-line wording fix. No other open PR exists. No 
 Rules honoured: shared tables (`flagged.html`) change only in this integration phase; other sessions'
 sections, findings and scripts are preserved verbatim; every new claim goes through official source links.
 
-
 ### K1–K3 completion notes (session-8dcab433, 2026-11-22 08:2xZ)
 
 - **K1 done** — claim committed and pushed as the first commit on this branch (`a3e4160`), before any
@@ -3488,7 +3471,6 @@ sections, findings and scripts are preserved verbatim; every new claim goes thro
   `npm test` exit 0; `build-site --check` clean; 90 pages / 2,201 internal links / 0 broken; 342
   external URLs listed but **not fetched**; authenticated demo account still disconnected, so every
   account figure stays blank.
-
 
 ## Session session-f134d89d — authenticated demo-account safety and API audit (2026-11-22)
 
@@ -3593,7 +3575,6 @@ Egress: only github.com / api.github.com / codeload / npm registry / PyPI are re
 - No other active claim is older than 60 minutes. Historical merged sections above are records, not live locks.
   Shared generated pages (`*.html` from `templates/`) will only be regenerated by this session's final build step,
   after source edits pass their tests — the same rule earlier sessions followed.
-
 
 ### Conflict + handoff log — session-401144df
 
@@ -3744,7 +3725,6 @@ deriving-control variant. Per the board's duplicate-work precedent, **main's mer
 variant and its planned F-E43-01 / F-93 rows were withdrawn before publication to avoid a third copy of the same
 findings, and the duplicate-work record lives in `verification/2026-11-25-d6ae0eb2.md`. Nothing of any session's was
 reverted.
-
 
 ---
 
@@ -4059,7 +4039,6 @@ Sources used by this session (all fetched/read 2026-11-25): [Kalshi demo environ
 `gh api` Pages/pages-builds/runs probes; committed `data/snapshot.json`/`data/live/feed.json` metadata. Constraints honored throughout: no credentials requested, no
 authenticated API read, no order placed, no inferred values — unverified items stay blank on Flagged for Review.
 
-
 ## Session `arena/5d35b42d-kalshidash1` — independent current-state + line-by-line verification (2026-11-27)
 
 **Session ID:** `session-5d35b42d`. Arena-pinned branch `arena/5d35b42d-kalshidash1`, branched from `main` @ `a2816c54` (engine sample 2026-11-27T14:25:01Z). Board read before claiming.
@@ -4204,8 +4183,76 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review`.
 - **GitHub Pages deploy:** build `1409346749` (commit `684de09`, `2026-11-27T17:43:08Z`) completed `status: "built"`, `error: { message: null }`; live `https://kanlerxz87-cyber.github.io/KalshiDash1/index.html`, `categories/gas.html`, and `questions.html` re-fetched and verified.
 - **Conflict log (session-c23c0f31):** Merged `origin/main` @ `8838a4a` (after PR #132 and PR #133 landed). The single append conflict in `COORDINATION.md` was resolved by preserving `session-add70e82`'s full section intact followed by this section; zero files outside `COORDINATION.md` conflicted and nothing from any concurrent session was discarded.
 
+---
+
+## Session `arena/1a950f57-kalshidash1` — requirements-conformance verification + trader-verification/QA hardening (2026-11-27)
+
+**Session ID:** `session-1a950f57`. Arena-pinned branch `arena/1a950f57-kalshidash1`, branched from `main` @
+`5a1579067e8ac7238ce80f2672ff563a40a49f87` (PR #138 merge). Board read before claiming.
+
+**Concurrent sessions observed at claim time (2026-11-27T22:24–22:35Z), all audit-only, so none is duplicated here:**
+`arena/4fd9d11a` (claim: independent release and requirements audit), `arena/732e24f6` (claim: independent
+post-integration verification, new `verification/2026-11-27-732e24f6.md`), `arena/155a1ceb` (claim: current-tree
+verification audit). Those three are read-only audits publishing their own dated records; this session does **not**
+write a fourth audit record of the same facts and does **not** touch their files.
+
+**What is genuinely unclaimed at claim time:** the repo's external-source liveness audit is not enforced anywhere
+(`tools/external_link_audit.mjs` exists but no workflow runs it and CI has no general egress), the data-writer shell
+syntax gate only covers 3 of the 4 writer workflows, and no page states the session's requirement set in one
+reviewable table. This session claims exactly those three gaps.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| K1 | Claim this scope on the board; commit and push the claim before any other edit. | done | session-1a950f57 | this section of `COORDINATION.md` |
+| K2 | Make external-source verification automatic and re-runnable: add a documented opt-in `verify:external` audit that probes every `docs.kalshi.com` doc URL the site cites against the publisher's own `llms.txt` index (no guessing, no scraping of content), and wire it as a **non-blocking** signal so Pages never breaks on a publisher-side outage. | unclaimed | session-1a950f57 | new `scripts/check-external-sources.mjs`, new `data/external-source-check.json`, `package.json`, `.github/workflows/site-qa.yml` |
+| K3 | Close the shell-syntax gap: extend `scripts/check-data-workflow-shells.mjs` to every workflow that runs a block `run:` (currently 3 of 10; `demo-account.yml` is the only credential-bearing writer and is unchecked), with positive and negative controls. | unclaimed | session-1a950f57 | `scripts/check-data-workflow-shells.mjs` |
+| K4 | Publish one reviewable requirements-conformance table (each session requirement → where it is delivered → how it is verified → its known limitation), linking existing official sources rather than restating values; regenerate the published HTML through `scripts/build-site.mjs` only. | unclaimed | session-1a950f57 | new `templates/requirements.tpl`, generated `requirements.html`, `scripts/build-site.mjs` (PAGES + nav entry only), `templates/index.tpl` (one link) |
+| K5 | Full QA battery, PR to `main`, merge when green without waiting for approval, confirm the Pages build, and re-fetch the published pages; record the release here. | unclaimed | session-1a950f57 | PR metadata, this section |
+
+Sources for this session's verification work are official and fetched live on 2026-11-27 (page-fetch tool, since the
+sandbox egress allowlist excludes kalshi.co): `docs.kalshi.com/llms.txt` (the publisher's own page index),
+`docs.kalshi.com/sitemap.xml`, `docs.kalshi.com/getting_started/demo_env` (demo REST/WS endpoint table),
+`docs.kalshi.com/getting_started/orderbook_responses` and `docs.kalshi.com/api-reference/market/get-market-orderbook`
+(bids-only book, bid/ask reciprocity, empty book → 200), the live Demo API
+`external-api.demo.kalshi.co/trade-api/v2/exchange/status` and `.../markets?series_ticker=KXAAAGASM&status=open`.
+No credentials, no authenticated read, no order placed, and no value is inferred.
+
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
 
+## Session `arena/1a950f57-kalshidash1` — requirements-conformance verification + trader-verification/QA hardening (2026-11-27)
+
+**Session ID:** `session-1a950f57`. Arena-pinned branch `arena/1a950f57-kalshidash1`, branched from `main` @
+`5a1579067e8ac7238ce80f2672ff563a40a49f87` (PR #138 merge). Board read before claiming.
+
+**Concurrent sessions observed at claim time (2026-11-27T22:24–22:35Z), all audit-only, so none is duplicated here:**
+`arena/4fd9d11a` (claim: independent release and requirements audit), `arena/732e24f6` (claim: independent
+post-integration verification, new `verification/2026-11-27-732e24f6.md`), `arena/155a1ceb` (claim: current-tree
+verification audit). Those three are read-only audits publishing their own dated records; this session does **not**
+write a fourth audit record of the same facts and does **not** touch their files.
+
+**What is genuinely unclaimed at claim time:** the repo's external-source liveness audit is not enforced anywhere
+(`tools/external_link_audit.mjs` exists but no workflow runs it and CI has no general egress), the data-writer shell
+syntax gate only covers 3 of the 4 writer workflows, and no page states the session's requirement set in one
+reviewable table. This session claims exactly those three gaps.
+
+| ID | Task | Status | Owner | File scope (only these) |
+|---|---|---|---|---|
+| K1 | Claim this scope on the board; commit and push the claim before any other edit. | done (`c0921bc`, rebased since) | session-1a950f57 | this section of `COORDINATION.md` |
+| K2 | Make external-source verification automatic and re-runnable: add a documented opt-in `verify:external` audit that probes every `docs.kalshi.com` doc URL the site cites against the publisher's own `llms.txt` index (no guessing, no scraping of content), and wire it as a **non-blocking** signal so Pages never breaks on a publisher-side outage. | done — `scripts/check-external-sources.mjs` (20 offline checks + negative controls), `verify:external` + `test:external-sources` in `package.json`, offline coverage step in `site-qa.yml`, new `external-sources.yml` workflow (run [46076557700](https://github.com/kanlerxz87-cyber/KalshiDash1/actions/runs/46076557700) and later: evidence committed by the runner, 31 citations, 0 broken). **It found a real defect on its first run** — see K6. | session-1a950f57 | `scripts/check-external-sources.mjs`, `data/external-source-check.json`, `package.json`, `.github/workflows/site-qa.yml`, `.github/workflows/external-sources.yml` |
+| K3 | Close the shell-syntax gap: extend `scripts/check-data-workflow-shells.mjs` to every workflow that runs a block `run:` (currently 3 of 10; `demo-account.yml` is the only credential-bearing writer and is unchecked), with positive and negative controls. | done — discovers every workflow (24 block scripts across 11 files incl. `demo-account.yml`), asserts the discovery is non-empty and that the known writers keep their blocks, positive + negative controls. | session-1a950f57 | `scripts/check-data-workflow-shells.mjs` |
+| K4 | Publish one reviewable requirements-conformance table (each session requirement → where it is delivered → how it is verified → its known limitation), linking existing official sources rather than restating values; regenerate the published HTML through `scripts/build-site.mjs` only. | done — `requirements.html` (nav: Review group; one link from `index.html`), 20 rows, added to `check-row-sources.mjs` so it obeys the same rule as every other table. It restates no price or count, so it cannot drift from the sourced tables. | session-1a950f57 | `templates/requirements.tpl`, `requirements.html`, `scripts/build-site.mjs`, `templates/index.tpl`, `scripts/check-row-sources.mjs` |
+| K5 | Full QA battery, PR to `main`, merge when green without waiting for approval, confirm the Pages build, and re-fetch the published pages; record the release here. | in progress | session-1a950f57 | PR metadata, this section |
+| K6 | (added during K2) Publish the defect the new gate found, with official evidence, instead of silently fixing it. | done — `F-SOURCE-02` on `flagged.html`: `api.html` linked `.../search/get-tags-by-categories`, which Kalshi lists in neither `llms.txt` nor `sitemap.xml` and which does not serve a page; the documented page is `.../search/get-tags-for-series-categories` (HTTP 200, same endpoint). Fixed to the publisher's listed path. | session-1a950f57 | `templates/flagged.tpl`, `templates/api.tpl` |
+
+Sources for this session's verification work are official and fetched live on 2026-11-27 (page-fetch tool, since the
+sandbox egress allowlist excludes kalshi.co): `docs.kalshi.com/llms.txt` (the publisher's own page index),
+`docs.kalshi.com/sitemap.xml`, `docs.kalshi.com/getting_started/demo_env` (demo REST/WS endpoint table),
+`docs.kalshi.com/getting_started/orderbook_responses` and `docs.kalshi.com/api-reference/market/get-market-orderbook`
+(bids-only book, bid/ask reciprocity, empty book → 200), the live Demo API
+`external-api.demo.kalshi.co/trade-api/v2/exchange/status` and `.../markets?series_ticker=KXAAAGASM&status=open`.
+No credentials, no authenticated read, no order placed, and no value is inferred.
+
+Status key: `unclaimed` · `in progress` · `done` · `needs review`.
 
 ---
 
@@ -4274,8 +4321,12 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review`.
   `site-qa` **failure** alongside green `suite-qa`/`alerts-qa`/`external-sources`. That is not this branch and not on `main`; whoever
   integrates that branch should read the failing step before merging it.
 
-
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
+
+| A1 | Claim this audit scope before other edits. | in progress | session-6f817a1b | this section of `COORDINATION.md` |
+| A2 | Independently run the repository's full automated QA and inspect the canonical build/data/navigation/source-link contracts against official Kalshi docs; do not make any authenticated call or place an order. | done — `npm test` passed after `npm ci`; build freshness check, both internal link checkers (0 broken across 90 pages / 2,243 links), 624 HTML IDs (0 dupes), and 1,032 canonical source-linked rows passed. Official demo endpoints, market schema/orderbook depth, settlement and WS docs re-fetched 2026-11-27. Concurrent PR #139 (`session-155a1ceb`) independently claimed a read-only audit and published its own verification report before this audit closed; no duplicate report will be added. | session-6f817a1b | read-only; no verification report |
+| A3 | Record the audit overlap and scope a distinct correction to misleading alert-feed cadence copy, rather than duplicate the concurrent audit. | done — the deployed alert page said "Every time ... moves" / "scroll in real time" and in engine-only mode asserted the scheduled feed "stays current"; current official docs require authenticated WS, and measured Actions history has an 8-hour-old feed despite `*/10` cron (existing F-83). The landing/dashboard page meta descriptions also described alerts as "real-time" without qualification. | session-6f817a1b | this section, `alerts/index.html`, `alerts/js/alerts-page.js`, `templates/index.tpl`, `templates/dashboard.tpl`, generated `index.html`/`dashboard.html`, `scripts/check_alerts_page.mjs` |
+| A4 | Correct the alert page and SEO descriptions' absolute/overstated cadence wording; test the claims in the existing page suite, run QA, rebase/push this branch, open a PR, merge only if checks pass, and verify Pages. | code + QA done — `npm test`, build checks, 2 link checkers (0 broken), 1,032 source-linked rows, 624 IDs (0 dupes), and copy regression assertions pass; dated report [`verification/2026-11-27-6f817a1b.md`](verification/2026-11-27-6f817a1b.md) records official citations and measured cadence. PR/Pages verification pending. | session-6f817a1b | `alerts/index.html`, `alerts/js/alerts-page.js`, `templates/index.tpl`, `templates/dashboard.tpl`, generated `index.html`/`dashboard.html`, `scripts/check_alerts_page.mjs`, new `verification/2026-11-27-6f817a1b.md`, this section |
 
 **Session-8e28c889 close-out (2026-11-27 22:42Z):** E1–E7 done. Net effect on the published site: the alert feed moved from
 291.5 minutes stale to 2.3 minutes fresh (run 46076632008 → commit `762c596`), the executive-summary page no longer states a stale
@@ -4284,6 +4335,5 @@ the sandbox cannot reach the demo API or the live site over TLS (`SSL_ERROR_SYSC
 committed samples written by the CI samplers and the deploy was confirmed through the Pages API plus a page fetch. Remaining
 non-blocking flags: **F-83** (schedule delivery sparse — root cause unfixed, so the feed will age again), **F-94** (high-ROI pane
 saturated), **F-96**, **F-97**, **F-DEMO-01** (account disconnected; no balance/fill ever verified), Culture 0 open markets.
-
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.

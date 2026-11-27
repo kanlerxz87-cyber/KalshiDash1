@@ -117,6 +117,7 @@
         <li><a href="markets.html">Markets</a> — the full tracked list, filterable by topic and by open/resolved, with each market's result.</li>
         <li><a href="categories/gas.html">Topic pages</a> — series, open markets, liquidity and resolved events for one topic at a time.</li>
         <li><a href="market.html">Market detail</a> — price chart (30 s → 24 h), order-book ladder, settlement rules, paper trade.</li>
+        <li><a href="requirements.html">Requirements check</a> — the brief this dashboard was built to, where each item is delivered, and what checks it.</li>
       </ol>
     </div>
     <div class="panel">

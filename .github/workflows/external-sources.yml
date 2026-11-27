@@ -1,0 +1,90 @@
+name: external-sources
+
+# Do the Kalshi documentation pages this site cites still exist?
+#
+# Why this is a separate workflow: the checks in site-qa.yml run offline and must stay offline, so
+# they cannot prove an external page is still listed. This job has general HTTPS egress, asks
+# docs.kalshi.com only for its own listings (`llms.txt` and `sitemap.xml`), writes the evidence to
+# data/external-source-check.json, and commits it. `npm run test:external-sources` (site-qa, PRs,
+# local) then asserts the committed evidence covers every citation the site currently makes.
+#
+# Deliberately NON-BLOCKING for publication: a broken citation is printed as a warning and
+# recorded in the evidence file for review. A publisher-side rename must never take the published
+# dashboard down, and no URL is ever rewritten from a guess. If the publisher cannot be reached,
+# the job records `verified: false` and warns instead of failing the repository.
+
+on:
+  schedule:
+    - cron: '41 5 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main, 'arena/**']
+    paths:
+      - 'templates/**.tpl'
+      - 'data/sources.json'
+      - 'scripts/check-external-sources.mjs'
+      - '.github/workflows/external-sources.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: external-sources
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Offline selftest of the citation parser (no network)
+        run: node scripts/check-external-sources.mjs --selftest
+
+      # --fetch --write exits 2 when the publisher is unreachable: it then writes evidence marked
+      # `verified: false` and this step records the outcome without failing the repository, because
+      # an upstream outage is not a broken citation. The script exits 1 only on its own errors,
+      # which do fail the run. An unreachable run leaves the last verified listing in place, so the
+      # offline gate keeps passing on evidence that was genuinely checked.
+      - name: Ask the publisher for its own page listings and record the verdicts
+        id: probe
+        continue-on-error: true
+        run: node scripts/check-external-sources.mjs --fetch --write
+
+      - name: Report an unreachable publisher (does not fail the job)
+        if: steps.probe.outcome == 'failure'
+        run: echo "::warning::the external-source probe did not complete; the committed evidence was left unchanged"
+
+      - name: Summarise the evidence
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            const p = "data/external-source-check.json";
+            if (!fs.existsSync(p)) { console.log("::warning::no evidence file was written"); process.exit(0); }
+            const d = JSON.parse(fs.readFileSync(p, "utf8"));
+            console.log("verified:", d.verified, "checked_at:", d.checked_at);
+            if (!d.verified) { console.log("::warning::" + (d.reason || "unverified")); process.exit(0); }
+            const s = d.summary || {};
+            console.log(`citations ${s.distinct_citations} · ok ${s.ok} · broken ${s.broken}`);
+            for (const b of s.broken_pages || []) console.log("::warning::cited Kalshi doc page is not listed by the publisher: " + b);
+          '
+
+      - name: Commit the evidence if it changed
+        run: |
+          git add data/external-source-check.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "data/external-source-check.json unchanged"
+          else
+            git config user.name "kalshidash-bot"
+            git config user.email "actions@users.noreply.github.com"
+            git commit -m "data(external): re-check cited Kalshi doc pages [skip ci]"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push
+          fi

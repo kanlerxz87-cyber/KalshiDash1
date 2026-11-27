@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Requirements check — KalshiDash1</title>
+<meta name="description" content="Every requirement this dashboard was built to, where it is delivered, how it is checked, and the limitation that comes with it. Each row links the official source or the repository evidence.">
+<link rel="stylesheet" href="{{BASE}}assets/style.css">
+</head>
+<body data-base="{{BASE}}">
+<header class="site">
+  <div class="head-inner">
+    <div class="brand">Kalshi<span class="dot">Dash</span>1 <span class="badge neutral">Demo</span></div>
+    <div class="head-meta"><span id="feed-freshness" class="badge neutral" title="Age of the last live alert-engine sample">engine …</span><span class="asof-wrap">{{FEED_ASOF}}</span>
+      <span id="mode-badge" class="badge warn">data: probing…</span>
+      <span id="clock" class="mono small muted"></span>
+    </div>
+  </div>
+  <nav class="site"><div class="nav-inner">{{NAV}}</div></nav>
+</header>
+
+<main><div class="wrap">
+  <div class="page-head">
+    <div class="grow">
+      <h1>Requirements check</h1>
+      <p class="sub">One table for the brief this dashboard was built to. Each requirement says where it is delivered,
+      what measures it, and the limitation that comes with it. A row is never marked done because a page mentions it:
+      the “Checked by” cell names a test, a workflow or a dated verification record, and links it.</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <p class="small muted" style="margin:0">How to read this page. <strong>Delivered</strong> names the page or tool a trader
+    actually uses. <strong>Checked by</strong> names the automated gate or dated record that would fail if it broke.
+    <strong>Limitation</strong> is stated up front instead of being left for the trader to discover; every limitation here is also
+    published on the <a href="{{BASE}}flagged.html">Flagged for review</a> page with its evidence. Values on the site are not restated here:
+    they live in the tables on the page named, each with its own source link, so this page cannot drift out of agreement with them.
+    <strong>Sources for the build itself are labelled, not overclaimed:</strong> a requirement that implements an exchange rule links
+    that rule on Kalshi&rsquo;s documentation; a requirement that is a project decision (which five topics, which model, which pages) links
+    this repository&rsquo;s own code and README instead, because no exchange document defines it. The source gate accepts both kinds and
+    rejects an internal-only link pretending to be an official claim.</p>
+  </div>
+
+  <h2>Platform facts the build relies on</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Fact</th><th>What the dashboard does with it</th><th>Official source</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Demo REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code>; also supported <code>https://demo-api.kalshi.co/trade-api/v2</code></td>
+          <td>Every capture and every browser poll uses the recommended root. The legacy host is named as supported, not used by default.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Test In The Demo Environment</a></td>
+        </tr>
+        <tr>
+          <td>Demo WebSocket root <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code>; also supported <code>wss://demo-api.kalshi.co/trade-api/ws/v2</code></td>
+          <td>Named on every page for completeness. The site does <strong>not</strong> stream: a handshake needs a signed API key, and a key cannot be shipped in a public static page.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo_env</a> · <a href="https://docs.kalshi.com/websockets/websocket-connection" target="_blank" rel="noopener">WebSocket Connection</a> (<code>apiKey</code> security scheme)</td>
+        </tr>
+        <tr>
+          <td>Public market data needs no authentication; balances, positions and orders need a signed request</td>
+          <td>Browser pages read public endpoints only. Anything account-level is written server-side by a GitHub Actions job and read from <code>data/account.json</code>.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Quick Start: Market Data</a> · <a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">Quick Start: Authenticated Requests</a></td>
+        </tr>
+        <tr>
+          <td>The order book returns bids only; a YES bid at X is a NO ask at $1.00 − X</td>
+          <td>The liquidity ladder shows contracts available at each price by deriving the ask side from the opposite side's bid, and says it does so.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">Orderbook Responses</a> · <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">Get Market Orderbook</a></td>
+        </tr>
+        <tr>
+          <td>A market resolves <strong>yes</strong> or <strong>no</strong> (other markets can be scalar); a winning binary contract pays $1.00</td>
+          <td>Resolution tracking follows each tracked binary market to a final <code>result</code> and records how it resolved. Scalar and unknown outcomes are left unresolved rather than guessed.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a> · <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a></td>
+        </tr>
+        <tr>
+          <td>Demo funds are mock funds and the credentials are separate from production</td>
+          <td>Every page is labelled Demo. Nothing here is presented as a live-money result or a trading recommendation.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo_env</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>What was asked for, and where it is</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Requirement</th><th>Delivered</th><th>Checked by</th><th>Limitation (published, not hidden)</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Executive summary of the important details</td>
+          <td><a href="{{BASE}}executive-summary.html">Executive summary</a> — verified platform facts, what the site covers, what is deliberately blank.</td>
+          <td>Generated from <code>templates/executive-summary.tpl</code>; the dated verification records under <code>verification/</code>.</td>
+          <td>Summary figures are the committed capture's, stamped with their time. They are not a live exchange total.</td>
+        <td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/EXECUTIVE_SUMMARY.md" target="_blank" rel="noopener">EXECUTIVE_SUMMARY.md</a></td></tr>
+        <tr>
+          <td>Track the highest-dollar live events, only in gas prices, elections, culture, crypto and golf</td>
+          <td><a href="{{BASE}}index.html">Landing page</a> topic summary and top rows; one page per topic under <a href="{{BASE}}categories/gas.html">Topics</a>.</td>
+          <td><code>test:topic-integrity</code> (topic filter, including the EIA natural-gas exclusion), <code>test:rows</code> (every row carries a publisher link).</td>
+          <td>“Highest dollar” is an estimate: contracts × published <code>notional_value_dollars</code>, not an exchange-wide traded-dollar census. Sampling is capped per topic and the cap is printed beside the number.</td>
+        <td><a href="https://docs.kalshi.com/api-reference/market/get-series-list" target="_blank" rel="noopener">Get Series List</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/scripts/fetch-snapshot.mjs" target="_blank" rel="noopener">capture code</a></td></tr>
+        <tr>
+          <td>Live alerting on price swings of $0.10 or more, in either direction</td>
+          <td><a href="{{BASE}}alerts/index.html">Live alerts console</a> — two scrolling panes; plus the browser-served <a href="{{BASE}}dashboard.html">research dashboard</a>.</td>
+          <td><code>test:engine</code>, <code>test:feed</code>, <code>test:guard</code>, <code>test:page</code>, <code>test:resolution</code>; the scheduled <code>live-alerts</code> workflow.</td>
+          <td>Detection compares two published observations, so a move that reverses between samples is missed. GitHub delivers the scheduled runs far less often than the declared cron; the measured sample age is printed in the header badge and a stale feed says so.</td>
+        <td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">public market data</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/tools/live_engine.mjs" target="_blank" rel="noopener">live_engine.mjs</a></td></tr>
+        <tr>
+          <td>Two scrolling chats: every event, and a model-selected high-ROI subset</td>
+          <td>The two panes on the alerts console and the dashboard.</td>
+          <td><code>test:highroi</code> measures the composition of the selective pane and fails only if a row breaks the model's own published rules.</td>
+          <td>The filter is a transparent heuristic, not a validated return forecast. Its measured composition is published on Flagged for review rather than described as “high ROI” without qualification.</td>
+        <td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/docs/ALERTS.md" target="_blank" rel="noopener">ALERTS.md (model score)</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/tools/live_engine.mjs" target="_blank" rel="noopener">live_engine.mjs</a></td></tr>
+        <tr>
+          <td>Track live events until they resolve, and record how each resolved (yes or no)</td>
+          <td>Resolution tracking in the console; each topic's “Resolved events (yes / no)” table; the market's <code>result</code> on <a href="{{BASE}}markets.html">Markets</a>.</td>
+          <td><code>test:resolution</code> (including partially settled events), <code>test:topic-integrity</code> (no still-active market may appear in a resolved table), <code>test:settlement</code>.</td>
+          <td>The tracker only follows markets it sampled. Markets that never appeared in a sample are not resolved here even if the exchange has settled them.</td>
+        <td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a> · <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a></td></tr>
+        <tr>
+          <td>Automate simulated trades to test strategies</td>
+          <td>The auto-trader on <a href="{{BASE}}portfolio.html">Portfolio</a>; the published rules on <a href="{{BASE}}strategies.html">Strategies</a>.</td>
+          <td><code>test:paper</code> (execution and accounting rules), <code>test:chart</code> (automatic strategy behaviour).</td>
+          <td>Paper only: no exchange order is sent, and fees, queue position, market impact and latency are not modelled. Gross paper P&amp;L is not a forecast.</td>
+        <td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/assets/paper.js" target="_blank" rel="noopener">paper.js execution model</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/templates/strategies.tpl" target="_blank" rel="noopener">strategies template</a></td></tr>
+        <tr>
+          <td>Track portfolio performance on the Kalshi demo account, and analyse trades by category</td>
+          <td><a href="{{BASE}}demo-account.html">Demo account</a> (balance, positions, fills, settlements) and <a href="{{BASE}}analysis.html">Trade analysis</a>.</td>
+          <td><code>test:privacy</code> (public-snapshot warning), <code>test:demo-safety</code> (demo-only boundary and signing), the <code>demo-account</code> workflow.</td>
+          <td><strong>The demo account is not connected.</strong> No credentials are configured for this repository, so the account page publishes a “not connected” placeholder rather than numbers. Enabling it makes the snapshot public — that warning is stated before the data.</td>
+        <td><a href="https://docs.kalshi.com/getting_started/quick_start_authenticated_requests" target="_blank" rel="noopener">signed requests</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/tools/demo_trader.mjs" target="_blank" rel="noopener">demo_trader.mjs</a></td></tr>
+        <tr>
+          <td>Execute trades on events and track the performance</td>
+          <td>The credential-gated demo-order path in <code>tools/demo_trader.mjs</code>; performance tracking on Portfolio and Analysis.</td>
+          <td><code>test:demo-safety</code>; the tool is dry-run unless explicitly confirmed live.</td>
+          <td>No order is, or can be, placed from the site while the account is unconnected. The tool is built for, and only for, the demo environment.</td>
+        <td><a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order V2</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/docs/DEMO_ACCOUNT.md" target="_blank" rel="noopener">DEMO_ACCOUNT.md</a></td></tr>
+        <tr>
+          <td>Price chart with time on X and contract price on Y; choose seconds, minutes or hours of history</td>
+          <td><a href="{{BASE}}market.html">Market detail</a> chart.</td>
+          <td><code>test:chart</code> (canonical DOM, window selection, provenance of each point).</td>
+          <td>Seconds are local poll observations; longer windows use the exchange's own candles with their real period-end times. Point provenance is labelled rather than blended.</td>
+        <td><a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">Get Market Candlesticks</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/assets/chart.js" target="_blank" rel="noopener">chart.js</a></td></tr>
+        <tr>
+          <td>See current liquidity: how many contracts are available at a given price</td>
+          <td>The order-book ladder on Market detail; liquidity columns on the topic pages.</td>
+          <td><code>test:rows</code>, the API-client logic tests.</td>
+          <td>The book is a point-in-time read. The ask side is derived from the opposite side's bid, as documented, and the page says so.</td>
+        <td><a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">Orderbook Responses</a> · <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">Get Market Orderbook</a></td></tr>
+        <tr>
+          <td>Link the events and official pages that may explain a sharp move</td>
+          <td><a href="{{BASE}}catalyst.html">Swing catalysts</a> — each sampled move with its official event link and the settlement sources the API itself names.</td>
+          <td><code>test:chart</code> and <code>test:rows</code> for the source linking; <code>test:external-sources</code> for the documentation links.</td>
+          <td>A link is <em>discovery</em>, not proof of cause. The page labels it that way rather than asserting what moved the price.</td>
+        <td><a href="https://docs.kalshi.com/api-reference/events/get-events" target="_blank" rel="noopener">Get Events</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/assets/catalyst.js" target="_blank" rel="noopener">catalyst.js</a></td></tr>
+        <tr>
+          <td>Split by topic, with events inside a topic kept together</td>
+          <td>Five topic pages; the nav keeps Topics as its own group.</td>
+          <td><code>test:links</code> (whole-tree internal links), <code>test:ids</code>.</td>
+          <td>Culture currently has no open demo market at capture; the page says so instead of backfilling it.</td>
+        <td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/README.md" target="_blank" rel="noopener">README (topics)</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/scripts/fetch-snapshot.mjs" target="_blank" rel="noopener">topic rules</a></td></tr>
+        <tr>
+          <td>Suggestions for making the site more live and interactive</td>
+          <td><a href="{{BASE}}suggestions.html">Suggestions board</a> — each item reviewable and tied to its evidence.</td>
+          <td>Rendered from <code>templates/suggestions.tpl</code>; the items that were adopted are those shown working on the pages above.</td>
+          <td>A suggestion is not a delivered feature; the board distinguishes the two.</td>
+        <td><a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/templates/suggestions.tpl" target="_blank" rel="noopener">suggestions template</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/README.md" target="_blank" rel="noopener">README</a></td></tr>
+        <tr>
+          <td>Every table row carries a source link; anything unconfirmed is blank and flagged</td>
+          <td><a href="{{BASE}}sources.html">Sources</a> register; <a href="{{BASE}}flagged.html">Flagged for review</a> for every gap.</td>
+          <td><code>test:rows</code> (with negative controls), <code>test:external-sources</code> (every cited Kalshi doc page still listed by the publisher), <code>test:ids</code>, both link checkers.</td>
+          <td>The source gate proves a publisher link is present and that the page exists. It cannot prove the page still says what is quoted; that is what the dated verification records are for.</td>
+        <td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">public endpoints</a> · <a href="https://github.com/kanlerxz87-cyber/KalshiDash1/blob/main/scripts/check-row-sources.mjs" target="_blank" rel="noopener">source gate</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h3>What this page deliberately does not do</h3>
+    <p class="small">It does not re-type any price, count or volume. Those live in the tables that carry their own source
+    links, and duplicating them here would create a second copy that can silently disagree. It also does not grade itself:
+    the “Checked by” column names the gate that would fail, so the claim can be re-run rather than trusted.</p>
+  </div>
+</div></main>
+
+<footer class="site">{{FOOTER}}</footer>
+<!-- app.js is loaded even though this page renders no live table: it runs the header clock, the
+     API-mode badge and the demo-API reachability probe that every canonical page shares, and the
+     site link checker requires it on each template page (scripts/check-links.mjs). -->
+<script src="{{BASE}}assets/app.js"></script>
+<script src="{{BASE}}assets/freshness.js"></script>
+</body>
+</html>
