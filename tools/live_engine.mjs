@@ -1162,6 +1162,36 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
  */
 export const SETTLE_OVERLAP_SECONDS = 900;
 
+/**
+ * Compute the `min_settled_ts` window start from the PREVIOUS run's state — MUST be read
+ * BEFORE `applySample()` overwrites `next.meta.generated_at` to `now` (F-95).
+ */
+export function computeResolutionSince(prevState) {
+  const previousRun = Date.parse(prevState?.meta?.generated_at || '') / 1000;
+  return Number.isFinite(previousRun) ? Math.max(0, Math.floor(previousRun) - SETTLE_OVERLAP_SECONDS) : null;
+}
+
+function buildResolutionRow(m, state, sourceUrl, fallbackSeries = null) {
+  const prev = state.markets?.[m.ticker] || {};
+  return {
+    ticker: m.ticker,
+    event_ticker: m.event_ticker || prev.event_ticker || null,
+    series_ticker: m.series_ticker || prev.series_ticker || fallbackSeries || null,
+    topic: prev.topic || state.settled_markets?.[m.ticker] || null,
+    title: m.title || prev.title || null,
+    result: m.result,
+    status: m.status || null,
+    settlement_value_dollars: m.settlement_value_dollars ?? null,
+    settlement_ts: m.settlement_ts || null,
+    last_price_dollars: m.last_price_dollars ?? null,
+    volume_fp: m.volume_fp ?? null,
+    close_time: m.close_time || null,
+    rules_primary: m.rules_primary || prev.rules_primary || null,
+    contract_terms_url: prev.contract_terms_url || null,
+    source_url: sourceUrl,
+  };
+}
+
 export async function collectResolutions(client, state, { maxSeries = 12, maxPages = 2, nowSeconds = null, since = null, log = () => {} } = {}) {
   const now = nowSeconds === null ? Math.floor(Date.now() / 1000) : nowSeconds;
   const resolvedTickers = new Set((state.resolutions || []).map((r) => r.ticker));
@@ -1212,28 +1242,96 @@ export async function collectResolutions(client, state, { maxSeries = 12, maxPag
       for (const m of data.markets || []) {
         if (!pendingTickers.has(m.ticker)) continue;      // counted as untracked below
         if (m.result !== 'yes' && m.result !== 'no' && m.result !== 'scalar') continue;
-        out.push({
-        ticker: m.ticker,
-        event_ticker: m.event_ticker || null,
-        series_ticker: st,
-        topic: (state.markets?.[m.ticker] || {}).topic || null,
-        title: m.title || null,
-        result: m.result,
-        status: m.status || null,
-        settlement_value_dollars: m.settlement_value_dollars ?? null,
-        settlement_ts: m.settlement_ts || null,
-        last_price_dollars: m.last_price_dollars ?? null,
-        volume_fp: m.volume_fp ?? null,
-        close_time: m.close_time || null,
-        rules_primary: m.rules_primary || null,
-        contract_terms_url: (state.markets?.[m.ticker] || {}).contract_terms_url || null,
-        source_url: client.base + path,
-      });
+        out.push(buildResolutionRow(m, state, client.base + path, st));
         log(`  resolved: ${m.ticker} -> ${m.result}`);
       }
     } while (cursor && pages < maxPages);
   }
   return out;
+}
+
+/**
+ * Direct batched ticker lookup (`GET /markets?tickers=...`) for pending tracked markets that
+ * were alerted, dropped out of the current `status=open` poll, or passed `close_time` /
+ * `expected_expiration_time` (F-95).
+ *
+ * Official Get Markets docs (S4) state that when `tickers` is the ONLY filter (no `status`,
+ * `series_ticker`, timestamp filter, `mve_filter`, or `cursor`), every matching market is
+ * returned in one unpaged response. This guarantees that early-closed markets (`can_close_early`,
+ * where `expected_expiration_time` precedes `close_time`) and markets whose settlement fell
+ * outside an earlier cron window are always reconciled to their final yes/no/scalar outcome.
+ */
+export async function collectDirectResolutions(
+  client,
+  state,
+  { openTickers = null, alreadyFound = null, nowSeconds = null, batchSize = 20, maxTickers = 120, log = () => {} } = {},
+) {
+  const now = nowSeconds === null ? Math.floor(Date.now() / 1000) : nowSeconds;
+  const resolvedTickers = new Set((state.resolutions || []).map((r) => r.ticker));
+  if (alreadyFound) for (const t of alreadyFound) resolvedTickers.add(t);
+  const alertedTickers = new Set((state.alerts || []).map((a) => a.ticker));
+
+  const candidates = Object.values(state.markets || {})
+    .filter((m) => {
+      if (!m || !m.ticker || resolvedTickers.has(m.ticker)) return false;
+      if (alertedTickers.has(m.ticker)) return true;
+      if (openTickers && !openTickers.has(m.ticker)) return true;
+      const closeTs = Date.parse(m.close_time || '') / 1000;
+      const expTs = Date.parse(m.expected_expiration_time || '') / 1000;
+      return (Number.isFinite(closeTs) && closeTs <= now) || (Number.isFinite(expTs) && expTs <= now);
+    })
+    .sort((a, b) => {
+      const aAlert = alertedTickers.has(a.ticker) ? 1 : 0;
+      const bAlert = alertedTickers.has(b.ticker) ? 1 : 0;
+      if (aAlert !== bAlert) return bAlert - aAlert;
+      const aTime = Math.min(
+        Number.isFinite(Date.parse(a.close_time || '')) ? Date.parse(a.close_time) : Infinity,
+        Number.isFinite(Date.parse(a.expected_expiration_time || '')) ? Date.parse(a.expected_expiration_time) : Infinity,
+      );
+      const bTime = Math.min(
+        Number.isFinite(Date.parse(b.close_time || '')) ? Date.parse(b.close_time) : Infinity,
+        Number.isFinite(Date.parse(b.expected_expiration_time || '')) ? Date.parse(b.expected_expiration_time) : Infinity,
+      );
+      return aTime - bTime;
+    })
+    .slice(0, maxTickers);
+
+  const candidateSet = new Set(candidates.map((m) => m.ticker));
+  const resolutions = [];
+  const statusUpdates = [];
+  const seenResolved = new Set();
+
+  for (let i = 0; i < candidates.length; i += batchSize) {
+    const batch = candidates.slice(i, i + batchSize).map((m) => m.ticker);
+    const path = `/markets?tickers=${batch.map(encodeURIComponent).join(',')}`;
+    let data;
+    try {
+      data = await client.getJson(path);
+    } catch (e) {
+      log(`  direct resolution lookup failed (${batch.length} tickers): ${e.message}`);
+      continue;
+    }
+    for (const m of data.markets || []) {
+      if (!m || !candidateSet.has(m.ticker)) continue;
+      const isFinalized = m.status === 'finalized' || m.status === 'settled';
+      const hasResult = m.result === 'yes' || m.result === 'no' || m.result === 'scalar';
+      if (isFinalized && hasResult) {
+        if (seenResolved.has(m.ticker)) continue;
+        seenResolved.add(m.ticker);
+        resolutions.push(buildResolutionRow(m, state, client.base + path));
+        log(`  resolved (direct): ${m.ticker} -> ${m.result}`);
+      } else {
+        statusUpdates.push({
+          ticker: m.ticker,
+          status: m.status || null,
+          close_time: m.close_time || null,
+          expected_expiration_time: m.expected_expiration_time || null,
+          last_price_dollars: m.last_price_dollars ?? null,
+        });
+      }
+    }
+  }
+  return { resolutions, statusUpdates };
 }
 
 /* ------------------------------------------------------------------ orderbook */
@@ -1548,10 +1646,34 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
   // 3. sample + detect
   const now = Math.floor(Date.now() / 1000);
   const runId = new Date(now * 1000).toISOString();
+  // F-95: capture the previous run's timestamp BEFORE applySample() overwrites meta.generated_at
+  // to `now`; passing `next` without `since` collapsed min_settled_ts to `now - 900s` (15 min).
+  const resolutionSince = computeResolutionSince(state);
+  const openTickers = new Set(markets.map((entry) => entry?.raw?.ticker).filter(Boolean));
   let next = applySample(state, { nowSeconds: now, markets, topicsFound: seriesByTopic, runId });
 
-  // 4. resolutions
-  const resolutions = await collectResolutions(client, next, { maxSeries, log });
+  // 4. resolutions — series-level settlement window (using pre-sample generated_at) plus
+  //    direct unpaged `GET /markets?tickers=...` lookup for alerted, overdue, and no-longer-open
+  //    tracked markets so delayed cron runs and early-closing markets (can_close_early) still
+  //    settle cleanly to yes/no/scalar (F-95).
+  const seriesResolutions = await collectResolutions(client, next, {
+    maxSeries, nowSeconds: now, since: resolutionSince, log,
+  });
+  const direct = await collectDirectResolutions(client, next, {
+    openTickers,
+    alreadyFound: new Set(seriesResolutions.map((r) => r.ticker)),
+    nowSeconds: now,
+    log,
+  });
+  for (const u of direct.statusUpdates) {
+    const row = next.markets?.[u.ticker];
+    if (!row) continue;
+    if (u.status) row.status = u.status;
+    if (u.close_time) row.close_time = u.close_time;
+    if (u.expected_expiration_time) row.expected_expiration_time = u.expected_expiration_time;
+    if (u.last_price_dollars !== null && u.last_price_dollars !== undefined) row.last_price_dollars = u.last_price_dollars;
+  }
+  const resolutions = [...seriesResolutions, ...direct.resolutions];
   if (resolutions.length) next = applySample(next, { nowSeconds: now, markets: [], resolutions, topicsFound: seriesByTopic, runId });
 
   // 4b. trade-level swings on the biggest rows of each topic (sharpest public view, S13).
@@ -1694,7 +1816,7 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
           meta: next.meta,
           run: next.run,
           alerts: next.alerts.slice(0, 200),
-          resolutions: next.resolutions.slice(0, 100),
+          resolutions: publishedResolutions(next, 100),
           awaiting: awaitingResolutions(next, 40),
           markets: topMarkets(next, 60),
           by_topic: boardByTopic(next, 24),
@@ -1739,6 +1861,26 @@ export function boardByTopic(state, perTopic = 24) {
     };
   }
   return out;
+}
+
+/**
+ * Published resolution slice for feed.json. Keeps newest resolutions up to `limit`, while
+ * guaranteeing every resolved ticker referenced by `state.alerts` stays inside the slice so
+ * `feed.resolutions` and `feed.awaiting` can never disagree when `state.resolutions` grows past
+ * `limit` (F-95).
+ */
+export function publishedResolutions(state, limit = 100) {
+  const all = state.resolutions || [];
+  if (all.length <= limit) return all.slice();
+  const alerted = new Set((state.alerts || []).map((a) => a.ticker));
+  const head = all.slice(0, limit);
+  const inHead = new Set(head.map((r) => r.ticker));
+  const missingAlerted = all.slice(limit).filter((r) => alerted.has(r.ticker) && !inHead.has(r.ticker));
+  if (!missingAlerted.length) return head;
+  const keepAlerted = head.filter((r) => alerted.has(r.ticker)).concat(missingAlerted);
+  const filler = head.filter((r) => !alerted.has(r.ticker)).slice(0, Math.max(0, limit - keepAlerted.length));
+  return keepAlerted.concat(filler)
+    .sort((a, b) => String(b.settlement_ts || '').localeCompare(String(a.settlement_ts || '')));
 }
 
 /**
@@ -2046,6 +2188,59 @@ export async function selftest() {
   const m = sinceClient.calls[0].match(/min_settled_ts=(\d+)/);
   ok(m && Number(m[1]) === Date.parse('2026-11-21T07:00:00Z') / 1000 - SETTLE_OVERLAP_SECONDS,
     `the settled window starts one overlap before the previous sample (got ${m && m[1]})`);
+
+  // F-95: computeResolutionSince uses PRE-sample generated_at even after applySample overwrites it,
+  // and collectDirectResolutions resolves early-closed / overdue / alerted markets via GET /markets?tickers=...
+  const prevOnlyState = { meta: { generated_at: '2026-11-23T12:00:00Z' } };
+  const expectedSince = Date.parse('2026-11-23T12:00:00Z') / 1000 - SETTLE_OVERLAP_SECONDS;
+  ok(computeResolutionSince(prevOnlyState) === expectedSince,
+    'computeResolutionSince captures pre-sample generated_at minus overlap');
+  const directCalls = [];
+  const directClient = {
+    base: 'https://example.invalid/trade-api/v2',
+    async getJson(p) {
+      directCalls.push(p);
+      return {
+        cursor: '',
+        markets: [
+          {
+            ticker: 'GAS_PAST', event_ticker: 'GAS_EV', title: 'Gas market',
+            status: 'finalized', result: 'no', settlement_ts: '2026-11-23T15:06:33Z',
+            settlement_value_dollars: '0.0000', last_price_dollars: '0.0200', volume_fp: '51761.17',
+          },
+          {
+            ticker: 'GOLF_EARLY', event_ticker: 'GOLF_EV', title: 'Golf early close',
+            status: 'finalized', result: 'yes', settlement_ts: '2026-11-23T19:58:03Z',
+            settlement_value_dollars: '1.0000', last_price_dollars: '0.0630', volume_fp: '462081.71',
+          },
+          {
+            ticker: 'STILL_DET', event_ticker: 'DET_EV', title: 'Determined not finalized',
+            status: 'determined', result: 'yes', close_time: '2026-11-23T12:00:00Z',
+            last_price_dollars: '0.9900',
+          },
+        ],
+      };
+    },
+  };
+  const directState = {
+    alerts: [{ ticker: 'GAS_PAST' }, { ticker: 'GOLF_EARLY' }],
+    resolutions: [],
+    markets: {
+      GAS_PAST: { ticker: 'GAS_PAST', series_ticker: 'KXAAAGASW', topic: 'gas', close_time: '2026-11-23T04:59:00Z', status: 'active' },
+      GOLF_EARLY: { ticker: 'GOLF_EARLY', series_ticker: 'KXPGATOUR', topic: 'golf', close_time: '2026-12-06T00:00:00Z', expected_expiration_time: '2026-11-22T00:00:00Z', status: 'active' },
+      STILL_DET: { ticker: 'STILL_DET', series_ticker: 'KXTEST', topic: 'crypto', close_time: '2026-11-23T12:00:00Z', status: 'active' },
+    },
+  };
+  const dOut = await collectDirectResolutions(directClient, directState, {
+    openTickers: new Set(), nowSeconds: Date.parse('2026-11-27T14:00:00Z') / 1000,
+  });
+  ok(directCalls.length === 1 && directCalls[0].startsWith('/markets?tickers=') && !directCalls[0].includes('status='),
+    'collectDirectResolutions uses unpaged GET /markets?tickers=... with no other filters (S4)');
+  ok(dOut.resolutions.length === 2 && dOut.resolutions.some((r) => r.ticker === 'GAS_PAST' && r.result === 'no')
+    && dOut.resolutions.some((r) => r.ticker === 'GOLF_EARLY' && r.result === 'yes'),
+    'collectDirectResolutions records finalized overdue + early-closed markets');
+  ok(dOut.statusUpdates.some((u) => u.ticker === 'STILL_DET' && u.status === 'determined'),
+    'determined (not yet finalized) markets stay pending with updated status');
 
   // ladder
   const ladder = buildLadder({ orderbook_fp: { yes_dollars: [['0.0100', '200.00'], ['0.4200', '13.00']], no_dollars: [['0.5600', '17.00']] } });
