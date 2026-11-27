@@ -116,6 +116,7 @@ const NAV_GROUPS = [
     ['sources.html', 'Sources'],
     ['flagged.html', 'Flagged for review'],
     ['questions.html', 'Questions'],
+    ['requirements.html', 'Requirements check'],
     ['api.html', 'API reference'],
     ['demo-account.html', 'Demo account'],
     ['dash/index.html', 'Legacy suite (dash/)'],
@@ -409,6 +410,7 @@ const PAGES = [
   // The alerts console is a standalone app (own nav, own css/js under alerts/) so it is NOT
   // regenerated from templates/; it is listed here only so the build reports it.
   { out: 'questions.html', tpl: 'questions.html' },
+  { out: 'requirements.html', tpl: 'requirements.html' },
   { out: 'suggestions.html', tpl: 'suggestions.html' },
   { out: 'api.html', tpl: 'api.html' },
   { out: 'catalyst.html', tpl: 'catalyst.html' },
