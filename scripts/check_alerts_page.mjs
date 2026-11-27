@@ -143,6 +143,13 @@ virtualConsole.on('jsdomError', (e) => {
 virtualConsole.on('error', (m) => pageErrors.push(String(m)));
 
 const html = await readFile('alerts/index.html', 'utf8');
+check(/observed moves of[\s\S]*?between observations can be missed/i.test(html),
+  'intro labels the alerts as sampled observations and discloses missed moves');
+check(/GitHub Actions schedule is best-effort, not real-time/i.test(html),
+  'intro does not promise a real-time background sampler');
+check(/flagged\.html#F-83/.test(html), 'intro links to the measured schedule limitation');
+check(!/Every time a contract[\s\S]*?scroll in real time/i.test(html),
+  'intro no longer claims complete every-move or real-time delivery');
 const dom = new JSDOM(html, {
   url: 'https://kanlerxz87-cyber.github.io/KalshiDash1/alerts/index.html',
   runScripts: 'outside-only',
@@ -253,6 +260,10 @@ check(text('#markets-table').includes('Live market for KXAAAGASTX'), 'browser po
 check(text('#stats').includes('High ROI'), 'stat cards rendered');
 check(feedRequests > 0, 'the engine feed was actually requested');
 check(text('#mode-badge').includes('live') || text('#mode-badge').includes('engine'), 'mode badge reports a real data mode');
+check(/next poll[\s\S]*?every 30 seconds/i.test(text('#mode-notice')),
+  'live mode says swings can appear on the next roughly 30-second poll, not immediately');
+check(!/within seconds|second-by-second/i.test(text('#mode-notice')),
+  'live mode makes no unsupported second-by-second promise');
 
 // the "highest dollar" ranking is ordered
 const firstRow = doc.querySelector('#markets-table tbody tr');
@@ -296,6 +307,12 @@ check(text2('#mode-badge').includes('engine feed only'),
 check(!text2('#mode-notice').includes('No data available'),
   'feed-only: the page must never say "No data available" while it is showing alert rows');
 check(/engine feed/i.test(text2('#mode-notice')), 'feed-only: the notice explains that the engine feed is being shown');
+check(/best-effort GitHub Actions schedule[\s\S]*?hours old/i.test(text2('#mode-notice')),
+  'feed-only: the notice warns that the scheduled feed may be hours old');
+check(/flagged\.html#F-83/.test(doc2.querySelector('#mode-notice').innerHTML),
+  'feed-only: the measured cadence limitation is linked');
+check(!/stays current|second-by-second/i.test(text2('#mode-notice')),
+  'feed-only: the notice does not promise current or second-by-second data');
 
 /* ---------------- F-86: board leader + 24h change ---------------- */
 /* The two new columns must show only published fields: the leader badge marks the top-ranked
