@@ -49,6 +49,15 @@
     historical sample. The snapshot then in force was <code>2026-11-27T17:41:59Z</code>.
     <a href="verification/2026-11-27-a1ded21f.md">That report</a> is retained unchanged; only its freshness lines
     were superseded, 68 seconds later, by the pulse above.
+
+  <aside class="notice warn" aria-label="Current operational status">
+    <strong>Operational status · verified 2026-11-27 22:25 UTC.</strong>
+    The committed alert feed was generated at <code>2026-11-27T17:34:38Z</code> and was 290.2 minutes old at verification,
+    beyond the 45-minute stale threshold. Treat its prices and counts as a historical sample, not current quotes.
+    The most recent captured market snapshot is <code>2026-11-27T17:41:59Z</code>. The demo-account snapshot is
+    disconnected (<code>connected: false</code>); the paper simulator is not exchange execution. See the
+    <a href="verification/2026-11-27-a1ded21f.md">dated verification report</a> and
+    <a href="flagged.html">Flagged for Review</a> for limitations and source links.
   </aside>
 
   <h2>1 · What was built</h2>

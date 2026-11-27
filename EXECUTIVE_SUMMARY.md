@@ -26,6 +26,9 @@
 > were true at 22:25 UTC and were superseded 68 seconds later by the recovery pulse recorded above. The
 > demo-account and transport findings here still stand.
 
+**Updated:** 2026-11-27 22:25 UTC (session-a1ded21f; older dated entries below are preserved) · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/a1ded21f-kalshidash1` · **Session:** `session-a1ded21f`
+
+## Current operational status — verified 2026-11-27 22:25 UTC
 
 - **The dashboard is deployed, but the committed alert feed is stale:** `data/live/feed.json` was generated at `2026-11-27T17:34:38Z` and measured 290.2 minutes old, beyond the 45-minute stale threshold. Its 122 alerts, 41 resolutions, and 14 awaiting counts are a historical sample, not live quotes.
 - **Last captured market snapshot:** `2026-11-27T17:41:59.132Z`. It recorded Gas 135 open markets, Elections 356, Culture 0, Crypto 1,753, and Golf 220. These counts and dollar estimates are snapshot values, not a current ranking.
