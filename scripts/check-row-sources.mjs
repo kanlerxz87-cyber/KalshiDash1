@@ -14,6 +14,7 @@ export const REQUIRED = [
   ...['gas', 'elections', 'culture', 'crypto', 'golf'].map((topic) => `categories/${topic}.html`),
   'flagged.html', 'questions.html', 'strategies.html', 'strategylab.html', 'suggestions.html',
   'dashboard.html', 'market.html', 'portfolio.html', 'analysis.html', 'demo-account.html',
+  'requirements.html',
   'alerts/index.html', 'audit/index.html',
 ];
 
