@@ -3932,3 +3932,11 @@ Sources used by this session (all fetched/read 2026-11-25): [Kalshi demo environ
 `gh api` Pages/pages-builds/runs probes; committed `data/snapshot.json`/`data/live/feed.json` metadata. Constraints honored throughout: no credentials requested, no
 authenticated API read, no order placed, no inferred values — unverified items stay blank on Flagged for Review.
 
+
+## Session session-49860fd0 — current-state independent audit (2026-11-27)
+
+Arena fixes this session to branch `arena/49860fd0-kalshidash1`. Board read before claim; no open PRs at initial inspection. This scoped audit does not claim other sessions' files or assert a repo-wide line-by-line verification.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| A498 | Audit current build, deployment, and major requested capabilities; document evidence and limitations. | in progress | session-49860fd0 | this section of `COORDINATION.md`, new `verification/2026-11-27-49860fd0.md` |
