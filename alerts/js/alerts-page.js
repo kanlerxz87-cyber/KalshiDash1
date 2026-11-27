@@ -28,8 +28,8 @@
       b.className = 'badge live';
       b.textContent = 'live: browser + engine';
       n.className = 'notice ok';
-      n.innerHTML = 'Browser polling of the official demo API is working, so new swings appear within seconds. ' +
-        'The engine feed is merged in underneath, which is what keeps the history when this page is closed.';
+      n.innerHTML = 'Browser polling of the official demo API is working; new observed swings can appear on the next poll (scheduled about every 30 seconds, subject to request and exchange delays). ' +
+        'The engine feed is merged in underneath and preserves its history when this page is closed; its sample age is shown above.';
     } else if (A.state.mode === 'probing') {
       /* MEASURED 2026-11-21 23:24Z on the live site: with a readable engine feed but a browser
        * poll that had not finished yet (8 series, each one request), the notice said "No data
@@ -41,16 +41,15 @@
       b.textContent = 'reading…';
       n.className = 'notice';
       n.innerHTML = '<strong>Reading the engine feed.</strong> The committed sample of the alert engine is loading. ' +
-        'Browser polling of the demo API, if your network allows it, starts at the same time and upgrades this ' +
-        'page to second-by-second updates.';
+        'Browser polling of the demo API, if your network allows it, starts at the same time; a successful poll can update the view, but a page reload does not make the underlying exchange sample newer.';
     } else if (A.state.mode === 'feed') {
       b.className = 'badge warn';
       b.textContent = 'engine feed only';
       n.className = 'notice';
-      n.innerHTML = '<strong>Showing the engine feed.</strong> This browser could not poll the demo API directly ' +
-        '(' + A.esc(A.state.live.note || 'request blocked') + '), which is usually a cross-origin (CORS) restriction rather than an outage. ' +
-        'The engine still samples the API on its schedule, so the feed stays current — just not second-by-second. ' +
-        'This limitation is listed on the <a href="../flagged.html">Flagged for review</a> page.';
+      n.innerHTML = '<strong>Showing the engine feed only.</strong> This browser could not poll the demo API directly ' +
+        '(' + A.esc(A.state.live.note || 'request blocked') + '), which may be a cross-origin (CORS) restriction or another network issue. ' +
+        'The engine runs on a best-effort GitHub Actions schedule; the recorded sample can be hours old. Check the timestamp and age above before relying on it, and see ' +
+        '<a href="../flagged.html#F-83">F-83</a> for measured cadence limits.';
     } else {
       b.className = 'badge warn';
       b.textContent = 'no live data';

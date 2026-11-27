@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Live Alerts — two chat feeds · KalshiDash1</title>
-<meta name="description" content="Live alerting for Kalshi demo contracts: every price swing of $0.10 or more in either direction, in a scrolling feed, plus a second feed filtered to the alerts our model scores as high expected ROI.">
+<meta name="description" content="Sampled Kalshi demo price-swing alerts of $0.10 or more, with a second feed filtered by a documented, unvalidated heuristic. Sample age is shown; gaps between samples may miss moves.">
 <link rel="stylesheet" href="css/alerts.css">
 </head>
 <body data-base="../">
@@ -43,11 +43,13 @@
 <main>
   <h1>Live alerts — two scrolling feeds</h1>
   <p class="sub">
-    Every time a contract in gas prices, elections, culture, crypto or golf moves by
-    <strong>$0.10 or more in either direction</strong>, it appears in the
-    <strong>All events</strong> feed. The <strong>High-ROI</strong> feed repeats only the alerts that a
-    documented heuristic scores at or above <span id="roi-threshold-label">0.62</span>. Both feeds scroll in real time
-    and keep working when the page is reloaded, because the engine also runs without a browser open.
+    The <strong>All events</strong> feed records observed moves of
+    <strong>$0.10 or more in either direction</strong> in gas prices, elections, culture, crypto and golf;
+    it is a sampled feed, not a complete tick record, so moves between observations can be missed.
+    The <strong>High-ROI</strong> feed filters those alerts through a documented, unvalidated heuristic
+    scoring at or above <span id="roi-threshold-label">0.62</span>. While this page is open, browser polling
+    and engine-feed refreshes update the view; the engine's GitHub Actions schedule is best-effort, not real-time.
+    The last exchange sample's timestamp and age appear above. See <a href="../flagged.html#F-83">F-83</a> for measured cadence limits.
   </p>
 
   <div id="mode-notice" class="notice">Starting up: reading the engine feed and trying the live demo API…</div>
