@@ -21,6 +21,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const API = process.env.KALSHI_API_ROOT || 'https://external-api.demo.kalshi.co/trade-api/v2';
 const API_LEGACY = 'https://demo-api.kalshi.co/trade-api/v2';
@@ -51,12 +52,52 @@ async function get(p, tries = 3) {
 /* Topic -> series query + the documented rule used to keep a series in the topic.
  * Rules are stated in plain words on the site's Methodology/Sources pages so a
  * reviewer can re-run them. */
-const TOPICS = [
+
+/**
+ * Retail gasoline filter (F-GAS-01, aligning with F-05 and F-18).
+ * Keeps AAA retail gasoline series (`KXAAAGAS*` / `AAAGAS*` or titles mentioning "gas price")
+ * while explicitly excluding natural gas futures (`KXNGAS*` / `NGAS*` / "natural gas", which
+ * settle against EIA Henry Hub rather than AAA) and diesel series.
+ */
+export function isGasPriceSeries(s) {
+  const ticker = String((s && s.ticker) || '');
+  const title = String((s && s.title) || '');
+  if (/^(?:KX)?NGAS/i.test(ticker) || /\bnatural\s+gas\b|\bdiesel\b/i.test(title) || /diesel/i.test(ticker)) {
+    return false;
+  }
+  return /^(?:KX)?AAAGAS/i.test(ticker) || /\bgas price/i.test(title);
+}
+
+/**
+ * Market-level resolution predicate (F-RESOLVED-01).
+ * `GET /events?status=settled&with_nested_markets=true` returns partially-settled events with
+ * every nested market, including strikes that are still `active` (`result: ""` / null). Only a
+ * nested market with a concrete exchange outcome (`yes`, `no`, or `scalar`) belongs in
+ * `settled_events[].markets`.
+ */
+export function isResolvedMarket(m) {
+  const r = String((m && m.result) || '').trim().toLowerCase();
+  return r === 'yes' || r === 'no' || r === 'scalar';
+}
+
+/**
+ * Full-topic 24h notional volume (F-VOL-01): sums `volume_24h_fp * notional_value_dollars`
+ * across all captured open markets in the topic BEFORE `live_markets` is sliced to
+ * MAX_TOPIC_MARKET_ROWS (60).
+ */
+export function sumVolume24hNotional(markets) {
+  return (markets || []).reduce(
+    (s, m) => s + (m.volume_24h_fp || 0) * (m.notional_value_dollars || 0),
+    0
+  );
+}
+
+export const TOPICS = [
   {
     id: 'gas', label: 'Gas Prices',
     query: '/series?category=Economics&tags=Oil%20and%20energy&include_volume=true',
-    rule: 'Keep a series when its ticker starts with "KXAAAGAS" (AAA gasoline price series) or its title contains "gas price". Verified against GET /series?category=Economics&tags=Oil and energy — every kept series settles against AAA (gasprices.aaa.com).',
-    keep: (s) => /^KXAAAGAS/.test(s.ticker || '') || /gas price/i.test(s.title || '')
+    rule: 'Keep AAA retail gasoline series (ticker prefix "KXAAAGAS" or "AAAGAS", or title containing "gas price"), explicitly excluding natural gas ("KXNGAS*"/"NGAS*"/"natural gas", EIA Henry Hub) and diesel. Verified against GET /series?category=Economics&tags=Oil and energy — every kept series settles against AAA (gasprices.aaa.com).',
+    keep: isGasPriceSeries
   },
   {
     id: 'elections', label: 'Elections',
@@ -152,6 +193,7 @@ function marketRow(m, topic, url, seriesTicker, settlementSources) {
 }
 
 /* ------------------------------------------------------------------- build */
+export async function main() {
 const snap = {
   meta: {
     captured_at: new Date().toISOString(),
@@ -201,12 +243,17 @@ for (const t of TOPICS) {
   }
   live.sort((a, b) => (b.volume_24h_fp || 0) - (a.volume_24h_fp || 0) || (b.volume_fp || 0) - (a.volume_fp || 0));
 
-  /* settled events (resolution evidence: result yes / no) */
+  /* settled events (resolution evidence: result yes / no / scalar).
+   * Filter nested markets by isResolvedMarket before slicing so partially-settled events
+   * (e.g. KXAAAGASMINCA-26DEC31) never emit still-active strikes into the resolved table
+   * or crowd out genuinely settled strikes (F-RESOLVED-01). */
   const settled = [];
   for (const s of series.slice(0, 6)) {
     const q = `/events?series_ticker=${encodeURIComponent(s.ticker)}&status=settled&with_nested_markets=true&limit=2`;
     const r = await get(q);
     for (const ev of (r.data && r.data.events) || []) {
+      const resolvedMarkets = (ev.markets || []).filter(isResolvedMarket);
+      if (!resolvedMarkets.length) continue;
       settled.push({
         event_ticker: ev.event_ticker ?? null,
         title: ev.title ?? null,
@@ -216,7 +263,7 @@ for (const t of TOPICS) {
         settlement_sources: (ev.settlement_sources || []).map((x) => ({ name: x.name ?? null, url: x.url ?? null })),
         topic: t.id,
         source_url: r.url,
-        markets: (ev.markets || []).slice(0, 12).map((m) => ({
+        markets: resolvedMarkets.slice(0, 12).map((m) => ({
           ticker: m.ticker ?? null,
           yes_sub_title: m.yes_sub_title ?? null,
           status: m.status ?? null,
@@ -245,6 +292,7 @@ for (const t of TOPICS) {
     series,
     live_markets: live.slice(0, MAX_TOPIC_MARKET_ROWS),
     live_markets_total: live.length,
+    live_volume_24h_notional_total: round2(sumVolume24hNotional(live)),
     settled_events: settled
   };
   console.log(`  -> ${series.length} series, ${live.length} open markets (${settled.length} settled events)`);
@@ -296,3 +344,8 @@ snap.meta.endpoints_used = [...new Set(usedEndpoints)];
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify(snap, null, 1));
 console.log(`wrote ${OUT} — ${snap.markets_count_all} open markets, ${Object.keys(snap.orderbooks).length} orderbooks, ${Object.keys(snap.candlesticks).length} candle sets`);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await main();
+}
