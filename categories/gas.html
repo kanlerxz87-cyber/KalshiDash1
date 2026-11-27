@@ -27,7 +27,7 @@
   <div id="mode-notice" class="notice">Probing the official demo API…</div>
 
   <h2>Selection rule</h2>
-  <div class="panel"><p>Keep a series when its ticker starts with &quot;KXAAAGAS&quot; (AAA gasoline price series) or its title contains &quot;gas price&quot;. Verified against GET /series?category=Economics&amp;tags=Oil and energy — every kept series settles against AAA (gasprices.aaa.com).</p>
+  <div class="panel"><p>Keep AAA retail gasoline series (ticker prefix &quot;KXAAAGAS&quot; or &quot;AAAGAS&quot;, or title containing &quot;gas price&quot;), explicitly excluding natural gas (&quot;KXNGAS*&quot;/&quot;NGAS*&quot;/&quot;natural gas&quot;, EIA Henry Hub) and diesel. Verified against GET /series?category=Economics&amp;tags=Oil and energy — every kept series settles against AAA (gasprices.aaa.com).</p>
   <p class="small muted">Series query used for this topic:
   <a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener" class="srcline">https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true</a></p></div>
 
@@ -40,7 +40,7 @@
     <td>US gas price up</td>
     <td>Economics</td>
     <td>Econ Weekly, Oil and energy</td>
-    <td class="num">94,780,330</td>
+    <td class="num">94,781,752</td>
     <td><a href="https://gasprices.aaa.com/" target="_blank" rel="noopener">AAA</a></td>
     <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
   </tr>
@@ -49,7 +49,7 @@
     <td>US gas price</td>
     <td>Economics</td>
     <td>Oil &amp; Gas, Oil and energy</td>
-    <td class="num">74,928,103</td>
+    <td class="num">74,928,104</td>
     <td><a href="https://gasprices.aaa.com/" target="_blank" rel="noopener">AAA</a></td>
     <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
   </tr>
@@ -58,7 +58,7 @@
     <td>US gas price up</td>
     <td>Economics</td>
     <td>Oil &amp; Gas, Oil and energy, Econ Daily</td>
-    <td class="num">5,013,808</td>
+    <td class="num">5,013,839</td>
     <td><a href="https://gasprices.aaa.com/" target="_blank" rel="noopener">AAA</a></td>
     <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
   </tr>
@@ -69,15 +69,6 @@
     <td>Oil and energy</td>
     <td class="num">59,184</td>
     <td><a href="https://gasprices.aaa.com/?state=TX" target="_blank" rel="noopener">AAA</a></td>
-    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
-  </tr>
-<tr>
-    <td><code>KXNGASMAX</code></td>
-    <td>Natural gas price peak</td>
-    <td>Economics</td>
-    <td>Oil &amp; Gas, Oil and energy</td>
-    <td class="num">42,841</td>
-    <td><a href="https://www.eia.gov/dnav/ng/NG_PRI_FUT_S1_D.htm" target="_blank" rel="noopener">Energy Information Administration</a></td>
     <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
   </tr>
 <tr>
@@ -150,15 +141,6 @@
     <td>Oil and energy, Econ Daily</td>
     <td class="num">16,995</td>
     <td><a href="https://gasprices.aaa.com/?state=MI" target="_blank" rel="noopener">AAA</a></td>
-    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
-  </tr>
-<tr>
-    <td><code>NGASMAX</code></td>
-    <td>Natural gas price peak</td>
-    <td>Economics</td>
-    <td>Oil and energy</td>
-    <td class="num">3,799</td>
-    <td><a href="https://www.eia.gov/dnav/ng/NG_PRI_FUT_S1_D.htm" target="_blank" rel="noopener">Energy Information Administration</a></td>
     <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
   </tr>
 <tr>
@@ -304,6 +286,24 @@
     <td class="num">234</td>
     <td><a href="https://gasprices.aaa.com/" target="_blank" rel="noopener">AAA</a></td>
     <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXAAAGASDNY</code></td>
+    <td>New York gas price</td>
+    <td>Economics</td>
+    <td>Oil and energy, Econ Daily</td>
+    <td class="num">223</td>
+    <td><a href="https://gasprices.aaa.com/?state=NY" target="_blank" rel="noopener">AAA</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
+  </tr>
+<tr>
+    <td><code>KXAAAGASDWY</code></td>
+    <td>Wyoming gas price</td>
+    <td>Economics</td>
+    <td>Oil and energy, Econ Daily</td>
+    <td class="num">193</td>
+    <td><a href="https://gasprices.aaa.com/?state=WY" target="_blank" rel="noopener">AAA</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/series?category=Economics&amp;tags=Oil%20and%20energy&amp;include_volume=true" target="_blank" rel="noopener">query</a></td>
   </tr></tbody></table></div>
 
   <h2>Open markets — highest dollar amount first</h2>
@@ -314,11 +314,11 @@
   <th class="num">Open int ($)</th><th>Status</th><th>Result</th><th>Source</th></tr></thead><tbody id="market-body"><tr>
       <td><a href="../market.html?ticker=KXAAAGASM-26NOV30-3.50">Will average **gas prices** be above $3.50?</a><br><span class="ticker">KXAAAGASM-26NOV30-3.50</span></td>
       <td><span class="tag gas">Gas Prices</span></td>
-      <td class="num">$0.7000</td>
+      <td class="num">$0.7200</td>
       <td class="num">$0.7000 / $0.7200</td>
       <td class="num">$0.0200</td>
-      <td class="num">4,028</td>
-      <td class="num">16,388</td>
+      <td class="num">4,029</td>
+      <td class="num">16,389</td>
       <td class="num">11,524</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
@@ -328,9 +328,9 @@
       <td><a href="../market.html?ticker=KXAAAGASW-26NOV30-3.5000">Will average **gas prices** be above $3.5000?</a><br><span class="ticker">KXAAAGASW-26NOV30-3.5000</span></td>
       <td><span class="tag gas">Gas Prices</span></td>
       <td class="num">$0.7500</td>
-      <td class="num">$0.3800 / $1.0000</td>
-      <td class="num">$0.6200</td>
-      <td class="num">3,686</td>
+      <td class="num">$0.6000 / $0.6100</td>
+      <td class="num">$0.0100</td>
+      <td class="num">3,052</td>
       <td class="num">11,345</td>
       <td class="num">9,713</td>
       <td>active</td>
@@ -343,9 +343,9 @@
       <td class="num">$0.0700</td>
       <td class="num">$0.0600 / $0.0700</td>
       <td class="num">$0.0100</td>
-      <td class="num">2,267</td>
-      <td class="num">17,277</td>
-      <td class="num">11,614</td>
+      <td class="num">2,480</td>
+      <td class="num">18,111</td>
+      <td class="num">12,447</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASW&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
@@ -356,9 +356,9 @@
       <td class="num">$0.0200</td>
       <td class="num">$0.0100 / $0.0200</td>
       <td class="num">$0.0100</td>
-      <td class="num">1,725</td>
-      <td class="num">8,084</td>
-      <td class="num">8,084</td>
+      <td class="num">1,716</td>
+      <td class="num">8,674</td>
+      <td class="num">8,674</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASW&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
@@ -369,7 +369,7 @@
       <td class="num">$0.0200</td>
       <td class="num">$0.0000 / $1.0000</td>
       <td class="num"><span class="muted">—</span></td>
-      <td class="num">1,040</td>
+      <td class="num">338</td>
       <td class="num">4,299</td>
       <td class="num">4,298</td>
       <td>active</td>
@@ -382,12 +382,25 @@
       <td class="num">$0.0200</td>
       <td class="num">$0.0000 / $1.0000</td>
       <td class="num"><span class="muted">—</span></td>
-      <td class="num">916</td>
+      <td class="num">331</td>
       <td class="num">4,094</td>
       <td class="num">4,093</td>
       <td>active</td>
       <td><span class="muted">—</span></td>
       <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASW&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
+    </tr>
+<tr>
+      <td><a href="../market.html?ticker=KXAAAGASD-26NOV28-3.5300">Will average **gas prices** be above $3.5300?</a><br><span class="ticker">KXAAAGASD-26NOV28-3.5300</span></td>
+      <td><span class="tag gas">Gas Prices</span></td>
+      <td class="num">$0.1500</td>
+      <td class="num">$0.0000 / $1.0000</td>
+      <td class="num"><span class="muted">—</span></td>
+      <td class="num">31</td>
+      <td class="num">31</td>
+      <td class="num">31</td>
+      <td>active</td>
+      <td><span class="muted">—</span></td>
+      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASD&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
     </tr>
 <tr>
       <td><a href="../market.html?ticker=KXAAAGASM-26NOV30-4.70">Will average **gas prices** be above $4.70?</a><br><span class="ticker">KXAAAGASM-26NOV30-4.70</span></td>
@@ -1070,19 +1083,6 @@
       <td><span class="tag gas">Gas Prices</span></td>
       <td class="num">$0.0100</td>
       <td class="num">$0.0000 / $0.3200</td>
-      <td class="num"><span class="muted">—</span></td>
-      <td class="num">0</td>
-      <td class="num">3</td>
-      <td class="num">0</td>
-      <td>active</td>
-      <td><span class="muted">—</span></td>
-      <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASMAXCA&amp;status=open&amp;limit=200" target="_blank" rel="noopener">row</a></td>
-    </tr>
-<tr>
-      <td><a href="../market.html?ticker=KXAAAGASMAXCA-26DEC31-6.60">Will average **gas prices** be above or below $6.60 by Dec 31, 2026?</a><br><span class="ticker">KXAAAGASMAXCA-26DEC31-6.60</span></td>
-      <td><span class="tag gas">Gas Prices</span></td>
-      <td class="num">$0.0100</td>
-      <td class="num">$0.0000 / $1.0000</td>
       <td class="num"><span class="muted">—</span></td>
       <td class="num">0</td>
       <td class="num">3</td>
@@ -2063,6 +2063,26 @@
     <td>2025-12-31 20:00:12 UTC</td>
     <td><a href="https://gasprices.aaa.com/" target="_blank" rel="noopener">AAA</a></td>
     <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASMINCA&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>How low will gas prices in Texas get next year?<br><span class="ticker">KXAAAGASMINTX-25DEC31</span></td>
+    <td>Below $2.25<br><span class="ticker">KXAAAGASMINTX-25DEC31-2.25</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">14,033</td>
+    <td>2025-12-31 20:00:11 UTC</td>
+    <td><a href="https://gasprices.aaa.com/" target="_blank" rel="noopener">AAA</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASMINTX&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
+  </tr>
+<tr>
+    <td>How low will gas prices in Texas get next year?<br><span class="ticker">KXAAAGASMINTX-25DEC31</span></td>
+    <td>Below $2.00<br><span class="ticker">KXAAAGASMINTX-25DEC31-2.00</span></td>
+    <td><span class="badge bad">no</span></td>
+    <td class="num">$0.0000</td>
+    <td class="num">6,563</td>
+    <td>2025-12-31 20:00:11 UTC</td>
+    <td><a href="https://gasprices.aaa.com/" target="_blank" rel="noopener">AAA</a></td>
+    <td class="src"><a href="https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASMINTX&amp;status=settled&amp;with_nested_markets=true&amp;limit=2" target="_blank" rel="noopener">events query</a></td>
   </tr></tbody></table></div>
 
   <h2>What a trader should do on this page</h2>
@@ -2082,7 +2102,7 @@
     (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo environment docs</a>).</p>
     <p>REST root <code>https://external-api.demo.kalshi.co/trade-api/v2</code> ·
        WebSocket <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> ·
-       Snapshot captured 2026-11-27 14:10:33 UTC ·
+       Snapshot captured 2026-11-27 17:41:59 UTC ·
        <a href="../sources.html">Sources</a> ·
        <a href="../flagged.html">Flagged for review</a> ·
        <a href="../COORDINATION.md">Coordination board</a></p>
