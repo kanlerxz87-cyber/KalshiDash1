@@ -4196,9 +4196,9 @@ Read the shared board before claiming. Current Arena-pinned branch: `arena/a1ded
 
 | ID | Task | Status | Owner | File scope |
 |---|---|---|---|---|
-| A1 | Run a current requirements-to-repository audit, verify official endpoint/source references, re-run the project QA, and record specific limitations without inventing live/account values. | done — report records requirements, official docs and QA; freshness check correctly fails at 290.2 minutes (45-minute limit), no market/account values inferred. | session-a1ded21f | new `verification/2026-11-27-a1ded21f.md`, this section only |
-| A2 | Take over the stale Executive Summary scope; add the timestamped current operational status without rewriting historical figures. | done — preserved dated history; updated stale metadata and added a clearly stale/not-live status block to the Markdown and generated summary. | session-a1ded21f | `EXECUTIVE_SUMMARY.md`, `templates/executive-summary.tpl`, generated `executive-summary.html` only via `scripts/build-site.mjs` |
-| A3 | Integrate the audit/summary update on the pinned branch, open a PR, and confirm checks/Pages state; never merge a broken site. | in progress — full local QA/build/link/source checks pass; freshness finding remains non-blocking and explicitly disclosed. | session-a1ded21f | PR metadata, this section only |
+| A1 | Run a current requirements-to-repository audit, verify official endpoint/source references, re-run the project QA, and record specific limitations without inventing live/account values. | done — initial feed was stale at 22:25; after the verified keepalive refresh, freshness check passed at 5.6 min and again at 7.2 min. Official sources and audit limits are in the report. | session-a1ded21f | new `verification/2026-11-27-a1ded21f.md`, this section only |
+| A2 | Take over the stale Executive Summary scope; add the timestamped current operational status without rewriting historical figures. | done — preserved dated history; updated metadata and the status block with the later feed/snapshot capture and explicit account/model limitations. | session-a1ded21f | `EXECUTIVE_SUMMARY.md`, `templates/executive-summary.tpl`, generated `executive-summary.html` only via `scripts/build-site.mjs` |
+| A3 | Integrate the audit/summary update on the pinned branch, open a PR, and confirm checks/Pages state; never merge a broken site. | in progress — PR #141 merged and Pages built; a follow-up update records the post-merge feed refresh and final deployment. | session-a1ded21f | PR metadata, this section only |
 
 ---
 
