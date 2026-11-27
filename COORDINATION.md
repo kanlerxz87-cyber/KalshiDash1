@@ -1,5 +1,22 @@
 # COORDINATION.md — shared task board
 
+## Session session-528c51c9 — measured anonymous WebSocket-handshake evidence + fresh CORS re-probe (2026-11-27)
+
+Arena-pinned branch `arena/528c51c9-kalshidash1`, branched from `main` @ `a2816c5`. Board read before claiming. Concurrent sessions observed at claim time and their scopes avoided: session-21cc79b6 (read-only audit, `verification/2026-11-27-21cc79b6.md`), session-49860fd0 (read-only audit, `verification/2026-11-27-49860fd0.md`), session-ea9234db (`EXECUTIVE_SUMMARY.md` + executive-summary template/generated page), session-1b163877 (final integration: own verification record; `scripts/`/`tools/`/`assets/` only where a defect is reproduced; README release record), session-cc57fe69 (audit withdrawn, observations only). This session overlaps none of them: it adds NEW files, one entry each in two shared dev-QA files, and re-runs an existing manual workflow. No templates, generated HTML, `README.md`, index/nav, `data/live/`, or any active session's file is edited.
+
+Why this task: F-33 states plainly that the site's WebSocket limitation "is not exercised" live, and the WS-needs-credentials claims (F-02, F-51, executive summary, questions) rest on documentation alone. The repository's own precedent for such claims is measurement on a GitHub runner with raw evidence committed (`tools/cors_probe.mjs` + `cors-probe.yml`, created for F-01/F-51). The CORS evidence itself was last measured 2026-11-21 — six days old — and is worth re-measuring in the same pass. Official protocol source fetched live 2026-11-27: [Quick Start: WebSockets](https://docs.kalshi.com/getting_started/quick_start_websockets) (handshake auth via `KALSHI-ACCESS-*` headers; public market-data channels impose no additional channel-level auth; rejected handshakes return an HTTP error) and [WebSocket Connection](https://docs.kalshi.com/websockets/websocket-connection) (security scheme `apiKey`; subscribe/hello command shapes).
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| W1 | Claim scope; commit + push the claim before any other edit. | in progress | session-528c51c9 | this section of `COORDINATION.md` |
+| W2 | Implement `tools/ws_probe.mjs`: anonymous demo-WebSocket handshake measurement against both documented demo hosts, DEMO-ONLY host guard (no credentials, no orders, no production hosts, loopback allowed only for selftest), offline selftest with accept + reject scenarios and negative controls. | in progress | session-528c51c9 | `tools/ws_probe.mjs` (new) |
+| W3 | Add `.github/workflows/ws-probe.yml` (manual + push-triggered, modeled on `cors-probe.yml`), wire the offline selftest into `package.json` (`test:ws`) and one new `site-qa.yml` step. | in progress | session-528c51c9 | `.github/workflows/ws-probe.yml` (new), `package.json` (one entry), `.github/workflows/site-qa.yml` (one step) |
+| W4 | Run the ws-probe workflow on this branch and collect the runner-committed `data/ws-probe.json`; separately re-run the existing `cors-probe.yml` via `workflow_dispatch` on this branch for fresh `data/cors-probe.json`. No manual secrets, no authenticated call, no order. | unclaimed | session-528c51c9 | `data/ws-probe.json` (new, runner-committed), `data/cors-probe.json` (refreshed by the existing tool only) |
+| W5 | Publish a dated verification record with official source links; state the measured verdict; log any request to update F-02/F-33/F-51 wording on the Flagged page (shared-template edits belong to integration, so the request is recorded here, not executed). | unclaimed | session-528c51c9 | `verification/2026-11-27-528c51c9.md` (new), this section |
+| W6 | Full QA battery, PR from this pinned branch to `main`, merge when green without waiting for approval, confirm the Pages build, record PR/merge/deploy here. | unclaimed | session-528c51c9 | this section, PR via `gh` |
+
+---
+
 ## Session session-d6ae0eb2 — final integration: stale PR #100 takeover (2026-11-25)
 
 Arena-pinned branch `arena/d6ae0eb2-kalshidash1` (branch names cannot be changed in this environment); local clone was shallow and has been unshallowed. Board read before claiming.
