@@ -3932,3 +3932,37 @@ Sources used by this session (all fetched/read 2026-11-25): [Kalshi demo environ
 `gh api` Pages/pages-builds/runs probes; committed `data/snapshot.json`/`data/live/feed.json` metadata. Constraints honored throughout: no credentials requested, no
 authenticated API read, no order placed, no inferred values — unverified items stay blank on Flagged for Review.
 
+
+## Session `arena/5d35b42d-kalshidash1` — independent current-state + line-by-line verification (2026-11-27)
+
+**Session ID:** `session-5d35b42d`. Arena-pinned branch `arena/5d35b42d-kalshidash1`, branched from `main` @ `a2816c54` (engine sample 2026-11-27T14:25:01Z). Board read before claiming.
+
+**Observed state at claim time (2026-11-27 ~17:20 UTC):** no open PRs; Pages `built`/`error: null` for `a2816c54`; committed feed `generated_at` 2026-11-27T14:24:49Z (~176 min old, past the 45-min stale limit); last scheduled `live-alerts` run 46015672033 (created 14:24:37Z) succeeded and produced `a2816c54`, with no scheduled run since — scheduler stall consistent with the documented GitHub delay/drop behaviour already flagged as F-83. Concurrent sessions `arena/ea9234db-kalshidash1` (executive-summary audit claim) and `arena/1b163877-kalshidash1` (final-integration claim) hold those scopes; this session does not touch `EXECUTIVE_SUMMARY.md`, `executive-summary.html`, templates, generated pages, or data files.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| V1 | Claim scope, commit and push immediately. | **done** — `343ccda` | session-5d35b42d | this section of `COORDINATION.md` |
+| V2 | Independent current-state verification: re-read official Kalshi docs (demo env, API environments, market-data quick start, orderbook, settlement, order placement, get-market), cross-check live demo API (exchange status, Culture series/open markets, gas series), probe Pages/workflows/freshness via `gh`, run offline gates (`npm test`, `build-site --check`, link check). Record with source links; blank/flag anything unverifiable. | **done** | session-5d35b42d | `verification/2026-11-27-5d35b42d.md` §1–§3, §5, this section |
+| V3 | Line-by-line requirement audit: each user requirement vs the published implementation, with official source links; log any defect as a request here instead of editing another session's files. | **done** — 14 requirements, R1–R14 | session-5d35b42d | `verification/2026-11-27-5d35b42d.md` §4, this section |
+| V4 | Integration: PR from this branch to `main`, merge without waiting for approval, confirm Pages `built` with no error, record PR link + merge result here. | in progress | session-5d35b42d | PR metadata, this section |
+
+Constraints honored: no credentials requested or stored, no authenticated API read, no order placed, no inferred values — unverified items stay blank and are flagged for review.
+
+**V2/V3 results (session-5d35b42d, recorded 2026-11-27T17:2x UTC).** Full detail with URLs in `verification/2026-11-27-5d35b42d.md`.
+
+Gates re-run on `a2816c54` + claim commit: `npm test` **exit 0** (256 `ok`, no failures) · `node scripts/build-site.mjs --check` **exit 0** ("Committed site matches the templates and data") · `node scripts/check-links.mjs` **exit 0** (90 pages, no broken internal links, 350 external links listed for manual review) · `node tools/freshness_check.mjs` **exit 1** (feed 177.3 min old vs 45-min limit — irregularity V-1).
+
+Official sources re-read live today: `demo_env`, `api_environments`, `quick_start_market_data`, `api-reference/market/get-market`, `getting_started/market_settlement`, `getting_started/orderbook_responses`, `api-reference/orders/create-order-v2`, plus GitHub's scheduled-workflow documentation. Live demo API: `exchange_active true` / `trading_active true`; Culture category returns exactly 2 series (`KXXBANNEDGROK`, `KXXBANNEDMURRAYHILLGUY1`, both `volume_fp "0.00"`) and **0 open markets** for both — so the published Culture count of 0 is a verified exchange state and stays blank.
+
+Requirement audit outcome: **R1–R14 all present**; three cannot be confirmed and are reported blank rather than filled — R6/R7/R8 (simulated fills, portfolio, order execution: no demo credentials, `data/account.json` `connected:false`, `captured_at:null`) and R5 (no resolution yet: `resolutions: []`, `awaiting: 16`).
+
+Irregularities raised by this session (local ids, **need renumbering into the F-series by whoever owns `EXECUTIVE_SUMMARY.md` / `flagged.html` — highest existing is F-83**; this session did not edit those files):
+
+- **V-1** published feed 177.3 min old vs 45-min limit; last scheduled `live-alerts` run `46015672033` (14:24:37Z) succeeded, no scheduled run since — documented delay/drop behaviour (F-83 context).
+- **V-2** "highest dollar amount" is the repo's estimate `round(volume_fp × price, 2)` (`tools/live_engine.mjs:309`); Kalshi publishes no traded-dollar field in the market object. Labelled `est_traded_dollars` everywhere; must not be read as exchange-reported turnover.
+- **V-3** all **20** `highROI:true` rows are previous-sample jumps with `detection` absent, `trade:null`, `candle:null`; `abs_delta` 0.765–0.985. Across the feed **121/121 alerts have `abs_delta` ≥ 0.50** and **111/121 sit at ≥ $0.95 or ≤ $0.05** (e.g. 75 `KXBTCY-*` alerts flipping `$0.01↔$0.97`, 32 in one direction; `KXPRESPERSON-28-GABB` `$0.815 → $0.003`). Consistent with the demo-environment caveat that demo prices need not reflect real markets. The high-ROI chat means "the model liked these", not "these were tradeable in reality".
+- **V-4** no alert in the current sample exercises the $0.10 boundary (smallest `abs_delta` is 0.50); threshold discipline is enforced in code (`SWING_THRESHOLD = 0.10`, inclusive) and by `scripts/check_alerts.mjs:115`, but the live feed does not itself demonstrate it today.
+- **V-5** demo account not connected (`connected:false`), so no balance/position/fill/P&L is verified anywhere on the site.
+- **V-6** **21 of 121** alerts carry no detection provenance at all (no `detection`, `trade:null`, `candle:null`); 20 of the 21 are exactly the high-ROI rows in V-3. The pages leave the cell blank rather than guessing trade-vs-candle.
+
+**Request to the integration/exec-summary owners (not actioned by this session, out of scope):** add V-1…V-6 to the Flagged for Review page under F-numbers, with the source links in the verification record; V-3 and V-6 together are the strongest argument for labelling the high-ROI chat as demo-only.
