@@ -1,0 +1,90 @@
+# Anonymous demo-WebSocket handshake probe.
+#
+# WHY A WORKFLOW: the build sandbox has NO egress to the *.demo.kalshi.co hosts (the same reason
+# cors-probe.yml exists for the REST headers). A GitHub runner does have egress — the alert engine
+# samples the same hosts on a schedule — so the measurement is taken here and the raw evidence is
+# committed to data/ws-probe.json for anyone to re-read.
+#
+# WHAT IT MEASURES: whether an anonymous client (no KALSHI-ACCESS-* headers, no signature, no
+# credentials anywhere) can open the WebSocket upgrade on both documented demo hosts, and — if the
+# upgrade is accepted — whether an anonymous session may subscribe to the public `ticker` channel.
+# The site's F-02/F-33/F-51 claims say this is impossible; this probe turns that documented claim
+# into a measured fact (a rejected upgrade with an HTTP status is a SUCCESSFUL measurement).
+#
+# SAFETY: no secrets exist in this workflow; the probe refuses every host except the two documented
+# DEMO WebSocket hosts (DEMO-ONLY guard), never signs anything, never touches private channels and
+# never places an order. Offline selftest with accept+reject fixtures runs first.
+#
+# Sources: https://docs.kalshi.com/getting_started/quick_start_websockets
+#          https://docs.kalshi.com/websockets/websocket-connection
+#          https://docs.kalshi.com/getting_started/demo_env
+
+name: ws-probe
+
+on:
+  workflow_dispatch:
+  # GitHub only exposes `workflow_dispatch` for a workflow that already exists on the DEFAULT
+  # branch, so a first run from a feature branch has to be triggered by a push to that branch.
+  # The path filter keeps it to changes in the probe itself.
+  push:
+    paths:
+      - '.github/workflows/ws-probe.yml'
+      - 'tools/ws_probe.mjs'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ws-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check
+        run: node --check tools/ws_probe.mjs
+
+      - name: Offline selftest (accept + reject fixtures, negative controls)
+        run: node tools/ws_probe.mjs --selftest
+
+      - name: Probe the anonymous demo WebSocket handshake
+        run: node tools/ws_probe.mjs --out data/ws-probe.json
+
+      - name: Show the measured verdict as a run annotation
+        if: always()
+        run: |
+          set -o pipefail
+          node -e '
+            const r = require("./data/ws-probe.json");
+            for (const h of r.hosts) {
+              const hs = h.anonymous_handshake || {};
+              console.log("::notice::" + h.url + " upgraded=" + hs.upgraded +
+                " http=" + (hs.http_status ?? "n/a") +
+                " verdict=" + h.verdict +
+                (hs.error ? " (" + hs.error + ")" : ""));
+            }
+            console.log("::notice::summary " + JSON.stringify(r.summary));
+          '
+
+      - name: Commit the raw handshake evidence
+        run: |
+          set -euo pipefail
+          git config user.name  "kalshidash1-engine"
+          git config user.email "engine@users.noreply.github.com"
+          git add data/ws-probe.json
+          if git diff --cached --quiet -- data/ws-probe.json; then
+            echo "No change in the measured handshake — nothing to commit."
+          else
+            git commit -m "data(ws): anonymous WS handshake probe $(date -u +%Y-%m-%dT%H:%M:%SZ) [skip ci]"
+            git push origin "HEAD:${{ github.ref_name }}"
+          fi

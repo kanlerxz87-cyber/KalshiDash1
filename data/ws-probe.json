@@ -1,0 +1,188 @@
+{
+  "probe": "anonymous demo WebSocket handshake measurement",
+  "why": "Turns the documented WS-authentication limitation (F-02/F-33/F-51) into a measured fact; a static page cannot stream ticks unless an anonymous handshake is accepted, so that is what is measured.",
+  "generated_at": "2026-11-27T17:47:05.080Z",
+  "probe_origin": "https://kanlerxz87-cyber.github.io",
+  "no_credentials_sent": true,
+  "signature_headers_sent": [],
+  "orders_placed": 0,
+  "private_channels_touched": [],
+  "protocol_sources": [
+    "https://docs.kalshi.com/getting_started/quick_start_websockets",
+    "https://docs.kalshi.com/websockets/websocket-connection",
+    "https://docs.kalshi.com/getting_started/demo_env",
+    "https://www.rfc-editor.org/rfc/rfc6455"
+  ],
+  "runner": {
+    "node": "v22.23.5",
+    "platform": "linux-x64",
+    "workflow_run": 46044417052,
+    "commit": "c41eba1627b829b45c65f444eef02af6ed8105bb"
+  },
+  "hosts": [
+    {
+      "url": "wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2",
+      "host_role": "recommended demo WebSocket host",
+      "official_sources": [
+        "https://docs.kalshi.com/getting_started/quick_start_websockets",
+        "https://docs.kalshi.com/getting_started/demo_env"
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "requested_url": "wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2",
+          "variant": "origin",
+          "note": null,
+          "upgraded": false,
+          "http_status": null,
+          "status_message": null,
+          "headers": {},
+          "body_snippet": null,
+          "sec_websocket_accept_matches": null,
+          "error": "upgrade timed out after 10000 ms",
+          "ms": 10009
+        },
+        {
+          "attempt": 2,
+          "requested_url": "wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2",
+          "variant": "origin",
+          "note": "retry after: upgrade timed out after 10000 ms",
+          "upgraded": false,
+          "http_status": null,
+          "status_message": null,
+          "headers": {},
+          "body_snippet": null,
+          "sec_websocket_accept_matches": null,
+          "error": "upgrade timed out after 10000 ms",
+          "ms": 10006
+        },
+        {
+          "attempt": 3,
+          "requested_url": "wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2",
+          "variant": "no_origin",
+          "note": "diagnostic only — browsers always send Origin on the WebSocket handshake; this checks whether Origin-based filtering (not authentication) caused the silence",
+          "upgraded": false,
+          "http_status": null,
+          "status_message": null,
+          "headers": {},
+          "body_snippet": null,
+          "sec_websocket_accept_matches": null,
+          "error": "upgrade timed out after 10000 ms",
+          "ms": 10005
+        }
+      ],
+      "anonymous_handshake": {
+        "attempt": 3,
+        "requested_url": "wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2",
+        "variant": "no_origin",
+        "note": "diagnostic only — browsers always send Origin on the WebSocket handshake; this checks whether Origin-based filtering (not authentication) caused the silence",
+        "upgraded": false,
+        "http_status": null,
+        "status_message": null,
+        "headers": {},
+        "body_snippet": null,
+        "sec_websocket_accept_matches": null,
+        "error": "upgrade timed out after 10000 ms",
+        "ms": 10005
+      },
+      "post_upgrade": null,
+      "verdict": "unreachable_or_timed_out"
+    },
+    {
+      "url": "wss://demo-api.kalshi.co/trade-api/ws/v2",
+      "host_role": "legacy shared demo WebSocket host (\"remain supported\")",
+      "official_sources": [
+        "https://docs.kalshi.com/getting_started/quick_start_websockets",
+        "https://docs.kalshi.com/getting_started/demo_env"
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "requested_url": "wss://demo-api.kalshi.co/trade-api/ws/v2",
+          "variant": "origin",
+          "note": null,
+          "upgraded": false,
+          "http_status": 301,
+          "status_message": "Moved Permanently",
+          "headers": {
+            "server": "CloudFront",
+            "date": "Fri, 27 Nov 2026 17:47:04 GMT",
+            "content-type": "text/html",
+            "content-length": "167",
+            "connection": "close",
+            "location": "https://demo-api.kalshi.co/trade-api/ws/v2",
+            "x-cache": "Redirect from cloudfront",
+            "via": "1.1 7da46316f14c93c894dc0b0f9fcad800.cloudfront.net (CloudFront)",
+            "x-amz-cf-pop": "IAD55-P7",
+            "x-amz-cf-id": "qFR8AJ3FPAI4-fQOi3qNz09x1uvQZL1oq3fEwtpZ2tRdSjA1vQcKfA=="
+          },
+          "body_snippet": "<html>\r\n<head><title>301 Moved Permanently</title></head>\r\n<body>\r\n<center><h1>301 Moved Permanently</h1></center>\r\n<hr><center>CloudFront</center>\r\n</body>\r\n</html>\r\n",
+          "sec_websocket_accept_matches": null,
+          "error": null,
+          "ms": 7,
+          "redirect_location": "https://demo-api.kalshi.co/trade-api/ws/v2",
+          "followed_to": "https://demo-api.kalshi.co/trade-api/ws/v2"
+        },
+        {
+          "attempt": 2,
+          "requested_url": "https://demo-api.kalshi.co/trade-api/ws/v2",
+          "variant": "origin",
+          "note": "followed 3xx Location (one hop max)",
+          "upgraded": false,
+          "http_status": 401,
+          "status_message": "Unauthorized",
+          "headers": {
+            "content-type": "application/json",
+            "content-length": "80",
+            "connection": "close",
+            "date": "Fri, 27 Nov 2026 17:47:05 GMT",
+            "strict-transport-security": "max-age=31536000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-cache": "Error from cloudfront",
+            "via": "1.1 48850a600c11c704f12260094c298d3a.cloudfront.net (CloudFront)",
+            "x-amz-cf-pop": "IAD55-P7",
+            "x-amz-cf-id": "a_c0v11GIE3EjrYTPaWsbK9qqng48r4_P-nKfNCKsvaDEcHhqVMlyw=="
+          },
+          "body_snippet": "{\"code\":\"token_authentication_failure\",\"message\":\"token authentication failure\"}",
+          "sec_websocket_accept_matches": null,
+          "error": null,
+          "ms": 219
+        }
+      ],
+      "anonymous_handshake": {
+        "attempt": 2,
+        "requested_url": "https://demo-api.kalshi.co/trade-api/ws/v2",
+        "variant": "origin",
+        "note": "followed 3xx Location (one hop max)",
+        "upgraded": false,
+        "http_status": 401,
+        "status_message": "Unauthorized",
+        "headers": {
+          "content-type": "application/json",
+          "content-length": "80",
+          "connection": "close",
+          "date": "Fri, 27 Nov 2026 17:47:05 GMT",
+          "strict-transport-security": "max-age=31536000; includeSubDomains",
+          "x-content-type-options": "nosniff",
+          "x-cache": "Error from cloudfront",
+          "via": "1.1 48850a600c11c704f12260094c298d3a.cloudfront.net (CloudFront)",
+          "x-amz-cf-pop": "IAD55-P7",
+          "x-amz-cf-id": "a_c0v11GIE3EjrYTPaWsbK9qqng48r4_P-nKfNCKsvaDEcHhqVMlyw=="
+        },
+        "body_snippet": "{\"code\":\"token_authentication_failure\",\"message\":\"token authentication failure\"}",
+        "sec_websocket_accept_matches": null,
+        "error": null,
+        "ms": 219
+      },
+      "post_upgrade": null,
+      "verdict": "handshake_rejected_http_401"
+    }
+  ],
+  "summary": {
+    "anonymous_handshake_accepted_on_any_demo_host": false,
+    "hosts_measured": 2,
+    "hosts_rejected_anonymous_upgrade": 1,
+    "hosts_unreachable": 1,
+    "note": "Every reachable documented demo host rejected the anonymous upgrade with an HTTP error instead of upgrading: measured confirmation of the official docs statement that WebSocket connections require authentication during the handshake."
+  }
+}

@@ -107,6 +107,11 @@ jobs:
       - name: CORS evidence matches the published claim
         run: node scripts/check-cors-evidence.mjs
 
+      # session-528c51c9: offline selftest (accept+reject fixtures) for the anonymous demo
+      # WebSocket handshake probe; the live measurement itself runs in the ws-probe workflow.
+      - name: WebSocket probe offline selftest (no credentials, no orders)
+        run: npm run test:ws
+
       - name: Catalyst + strategy lab render tests (jsdom)
         run: node scripts/check_lab.mjs
 
