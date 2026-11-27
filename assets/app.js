@@ -1116,6 +1116,7 @@
       [{ id: 'all', label: 'All topics' }].concat(CFG.topics).forEach(function (t) {
         var b = document.createElement('button');
         b.className = 'tab' + (t.id === 'all' ? ' on' : '');
+        b.setAttribute('data-topic', t.id);
         b.textContent = t.label;
         b.addEventListener('click', function () {
           feedState.topic = t.id;
@@ -1200,6 +1201,7 @@
       [{ id: 'all', label: 'All topics' }].concat(CFG.topics).forEach(function (t) {
         var b = document.createElement('button');
         b.className = 'tab' + (t.id === 'all' ? ' on' : '');
+        b.setAttribute('data-topic', t.id);
         b.textContent = t.label;
         b.addEventListener('click', function () {
           f.topic = t.id;

@@ -1111,12 +1111,27 @@ export function applySample(state, { nowSeconds, markets, resolutions = [], topi
       return !Number.isFinite(close) || close > nowSeconds - 30 * 86400;
     }),
   );
+  // Markets that have closed/determined/disputed/amended (non-live) but are not yet settled are
+  // excluded from the live boards (F-ALERTS-01), yet still kept in state.markets until finalized
+  // so collectDirectResolutions() can reconcile them to their terminal yes/no/scalar outcome.
+  const pendingSettlement = new Set(
+    Object.values(next.markets || {})
+      .filter((m) => {
+        if (!m || !m.ticker || isLiveMarket(m) || resolvedAt.has(m.ticker)) return false;
+        if (m.result && String(m.result).trim() !== '') return false;
+        const st = String(m.status || '').toLowerCase();
+        if (st === 'finalized' || st === 'settled') return false;
+        const close = Date.parse(m.close_time || '') / 1000;
+        return !Number.isFinite(close) || close > nowSeconds - 30 * 86400;
+      })
+      .map((m) => m.ticker),
+  );
   const marketTickers = Object.keys(next.markets);
   const budget = 300;
   if (marketTickers.length > budget) {
     const keepMarkets = new Set(topMarkets(next, budget).map((m) => m.ticker));
     for (const ticker of marketTickers) {
-      if (keepMarkets.has(ticker) || followed.has(ticker)) continue;
+      if (keepMarkets.has(ticker) || followed.has(ticker) || pendingSettlement.has(ticker)) continue;
       delete next.markets[ticker];
     }
   }
@@ -1368,7 +1383,7 @@ export function buildLadder(orderbookJson) {
 
 export async function collectOrderbooks(client, state, { maxMarkets = 8, log = () => {} } = {}) {
   const ranked = Object.values(state.markets || {})
-    .filter((m) => m && m.price !== null && m.ticker)
+    .filter((m) => isLiveMarket(m) && m.price !== null && m.ticker)
     .sort((a, b) => (b.est_traded_dollars || 0) - (a.est_traded_dollars || 0))
     .slice(0, maxMarkets);
   const out = {};
@@ -1835,12 +1850,26 @@ export async function runOnce({ dir = 'data/live', maxSeries = 12, candleMarkets
   return next;
 }
 
-/** Highest-dollar rows per topic: one topic can never starve the others. */
+/**
+ * True only for live/open markets (`active`, `initialized`, or unspecified status) with no
+ * published settlement `result`. Excludes `closed`, `determined`, `disputed`, `amended`,
+ * `inactive`, `settled`, and `finalized` rows so settled contracts cannot appear on the
+ * "Highest-dollar live events" boards or consume trade/candle/orderbook polling budgets
+ * (F-ALERTS-01; see https://docs.kalshi.com/getting_started/market_lifecycle).
+ */
+export function isLiveMarket(m) {
+  if (!m) return false;
+  if (m.result && String(m.result).trim() !== '') return false;
+  const st = String(m.status || '').toLowerCase();
+  return !st || st === 'active' || st === 'initialized';
+}
+
+/** Highest-dollar live rows per topic: one topic can never starve the others. */
 export function topMarketsByTopic(state, perTopic = 4) {
   const out = [];
   for (const t of TOPICS) {
     const rows = Object.values(state.markets || {})
-      .filter((m) => m && m.topic === t.id && m.price !== null)
+      .filter((m) => isLiveMarket(m) && m.topic === t.id && m.price !== null)
       .sort((a, b) => (b.est_traded_dollars || 0) - (a.est_traded_dollars || 0))
       .slice(0, perTopic);
     out.push(...rows);
@@ -1848,14 +1877,14 @@ export function topMarketsByTopic(state, perTopic = 4) {
   return out;
 }
 
-/** Per-topic board, so topics stay separate and each one ranks its own top contracts. */
+/** Per-topic live board, so topics stay separate and each one ranks its own top open contracts. */
 export function boardByTopic(state, perTopic = 24) {
   const out = {};
   for (const t of TOPICS) {
     out[t.id] = {
       label: t.label,
       rows: Object.values(state.markets || {})
-        .filter((m) => m && m.topic === t.id)
+        .filter((m) => isLiveMarket(m) && m.topic === t.id)
         .sort((a, b) => (b.est_traded_dollars || 0) - (a.est_traded_dollars || 0))
         .slice(0, perTopic),
     };
@@ -1912,10 +1941,10 @@ export function awaitingResolutions(state, limit = 40) {
     .slice(0, limit);
 }
 
-/** Highest estimated traded dollars first — the brief's "highest dollar amount" ranking. */
+/** Highest estimated traded dollars first among live/open contracts — the brief's "highest dollar amount" ranking. */
 export function topMarkets(state, limit = 60) {
   return Object.values(state.markets || {})
-    .filter(Boolean)
+    .filter(isLiveMarket)
     .sort((a, b) => (b.est_traded_dollars || 0) - (a.est_traded_dollars || 0))
     .slice(0, limit);
 }

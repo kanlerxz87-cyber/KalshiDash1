@@ -125,7 +125,7 @@
         (model.highROI ? '<span class="badge accent">model ' + Number(model.score).toFixed(2) + '</span>' : '') +
         '<span class="when" title="' + A.esc(a.ts || '') + '">' + timeAgo(a.ts) + '</span>' +
       '</div>' +
-      '<div class="what"><a href="../dashboard.html?ticker=' + encodeURIComponent(a.ticker) + '">' +
+      '<div class="what"><a href="../market.html?ticker=' + encodeURIComponent(a.ticker) + '">' +
         A.esc(a.title || a.ticker) + '</a> <code class="small muted">' + A.esc(a.ticker) + '</code></div>' +
       '<div class="figs">' +
         '<span>' + A.usd(a.from, 2) + ' → <b>' + A.usd(a.to, 2) + '</b></span>' +
@@ -159,7 +159,8 @@
       '<div class="top"><span class="who">resolved</span>' +
         '<span class="badge ' + (yes ? 'yes' : 'no') + '">result: ' + A.esc(r.result) + '</span>' +
         '<span class="when" title="' + A.esc(r.settlement_ts || '') + '">' + (r.settlement_ts ? timeAgo(r.settlement_ts) : 'time not published') + '</span></div>' +
-      '<div class="what">' + A.esc(r.title || r.ticker) + ' <code class="small muted">' + A.esc(r.ticker) + '</code></div>' +
+      '<div class="what"><a href="../market.html?ticker=' + encodeURIComponent(r.ticker) + '">' +
+        A.esc(r.title || r.ticker) + '</a> <code class="small muted">' + A.esc(r.ticker) + '</code></div>' +
       '<div class="figs"><span>settlement value <b>' + A.usd(A.num(r.settlement_value_dollars), 2) + '</b></span>' +
         '<span>payout <b>$1.00 to ' + (yes ? 'YES' : 'NO') + '</b></span></div>' +
       '<div class="small"><a href="' + A.esc(r.source_url || A.BASE) + '" target="_blank" rel="noopener">API row</a></div>' +
@@ -247,6 +248,16 @@
 
   /* ---------------- markets table ---------------- */
 
+  /* F-ALERTS-01: exclude finalized, settled, closed, determined, disputed, amended, or
+   * already-resolved contracts from the "Highest-dollar live events" boards (matching official
+   * Kalshi lifecycle states in https://docs.kalshi.com/getting_started/market_lifecycle). */
+  function isLiveRow(m) {
+    if (!m) return false;
+    if (m.result && String(m.result).trim() !== '') return false;
+    var st = String(m.status || '').toLowerCase();
+    return !st || st === 'active' || st === 'initialized';
+  }
+
   /* Per-topic board. Rows come from the engine's by_topic block when it exists (the engine is
    * the only source that samples every topic), with browser-polled rows merged on top. */
   function topicRows(topicId) {
@@ -261,7 +272,7 @@
     });
     var liveOnly = {};
     A.markets().forEach(function (m) { if (m.topic === topicId) liveOnly[m.ticker] = m; });
-    rows = rows.map(function (m) { return liveOnly[m.ticker] || m; });
+    rows = rows.map(function (m) { return liveOnly[m.ticker] || m; }).filter(isLiveRow);
     rows.sort(function (a, b) { return (b.est_traded_dollars || 0) - (a.est_traded_dollars || 0); });
     return rows;
   }
@@ -273,6 +284,7 @@
     ids.forEach(function (id) {
       var b = document.createElement('button');
       b.className = 'btn small' + (id === ui.boardTopic ? ' primary' : '');
+      b.setAttribute('data-topic', id);
       b.textContent = id === 'all' ? 'All topics' : A.topicLabel(id);
       b.addEventListener('click', function () {
         ui.boardTopic = id;
@@ -322,7 +334,7 @@
     var rows;
     var noteEl = document.getElementById('topic-note');
     if (ui.boardTopic === 'all') {
-      rows = A.markets().filter(function (m) { return m.status === 'active' || m.status === 'initialized' || !m.status; });
+      rows = A.markets().filter(isLiveRow);
       rows.sort(function (a, b) { return (b.est_traded_dollars || 0) - (a.est_traded_dollars || 0); });
       rows = rows.slice(0, 40);
       if (noteEl) noteEl.textContent = 'Showing the combined board. Pick a topic above to see it on its own.';
@@ -345,7 +357,7 @@
       var ch = change24h(m);
       return '<tr>' +
         '<td>' + (leaders[m.ticker] ? '<span class="badge accent" title="Highest estimated traded dollars in this topic on this board">leader</span>' : '<span class="muted small">—</span>') + '</td>' +
-        '<td><a href="../dashboard.html?ticker=' + encodeURIComponent(m.ticker) + '">' + A.esc(m.title || m.ticker) + '</a>' +
+        '<td><a href="../market.html?ticker=' + encodeURIComponent(m.ticker) + '">' + A.esc(m.title || m.ticker) + '</a>' +
           '<br><code class="small muted">' + A.esc(m.ticker) + '</code></td>' +
         '<td class="num">' + A.usd(m.price, 2) + '</td>' +
         '<td class="num">' + A.usd(A.num(m.yes_bid_dollars), 2) + ' (' + (m.yes_bid_size_fp === undefined || m.yes_bid_size_fp === null ? '—' : A.esc(m.yes_bid_size_fp)) + ')</td>' +
@@ -384,7 +396,7 @@
       var waiting = r.close_time ? 'close_time passed ' + r.close_time + '; awaiting settlement' : 'awaiting settlement';
       if (r.close_time && Date.parse(r.close_time) > Date.now()) waiting = 'close_time ' + r.close_time;
       return '<tr>' +
-        '<td>' + A.esc(r.title || r.ticker) + '<br><code class="small muted">' + A.esc(r.ticker) + '</code></td>' +
+        '<td><a href="../market.html?ticker=' + encodeURIComponent(r.ticker) + '">' + A.esc(r.title || r.ticker) + '</a><br><code class="small muted">' + A.esc(r.ticker) + '</code></td>' +
         '<td>' + A.esc(A.topicLabel(r.topic)) + '</td>' +
         '<td class="num small nowrap">' + (r.last_alert_delta === null || r.last_alert_delta === undefined ? '—'
           // sign before the currency symbol: usd(-0.54) would render "$-0.54"
@@ -409,7 +421,7 @@
     }
     tb.innerHTML = rows.map(function (r) {
       return '<tr>' +
-        '<td>' + A.esc(r.title || r.ticker) + '<br><code class="small muted">' + A.esc(r.ticker) + '</code></td>' +
+        '<td><a href="../market.html?ticker=' + encodeURIComponent(r.ticker) + '">' + A.esc(r.title || r.ticker) + '</a><br><code class="small muted">' + A.esc(r.ticker) + '</code></td>' +
         '<td>' + A.esc(A.topicLabel(r.topic)) + '</td>' +
         '<td><span class="badge ' + (r.result === 'yes' ? 'yes' : 'no') + '">' + A.esc(r.result) + '</span></td>' +
         '<td class="num">' + A.usd(A.num(r.settlement_value_dollars), 2) + '</td>' +
@@ -490,8 +502,10 @@
   }
 
   function chartCandidates() {
-    // Highest estimated dollars first; the picker shows the same list.
-    return A.markets().slice().sort(function (a, b) {
+    // Highest estimated dollars first among live contracts; fall back to all markets only if none are live.
+    var live = A.markets().filter(isLiveRow);
+    var pool = live.length ? live : A.markets();
+    return pool.slice().sort(function (a, b) {
       return (b.est_traded_dollars || 0) - (a.est_traded_dollars || 0);
     });
   }
@@ -670,6 +684,18 @@
   }
 
   function boot() {
+    /* F-ALERTS-02: honor ?topic=<id> deep-links on initial load so both the topic board
+     * and the two alert chats open pre-filtered to that topic. */
+    var topicMatch = (window.location && window.location.search || '').match(/[?&]topic=([a-z]+)/i);
+    if (topicMatch) {
+      var want = topicMatch[1].toLowerCase();
+      if (A.TOPICS.some(function (t) { return t.id === want; })) {
+        ui.boardTopic = want;
+        ui.topicFilter = want;
+        var filterBtn = document.getElementById('btn-filter-topic');
+        if (filterBtn) filterBtn.textContent = 'Topics: ' + A.topicLabel(want);
+      }
+    }
     clock();
     chartWindows();
     wireControls();
