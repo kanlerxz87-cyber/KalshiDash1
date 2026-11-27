@@ -1,15 +1,11 @@
 # Executive Summary — KalshiDash1
 
-**Reviewed:** 2026-11-27 UTC · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Current branch:** `arena/21cc79b6-kalshidash1` · **Session:** `session-21cc79b6`
+**Updated:** 2026-11-22 08:10 UTC (session-b8913775; earlier 2026-11-21 20:28 UTC record kept below) · **Environment:** Kalshi demo (`external-api.demo.kalshi.co`) · **Branch:** `arena/96019ad5-kalshidash1` · **Session:** `session-96019ad5`
 
-> **Scope and freshness:** This Markdown file preserves dated historical audit sections below; their figures are not current-market claims. Current published pages are the root [GitHub Pages site](https://kanlerxz87-cyber.github.io/KalshiDash1/) and its [Executive Summary](https://kanlerxz87-cyber.github.io/KalshiDash1/executive-summary.html). The latest repository audit is [verification/2026-11-27-21cc79b6.md](verification/2026-11-27-21cc79b6.md). The `dash/` directory is a legacy suite, not the canonical published dashboard.
-
-## Current verified state — 2026-11-27
-
-- **Published data is timestamped, not a guaranteed real-time feed.** The committed market snapshot was captured at **2026-11-27 14:10:33 UTC** and the engine feed was generated at **14:24:49 UTC**. These times identify samples; they do not prove the exchange is unchanged now. The feed contains 121 retained alert rows, 20 marked high-ROI by the project's heuristic, 0 recorded resolutions, and 16 markets awaiting resolution. High-ROI is a model label, not measured profit or a recommendation. See [`data/snapshot.json`](data/snapshot.json), [`data/live/feed.json`](data/live/feed.json), and the [published live alerts](https://kanlerxz87-cyber.github.io/KalshiDash1/alerts/index.html).
-- **Coverage and interaction.** The site organizes gas prices, elections, culture, crypto, and golf into separate topic pages; provides two scrolling alert views, price charts, order-book depth, market lifecycle/resolution tracking, simulated strategy tests, and suggestions. A browser can poll public demo market endpoints, but polling is not a guaranteed tick stream; GitHub Actions schedule delivery has documented delay/drop caveats ([F-83](https://kanlerxz87-cyber.github.io/KalshiDash1/flagged.html#F-83)).
-- **Trading/account boundary.** The committed [`data/account.json`](data/account.json) says `connected: false` and has no capture timestamp. The browser simulator records paper trades only. No live demo-account balance, fill, order, or portfolio performance is confirmed in this audit, and no exchange order was placed. Kalshi requires signed authentication for private account endpoints ([official authenticated-request guide](https://docs.kalshi.com/getting_started/quick_start_authenticated_requests)); the demo environment uses separate mock-fund credentials ([official demo guide](https://docs.kalshi.com/getting_started/demo_env)).
-- **Verification.** Today's source fetch re-confirmed the official REST/WebSocket demo endpoints and demo limitations; the full offline `npm test` suite passed, including source-link coverage, internal-link checks, alerts, chart, paper-trade, settlement, and account-safety tests. The offline source gate checks publisher links and row coverage, not semantic truth or the continued availability of every external URL. Details and irregularities are recorded in the dated verification report linked above.
+> **Scope and freshness note:** Sections 4–6 below preserve the historical findings from the explicitly dated
+> 2026-11-20 11:10 UTC snapshot; those numbers are not current-market claims. Current repository/feed checks and
+> the stale-feed discrepancy are recorded in [this session's dated verification report](verification/2026-11-21-96019ad5.md).
+> The canonical live site is the root GitHub Pages build linked from [README](README.md), not the older `dash/` suite.
 
 ## Update — 2026-11-22 08:10 UTC (session-b8913775)
 
