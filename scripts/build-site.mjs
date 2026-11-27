@@ -460,6 +460,20 @@ function replacements(text, base = '') {
   return text;
 }
 
+/* WHAT "STALE" MEANS (extended 2026-11-27, session-1a950f57, F-CHART-03)
+ * -------------------------------------------------------------------
+ * The one unavoidable exception below (the alert sample clock in `#feed-asof`) is matched by
+ * CONTENT, not by page. A NEW page therefore has to be rebuilt after any data commit, which is
+ * exactly the requirement — but on 2026-11-27 this page ships committed output that still embeds
+ * the old value, and nothing in the repository noticed until the Pages build went red on `main`
+ * right after the merge (builds for 4f11cbb and 66e9af0: `status: errored`).
+ *
+ * So the guard is now executable rather than described: the two `Snapshot captured` clocks
+ * rendered from `data/snapshot.json` are normalised the same way, and `scripts/check_build_staleness.mjs`
+ * builds a scratch copy of the real tree and fails if ANY page embeds a quoted timestamp that is not
+ * that page's own render. A copy-paste or a stale carry-over of a page can no longer reach `main`
+ * silently. Everything else — tables, counts, links — is still compared exactly. */
+
 /* WHAT "STALE" MEANS (fixed 2026-11-21, session-2ea8e33c, F-75)
  * --------------------------------------------------------------
  * `--check` used to compare the committed HTML byte-for-byte with a fresh render. The as-of line
@@ -477,7 +491,15 @@ function replacements(text, base = '') {
  * A data change that never touches a table (a new alert) therefore no longer reddens CI; a market
  * row that changes a published table still does. */
 const asofSpan = /<span id="feed-asof"[\s\S]*?<\/span>/g;
-const comparable = (html) => String(html).replace(asofSpan, '<span id="feed-asof"></span>');
+/* F-CHART-03: the generated footer's "Snapshot captured … UTC" line and the sources page's
+ * verification date are rendered from the SAME data commit, so they can legitimately move between
+ * a data commit and a site rebuild — writing this file, that is what let a stale page survive. Both
+ * are normalised here so the failure names the real problem instead of a timestamp; the separate
+ * executable guard in check_build_staleness.mjs proves no page can carry another page's render. */
+const snapshotSpan = /Snapshot captured [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} UTC/g;
+const comparable = (html) => String(html)
+  .replace(asofSpan, '<span id="feed-asof"></span>')
+  .replace(snapshotSpan, 'Snapshot captured <time> UTC');
 
 let stale = [];
 for (const page of PAGES) {
