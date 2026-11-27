@@ -4096,3 +4096,11 @@ Status key: `unclaimed` · `in progress` · `done` · `needs review`.
 
 Status key: `unclaimed` · `in progress` · `done` · `needs review`.
 
+
+## Session session-4fd9d11a — independent release and requirements audit (2026-11-27)
+
+Arena-pinned branch `arena/4fd9d11a-kalshidash1`; board read before claim. Branch name is fixed by the session environment. No open PRs at claim time.
+
+| ID | Task | Status | Owner | File scope |
+|---|---|---|---|---|
+| 4F-1 | Independently audit current implementation, official API documentation, automated checks, and deployed Pages/release status; document verified limitations and evidence without editing another session's scope. | in progress | session-4fd9d11a | `verification/2026-11-27-4fd9d11a.md` (new), this section of `COORDINATION.md` |
